@@ -17,6 +17,9 @@
 #include "C_SyvDaDashboardWidget.hpp"
 #include "C_OgeWiDashboardTab.hpp"
 #include "C_SyvComDriverDiag.hpp"
+#include "C_OgePubIconText.hpp"
+#include "C_SyvDaDashboardScreenshot.hpp"
+#include "C_OgePubIconEvents.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -82,6 +85,7 @@ Q_SIGNALS:
 protected:
    void paintEvent(QPaintEvent * const opc_Event) override;
    void closeEvent(QCloseEvent * const opc_Event) override;
+   void keyPressEvent(QKeyEvent  * const opc_Event) override;
 
 private:
    void m_OnActiveChange(const stw::opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source,
@@ -99,6 +103,9 @@ private:
    C_SyvDaDashboardWidget * mpc_Dashboard;
    bool mq_EditModeActive;
    bool mq_DarkModeActive;
+
+   C_SyvDaDashboardScreenshot * mpc_ScreenshotDashboardTab;
+   void m_PerformScreenshot(const bool oq_IsControlButtonPressed);
 };
 }
 }

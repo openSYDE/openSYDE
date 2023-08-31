@@ -83,6 +83,7 @@ protected:
    void drawBranches(QPainter * const opc_Painter, const QRect & orc_Rect,
                      const QModelIndex & orc_Index) const override;
    int32_t sizeHintForColumn(const int32_t os32_Column) const override;
+   void startDrag(const Qt::DropActions oc_SupportedActions) override;
 
 private:
    static const QString mhc_STYLESHEET;

@@ -41,6 +41,8 @@ public:
 
    void InitStaticNames(void) const;
    QString GetComment(void) const;
+   void GetCommentToEditor(const QString oc_Comment) const;
+   void SetTitle(const QString oc_Title);
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -55,7 +57,6 @@ private:
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
-   void m_CommentConfirmed(void);
 
    //Avoid call
    C_SdNdeDpListCommentDialog(const C_SdNdeDpListCommentDialog &);

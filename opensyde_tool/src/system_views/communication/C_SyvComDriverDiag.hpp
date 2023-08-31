@@ -26,6 +26,7 @@
 #include "C_OscIpDispatcherWinSock.hpp"
 #include "C_OscCanSignal.hpp"
 #include "C_OscSecurityPemDatabase.hpp"
+#include "C_OscDiagProtocolOsy.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -189,6 +190,15 @@ private:
                                      stw::opensyde_core::C_OscProtocolDriverOsy::C_DataPoolMetaData & orc_Metadata)
    const;
    uint32_t m_GetActiveDiagIndex(const uint32_t ou32_NodeIndex, bool * const opq_Found = NULL) const;
+   static int32_t mh_HandleDatapoolCrcVerification(const opensyde_core::C_OscNodeDataPool & orc_Datapool,
+                                                   stw::opensyde_core::C_OscDiagProtocolOsy & orc_Protocol,
+                                                   const uint32_t ou32_ServerDatapoolIndex, bool & orq_Match,
+                                                   QString & orc_ErrorReason);
+   static int32_t mh_DoDatapoolCrcVerification(const opensyde_core::C_OscNodeDataPool & orc_Datapool,
+                                               stw::opensyde_core::C_OscDiagProtocolOsy & orc_Protocol,
+                                               const uint32_t ou32_ServerDatapoolIndex,
+                                               const bool oq_UseGeneratedVariant, bool & orq_Match,
+                                               QString & orc_ErrorReason);
 
    int32_t m_Cycle(void);
    static void mh_ThreadFunc(void * const opv_Instance);

@@ -14,6 +14,7 @@
 
 #include <QListWidgetItem>
 #include <QMimeData>
+#include <QDesktopWidget>
 
 #include "C_CamMosFilterWidget.hpp"
 #include "ui_C_CamMosFilterWidget.h"
@@ -56,7 +57,8 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterWidget::C_CamMosFilterWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
-   mpc_Ui(new Ui::C_CamMosFilterWidget)
+   mpc_Ui(new Ui::C_CamMosFilterWidget),
+   ms32_LastMessageFilterItemDropPosition(0)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -66,7 +68,6 @@ C_CamMosFilterWidget::C_CamMosFilterWidget(QWidget * const opc_Parent) :
    // load configuration
    connect(C_CamProHandler::h_GetInstance(), &C_CamProHandler::SigNewConfiguration,
            this, &C_CamMosFilterWidget::m_LoadConfig);
-
    this->setAcceptDrops(true);
 }
 
@@ -134,7 +135,7 @@ void C_CamMosFilterWidget::Clear(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set function for calling m_OnAddFilterFromContextmenu
+/*! \brief  Set function for calling m_OnAddFilterFromContextmenu or m_SetAddFilterToExistingFilter
 
    \param[in]       oc_CanMsgId     List of selected message CanId's
    \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
@@ -145,7 +146,73 @@ void C_CamMosFilterWidget::Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::SetAddFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd)
 {
-   C_CamMosFilterWidget::m_OnAddFilterFromContextmenu(oc_CanMsgId, oc_CanMsgXtd);
+   const std::vector<C_CamProFilterData> c_Filters = C_CamProHandler::h_GetInstance()->GetFilters();
+   const int32_t s32_MessageFilterItemDroppedOnIndex = (ms32_LastMessageFilterItemDropPosition - 20) / 26;
+
+   const int32_t s32_MessageFilterItemDropMaxPosLimit = 52 + (static_cast<int32_t>(c_Filters.size()) * 26);
+
+   if (((ms32_LastMessageFilterItemDropPosition >= 62) &&
+        (ms32_LastMessageFilterItemDropPosition <= s32_MessageFilterItemDropMaxPosLimit)) &&
+       (s32_MessageFilterItemDroppedOnIndex <= static_cast<int32_t>(c_Filters.size())) && (c_Filters.size() >= 1))
+   {
+      C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Do you want to add the filter item to an existing filter \"%1\" ?")).arg(
+                                     c_Filters.at(static_cast<std::vector<int32_t>::size_type>(
+                                                     s32_MessageFilterItemDroppedOnIndex) - 1).c_Name));
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Filter"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Add to existing Filter"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Create new Filter"));
+      c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      e_ReturnMessageBox = c_MessageBox.Execute();
+
+      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eOK)
+      {
+         C_CamMosFilterWidget::m_SetAddFilterToExistingFilter(oc_CanMsgId, oc_CanMsgXtd,
+                                                              static_cast<uint32_t>(s32_MessageFilterItemDroppedOnIndex));
+      }
+      else if (e_ReturnMessageBox == C_OgeWiCustomMessage::eNO)
+      {
+         C_CamMosFilterWidget::m_OnAddFilterFromContextmenu(oc_CanMsgId, oc_CanMsgXtd);
+      }
+      else
+      {
+         //On cancle button press don't do anything
+      }
+   }
+   else
+   {
+      C_CamMosFilterWidget::m_OnAddFilterFromContextmenu(oc_CanMsgId, oc_CanMsgXtd);
+   }
+   ms32_LastMessageFilterItemDropPosition = 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Emit signal on filter message dropped on existing item
+
+   \param[in]       oc_CanMsgId                  List of selected message CanId's
+   \param[in]       oc_CanMsgXtd                 List of selected CanMessage has extended format
+   \param[in]       ou32_ExistingFilterIndex     Index on which the filter message got dropped
+
+   \return
+   Type of return values, e.g. STW error codes
+
+   \retval   Return value 1   Detailed description of 1st return value
+   \retval   Return value 2   Detailed description of 2nd return value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterWidget::m_SetAddFilterToExistingFilter(const QList<int32_t> oc_CanMsgId,
+                                                          const QList<uint8_t> oc_CanMsgXtd,
+                                                          const uint32_t ou32_ExistingFilterIndex)
+{
+   connect(this, &C_CamMosFilterWidget::SigAddFilterToExistingFilter,
+           this->mc_Entries[ou32_ExistingFilterIndex - 1],
+           &C_CamMosFilterItemWidget::SetAddFilterToExistingFilter);
+   Q_EMIT C_CamMosFilterWidget::SigAddFilterToExistingFilter(oc_CanMsgId, oc_CanMsgXtd);
+   disconnect(this, &C_CamMosFilterWidget::SigAddFilterToExistingFilter, this->mc_Entries[ou32_ExistingFilterIndex - 1],
+              &C_CamMosFilterItemWidget::SetAddFilterToExistingFilter);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -191,6 +258,14 @@ void C_CamMosFilterWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
    if (pc_MimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
    {
       opc_Event->setAccepted(true);
+
+      QPoint c_FilterItemDropPos = opc_Event->pos();
+      if ((c_FilterItemDropPos.y() >= 62) && (c_FilterItemDropPos.y() <= 195))
+      {
+         c_FilterItemDropPos += this->mpc_Ui->pc_ScrollArea->viewport()->pos();
+         c_FilterItemDropPos -= this->mpc_Ui->pc_ScrollArea->widget()->pos();
+      }
+      ms32_LastMessageFilterItemDropPosition = c_FilterItemDropPos.y();
    }
    else
    {
@@ -216,12 +291,12 @@ void C_CamMosFilterWidget::dropEvent(QDropEvent * const opc_Event)
    if (pc_MimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
    {
       opc_Event->setAccepted(true);
+      Q_EMIT C_CamMosFilterWidget::SigSendCanFilterMsgDroppedToParentWidget();
    }
    else
    {
       opc_Event->setAccepted(false);
    }
-   Q_EMIT C_CamMosFilterWidget::SigSendCanFilterMsgDroppedToParentWidget();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -592,6 +592,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                bool q_IsUpdateAvailable;
                bool q_IsRoutingAvailable;
                bool q_IsDiagnosisAvailable;
+               bool q_IsRoutingEnabled = true;
                if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
                {
                   q_IsUpdateAvailable =
@@ -661,6 +662,9 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                         // add the bitrate
                         c_BusName += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kbit/s)";
                      }
+
+                     // Is this bus usable for routing
+                     q_IsRoutingEnabled = pc_Bus->q_UseableForRouting;
                   }
                }
                else
@@ -813,7 +817,15 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                   dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                     ->cellWidget(u8_ComIfCnt, s32_COL_ROUTING))
                   ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsRoutingEnabled);
+
+                  if (q_IsRoutingEnabled == false)
+                  {
+                     // Routing for the bus has been disabled
+                     this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, s32_COL_ROUTING)->
+                     setEnabled(false);
+                  }
                }
+
                else
                {
                   //disable

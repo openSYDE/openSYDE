@@ -148,39 +148,41 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const int32_t os32_Result,
          if ((os32_Result == C_WARN) ||
              ((os32_Result == C_NO_ERR) && (this->mc_DatabasesToLoad[0]->GetDatabaseData().s32_BusIndex < 0)))
          {
-            // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
-            const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
-                                                                          this->mpc_Ui->pc_ScrollAreaContents);
-
-            C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
-               new C_CamMosDatabaseBusSelectionPopup(orc_Busses, this->mc_DatabasesToLoad[0]->GetDatabaseData(),
-                                                     *c_New);
-
-            //Resize
-            const QSize c_SIZE(700, 412);
-            c_New->SetSize(c_SIZE);
-
-            // Execute
-            if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+            if (orc_Busses.size() > 1)
             {
-               // remember selected bus and update data handling later on success (signal)
-               this->mc_DatabasesToLoad[0]->SetBusIndex(pc_Dialog->GetSelectedBus());
+               // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
+               const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
+                                                                             this->mpc_Ui->pc_ScrollAreaContents);
 
-               // inform which bus to use
-               this->m_UpdateDatabaseOsySysDefBus(this->mc_DatabasesToLoad[0], pc_Dialog->GetSelectedBus());
-            }
-            else
-            {
-               // delete database if dialog was canceled
-               this->m_RemoveDatabase(mc_DatabasesToLoad[0], false);
-            }
+               C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
+                  new C_CamMosDatabaseBusSelectionPopup(orc_Busses, this->mc_DatabasesToLoad[0]->GetDatabaseData(),
+                                                        *c_New);
 
-            if (c_New != NULL)
-            {
-               c_New->HideOverlay();
-            }
-         } //lint !e429  no memory leak because of the parent pc_Dialog and the Qt memory management
+               //Resize
+               const QSize c_SIZE(700, 412);
+               c_New->SetSize(c_SIZE);
 
+               // Execute
+               if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+               {
+                  // remember selected bus and update data handling later on success (signal)
+                  this->mc_DatabasesToLoad[0]->SetBusIndex(pc_Dialog->GetSelectedBus());
+
+                  // inform which bus to use
+                  this->m_UpdateDatabaseOsySysDefBus(this->mc_DatabasesToLoad[0], pc_Dialog->GetSelectedBus());
+               }
+               else
+               {
+                  // delete database if dialog was canceled
+                  this->m_RemoveDatabase(mc_DatabasesToLoad[0], false);
+               }
+
+               if (c_New != NULL)
+               {
+                  c_New->HideOverlay();
+               }
+            } //lint !e429  no memory leak because of the parent pc_Dialog and the Qt memory management
+         }
          this->m_LoadFinishedGeneric(os32_Result);
       }
    }

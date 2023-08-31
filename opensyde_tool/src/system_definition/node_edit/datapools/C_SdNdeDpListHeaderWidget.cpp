@@ -646,7 +646,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
          new C_SdNdeDpListCommentDialog(*c_Dialog, this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                         this->mu32_ListIndex);
       //Resize
-      c_Dialog->SetSize(QSize(750, 400));
+      c_Dialog->SetSize(QSize(800, 550));
 
       if ((c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted)) && (this->mpc_UndoManager != NULL))
       {

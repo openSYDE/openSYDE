@@ -12,9 +12,10 @@ Features:
 * Unpack Service Update Package and update system with resulting information
 * Communication via CAN or Ethernet
 * Configuration through command line parameters (run SYDEsup without parameters to get a list of options)
+* Create Service Update Package from a specific view of a given openSYDE project and corresponding device definitions
 
 Non-Features:
-* Update system without previous use of openSYDE to create Service Update Package
+* Update system without previous use of openSYDE or SYDEsup to create Service Update Package
 
 Platform:
 =========

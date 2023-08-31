@@ -34,6 +34,7 @@
 #include "C_SdUtil.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_UsHandler.hpp"
+#include "C_SdNdeDpListCommentDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -80,6 +81,7 @@ C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
    mpc_ActionCopy(NULL),
    mpc_ActionPaste(NULL),
    mpc_ActionDelete(NULL),
+   mpc_ActionEditComment(NULL),
    mq_AllowMoveUp(true),
    mq_AllowMoveDown(true),
    mq_AllowAdd(true)
@@ -156,15 +158,16 @@ C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
    }
 
    //cleanup handled by Qt engine; just NULLing here
-   mpc_ContextMenu      = NULL;
-   mpc_ModelViewManager = NULL;
-   mpc_ActionMoveUp     = NULL;
-   mpc_ActionMoveDown   = NULL;
-   mpc_ActionAdd        = NULL;
-   mpc_ActionCut        = NULL;
-   mpc_ActionCopy       = NULL;
-   mpc_ActionPaste      = NULL;
-   mpc_ActionDelete     = NULL;
+   mpc_ContextMenu       = NULL;
+   mpc_ModelViewManager  = NULL;
+   mpc_ActionMoveUp      = NULL;
+   mpc_ActionMoveDown    = NULL;
+   mpc_ActionAdd         = NULL;
+   mpc_ActionCut         = NULL;
+   mpc_ActionCopy        = NULL;
+   mpc_ActionPaste       = NULL;
+   mpc_ActionDelete      = NULL;
+   mpc_ActionEditComment = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -300,6 +303,42 @@ void C_SdNdeDpListTableView::InsertAction(void)
 {
    Insert(true);
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Edit comment in editor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListTableView::m_EditCommentInEditor()
+{
+   const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+   C_SdNdeDpListCommentDialog * const pc_ArrayEditWidget =
+      new C_SdNdeDpListCommentDialog(*c_Dialog, this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                     this->mu32_ListIndex);
+
+   const int32_t s32_SelectedRow = this->selectedIndexes().at(0).row();
+   const QModelIndex c_NameIndex = this->model()->index(s32_SelectedRow, 3);
+   const QModelIndex c_CommentIndex = this->model()->index(s32_SelectedRow, 4);
+   const QString c_Text =
+      static_cast<QString>(C_GtGetText::h_GetText("Data Element \"%1\" ")).arg(this->model()->data(
+                                                                                  c_NameIndex).toString());
+
+   pc_ArrayEditWidget->SetTitle(c_Text);
+
+   c_Dialog->SetSize(QSize(800, 550));
+   pc_ArrayEditWidget->GetCommentToEditor(this->model()->data(c_CommentIndex).toString());
+
+   if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      const QVariant c_Data = pc_ArrayEditWidget->GetComment();
+      this->model()->setData(c_CommentIndex, c_Data);
+   }
+
+   if (c_Dialog != NULL)
+   {
+      c_Dialog->HideOverlay();
+      c_Dialog->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert tree item
@@ -563,6 +602,14 @@ void C_SdNdeDpListTableView::keyPressEvent(QKeyEvent * const opc_Event)
       {
          q_CallOrig = false;
          DoMoveDown();
+         opc_Event->accept();
+      }
+      break;
+   case Qt::Key_F10:
+      if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == false)
+      {
+         q_CallOrig = false;
+         this->m_EditCommentInEditor();
          opc_Event->accept();
       }
       break;
@@ -947,6 +994,9 @@ void C_SdNdeDpListTableView::m_SetupContextMenu(void)
    this->mpc_ActionAdd = this->mpc_ContextMenu->addAction("", this, &C_SdNdeDpListTableView::InsertAction,
                                                           static_cast<int32_t>(Qt::CTRL) +
                                                           static_cast<int32_t>(Qt::Key_Plus));
+   this->mpc_ActionEditComment = this->mpc_ContextMenu->addAction("Edit Comment in Editor", this,
+                                                                  &C_SdNdeDpListTableView::m_EditCommentInEditor,
+                                                                  static_cast<int32_t>(Qt::Key_F10));
 
    this->mpc_ContextMenu->addSeparator();
 

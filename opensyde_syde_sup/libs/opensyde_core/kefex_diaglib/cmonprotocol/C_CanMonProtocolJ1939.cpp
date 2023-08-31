@@ -47,16 +47,23 @@ using namespace stw::can;
 #define J1939_PGN_ADDRESS_CLAIMED            (static_cast<uint16_t>(0xEE00U)) // Address Claim Response
 
 /* Multi-Packet Broadcast/Peer-to-Peer */
-#define J1939_PGN_TP_CM                      (static_cast<uint16_t>(0xEC00U)) // TP.CM Connection Management
-#define J1939_PGN_TP_DT                      (static_cast<uint16_t>(0xEB00U)) // TP.DT Data Transfer
-#define J1939_TP_CM_RTS                      (static_cast<uint8_t>(16U))      // TP.CM Ready to Send
-#define J1939_TP_CM_CTS                      (static_cast<uint8_t>(17U))      // TP.CM Clear to Send
-#define J1939_TP_CM_EOM_ACK                  (static_cast<uint8_t>(19U))      // TP.CM End of message acknowledgement
-#define J1939_TP_CM_CONN_ABORT               (static_cast<uint8_t>(0xFFU))    // TP.CM Connection Abort
-#define J1939_TP_CM_BAM                      (static_cast<uint8_t>(32U))      // TP.CM Broadcast Announce Message
-#define J1939_TP_CM_ABORT_AS_BUSY            (static_cast<uint8_t>(1U))       // TP.CM Connection Abort Reason 1
-#define J1939_TP_CM_ABORT_AS_RESOURCE_LACK   (static_cast<uint8_t>(2U))       // TP.CM Connection Abort Reason 2
-#define J1939_TP_CM_ABORT_AS_TIMEOUT         (static_cast<uint8_t>(3U))       // TP.CM Connection Abort Reason 3
+#define J1939_PGN_TP_CM                       (static_cast<uint16_t>(0xEC00U)) // TP.CM Connection Management
+#define J1939_PGN_TP_DT                       (static_cast<uint16_t>(0xEB00U)) // TP.DT Data Transfer
+#define J1939_TP_CM_RTS                       (static_cast<uint8_t>(16U))      // TP.CM Ready to Send
+#define J1939_TP_CM_CTS                       (static_cast<uint8_t>(17U))      // TP.CM Clear to Send
+#define J1939_TP_CM_EOM_ACK                   (static_cast<uint8_t>(19U))      // TP.CM End of message acknowledgement
+#define J1939_TP_CM_CONN_ABORT                (static_cast<uint8_t>(0xFFU))    // TP.CM Connection Abort
+#define J1939_TP_CM_BAM                       (static_cast<uint8_t>(32U))      // TP.CM Broadcast Announce Message
+#define J1939_TP_CM_ABORT_AS_BUSY             (static_cast<uint8_t>(1U))       // TP.CM Connection Abort Reason 1
+#define J1939_TP_CM_ABORT_AS_RESOURCE_LACK    (static_cast<uint8_t>(2U))       // TP.CM Connection Abort Reason 2
+#define J1939_TP_CM_ABORT_AS_TIMEOUT          (static_cast<uint8_t>(3U))       // TP.CM Connection Abort Reason 3
+#define J1939_TP_CM_ABORT_AS_UNEXPECTED_CTS   (static_cast<uint8_t>(4U))       // TP.CM Connection Abort Reason 4
+#define J1939_TP_CM_ABORT_AS_MAX_RETRANSMIT   (static_cast<uint8_t>(5U))       // TP.CM Connection Abort Reason 5
+#define J1939_TP_CM_ABORT_AS_UNEXPECTED_DT    (static_cast<uint8_t>(6U))       // TP.CM Connection Abort Reason 6
+#define J1939_TP_CM_ABORT_AS_BAD_SEQ_NR       (static_cast<uint8_t>(7U))       // TP.CM Connection Abort Reason 7
+#define J1939_TP_CM_ABORT_AS_DUPLICATE_SEQ_NR (static_cast<uint8_t>(8U))       // TP.CM Connection Abort Reason 8
+#define J1939_TP_CM_ABORT_AS_MSG_SIZE_TOO_BIG (static_cast<uint8_t>(9U))       // TP.CM Connection Abort Reason 9
+#define J1939_TP_CM_ABORT_AS_UNDEFINED          (static_cast<uint8_t>(250U))   // TP.CM Connection Abort Reason 250
 
 /* Destination Addresses */
 #define J1939_DA_BROADCAST                   (static_cast<uint8_t>(0xFFU))    // Destination address for Broadcasts
@@ -460,21 +467,57 @@ C_SclString C_CanMonProtocolJ1939::MessageToString(const T_STWCAN_Msg_RX & orc_M
                //Connection abort
                c_Pgn = "TP.CM.CONN_ABORT";
                //Connection abort reason
-               switch (orc_Msg.au8_Data[1])
+               if ((orc_Msg.au8_Data[1] > J1939_TP_CM_ABORT_AS_MSG_SIZE_TOO_BIG) &&
+                   (orc_Msg.au8_Data[1] < J1939_TP_CM_ABORT_AS_UNDEFINED))
                {
-               case J1939_TP_CM_ABORT_AS_BUSY:
-                  c_Reason += "1 ";
-                  break;
-               case J1939_TP_CM_ABORT_AS_RESOURCE_LACK:
-                  c_Reason += "2 ";
-                  break;
-               case J1939_TP_CM_ABORT_AS_TIMEOUT:
-                  c_Reason += "3 ";
-                  break;
-               default:
-                  //Reserved by SAE
-                  c_Reason += "UNKNOWN ";
-                  break;
+                  // abort reasons 10-249
+                  c_Reason += "SAE_RESERVED (" + m_GetValueDecHex(orc_Msg.au8_Data[1]) + ") ";
+               }
+               else if (orc_Msg.au8_Data[1] > J1939_TP_CM_ABORT_AS_UNDEFINED)
+               {
+                  // abort reasons 251-255
+                  c_Reason += "J1939_71_DEF (" + m_GetValueDecHex(orc_Msg.au8_Data[1]) + ") ";
+               }
+               else
+               {
+                  // abort reasons 1-9
+                  switch (orc_Msg.au8_Data[1])
+                  {
+                  case J1939_TP_CM_ABORT_AS_BUSY:
+                     c_Reason += "BUSY ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_RESOURCE_LACK:
+                     c_Reason += "RESOURCE_LACK ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_TIMEOUT:
+                     c_Reason += "TIMEOUT ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_UNEXPECTED_CTS:
+                     c_Reason += "UNEXPECTED_CTS ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_MAX_RETRANSMIT:
+                     c_Reason += "MAX_RETRANSMIT ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_UNEXPECTED_DT:
+                     c_Reason += "UNEXPECTED_DT ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_BAD_SEQ_NR:
+                     c_Reason += "BAD_SEQ_NR ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_DUPLICATE_SEQ_NR:
+                     c_Reason += "DUPLICATE_SEQ_NR ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_MSG_SIZE_TOO_BIG:
+                     c_Reason += "MSG_SIZE_TOO_BIG ";
+                     break;
+                  case J1939_TP_CM_ABORT_AS_UNDEFINED:
+                     c_Reason += "UNDEFINED ";
+                     break;
+                  default:
+                     // should never occur
+                     c_Reason += "UNSPECIFIED (" + m_GetValueDecHex(orc_Msg.au8_Data[1]) + ") ";
+                     break;
+                  }
                }
                //Parameter Group Number of the multi-packet message
                t_PGNMBM += m_GetValueDecHex(m_GetPgn(&orc_Msg.au8_Data[5]));

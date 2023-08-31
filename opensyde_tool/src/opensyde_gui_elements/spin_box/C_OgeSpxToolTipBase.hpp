@@ -42,6 +42,9 @@ public:
    QString textFromValue(const int32_t os32_Value) const override;
    //lint -restore
 
+protected:
+   void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
+
 private:
    stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    void m_InitContextMenu();

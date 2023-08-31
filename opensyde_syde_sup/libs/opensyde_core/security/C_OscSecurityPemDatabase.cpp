@@ -40,7 +40,8 @@ using namespace stw::opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscSecurityPemDatabase::C_OscSecurityPemDatabase()
+C_OscSecurityPemDatabase::C_OscSecurityPemDatabase() :
+   mq_StoredLevel7PemInformationValid(false)
 {
 }
 
@@ -95,6 +96,52 @@ const C_OscSecurityPemKeyInfo * C_OscSecurityPemDatabase::GetPemFileBySerialNumb
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get level 7 pem information
+
+   \return
+   Level 7 pem information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OscSecurityPemKeyInfo * C_OscSecurityPemDatabase::GetLevel7PemInformation() const
+{
+   const C_OscSecurityPemKeyInfo * pc_Retval = NULL;
+
+   if (this->mq_StoredLevel7PemInformationValid)
+   {
+      pc_Retval = &this->mc_StoredLevel7PemInformation;
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add level 7 pem file
+
+   \param[in]  orc_Path    Path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Information extracted
+   \retval   C_RANGE    File not found
+   \retval   C_CONFIG   Invalid file content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscSecurityPemDatabase::AddLevel7PemFile(const std::string & orc_Path)
+{
+   int32_t s32_Retval;
+
+   if (TglFileExists(orc_Path))
+   {
+      s32_Retval = C_OscSecurityPemDatabase::m_TryAddKeyFromPath(orc_Path, false);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Parse folder
 
    \param[in]  orc_FolderPath    Folder path
@@ -123,26 +170,13 @@ int32_t C_OscSecurityPemDatabase::ParseFolder(const std::string & orc_FolderPath
       for (uint32_t u32_It = 0UL; u32_It < c_Files.size(); ++u32_It)
       {
          const std::string c_CurFolderPath = c_Files[u32_It];
-         C_OscSecurityPem c_NewFile;
-         std::string c_ErrorMessage;
-         s32_Retval = c_NewFile.LoadFromFile(c_CurFolderPath, c_ErrorMessage);
-         if (s32_Retval == C_NO_ERR)
-         {
-            m_TryAddKey(c_NewFile.GetKeyInfo(), c_ErrorMessage);
-         }
-         if (c_ErrorMessage.size() > 0UL)
-         {
-            osc_write_log_warning("Read PEM database",
-                                  "Error reading file \"" + c_CurFolderPath + "\": " + c_ErrorMessage);
-         }
+         C_OscSecurityPemDatabase::m_TryAddKeyFromPath(c_CurFolderPath, true);
       }
       osc_write_log_info("Read PEM database",
                          "Imported " + stw::scl::C_SclString::IntToStr(
                             this->mc_StoredPemFiles.size()) + " valid PEM files of the total seen " +
                          stw::scl::C_SclString::IntToStr(
                             c_Files.size()) + " PEM files in folder \"" + c_FolderPathWithDelimiter + "\".");
-      //Reset error status
-      s32_Retval = C_NO_ERR;
    }
    else
    {
@@ -152,43 +186,90 @@ int32_t C_OscSecurityPemDatabase::ParseFolder(const std::string & orc_FolderPath
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Try add key from path
+
+   \param[in]  orc_Path       Path
+   \param[in]  oq_AddToList   Add to list (or alternative level 7 file)
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Information extracted
+   \retval   C_RANGE    File not found
+   \retval   C_CONFIG   Invalid file content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscSecurityPemDatabase::m_TryAddKeyFromPath(const std::string & orc_Path, const bool oq_AddToList)
+{
+   C_OscSecurityPem c_NewFile;
+
+   std::string c_ErrorMessage;
+   int32_t s32_Retval = c_NewFile.LoadFromFile(orc_Path, c_ErrorMessage);
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = m_TryAddKey(c_NewFile.GetKeyInfo(), c_ErrorMessage, oq_AddToList);
+   }
+   if (c_ErrorMessage.size() > 0UL)
+   {
+      std::string c_Heading;
+      if (oq_AddToList)
+      {
+         c_Heading = "Read PEM database";
+      }
+      else
+      {
+         c_Heading = "Read PEM level 7 key";
+      }
+      osc_write_log_warning(c_Heading,
+                            "Error reading file \"" + orc_Path + "\": " + c_ErrorMessage);
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Try add key
 
    \param[in]      orc_NewKey          New key
    \param[in,out]  orc_ErrorMessage    Error message
+   \param[in]      oq_AddToList        Add to list (or alternative level 7 file)
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Information extracted
+   \retval   C_CONFIG   Invalid file content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscSecurityPemDatabase::m_TryAddKey(const C_OscSecurityPemKeyInfo & orc_NewKey, std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPemDatabase::m_TryAddKey(const C_OscSecurityPemKeyInfo & orc_NewKey,
+                                              std::string & orc_ErrorMessage, const bool oq_AddToList)
 {
-   if (orc_NewKey.GetPubKeyTextDecoded().size() > 0UL)
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_NewKey.CheckValidKey(orc_ErrorMessage, oq_AddToList))
    {
-      if (orc_NewKey.GetPubKeySerialNumber().size() > 0UL)
+      if (oq_AddToList)
       {
-         if (orc_NewKey.GetPrivKeyTextDecoded().size() > 0UL)
+         if (this->GetPemFileBySerialNumber(orc_NewKey.GetPubKeySerialNumber()) == NULL)
          {
-            if (this->GetPemFileBySerialNumber(orc_NewKey.GetPubKeySerialNumber()) == NULL)
-            {
-               this->mc_StoredPemFiles.push_back(orc_NewKey);
-            }
-            else
-            {
-               orc_ErrorMessage = "ignored because serial number already exists";
-            }
+            this->mc_StoredPemFiles.push_back(orc_NewKey);
          }
          else
          {
-            orc_ErrorMessage = "could not find private key";
+            s32_Retval = C_CONFIG;
+            orc_ErrorMessage = "ignored because serial number already exists";
          }
       }
       else
       {
-         orc_ErrorMessage = "could not find serial number in public key";
+         this->mq_StoredLevel7PemInformationValid = true;
+         this->mc_StoredLevel7PemInformation = orc_NewKey;
       }
    }
    else
    {
-      orc_ErrorMessage = "could not find public key";
+      s32_Retval = C_CONFIG;
    }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -102,6 +102,7 @@ private:
                               const QString & orc_IdBase, const std::vector<int32_t> & orc_ColumnWidths);
    static void mh_LoadColumns(stw::scl::C_SclIniFile & orc_Ini, const QString & orc_SectionName,
                               const QString & orc_IdBase, std::vector<int32_t> & orc_ColumnWidths);
+   static void mh_LoadScreenshotGifSucessTimeout(C_UsHandler & orc_UserSettings, stw::scl::C_SclIniFile & orc_Ini);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

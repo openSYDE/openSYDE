@@ -25,6 +25,8 @@
 #include "C_OgeWiDashboardTab.hpp"
 #include "C_SyvComDriverDiag.hpp"
 #include "C_PuiSvReadDataConfiguration.hpp"
+#include "C_SyvDaDashboardScreenshot.hpp"
+#include "C_OgePubIconEvents.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -81,6 +83,7 @@ protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;
    void hideEvent(QHideEvent * const opc_Event) override;
    void showEvent(QShowEvent * const opc_Event) override;
+   void keyPressEvent(QKeyEvent  * const opc_Event) override;
 
 private:
    //Avoid call
@@ -134,7 +137,12 @@ private:
    static const QTabBar::ButtonPosition mhe_TAB_CONTENT_POSITION;
    static const QString mhc_ADD_ICON_DARK;
    static const QString mhc_ADD_ICON_LIGHT;
+
    stw::opensyde_gui_logic::C_PuiSvDashboard::E_TabType me_DashboardTabType;
+
+   C_SyvDaDashboardScreenshot * mpc_ScreenshotDashboardTab;
+   void m_PerformScreenshot(const bool oq_IsControlButtonPressed);
+   void m_SetCurrentTabNameForScreenshotFile(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

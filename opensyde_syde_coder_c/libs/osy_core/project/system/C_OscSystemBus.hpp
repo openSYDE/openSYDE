@@ -49,6 +49,7 @@ public:
    uint64_t u64_BitRate;            ///< bitrate of bus in bits / second
    uint8_t u8_BusId;                ///< unique bus id
    uint16_t u16_RxTimeoutOffsetMs;  ///< Delta time to wait for receive before timeout in ms
+   bool q_UseableForRouting;        ///< indicator if routing is available for this bus
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

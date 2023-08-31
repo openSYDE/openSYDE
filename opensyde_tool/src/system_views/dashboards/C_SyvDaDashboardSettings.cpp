@@ -25,7 +25,7 @@ using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const int32_t C_SyvDaDashboardSettings::mhs32_MIN = 10;
+const int32_t C_SyvDaDashboardSettings::mhs32_MIN = 1;
 const int32_t C_SyvDaDashboardSettings::mhs32_MAX = 65000;
 const int32_t C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN = 10;
 

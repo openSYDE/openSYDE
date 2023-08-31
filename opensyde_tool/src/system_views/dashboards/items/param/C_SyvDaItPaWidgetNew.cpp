@@ -1190,7 +1190,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OscNodeDataPoolLis
 
                   // Fill datapool information
                   pc_CurIntDataPool->c_DataPoolInfo.c_Name = rc_SdDataPool.c_Name;
-                  rc_SdDataPool.CalcDefinitionHash(pc_CurIntDataPool->c_DataPoolInfo.u32_DataPoolCrc);
+                  rc_SdDataPool.CalcGeneratedDefinitionHash(pc_CurIntDataPool->c_DataPoolInfo.u32_DataPoolCrc);
                   memcpy(pc_CurIntDataPool->c_DataPoolInfo.au8_Version, rc_SdDataPool.au8_Version, 3);
                }
 

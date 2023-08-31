@@ -132,6 +132,7 @@ using namespace stw::can;
 #define UDC_H_DATAID_SYSTEM_SUPPLIER_ECU_HW_NUMBER          (0xF192U)
 #define UDC_H_DATAID_SYSTEM_SUPPLIER_ECU_HW_VERSION_NUMBER  (0xF193U)
 #define UDC_H_DATAID_UDS_VERSION                            (0xFF00U)
+#define UDC_H_DATAID_MASTER_RESET                           (0x0000U)
 
 //routine IDs
 #define UDS_H_ROUTINE_CTRL_ROUTE_DIAGNOSIS_COMMUNICATION        (0x202U)
@@ -163,6 +164,7 @@ using namespace stw::can;
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_10    (0x222U)
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_11    (0x223U)
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_12    (0x224U)
+#define UDS_H_ROUTINE_CTRL_FACTORY_MODE                         (0x225U)
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -1753,6 +1755,30 @@ C_SclString C_CanMonProtocolOpenSyde::m_RoutineDataToText(const uint16_t ou16_Ro
             c_Text += " error: incorrect number of data bytes";
          }
       }
+      break;
+   case UDS_H_ROUTINE_CTRL_FACTORY_MODE:
+      //no details reported for now
+      c_Text = "FactoryMode";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize == 2U)
+         {
+            if (opu8_Data[0] == UDC_H_DATAID_MASTER_RESET)
+            {
+               c_Text += "  OPERATION:MASTER_RESET";
+            }
+            else
+            {
+               c_Text += "  OPERATION:UNDEFINED (" + m_GetValueDecHex(opu8_Data[0]) + ")";
+            }
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         u8_FirstRawByte = ou8_DataSize; //finished here ...
+      }
+
       break;
    default:
       c_Text = "unknownroutineidentifier (" + m_GetValueDecHex(ou16_RoutineIdentifier) + ")";

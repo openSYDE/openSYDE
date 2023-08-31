@@ -62,6 +62,8 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
    mpc_Ui(new Ui::C_SdBueBusEditPropertiesWidget),
    mu32_BusIndex(0)
 {
+   bool q_UsableForRoutingDisabled;
+
    // init UI
    mpc_Ui->setupUi(this);
 
@@ -73,6 +75,11 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
                                                            C_NagToolTip::eDEFAULT);
 
    InitStaticNames();
+
+   // Usable for Routing
+   q_UsableForRoutingDisabled = (this->mpc_Ui->pc_CheckBoxUsableForRouting->isChecked() == false);
+   this->m_UpdateUsableForRoutingUi(q_UsableForRoutingDisabled);
+   this->mpc_Ui->pc_HorizontalLayoutBusId->setAlignment(this->mpc_Ui->pc_SpinBoxBusId, Qt::AlignLeft);
 
    //Name restriction
    this->mpc_Ui->pc_LineEditBusName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
@@ -124,6 +131,14 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
                                                          "\nThe ID is used for addressing in the communication protocol."));
    this->mpc_Ui->pc_LabelBitRate->SetToolTipInformation(C_GtGetText::h_GetText("Bitrate"),
                                                         C_GtGetText::h_GetText("CAN bus bitrate"));
+   this->mpc_Ui->pc_CheckBoxUsableForRouting->SetToolTipInformation(C_GtGetText::h_GetText("Usable for Routing"),
+                                                                    C_GtGetText::h_GetText(
+                                                                       "If disabled, the bus is no more usable for routing."));
+   this->mpc_Ui->pc_LabelNotRelevant->SetToolTipInformation(C_GtGetText::h_GetText("Bus ID not relevant"),
+                                                            C_GtGetText::h_GetText(
+                                                               "Bus ID is not relevant when the option "
+                                                               "\"Usable for Routing\" is disabled. \nUniqueness check "
+                                                               "is also disabled in this state."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -178,12 +193,16 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
       disconnect(this->mpc_Ui->pc_SpinBoxBusId, static_cast<void (QSpinBox::*)(
                                                                int32_t)>(&C_OgeSpxNumber::valueChanged), this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
+      disconnect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::stateChanged, this,
+                 &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       disconnect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
                                                                   int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterChange);
       disconnect(this->mpc_Ui->pc_ComboBoxBitRate, &C_OgeCbxText::SigErrorFixed, this,
                  &C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed);
+      disconnect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::toggled, this,
+                 &C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged);
 
       //name
       this->mpc_Ui->pc_LineEditBusName->setText(pc_Bus->c_Name.c_str());
@@ -281,6 +300,10 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
          this->mpc_Ui->pc_LabBusImage->SetSvg("://images/system_definition/BusEdit/ImageBusEth.svg");
       }
 
+      // Usable for Routing
+      this->mpc_Ui->pc_CheckBoxUsableForRouting->setChecked(pc_Bus->q_UseableForRouting);
+      this->m_UpdateUsableForRoutingUi(!pc_Bus->q_UseableForRouting);
+
       //connects for RegisterChange
       connect(this->mpc_Ui->pc_LineEditBusName, &QLineEdit::editingFinished, this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterNameChange);
@@ -290,12 +313,16 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
       connect(this->mpc_Ui->pc_SpinBoxBusId, static_cast<void (QSpinBox::*)(
                                                             int32_t)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
+      connect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::stateChanged, this,
+              &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       connect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
                                                                int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterChange);
       connect(this->mpc_Ui->pc_ComboBoxBitRate, &C_OgeCbxText::SigErrorFixed, this,
               &C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed);
+      connect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::toggled, this,
+              &C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged);
    }
 }
 
@@ -305,6 +332,78 @@ void C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed(void) const
    this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
                                                            C_GtGetText::h_GetText(""),
                                                            C_NagToolTip::eDEFAULT);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle "Usable for Routing" state of the bus
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged()
+{
+   bool q_UsableForRoutingDisabled = (this->mpc_Ui->pc_CheckBoxUsableForRouting->isChecked() == false);
+
+   if (q_UsableForRoutingDisabled == true)
+   {
+      // Confirm if the user really wants to disable the routing for the bus
+      if (this->m_ConfirmDisableRouting() == false)
+      {
+         disconnect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::toggled, this,
+                    &C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged);
+
+         this->mpc_Ui->pc_CheckBoxUsableForRouting->setChecked(true);
+         q_UsableForRoutingDisabled =  (this->mpc_Ui->pc_CheckBoxUsableForRouting->isChecked() == false);
+
+         connect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::toggled, this,
+                 &C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged);
+      }
+   }
+   this->m_UpdateUsableForRoutingUi(q_UsableForRoutingDisabled);
+   this->m_RegisterChange();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update the GUI when the user modifies the "Usable for Routing" setting
+
+  \param[in]       oq_Enabled     True / False
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditPropertiesWidget::m_UpdateUsableForRoutingUi(const bool oq_Enabled)
+{
+   // Bus Id and the label are modified accordingly
+   this->mpc_Ui->pc_LabelNotRelevant->setVisible(oq_Enabled);
+   this->mpc_Ui->pc_SpinBoxBusId->setEnabled(!oq_Enabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Prompt user when routing is disabled for the bus
+
+   \return
+   true if user selects button with text "Yes"
+   false otherwise
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueBusEditPropertiesWidget::m_ConfirmDisableRouting()
+{
+   bool q_Return = false;
+
+   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Usable for Routing"));
+   c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to disable routing for this bus?"));
+   c_Message.SetDetails(C_GtGetText::h_GetText("This will disable the routing flags of all node interfaces "
+                                               "connected to this bus."));
+   c_Message.SetCustomMinHeight(180, 270);
+
+   c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
+   c_Message.SetOkButtonText(C_GtGetText::h_GetText("Disable Routing"));
+
+   if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -361,8 +460,16 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
          c_NewBus.u64_BitRate = 1000000ULL;
       }
 
+      // Usable for Routing
+      c_NewBus.q_UseableForRouting = this->mpc_Ui->pc_CheckBoxUsableForRouting->isChecked();
+
       //save new bus
       C_PuiSdHandler::h_GetInstance()->SetOscBus(this->mu32_BusIndex, c_NewBus);
+
+      // Disable routing settings for all nodes connected to this bus.
+      // NOTE: Only "disabling" routing for the bus is rendered to all nodes. Enabling routing for the bus
+      // will not reverse the action for all nodes
+      C_PuiSdHandler::h_GetInstance()->SetAutomaticBusRoutingSettings(this->mu32_BusIndex);
    }
 }
 

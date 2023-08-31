@@ -23,6 +23,7 @@ using namespace stw::opensyde_core;
 using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const uint32_t C_OscNodeDataPoolList::hu32_DEFAULT_NVM_SIZE = 100UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -44,7 +45,7 @@ C_OscNodeDataPoolList::C_OscNodeDataPoolList(void) :
    q_NvmCrcActive(false),
    u32_NvmCrc(0),
    u32_NvmStartAddress(0),
-   u32_NvmSize(100),
+   u32_NvmSize(0),
    c_Elements(),
    c_DataSets()
 {

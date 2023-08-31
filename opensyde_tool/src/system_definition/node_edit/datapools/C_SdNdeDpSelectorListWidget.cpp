@@ -503,6 +503,9 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
                                                                                        c_NewDatapool.c_Name);
          c_NewDatapool.e_Type = this->me_DataPoolType;
 
+         //Handle default NVM size (as soon as possible)
+         C_SdNdeDpSelectorListWidget::mh_HandleDefaultNvmSize(c_NewDatapool);
+
          // ask for sharing or RAMView import if possible
          // (only if it is a DIAG or NVM Datapool - no sharing between and no import of COMM and HAL Datapools)
          if ((this->me_DataPoolType == C_OscNodeDataPool::eDIAG) ||
@@ -1357,13 +1360,13 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OscNodeDataPool & orc_O
    {
       if (!pc_Dialog->GetIsDatapoolShared())
       {
-         const QSize c_SIZE(892, 800);
+         const QSize c_SIZE(892, 850);
 
          c_New->SetSize(c_SIZE);
       }
       else
       {
-         const QSize c_SIZE(892, 908);
+         const QSize c_SIZE(892, 958);
 
          c_New->SetSize(c_SIZE);
       }
@@ -1372,29 +1375,29 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OscNodeDataPool & orc_O
    {
       if (!pc_Dialog->GetIsDatapoolShared())
       {
-         const QSize c_SIZE(892, 932);
+         const QSize c_SIZE(892, 982);
          c_New->SetSize(c_SIZE);
       }
       else
       {
-         const QSize c_SIZE(892, 1040);
+         const QSize c_SIZE(892, 1090);
          c_New->SetSize(c_SIZE);
       }
    }
    else if (orc_OscDataPool.e_Type == C_OscNodeDataPool::eCOM)
    {
-      const QSize c_SIZE(892, 843);
+      const QSize c_SIZE(892, 893);
 
       c_New->SetSize(c_SIZE);
    }
    else if (orc_OscDataPool.e_Type == C_OscNodeDataPool::eHALC)
    {
-      const QSize c_SIZE(892, 800);
+      const QSize c_SIZE(892, 850);
       c_New->SetSize(c_SIZE);
    }
    else //C_OscNodeDataPool::eHALC_NVM
    {
-      const QSize c_SIZE(892, 889);
+      const QSize c_SIZE(892, 933);
       c_New->SetSize(c_SIZE);
    }
 
@@ -2286,6 +2289,25 @@ void C_SdNdeDpSelectorListWidget::m_RearrangeItems(void)
    }
 
    this->updateGeometry();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle default NVM size
+
+   \param[in] orc_DataPool Datapool
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::mh_HandleDefaultNvmSize(C_OscNodeDataPool & orc_DataPool)
+{
+   if (orc_DataPool.e_Type == C_OscNodeDataPool::eNVM)
+   {
+      orc_DataPool.u32_NvmSize = C_OscNodeDataPool::hu32_DEFAULT_NVM_SIZE;
+      for (uint32_t u32_ItList = 0UL; u32_ItList < orc_DataPool.c_Lists.size(); ++u32_ItList)
+      {
+         C_OscNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ItList];
+         rc_List.u32_NvmSize = C_OscNodeDataPoolList::hu32_DEFAULT_NVM_SIZE;
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

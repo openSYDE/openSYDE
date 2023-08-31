@@ -744,7 +744,10 @@ std::vector<uint32_t> C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(const in
          const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_ItBus);
          if (pc_Bus != NULL)
          {
-            c_Retval.push_back(static_cast<uint32_t>(pc_Bus->u8_BusId));
+            if (pc_Bus->q_UseableForRouting == true)
+            {
+               c_Retval.push_back(static_cast<uint32_t>(pc_Bus->u8_BusId));
+            }
          }
       }
    }
@@ -1453,7 +1456,8 @@ int32_t C_SdUtil::h_GetErrorToolTipNode(const uint32_t & oru32_NodeIndex, QStrin
       bool q_DataPoolsInvalid;
       bool q_ApplicationsInvalid;
       bool q_DomainsInvalid;
-      bool q_CommSignalCountInvalid;
+      bool q_CommMinSignalCountInvalid;
+      bool q_CommMaxSignalCountInvalid;
       bool q_CoPdoCountInvalid;
       bool q_CoNodeIdInvalid;
       bool q_CoHeartbeatInvalid;
@@ -1466,7 +1470,8 @@ int32_t C_SdUtil::h_GetErrorToolTipNode(const uint32_t & oru32_NodeIndex, QStrin
       s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().CheckErrorNode(
          c_NodeIndices[u32_ItNode], &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_IpInvalid, &q_DataPoolsInvalid,
          &q_ApplicationsInvalid,
-         &q_DomainsInvalid, &q_CommSignalCountInvalid, &q_CoPdoCountInvalid, &q_CoNodeIdInvalid, &q_CoHeartbeatInvalid,
+         &q_DomainsInvalid, &q_CommMinSignalCountInvalid, &q_CommMaxSignalCountInvalid, &q_CoPdoCountInvalid,
+         &q_CoNodeIdInvalid, &q_CoHeartbeatInvalid,
          true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
          &c_InvalidDomainIndices, &c_InvalidProtocolTypes);
 
@@ -1475,7 +1480,8 @@ int32_t C_SdUtil::h_GetErrorToolTipNode(const uint32_t & oru32_NodeIndex, QStrin
          if ((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true) ||
              (q_DataPoolsInvalid == true) ||
              (q_ApplicationsInvalid == true) || (q_DomainsInvalid == true) || (q_DataPoolNvmConflict == true) ||
-             (q_NameEmpty == true) || (q_CommSignalCountInvalid == true) || (q_CoPdoCountInvalid == true) ||
+             (q_NameEmpty == true) || (q_CommMinSignalCountInvalid == true) || (q_CommMaxSignalCountInvalid == true) ||
+             (q_CoPdoCountInvalid == true) ||
              (q_CoNodeIdInvalid == true) || (q_CoHeartbeatInvalid == true))
          {
             if (q_IsMulti)
@@ -1585,10 +1591,10 @@ int32_t C_SdUtil::h_GetErrorToolTipNode(const uint32_t & oru32_NodeIndex, QStrin
                orc_Text += "\n";
             }
 
-            if (q_CommSignalCountInvalid == true)
+            if ((q_CommMinSignalCountInvalid == true) || (q_CommMaxSignalCountInvalid == true))
             {
                uint32_t u32_InvalidProtCounter;
-               orc_Text += C_GtGetText::h_GetText("Invalid COMM protocol configuration with too many signals:\n");
+               orc_Text += C_GtGetText::h_GetText("Invalid COMM protocol configuration with invalid signal count:\n");
                for (u32_InvalidProtCounter = 0U; u32_InvalidProtCounter < c_InvalidProtocolTypes.size();
                     ++u32_InvalidProtCounter)
                {

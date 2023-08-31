@@ -483,23 +483,25 @@ const
 
                      if (pc_Node != NULL)
                      {
-                        bool q_TempCommRxSignalCountInvalid;
-                        bool q_TempCommTxSignalCountInvalid;
+                        bool q_TempCommMaxRxSignalCountInvalid;
+                        bool q_TempCommMaxTxSignalCountInvalid;
                         bool q_TempCoRxPdoCountInvalid;
                         bool q_TempCoTxPdoCountInvalid;
+                        bool q_TempCommMinSignalCountInvalid;
 
                         pc_Node->CheckErrorCanProtocol(c_ConnectedInterfaces[u32_NodeCounter],
                                                        e_Type,
                                                        true,
-                                                       q_TempCommRxSignalCountInvalid,
-                                                       q_TempCommTxSignalCountInvalid,
+                                                       q_TempCommMaxRxSignalCountInvalid,
+                                                       q_TempCommMaxTxSignalCountInvalid,
                                                        q_TempCoRxPdoCountInvalid,
-                                                       q_TempCoTxPdoCountInvalid);
+                                                       q_TempCoTxPdoCountInvalid, q_TempCommMinSignalCountInvalid);
 
-                        if ((q_TempCommRxSignalCountInvalid == true) ||
-                            (q_TempCommTxSignalCountInvalid == true) ||
+                        if ((q_TempCommMaxRxSignalCountInvalid == true) ||
+                            (q_TempCommMaxTxSignalCountInvalid == true) ||
                             (q_TempCoRxPdoCountInvalid == true) ||
-                            (q_TempCoTxPdoCountInvalid == true))
+                            (q_TempCoTxPdoCountInvalid == true) ||
+                            (q_TempCommMinSignalCountInvalid == true))
                         {
                            opc_InvalidProtocols->push_back(e_Type);
                         }
@@ -528,6 +530,130 @@ const
 uint32_t C_PuiSdHandlerBusLogic::GetOscBusesSize(void) const
 {
    return this->mc_CoreDefinition.c_Buses.size();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set automatic bus routing settings
+
+   \param[in]  ou32_BusIndex  Bus index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerBusLogic::SetAutomaticBusRoutingSettings(const uint32_t ou32_BusIndex)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
+
+   this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes, c_InterfaceIndexes);
+   tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
+
+   if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+   {
+      for (uint32_t u32_ItNode = 0UL; (u32_ItNode < c_NodeIndexes.size()) && (s32_Retval == C_NO_ERR); ++u32_ItNode)
+      {
+         s32_Retval =
+            this->SetAutomaticNodeInterfaceRoutingSettings(c_NodeIndexes[u32_ItNode], c_InterfaceIndexes[u32_ItNode]);
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set automatic node interface routing settings
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  oe_ComType           Com type
+   \param[in]  ou8_InterfaceNumber  Interface number
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const uint32_t ou32_NodeIndex,
+                                                                         const C_OscSystemBus::E_Type oe_ComType,
+                                                                         const uint8_t ou8_InterfaceNumber)
+{
+   int32_t s32_Retval = C_NO_ERR;
+   C_OscNode * const pc_Node = this->GetOscNode(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      for (uint32_t u32_ItInterface = 0UL; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+           ++u32_ItInterface)
+      {
+         C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
+         if ((rc_Interface.u8_InterfaceNumber == ou8_InterfaceNumber) && (rc_Interface.e_InterfaceType == oe_ComType))
+         {
+            s32_Retval = this->SetAutomaticNodeInterfaceRoutingSettings(ou32_NodeIndex, u32_ItInterface);
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set automatic node interface routing settings
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const uint32_t ou32_NodeIndex,
+                                                                         const uint32_t ou32_InterfaceIndex)
+{
+   int32_t s32_Retval = C_NO_ERR;
+   C_OscNode * const pc_Node = this->GetOscNode(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      if (ou32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size())
+      {
+         C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[ou32_InterfaceIndex];
+
+         if (rc_Interface.GetBusConnected())
+         {
+            const C_OscSystemBus * const pc_Bus = this->GetOscBus(rc_Interface.u32_BusIndex);
+            if (pc_Bus != NULL)
+            {
+               if (!pc_Bus->q_UseableForRouting)
+               {
+                  rc_Interface.q_IsRoutingEnabled = false;
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -591,6 +717,8 @@ void C_PuiSdHandlerBusLogic::AddConnection(const uint32_t ou32_NodeIndex, const 
                      //Also add corresponding UI element:
                      this->mc_UiNodes[u32_CurIndex].c_UiBusConnections.push_back(c_NewConnection);
                   }
+                  tgl_assert(this->SetAutomaticNodeInterfaceRoutingSettings(ou32_NodeIndex, pc_Bus->e_Type,
+                                                                            ou8_InterfaceNumber) == C_NO_ERR);
                }
             }
          }
@@ -648,6 +776,8 @@ void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32_t ou32_NodeIndex, con
 
    ChangeCompleteConnection(ou32_NodeIndex, c_OrgCopy, c_Tmp, orc_Properties, 0xFFFFFFFFUL, false);
    m_HandleChangeConnectionForCanOpen(ou32_NodeIndex, c_OrgCopy, ou8_NewInterface);
+   tgl_assert(this->SetAutomaticNodeInterfaceRoutingSettings(ou32_NodeIndex, orc_Id.e_InterfaceType,
+                                                             ou8_NewInterface) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -724,6 +854,8 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32_t ou32_NodeIn
                }
             }
          }
+         tgl_assert(this->SetAutomaticNodeInterfaceRoutingSettings(u32_CurIndex, orc_NewId.e_InterfaceType,
+                                                                   orc_NewId.u8_InterfaceNumber) == C_NO_ERR);
 
          //UI
          for (uint32_t u32_ItBusConn = 0; u32_ItBusConn < rc_UiNode.c_UiBusConnections.size(); ++u32_ItBusConn)

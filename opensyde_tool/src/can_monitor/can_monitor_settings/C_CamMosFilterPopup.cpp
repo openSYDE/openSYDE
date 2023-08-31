@@ -156,6 +156,7 @@ C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Filtering the duplicates from QList's (QList<int32_t> oc_CanMsgId,  const QList<uint8_t> oc_CanMsgXtd)
+ *  Skip adding of existing filter messages to filter items
  *  Set function for calling C_CamMosFilterPopup::m_OnAddFilterItemFromContextmenu()
 
    \param[in]       oc_CanMsgId     List of selected message CanId's

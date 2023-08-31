@@ -33,8 +33,17 @@ class C_OscNodeDataPool
 public:
    C_OscNodeDataPool(void);
 
+   enum E_CrcType ///< Type of CRC for data pool
+   {
+      eCT_COMPAT_V1,                 ///< CRC type: compatibility with V1 calculation
+      eCT_NON_NVM,                   ///< CRC type: for non NVM data pools
+      eCT_NON_NVM_DEFAULT_COMPAT_V1, ///< CRC type: for non NVM data pools with V1 calculation and default values
+      eCT_NVM                        ///< CRC type: for NVM data pools
+   };
+
    void CalcHash(uint32_t & oru32_HashValue) const;
-   void CalcDefinitionHash(uint32_t & oru32_HashValue) const;
+   void CalcGeneratedDefinitionHash(uint32_t & oru32_HashValue) const;
+   void CalcDefinitionHash(uint32_t & oru32_HashValue, const E_CrcType oe_CrcType) const;
 
    void MoveList(const uint32_t & oru32_Start, const uint32_t & oru32_Target);
    void RecalculateAddress(void);
@@ -58,15 +67,17 @@ public:
    E_Type e_Type;                     ///< Data pool type
    stw::scl::C_SclString c_Name;      ///< User data pool name
    uint8_t au8_Version[3];            ///< User data pool version Major, minor, release
+   uint16_t u16_DefinitionCrcVersion; ///< Version of data pool definition CRC
    stw::scl::C_SclString c_Comment;   ///< User data pool comment
    int32_t s32_RelatedDataBlockIndex; ///< Related application index
    ///< -1, No application selected
    ///< Else valid application assumed
-   bool q_IsSafety;                            ///< Flag if data pool contains safety relevant content
-   bool q_ScopeIsPrivate;                      ///< Flag if data pools scope of content is private (vs. public)
-   uint32_t u32_NvmStartAddress;               ///< NvM start address of data pool
-   uint32_t u32_NvmSize;                       ///< NvM size of data pool
-   std::vector<C_OscNodeDataPoolList> c_Lists; ///< Data pool lists
+   bool q_IsSafety;                             ///< Flag if data pool contains safety relevant content
+   bool q_ScopeIsPrivate;                       ///< Flag if data pools scope of content is private (vs. public)
+   uint32_t u32_NvmStartAddress;                ///< NvM start address of data pool
+   uint32_t u32_NvmSize;                        ///< NvM size of data pool
+   static const uint32_t hu32_DEFAULT_NVM_SIZE; ///< Default NvM size of data pool
+   std::vector<C_OscNodeDataPoolList> c_Lists;  ///< Data pool lists
 
 private:
    uint32_t m_GetElementHash(const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex) const;

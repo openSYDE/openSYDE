@@ -397,10 +397,11 @@ void C_SdBueMessageSelectorWidget::RecheckProtocolError(void) const
    QString c_ErrorNodes;
    bool q_Valid = true;
 
-   bool q_CommRxSignalCountInvalid = false;
-   bool q_CommTxSignalCountInvalid = false;
+   bool q_CommMaxRxSignalCountInvalid = false;
+   bool q_CommMaxTxSignalCountInvalid = false;
    bool q_CoRxPdoCountInvalid = false;
    bool q_CoTxPdoCountInvalid = false;
+   bool q_CommMinSignalCountInvalid = false;
 
    if (this->mq_ModeSingleNode == true)
    {
@@ -409,8 +410,8 @@ void C_SdBueMessageSelectorWidget::RecheckProtocolError(void) const
       if (pc_Node != NULL)
       {
          pc_Node->CheckErrorCanProtocol(this->mu32_InterfaceIndex, this->me_ProtocolType, false,
-                                        q_CommRxSignalCountInvalid, q_CommTxSignalCountInvalid,
-                                        q_CoRxPdoCountInvalid, q_CoTxPdoCountInvalid);
+                                        q_CommMaxRxSignalCountInvalid, q_CommMaxTxSignalCountInvalid,
+                                        q_CoRxPdoCountInvalid, q_CoTxPdoCountInvalid, q_CommMinSignalCountInvalid);
       }
    }
    else
@@ -431,30 +432,37 @@ void C_SdBueMessageSelectorWidget::RecheckProtocolError(void) const
 
          if (pc_Node != NULL)
          {
-            bool q_TempCommRxSignalCountInvalid;
-            bool q_TempCommTxSignalCountInvalid;
+            bool q_TempCommMaxRxSignalCountInvalid;
+            bool q_TempCommMaxTxSignalCountInvalid;
             bool q_TempCoRxPdoCountInvalid;
             bool q_TempCoTxPdoCountInvalid;
+            bool q_TempCommMinSignalCountInvalid;
 
             pc_Node->CheckErrorCanProtocol(c_InterfaceIndexes[u32_Counter], this->me_ProtocolType, true,
-                                           q_TempCommRxSignalCountInvalid, q_TempCommTxSignalCountInvalid,
-                                           q_TempCoRxPdoCountInvalid, q_TempCoTxPdoCountInvalid);
+                                           q_TempCommMaxRxSignalCountInvalid, q_TempCommMaxTxSignalCountInvalid,
+                                           q_TempCoRxPdoCountInvalid, q_TempCoTxPdoCountInvalid,
+                                           q_TempCommMinSignalCountInvalid);
 
             // Do not overwrite already detected errors
-            if ((q_TempCommRxSignalCountInvalid == true) ||
-                (q_TempCommTxSignalCountInvalid == true) ||
+            if ((q_TempCommMaxRxSignalCountInvalid == true) ||
+                (q_TempCommMaxTxSignalCountInvalid == true) ||
                 (q_TempCoRxPdoCountInvalid == true) ||
-                (q_TempCoTxPdoCountInvalid == true))
+                (q_TempCoTxPdoCountInvalid == true) ||
+                (q_TempCommMinSignalCountInvalid == true))
             {
                c_ErrorNodes += "\n" + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str());
 
-               if (q_TempCommRxSignalCountInvalid == true)
+               if (q_TempCommMaxRxSignalCountInvalid == true)
                {
-                  q_CommRxSignalCountInvalid = true;
+                  q_CommMaxRxSignalCountInvalid = true;
                }
-               if (q_TempCommTxSignalCountInvalid == true)
+               if (q_TempCommMaxTxSignalCountInvalid == true)
                {
-                  q_CommTxSignalCountInvalid = true;
+                  q_CommMaxTxSignalCountInvalid = true;
+               }
+               if (q_TempCommMinSignalCountInvalid == true)
+               {
+                  q_CommMinSignalCountInvalid = true;
                }
                if (q_TempCoRxPdoCountInvalid == true)
                {
@@ -469,21 +477,26 @@ void C_SdBueMessageSelectorWidget::RecheckProtocolError(void) const
       }
    }
 
-   if ((q_CommRxSignalCountInvalid == true) ||
-       (q_CommTxSignalCountInvalid == true) ||
+   if ((q_CommMaxRxSignalCountInvalid == true) ||
+       (q_CommMaxTxSignalCountInvalid == true) ||
        (q_CoRxPdoCountInvalid == true) ||
-       (q_CoTxPdoCountInvalid == true))
+       (q_CoTxPdoCountInvalid == true) ||
+       (q_CommMinSignalCountInvalid == true))
    {
       q_Valid = false;
       c_ErrorText = C_GtGetText::h_GetText("\n\nProtocol error detected:\n");
 
-      if (q_CommRxSignalCountInvalid == true)
+      if (q_CommMaxRxSignalCountInvalid == true)
       {
          c_ErrorText += C_GtGetText::h_GetText("The number of RX signals is too high. The maximum is 2048.");
       }
-      if (q_CommTxSignalCountInvalid == true)
+      if (q_CommMaxTxSignalCountInvalid == true)
       {
          c_ErrorText += C_GtGetText::h_GetText("The number of TX signals is too high. The maximum is 2048.");
+      }
+      if (q_CommMinSignalCountInvalid == true)
+      {
+         c_ErrorText += C_GtGetText::h_GetText("At least one signal is required.");
       }
       if (q_CoRxPdoCountInvalid == true)
       {

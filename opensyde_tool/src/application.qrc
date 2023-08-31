@@ -680,5 +680,9 @@
         <file>images/system_definition/IconBusInactive.svg</file>
         <file>images/system_definition/IconBusError.svg</file>
         <file>images/system_definition/IconNodeError.svg</file>
+        <file>images/system_views/IconScreenshot.svg</file>
+        <file>images/system_views/IconScreenshotDark.svg</file>
+        <file>images/system_views/IconScreenshotInAction.svg</file>
+        <file>images/system_views/IconScreenshotInActionDark.svg</file>
     </qresource>
 </RCC>

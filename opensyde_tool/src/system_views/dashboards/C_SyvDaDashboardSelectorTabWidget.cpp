@@ -25,6 +25,10 @@
 #include "C_OgePopUpDialog.hpp"
 #include "C_SyvDaDashboardTabProperties.hpp"
 #include "C_SyvDaCopyPasteManager.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SclString.hpp"
+#include "constants.hpp"
+#include "C_SyvDaDashboardScreenshot.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -33,6 +37,7 @@ using namespace stw::opensyde_gui;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QTabBar::ButtonPosition C_SyvDaDashboardSelectorTabWidget::mhe_TAB_CONTENT_POSITION = QTabBar::LeftSide;
@@ -63,6 +68,8 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
    mq_Connected(false),
    me_DashboardTabType(C_PuiSvDashboard::eSCENE)
 {
+   stw::opensyde_gui_elements::C_OgePubIconEvents * const pc_ScreenshotPushButton = new C_OgePubIconEvents(this);
+
    const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
 
    //Add button
@@ -94,7 +101,12 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
            &C_SyvDaDashboardSelectorTabWidget::m_OnTabChanged);
 
    this->setMovable(true);
-}
+
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   mpc_ScreenshotDashboardTab = new C_SyvDaDashboardScreenshot(this, pc_ScreenshotPushButton);
+   connect(pc_ScreenshotPushButton, &C_OgePubIconEvents::SigPubIconClicked, this,
+           &C_SyvDaDashboardSelectorTabWidget::m_PerformScreenshot);
+} //lint !e429  //pc_ScreenshotPushButton will be deleted by parent
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -389,6 +401,8 @@ void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
          this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_ADD_ICON_LIGHT));
       }
    }
+
+   mpc_ScreenshotDashboardTab->SetDarkModeActive(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -613,7 +627,8 @@ void C_SyvDaDashboardSelectorTabWidget::resizeEvent(QResizeEvent * const opc_Eve
    QTabWidget::resizeEvent(opc_Event);
 
    //Restrict size
-   this->tabBar()->setMaximumWidth(std::max((this->width() - s32_BUTTON_WIDTH) - 50, 0));
+   this->tabBar()->setMaximumWidth(std::max((this->width() - s32_BUTTON_WIDTH) - 100, 0));
+   mpc_ScreenshotDashboardTab->RepositionScreenshotIcon(this->width() - 45, 8);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -647,6 +662,28 @@ void C_SyvDaDashboardSelectorTabWidget::showEvent(QShowEvent * const opc_Event)
         c_ItItem != this->mc_TearedOffWidgets.end(); ++c_ItItem)
    {
       (*c_ItItem)->show();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Over written keyPressEvent
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardSelectorTabWidget::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   C_SyvDaDashboardSelectorTabWidget::m_SetCurrentTabNameForScreenshotFile();
+   QTabWidget::keyPressEvent(opc_Event);
+   if ((opc_Event->modifiers().testFlag(Qt::ControlModifier) == true) &&
+       (opc_Event->key() == static_cast<int32_t>(Qt::Key_F10)))
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithCtrlPress();
+   }
+   if ((opc_Event->modifiers().testFlag(Qt::ControlModifier) == false) &&
+       (opc_Event->key() == static_cast<int32_t>(Qt::Key_F10)))
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithoutCtrlPress();
    }
 }
 
@@ -1608,6 +1645,52 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnTabChanged(const int32_t os32_Index)
       if (pc_Widget != NULL)
       {
          pc_Widget->SetDrawingActive(os32_Index == s32_Counter);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Performing screenshot action and decides to open screenshot save location in file explorer
+
+   \param[in]       oq_IsControlButtonPressed     Is Control Key pressed or not
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardSelectorTabWidget::m_PerformScreenshot(const bool oq_IsControlButtonPressed)
+{
+   C_SyvDaDashboardSelectorTabWidget::m_SetCurrentTabNameForScreenshotFile();
+   if (oq_IsControlButtonPressed == true)
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithCtrlPress();
+   }
+   else
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithoutCtrlPress();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Getting current tab name for save the screenshot file with correct tab name
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardSelectorTabWidget::m_SetCurrentTabNameForScreenshotFile()
+{
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      C_SyvDaDashboardWidget * const pc_Widget =
+         dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(this->currentIndex()));
+      if (pc_Widget != NULL)
+      {
+         const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(pc_Widget->GetDashboardIndex());
+         if (pc_Dashboard != NULL)
+         {
+            const C_SclString c_DashboardName =
+               C_OscUtils::h_NiceifyStringForFileName(pc_Dashboard->GetName().toStdString()).c_str();
+            mpc_ScreenshotDashboardTab->setParent(this->currentWidget());
+            mpc_ScreenshotDashboardTab->setAccessibleName(c_DashboardName.c_str());
+         }
       }
    }
 }

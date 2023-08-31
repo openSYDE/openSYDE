@@ -310,6 +310,68 @@ void C_CamMosFilterItemWidget::m_SetFilterNameElided(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Modified function to "m_OnEdit" to add the filter message items to the existing filter
+
+   \param[in]       oc_CanMsgId     List of Can Message Id's for corresponding message
+   \param[in]      oc_CanMsgXtd   List of Extended format for corresponding message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterItemWidget::m_OnAddToExistingFilter(const QList<int32_t> oc_CanMsgId,
+                                                       const QList<uint8_t> oc_CanMsgXtd)
+{
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_CamMosFilterPopup * const pc_Dialog = new C_CamMosFilterPopup(this->mc_Filter, *c_New);
+
+   //Resize
+   c_New->SetSize(QSize(700, 820));
+   pc_Dialog->SetAddFilterItem(oc_CanMsgId, oc_CanMsgXtd);
+   // Update settings on accept
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      // check if there are any changes
+      C_CamProFilterData c_FilterDataNew = pc_Dialog->GetFilterData();
+      c_FilterDataNew.q_Enabled = this->mc_Filter.q_Enabled; // enabled flag of whole filter is not set in dialog
+      uint32_t u32_HashValueOld = 0xFFFFFFFFUL;
+      uint32_t u32_HashValueNew = 0xFFFFFFFFUL;
+      this->mc_Filter.CalcHash(u32_HashValueOld);
+      c_FilterDataNew.CalcHash(u32_HashValueNew);
+
+      if (u32_HashValueNew != u32_HashValueOld)
+      {
+         // note: we also started the dialog with data from mc_Filter, so unedited properties did not change
+
+         // inform filter widget (that than handles data handling)
+         Q_EMIT (this->SigUpdateFilter(this, this->mc_Filter, c_FilterDataNew));
+
+         // update intern filter (after emitting signal!)
+         this->mc_Filter = c_FilterDataNew;
+
+         // adapt item widget
+         this->m_CreateTooltipInformation();
+         this->m_SetFilterNameElided();
+      }
+   }
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+   }
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Setter to add filter items to existing filter
+
+   \param[in]       oc_CanMsgId     List of Can Message Id's for corresponding message
+   \param[in]      oc_CanMsgXtd   List of Extended format for corresponding message
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterItemWidget::SetAddFilterToExistingFilter(const QList<int32_t> oc_CanMsgId,
+                                                            const QList<uint8_t> oc_CanMsgXtd)
+{
+   C_CamMosFilterItemWidget::m_OnAddToExistingFilter(oc_CanMsgId, oc_CanMsgXtd);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overridden event function.
 
     Here: Show or hide buttons; elide text if necessary.

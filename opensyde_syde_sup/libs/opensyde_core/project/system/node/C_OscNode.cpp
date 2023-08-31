@@ -1444,27 +1444,29 @@ C_OscCanProtocol * C_OscNode::GetRelatedCanProtocol(const uint32_t ou32_DataPool
    For CANopen only:
    Allowed active PDOS (Messages) for each direction (TPDO/RPDO) is 512
 
-   \param[in]  oe_ComProtocol                Communication protocol
-   \param[in]  oq_ComProtocolUsedByInterface Flag for communication protocol bus connection to check for
-                                             true: Check only protocol instances which are connected to a bus
-                                             false: Check only protocol instances which are not connected to a bus
-   \param[out] orq_InvalidRxSignalCount  The number of RX signals of this protocol with at least one Datapool is to high
-   \param[out] orq_InvalidTxSignalCount  The number of TX signals of this protocol with at least one Datapool is to high
-   \param[out] orq_InvalidCoRxPdoCount    The number of active RPDOs (CANopen Manager viewpoint) of CANopen is to high
-   \param[out] orq_InvalidCoTxPdoCount    The number of active TPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[in]   oe_ComProtocol                  Communication protocol
+   \param[in]   oq_ComProtocolUsedByInterface   Flag for communication protocol bus connection to check for
+                                                true: Check only protocol instances which are connected to a bus
+                                                false: Check only protocol instances which are not connected to a bus
+   \param[out]  orq_InvalidMaxRxSignalCount     The number of RX signals of this protocol with at least one Datapool is to high
+   \param[out]  orq_InvalidMaxTxSignalCount     The number of TX signals of this protocol with at least one Datapool is to high
+   \param[out]  orq_InvalidCoRxPdoCount         The number of active RPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out]  orq_InvalidCoTxPdoCount         The number of active TPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out]  orq_InvalidMinSignalCount       The number of signals of this protocol with at least one Datapool is too low
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscNode::CheckErrorCanProtocol(const C_OscCanProtocol::E_Type oe_ComProtocol,
-                                      const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidRxSignalCount,
-                                      bool & orq_InvalidTxSignalCount, bool & orq_InvalidCoRxPdoCount,
-                                      bool & orq_InvalidCoTxPdoCount) const
+                                      const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidMaxRxSignalCount,
+                                      bool & orq_InvalidMaxTxSignalCount, bool & orq_InvalidCoRxPdoCount,
+                                      bool & orq_InvalidCoTxPdoCount, bool & orq_InvalidMinSignalCount) const
 {
    uint32_t u32_InterfaceCounter;
 
-   orq_InvalidRxSignalCount = false;
-   orq_InvalidTxSignalCount = false;
+   orq_InvalidMaxRxSignalCount = false;
+   orq_InvalidMaxTxSignalCount = false;
    orq_InvalidCoTxPdoCount = false;
    orq_InvalidCoRxPdoCount = false;
+   orq_InvalidMinSignalCount = false;
 
    // Check all interfaces
    for (u32_InterfaceCounter = 0U;
@@ -1474,24 +1476,30 @@ void C_OscNode::CheckErrorCanProtocol(const C_OscCanProtocol::E_Type oe_ComProto
       if (this->c_Properties.c_ComInterfaces[u32_InterfaceCounter].e_InterfaceType ==
           C_OscSystemBus::eCAN)
       {
-         bool q_TempCommRxSignalCountInvalid = false;
-         bool q_TempCommTxSignalCountInvalid = false;
+         bool q_TempCommMaxRxSignalCountInvalid = false;
+         bool q_TempCommMaxTxSignalCountInvalid = false;
          bool q_TempCoRxPdoCountInvalid = false;
          bool q_TempCoTxPdoCountInvalid = false;
+         bool q_TempCommMinSignalCountInvalid = false;
 
          this->CheckErrorCanProtocol(u32_InterfaceCounter, oe_ComProtocol,
                                      oq_ComProtocolUsedByInterface,
-                                     q_TempCommRxSignalCountInvalid, q_TempCommTxSignalCountInvalid,
-                                     q_TempCoRxPdoCountInvalid, q_TempCoTxPdoCountInvalid);
+                                     q_TempCommMaxRxSignalCountInvalid, q_TempCommMaxTxSignalCountInvalid,
+                                     q_TempCoRxPdoCountInvalid, q_TempCoTxPdoCountInvalid,
+                                     q_TempCommMinSignalCountInvalid);
 
          // Do not overwrite already detected errors
-         if (q_TempCommRxSignalCountInvalid == true)
+         if (q_TempCommMaxRxSignalCountInvalid == true)
          {
-            orq_InvalidRxSignalCount = true;
+            orq_InvalidMaxRxSignalCount = true;
          }
-         if (q_TempCommTxSignalCountInvalid == true)
+         if (q_TempCommMaxTxSignalCountInvalid == true)
          {
-            orq_InvalidTxSignalCount = true;
+            orq_InvalidMaxTxSignalCount = true;
+         }
+         if (q_TempCommMinSignalCountInvalid == true)
+         {
+            orq_InvalidMinSignalCount = true;
          }
 
          if (q_TempCoRxPdoCountInvalid == true)
@@ -1515,29 +1523,31 @@ void C_OscNode::CheckErrorCanProtocol(const C_OscCanProtocol::E_Type oe_ComProto
    For CANopen only:
    Allowed active PDOS (Messages) for each direction (TPDO/RPDO) is 512
 
-   \param[in]  ou32_InterfaceIndex           Interface index
-   \param[in]  oe_ComProtocol                Communication protocol
-   \param[in]  oq_ComProtocolUsedByInterface Flag for communication protocol bus connection to check for
-                                             true: Check only protocol instances which are connected to a bus
-                                             false: Check only protocol instances which are not connected to a bus
-   \param[out] orq_InvalidRxSignalCount  The number of RX signals of this protocol with at least one Datapool is to high
-   \param[out] orq_InvalidTxSignalCount  The number of TX signals of this protocol with at least one Datapool is to high
-   \param[out] orq_InvalidCoRxPdoCount    The number of active RPDOs (CANopen Manager viewpoint) of CANopen is to high
-   \param[out] orq_InvalidCoTxPdoCount    The number of active TPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[in]   ou32_InterfaceIndex             Interface index
+   \param[in]   oe_ComProtocol                  Communication protocol
+   \param[in]   oq_ComProtocolUsedByInterface   Flag for communication protocol bus connection to check for
+                                                true: Check only protocol instances which are connected to a bus
+                                                false: Check only protocol instances which are not connected to a bus
+   \param[out]  orq_InvalidMaxRxSignalCount     The number of RX signals of this protocol with at least one Datapool is to high
+   \param[out]  orq_InvalidMaxTxSignalCount     The number of TX signals of this protocol with at least one Datapool is to high
+   \param[out]  orq_InvalidCoRxPdoCount         The number of active RPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out]  orq_InvalidCoTxPdoCount         The number of active TPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out]  orq_InvalidMinSignalCount       The number of signals of this protocol with at least one Datapool is too low
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscNode::CheckErrorCanProtocol(const uint32_t ou32_InterfaceIndex, const C_OscCanProtocol::E_Type oe_ComProtocol,
-                                      const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidRxSignalCount,
-                                      bool & orq_InvalidTxSignalCount, bool & orq_InvalidCoRxPdoCount,
-                                      bool & orq_InvalidCoTxPdoCount) const
+                                      const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidMaxRxSignalCount,
+                                      bool & orq_InvalidMaxTxSignalCount, bool & orq_InvalidCoRxPdoCount,
+                                      bool & orq_InvalidCoTxPdoCount, bool & orq_InvalidMinSignalCount) const
 {
    const std::vector<const C_OscCanProtocol *> c_Protocols = this->GetCanProtocolsConst(oe_ComProtocol);
    uint32_t u32_Counter;
 
-   orq_InvalidRxSignalCount = false;
-   orq_InvalidTxSignalCount = false;
+   orq_InvalidMaxRxSignalCount = false;
+   orq_InvalidMaxTxSignalCount = false;
    orq_InvalidCoTxPdoCount = false;
    orq_InvalidCoRxPdoCount = false;
+   orq_InvalidMinSignalCount = false;
 
    for (u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
    {
@@ -1548,15 +1558,23 @@ void C_OscNode::CheckErrorCanProtocol(const uint32_t ou32_InterfaceIndex, const 
           (ou32_InterfaceIndex < pc_Prot->c_ComMessages.size()) &&
           (oq_ComProtocolUsedByInterface == pc_Prot->c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface))
       {
+         orq_InvalidMinSignalCount = true;
          // Check Rx and RPDOs
          mh_CheckErrorCanProtocolDirection(pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_RxMessages,
                                            oe_ComProtocol,
-                                           orq_InvalidRxSignalCount, orq_InvalidCoRxPdoCount);
+                                           orq_InvalidMaxRxSignalCount, orq_InvalidCoRxPdoCount,
+                                           orq_InvalidMinSignalCount);
 
          // Check Tx and TPDOs
          mh_CheckErrorCanProtocolDirection(pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_TxMessages,
                                            oe_ComProtocol,
-                                           orq_InvalidTxSignalCount, orq_InvalidCoTxPdoCount);
+                                           orq_InvalidMaxTxSignalCount, orq_InvalidCoTxPdoCount,
+                                           orq_InvalidMinSignalCount);
+         if ((pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_RxMessages.size() == 0UL) &&
+             (pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_TxMessages.size() == 0UL))
+         {
+            orq_InvalidMinSignalCount = false;
+         }
       }
    }
 }
@@ -2386,15 +2404,17 @@ uint32_t C_OscNode::m_GetContainerHash(const uint32_t ou32_DataPoolIndex, const 
    For CANopen only:
    Allowed active PDOS (Messages) for each direction (TPDO/RPDO) is 512
 
-   \param[in]  orc_Messages              All messages of one specific direction of one specific protocol
-   \param[in]  oe_ComProtocol            Communication protocol
-   \param[out] orq_InvalidSignalCount    The number of signals of this messages is to high
-   \param[out] orq_InvalidCoPdoCount     The number of active PDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[in]   orc_Messages                 All messages of one specific direction of one specific protocol
+   \param[in]   oe_ComProtocol               Communication protocol
+   \param[out]  orq_InvalidMaxSignalCount    The number of signals of this messages is too high
+   \param[out]  orq_InvalidCoPdoCount        The number of active PDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out]  orq_InvalidMinSignalCount    The number of signals of this messages is too low
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscNode::mh_CheckErrorCanProtocolDirection(const std::vector<C_OscCanMessage> & orc_Messages,
                                                   const C_OscCanProtocol::E_Type oe_ComProtocol,
-                                                  bool & orq_InvalidSignalCount, bool & orq_InvalidCoPdoCount)
+                                                  bool & orq_InvalidMaxSignalCount, bool & orq_InvalidCoPdoCount,
+                                                  bool & orq_InvalidMinSignalCount)
 {
    uint32_t u32_MessageCounter;
    uint32_t u32_SignalCount = 0U;
@@ -2411,7 +2431,11 @@ void C_OscNode::mh_CheckErrorCanProtocolDirection(const std::vector<C_OscCanMess
       u32_SignalCount += static_cast<uint32_t>(rc_Msg.c_Signals.size());
       if (u32_SignalCount > hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST)
       {
-         orq_InvalidSignalCount = true;
+         orq_InvalidMaxSignalCount = true;
+      }
+      if (u32_SignalCount > 0)
+      {
+         orq_InvalidMinSignalCount = false;
       }
 
       // Check active PDO count, which is only relevant for CANopen

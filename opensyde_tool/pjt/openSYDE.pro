@@ -41,6 +41,7 @@ SOURCES += ../src/main.cpp \
     ../src/navigable_gui/C_NagTopTreeView.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGenericWithContextMenu.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubIconEvents.cpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebLabel.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.cpp \
@@ -83,6 +84,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableView.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamViewReport.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
+    ../src/system_views/dashboards/undo/C_SyvDaDashboardScreenshot.cpp \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfig.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfigFiler.cpp \
@@ -942,6 +944,7 @@ HEADERS  += \
     ../src/navigable_gui/C_NagTopTreeView.hpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGenericWithContextMenu.hpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.hpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubIconEvents.hpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebLabel.hpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.hpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.hpp \
@@ -984,6 +987,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableView.hpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamViewReport.hpp \
     ../src/system_views/C_SyvHandlerWidget.hpp \
+    ../src/system_views/dashboards/undo/C_SyvDaDashboardScreenshot.hpp \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfig.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfigFiler.hpp \

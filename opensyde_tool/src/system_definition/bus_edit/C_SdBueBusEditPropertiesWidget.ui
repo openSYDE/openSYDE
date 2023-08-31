@@ -343,42 +343,20 @@ p, li { white-space: pre-wrap; }
            <property name="verticalSpacing">
             <number>10</number>
            </property>
-           <item row="0" column="1">
-            <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxBusId">
-             <property name="minimumSize">
-              <size>
-               <width>120</width>
-               <height>30</height>
-              </size>
-             </property>
+           <item row="0" column="0" colspan="3">
+            <widget class="stw::opensyde_gui_elements::C_OgeChxPropertiesSmall" name="pc_CheckBoxUsableForRouting">
              <property name="maximumSize">
               <size>
-               <width>120</width>
-               <height>30</height>
+               <width>200</width>
+               <height>16777215</height>
               </size>
+             </property>
+             <property name="text">
+              <string>Usable for Routing</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelBitRate">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>31</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>31</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Bitrate</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
             <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelBusId">
              <property name="minimumSize">
               <size>
@@ -397,7 +375,26 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="0">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelBitRate">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>31</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>31</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Bitrate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
             <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxBitRate">
              <property name="minimumSize">
               <size>
@@ -413,7 +410,53 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="pc_HorizontalLayoutBusId" stretch="0,0,1">
+             <property name="spacing">
+              <number>10</number>
+             </property>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxBusId">
+               <property name="minimumSize">
+                <size>
+                 <width>120</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>120</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNotRelevant">
+               <property name="text">
+                <string>(not relevant)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="2">
             <spacer name="horizontalSpacer_19">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -463,119 +506,136 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item>
-        <widget class="stw::opensyde_gui_elements::C_OgeGbxGrayed" name="groupBox">
-         <property name="minimumSize">
-          <size>
-           <width>310</width>
-           <height>330</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>310</width>
-           <height>330</height>
-          </size>
-         </property>
-         <property name="title">
-          <string/>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_18" stretch="0,2,0,0">
-          <property name="leftMargin">
-           <number>12</number>
-          </property>
-          <property name="rightMargin">
-           <number>12</number>
-          </property>
-          <property name="bottomMargin">
-           <number>6</number>
-          </property>
-          <item>
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="stw::opensyde_gui_elements::C_OgeGbxGrayed" name="groupBox">
+           <property name="minimumSize">
+            <size>
+             <width>310</width>
+             <height>330</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>310</width>
+             <height>330</height>
+            </size>
+           </property>
+           <property name="title">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_18" stretch="0,2,0,0">
+            <property name="leftMargin">
+             <number>12</number>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
+            <property name="rightMargin">
+             <number>12</number>
             </property>
-           </spacer>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="bottomMargin">
+             <number>6</number>
+            </property>
             <item>
-             <spacer name="horizontalSpacer_2">
+             <spacer name="verticalSpacer_3">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
-                <height>20</height>
+                <width>20</width>
+                <height>40</height>
                </size>
               </property>
              </spacer>
             </item>
             <item>
-             <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabBusImage">
-              <property name="minimumSize">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabBusImage">
+                <property name="minimumSize">
+                 <size>
+                  <width>200</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Image Bus</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
                <size>
-                <width>200</width>
-                <height>200</height>
+                <width>20</width>
+                <height>40</height>
                </size>
               </property>
-              <property name="maximumSize">
-               <size>
-                <width>200</width>
-                <height>200</height>
-               </size>
-              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="stw::opensyde_gui_elements::C_OgeLabBusType" name="pc_BusType">
               <property name="text">
-               <string>Image Bus</string>
+               <string>Bus type</string>
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="stw::opensyde_gui_elements::C_OgeLabBusType" name="pc_BusType">
-            <property name="text">
-             <string>Bus type</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -601,15 +661,15 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
@@ -617,14 +677,19 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.hpp</header>
+   <class>stw::opensyde_gui_elements::C_OgeSpxNumber</class>
+   <extends>QSpinBox</extends>
+   <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
    <header>C_OgeCbxText.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeGbxGrayed</class>
@@ -638,14 +703,14 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLePropertiesName.hpp</header>
   </customwidget>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeChxPropertiesSmall</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxPropertiesSmall.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
    <header>C_OgeLabSvgOnly.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeSpxNumber</class>
-   <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLabBusType</class>

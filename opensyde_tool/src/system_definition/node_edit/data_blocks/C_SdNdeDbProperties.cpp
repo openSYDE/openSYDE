@@ -365,8 +365,9 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
            this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V6)));
    this->mpc_Ui->pc_LabelIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("IDE Call"),
-      C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Make sure to escape "
-                             "paths that contain blanks with quotation marks and avoid non-printable characters."));
+      C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Use quotation marks "
+                             "around executable and parameters if you have issues with the call. Especially needed for "
+                             "paths that contain blanks or for non-printable characters."));
 
    this->mpc_Ui->pc_PushButtonRevertToDefault->SetToolTipInformation(
       C_GtGetText::h_GetText("Revert to Default"),

@@ -176,6 +176,7 @@ private:
    static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1  = 0x0216U;
    static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2  = 0x0217U;
    static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3  = 0x0218U;
+   static const uint16_t mhu16_OSY_RC_SID_FACTORY_MODE                      = 0x0225U;
 
    //routine sub-functions
    static const uint8_t mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE           = 0x01U;
@@ -399,6 +400,7 @@ public:
    int32_t OsyWriteApplicationSoftwareFingerprint(const uint8_t (&orau8_Date)[3], const uint8_t (&orau8_Time)[3],
                                                   const stw::scl::C_SclString & orc_UserName,
                                                   uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyFactoryMode(const uint8_t ou8_Operation, uint8_t * const opu8_NrCode = NULL);
 
    //Security
    int32_t OsyReadCertificateSerialNumber(std::vector<uint8_t> & orc_SerialNumber, uint8_t * const opu8_NrCode = NULL);
@@ -449,6 +451,9 @@ public:
    static const uint8_t hu8_OSY_IP_2_IP_STATUS_IN_PROGRESS = 1U;
    static const uint8_t hu8_OSY_IP_2_IP_STATUS_ERROR       = 2U;
    static const uint8_t hu8_OSY_IP_2_IP_STATUS_CONNECTED   = 3U;
+
+   // factory mode operations
+   static const uint8_t hu8_OSY_FACTORY_MODE_MASTER_RESET = 0U;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

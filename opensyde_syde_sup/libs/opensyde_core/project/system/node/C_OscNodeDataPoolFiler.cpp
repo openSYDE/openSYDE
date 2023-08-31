@@ -159,6 +159,16 @@ int32_t C_OscNodeDataPoolFiler::h_LoadDataPool(C_OscNodeDataPool & orc_NodeDataP
    {
       orc_NodeDataPool.q_ScopeIsPrivate = true;
    }
+   if (orc_XmlParser.AttributeExists("definition-crc-version"))
+   {
+      orc_NodeDataPool.u16_DefinitionCrcVersion =
+         static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("definition-crc-version"));
+   }
+   else
+   {
+      // probably deprecated project -> default to first version
+      orc_NodeDataPool.u16_DefinitionCrcVersion = 1U;
+   }
    orc_NodeDataPool.u32_NvmStartAddress = orc_XmlParser.GetAttributeUint32("nvm-start-address");
    orc_NodeDataPool.u32_NvmSize = orc_XmlParser.GetAttributeUint32("nvm-size");
    if (orc_XmlParser.SelectNodeChild("type") == "type")
@@ -246,6 +256,7 @@ void C_OscNodeDataPoolFiler::h_SaveDataPool(const C_OscNodeDataPool & orc_NodeDa
    orc_XmlParser.SetAttributeSint32("related-application-index", orc_NodeDataPool.s32_RelatedDataBlockIndex);
    orc_XmlParser.SetAttributeBool("is-safety", orc_NodeDataPool.q_IsSafety);
    orc_XmlParser.SetAttributeBool("scope-is-private", orc_NodeDataPool.q_ScopeIsPrivate);
+   orc_XmlParser.SetAttributeUint32("definition-crc-version", orc_NodeDataPool.u16_DefinitionCrcVersion);
    if ((orc_NodeDataPool.e_Type == C_OscNodeDataPool::eNVM) ||
        (orc_NodeDataPool.e_Type == C_OscNodeDataPool::eHALC_NVM))
    {

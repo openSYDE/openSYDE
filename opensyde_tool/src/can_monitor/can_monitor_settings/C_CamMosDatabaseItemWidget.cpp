@@ -610,7 +610,7 @@ void C_CamMosDatabaseItemWidget::m_OnSelectBus()
       new C_CamMosDatabaseBusSelectionPopup(this->mc_Busses, this->mc_Database, *c_New);
 
    //Resize
-   c_New->SetSize(QSize(700, 400));
+   c_New->SetSize(QSize(700, 412));
 
    // Update settings on accept
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))

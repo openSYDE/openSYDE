@@ -45,8 +45,8 @@ using namespace stw::errors;
    pre-condition: the passed XML parser has the active node set to "bus"
    post-condition: the passed XML parser has the active node set to the same "bus"
 
-   \param[out]    orc_Bus        Bus data
-   \param[in,out] orc_XmlParser  XML parser
+   \param[out]     orc_Bus          Bus data
+   \param[in,out]  orc_XmlParser    XML parser
 
    \return
    C_NO_ERR   data read
@@ -168,6 +168,11 @@ int32_t C_OscSystemBusFiler::h_LoadBus(C_OscSystemBus & orc_Bus, C_OscXmlParserB
          s32_Retval = C_CONFIG;
       }
    }
+   //Useable for routing
+   if (s32_Retval == C_NO_ERR)
+   {
+      orc_Bus.q_UseableForRouting = orc_XmlParser.GetAttributeBool("useable-for-routing", true);
+   }
    return s32_Retval;
 }
 
@@ -178,8 +183,8 @@ int32_t C_OscSystemBusFiler::h_LoadBus(C_OscSystemBus & orc_Bus, C_OscXmlParserB
    pre-condition: the passed XML parser has the active node set to "bus"
    post-condition: the passed XML parser has the active node set to the same "bus"
 
-   \param[in]     orc_Bus        Bus data to store
-   \param[in,out] orc_XmlParser  XML with bus active
+   \param[in]      orc_Bus          Bus data to store
+   \param[in,out]  orc_XmlParser    XML with bus active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscSystemBusFiler::h_SaveBus(const C_OscSystemBus & orc_Bus, C_OscXmlParserBase & orc_XmlParser)
@@ -214,4 +219,6 @@ void C_OscSystemBusFiler::h_SaveBus(const C_OscSystemBus & orc_Bus, C_OscXmlPars
    orc_XmlParser.SetAttributeString("number", c_RxTimeout);
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
+   //Useable for routing
+   orc_XmlParser.SetAttributeBool("useable-for-routing", orc_Bus.q_UseableForRouting);
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>680</width>
-    <height>893</height>
+    <height>1037</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -385,7 +385,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>170</height>
+                    <height>0</height>
                    </size>
                   </property>
                   <property name="autoFillBackground">

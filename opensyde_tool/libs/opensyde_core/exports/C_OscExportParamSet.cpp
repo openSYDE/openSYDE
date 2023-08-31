@@ -274,7 +274,7 @@ void C_OscExportParamSet::mh_FillInterpretedDatapool(const C_OscNodeDataPool & o
                                                      C_OscParamSetInterpretedDataPool & orc_IntDataPool)
 {
    orc_IntDataPool.c_DataPoolInfo.c_Name = orc_SdDataPool.c_Name;
-   orc_SdDataPool.CalcDefinitionHash(orc_IntDataPool.c_DataPoolInfo.u32_DataPoolCrc);
+   orc_SdDataPool.CalcGeneratedDefinitionHash(orc_IntDataPool.c_DataPoolInfo.u32_DataPoolCrc);
    orc_IntDataPool.c_DataPoolInfo.u32_NvmStartAddress = orc_SdDataPool.u32_NvmStartAddress;
    orc_IntDataPool.c_DataPoolInfo.u32_NvmSize = orc_SdDataPool.u32_NvmSize;
    (void)memcpy(&orc_IntDataPool.c_DataPoolInfo.au8_Version[0], &orc_SdDataPool.au8_Version[0], 3);

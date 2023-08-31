@@ -136,6 +136,8 @@ void C_UsHandler::SetDefault(void)
    this->ms32_SysDefBusEditTabIndex = 0;
 
    this->mc_RecentColors.fill(QColor(255, 255, 255, 255), 6);
+
+   ms32_ScreenshotGifSucessTimeout = 3000;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -388,6 +390,18 @@ QVector<QColor> C_UsHandler::GetRecentColors(void) const
 int32_t C_UsHandler::GetNextRecentColorButtonNumber(void) const
 {
    return this->ms32_NextRecentColorButtonNumber;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get screenshot GIF Play timeout
+
+   \return
+   Screenshot GIF play timer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_UsHandler::GetScreenshotGifSucessTimeout() const
+{
+   return this->ms32_ScreenshotGifSucessTimeout;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1124,6 +1138,17 @@ void C_UsHandler::RemoveOfRecentProjects(const QString & orc_Str)
 void C_UsHandler::ClearRecentProjects(void)
 {
    this->mc_RecentProjects.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set Screenshot GIF play timeout
+
+   \param[in]       os32_ScreenshotGifSucessTimer     GIF Play timer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetScreenshotGifSucessTimeout(const int32_t os32_ScreenshotGifSucessTimer)
+{
+   this->ms32_ScreenshotGifSucessTimeout = os32_ScreenshotGifSucessTimer;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

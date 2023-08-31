@@ -50,7 +50,7 @@ public:
 
    explicit C_CamMosDatabaseItemWidget(const stw::opensyde_gui_logic::C_CamProDatabaseData & orc_Database,
                                        QWidget * const opc_Parent = NULL);
-   virtual ~C_CamMosDatabaseItemWidget(void);
+   ~C_CamMosDatabaseItemWidget(void) override;
 
    void SetState(const E_LoadingState oe_State);
    void SetBusIndex(const uint32_t ou32_BusIndex);

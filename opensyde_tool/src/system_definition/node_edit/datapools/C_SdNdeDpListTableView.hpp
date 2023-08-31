@@ -103,6 +103,7 @@ private:
    QAction * mpc_ActionCopy;
    QAction * mpc_ActionPaste;
    QAction * mpc_ActionDelete;
+   QAction * mpc_ActionEditComment;
    bool mq_AllowMoveUp;
    bool mq_AllowMoveDown;
    bool mq_AllowAdd;
@@ -125,6 +126,8 @@ private:
    //Avoid call
    C_SdNdeDpListTableView(const C_SdNdeDpListTableView &);
    C_SdNdeDpListTableView & operator =(const C_SdNdeDpListTableView &) &;
+
+   void m_EditCommentInEditor(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

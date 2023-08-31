@@ -10,17 +10,14 @@ Windows:
    CMake 3.19.2
    Ninja 1.10.0
 Ubuntu 20.04: 
-   GCC 9.3.0 (32-bit)
+   GCC 9.4.0
    CMake 3.16.3
 
 Required Library Installation:
 ==============================
 Ubuntu 20.04:
-   libssl-dev:i386 (sudo apt install libssl-dev:i386; tested with version 1.1.1f)
    libssl-dev:amd64 (sudo apt install libssl-dev:amd64; tested with version 1.1.1f)
-   For building with 32bit compiler on a 64bit System: install gcc-multilib and g++-multilib
-   
-   
+
 Editor:
 =======
 Windows: Qt Creator 4.14.2
@@ -43,29 +40,5 @@ How to use in Qt Creator:
 =========================
 Open project file CMakeLists.txt in Qt Creator and add CMAKE_TOOLCHAIN_FILE 
 variable to build settings (value = path to e.g. toolchain_windows.cmake).
-Make sure to use a 32 bit compiler.
 To get the resulting binary directly in result directory, 
 add build step "install" in project configuration.
-
-For building on a 64-bit Ubuntu machine but with a 32-bit compiler:
-- install gcc-multilib and g++-multilib
-- open Qt creator
-   - add new kit (Projects > Manage Kits > Add)
-   - adapt CMake configuration (Projects > Manage Kits > <YourNewKit> > CMake Configuration > Change)
-   - remove those two lines, because they else overwrite our configuration in the provided toolchain file:
-      CMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}
-      CMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
-   - adapt resp. add CMake flags (Projects > CMake):
-      CMAKE_CXX_FLAGS                  -m32
-      CMAKE_CXX_FLAGS_DEBUG            -m32
-      CMAKE_C_FLAGS                    -m32
-      CMAKE_C_FLAGS_DEBUG              -m32
-      CMAKE_SHARED_LINKER_FLAGS        "-m32"
-      CMAKE_SHARED_LINKER_FLAGS_DEBUG  "-m32"
-      CMAKE_CXX_COMPILER               /bin/g++ (should not be necessary, just to make sure)
-      CMAKE_TOOLCHAIN_FILE             ../pjt/toolchain_ubuntu.cmake (maybe using absolute path is safer)
-   - add build step "install"
-   - build project
-   - to verify the executable is 32-bit, execute "file SYDEsup" on command line
-
-

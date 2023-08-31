@@ -63,6 +63,9 @@ private:
    void m_RegisterIdChange(void);
    void m_LoadFromData(void);
    void m_CanBitrateFixed(void) const;
+   void m_HandleUsableForRoutingEnableChanged();
+   void m_UpdateUsableForRoutingUi(const bool oq_Enabled);
+   bool m_ConfirmDisableRouting();
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

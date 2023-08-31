@@ -307,7 +307,7 @@ void C_SebGraphicsView::ScrollTo(const QPointF & orc_ScenePosition, const QSizeF
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided background paint event
+/*! \brief  Overwritten background paint event
 
    Draws the background with a gradient and the background image which is defined in
    the ui file.
@@ -406,7 +406,7 @@ void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRect
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided resize event
+/*! \brief  Overwritten resize event
 
    \param[in,out]  opc_Event  Event
 */
@@ -422,7 +422,7 @@ void C_SebGraphicsView::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided mouse move event
+/*! \brief  Overwritten mouse move event
 
    Drag and move functionality.
 
@@ -484,7 +484,7 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided mouse press event
+/*! \brief  Overwritten mouse press event
 
    Drag and move functionality.
 
@@ -561,7 +561,7 @@ void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided mouse release event
+/*! \brief  Overwritten mouse release event
 
    \param[in,out]  opc_Event  Event
 */
@@ -613,7 +613,7 @@ void C_SebGraphicsView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided key press event
+/*! \brief  Overwritten key press event
 
    Zooming functionality.
 
@@ -658,7 +658,7 @@ void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overrided wheel event
+/*! \brief  Overwritten wheel event
 
    Zooming functionality.
 

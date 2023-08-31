@@ -226,6 +226,8 @@ public:
                                       uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyWriteDebuggerEnabled(const C_OscProtocolDriverOsyNode & orc_ServerId, const bool oq_DebuggerEnabled,
                                        uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyFactoryModeMasterReset(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                         uint8_t * const opu8_NrCode = NULL) const;
 
    // STW Flashloader services
    int32_t SendStwRequestNodeReset(void);

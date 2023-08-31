@@ -706,8 +706,8 @@ void C_OscDataDealerNvmSafe::NvmSafeClearInternalContent(void)
 
    Note: Not set CRCs are supported
 
-   \param[in]  orc_ListIds List IDs
-   \param[out] opu8_NrCode if != NULL: negative response code in case of an error response
+   \param[in]   orc_ListIds   List IDs
+   \param[out]  opu8_NrCode   if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   Data prepared for file
@@ -871,7 +871,7 @@ int32_t C_OscDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_O
                               //Info
                               //Data pool crc
                               c_DataPoolInfo.u32_DataPoolCrc = 0;
-                              rc_DataPool.CalcDefinitionHash(c_DataPoolInfo.u32_DataPoolCrc);
+                              rc_DataPool.CalcGeneratedDefinitionHash(c_DataPoolInfo.u32_DataPoolCrc);
                               c_DataPoolInfo.c_Name = rc_DataPool.c_Name;
                               c_DataPoolInfo.u32_NvmSize = rc_DataPool.u32_NvmSize;
                               c_DataPoolInfo.u32_NvmStartAddress = rc_DataPool.u32_NvmStartAddress;
@@ -1421,7 +1421,7 @@ void C_OscDataDealerNvmSafe::mh_CreateInterpretedList(const C_OscNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if raw node parameters match internal node
 
-   \param[in] orc_Node Raw node parameters to check
+   \param[in]  orc_Node    Raw node parameters to check
 
    \return
    C_NO_ERR   Match
@@ -1456,7 +1456,7 @@ int32_t C_OscDataDealerNvmSafe::m_CheckParameterFileContent(const C_OscParamSetR
                if (rc_NodeDataPool.c_Name == rc_DataPoolInfo.c_Name)
                {
                   uint32_t u32_Crc = 0U;
-                  rc_NodeDataPool.CalcDefinitionHash(u32_Crc);
+                  rc_NodeDataPool.CalcGeneratedDefinitionHash(u32_Crc);
                   q_Found = true;
                   //Check content
                   if (rc_DataPoolInfo.u32_DataPoolCrc != u32_Crc)

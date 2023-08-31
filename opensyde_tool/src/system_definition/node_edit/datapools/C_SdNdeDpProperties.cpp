@@ -40,6 +40,9 @@ using namespace stw::tgl;
 const int32_t C_SdNdeDpProperties::mhs32_INDEX_PRIVATE = 0;
 const int32_t C_SdNdeDpProperties::mhs32_INDEX_PUBLIC = 1;
 
+const int32_t C_SdNdeDpProperties::mhs32_VERSION_INDEX_V1 = 0;
+const int32_t C_SdNdeDpProperties::mhs32_VERSION_INDEX_V2 = 1;
+
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -302,6 +305,9 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
    //apply datapool style
    this->m_ApplyType(q_IsShared);
 
+   // CRC version
+   this->m_SetCrcVersion();
+
    if (q_IsShared == true)
    {
       uint32_t u32_DatapoolCounter;
@@ -378,6 +384,7 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelDatapoolShareConfiguration->setText(C_GtGetText::h_GetText(
                                                                 "Share Configuration with other Datapools:"));
    this->mpc_Ui->pc_BushButtonBreakRelation->setText(C_GtGetText::h_GetText("Break Relation"));
+   this->mpc_Ui->pc_LabelCrcVersion->setText(C_GtGetText::h_GetText("CRC Version"));
 
    //Tool tips
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
@@ -448,11 +455,33 @@ void C_SdNdeDpProperties::InitStaticNames(void)
       C_GtGetText::h_GetText("Shared Datapool Configuration"),
       C_GtGetText::h_GetText("The Datapool is a shared Datapool. All connected Datapools are in the list below."));
 
+   this->mpc_Ui->pc_LabelCrcVersion->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                              "CRC Version"),
+                                                           C_GtGetText::h_GetText(
+                                                              "Datapool CRC Version is used in openSYDE code generation."
+                                                              " As well in Dashboards on connect for the client - server "
+                                                              "Datapool compatibility check."
+                                                              "\n\nSince openSYDE release 23-0C_v1_21r0 (R26) a new CRC "
+                                                              "Version 2 was introduced. This was necessary because of a"
+                                                              " safety relevant issue in NVM Datapools. (see safety "
+                                                              "addendum for details)"
+                                                              "\n\nVersion 1: Default when no specific other version is "
+                                                              "saved in the system definition. Use for compatibility "
+                                                              "purpose in systems where the safety relevant NVM Datapools "
+                                                              "issue is not relevant."
+                                                              "\nVersion 2: Default for new Datapools. Shall be used "
+                                                              "since openSYDE release 23-0C_v1_21r0 (R26). "));
+
    // Scope combo box
    this->mpc_Ui->pc_ComboBoxScope->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxScope->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxScope->setItemText(mhs32_INDEX_PRIVATE, C_GtGetText::h_GetText("Private"));
    this->mpc_Ui->pc_ComboBoxScope->setItemText(mhs32_INDEX_PUBLIC, C_GtGetText::h_GetText("Public"));
+
+   this->mpc_Ui->pc_ComboBoxCrcVersion->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxCrcVersion->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxCrcVersion->setItemText(mhs32_VERSION_INDEX_V1, C_GtGetText::h_GetText("Version 1"));
+   this->mpc_Ui->pc_ComboBoxCrcVersion->setItemText(mhs32_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -636,6 +665,9 @@ void C_SdNdeDpProperties::m_OkClicked(void)
                *this->mpe_ComProtocolType = e_Protocol;
             }
          }
+
+         // CRC version
+         this->m_GetCrcVersion();
 
          if (this->mpc_ParentDialog != NULL)
          {
@@ -1271,28 +1303,83 @@ int32_t C_SdNdeDpProperties::m_GetCurrentDataBlockIndex(void) const
 {
    int32_t s32_ApplicationIndex = -1;
 
-   if (this->mpc_Ui->pc_ComboBoxApplication->currentIndex() > 0)
+   if (this->mpc_Ui->pc_ComboBoxApplication->isVisible())
    {
-      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
+      if (this->mpc_Ui->pc_ComboBoxApplication->currentIndex() > 0)
       {
-         int32_t s32_Counter = 0;
-
-         for (uint32_t u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if (pc_Node != NULL)
          {
-            const C_OscNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
-            if (rc_DataBlock.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
+            int32_t s32_Counter = 0;
+
+            for (uint32_t u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
             {
-               if (static_cast<int32_t>(this->mpc_Ui->pc_ComboBoxApplication->currentIndex() - 1) == s32_Counter)
+               const C_OscNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
+               if (rc_DataBlock.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
                {
-                  s32_ApplicationIndex = static_cast<int32_t>(u32_ItDataBlock);
+                  if (static_cast<int32_t>(this->mpc_Ui->pc_ComboBoxApplication->currentIndex() - 1) == s32_Counter)
+                  {
+                     s32_ApplicationIndex = static_cast<int32_t>(u32_ItDataBlock);
+                  }
+                  //Important iterator step for counter
+                  ++s32_Counter;
                }
-               //Important iterator step for counter
-               ++s32_Counter;
             }
          }
       }
    }
+   else
+   {
+      //Not visible use previous value
+      s32_ApplicationIndex = this->mpc_OscDataPool->s32_RelatedDataBlockIndex;
+   }
 
    return s32_ApplicationIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set the CRC version in the GUI (read from property)
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpProperties::m_SetCrcVersion()
+{
+   switch (this->mpc_OscDataPool->u16_DefinitionCrcVersion)
+   {
+   case 1U:
+      this->mpc_Ui->pc_ComboBoxCrcVersion->setCurrentIndex(mhs32_VERSION_INDEX_V1);
+      break;
+   case 2U:
+      this->mpc_Ui->pc_ComboBoxCrcVersion->setCurrentIndex(mhs32_VERSION_INDEX_V2);
+      break;
+   default:
+      // latest is greatest
+      this->mpc_Ui->pc_ComboBoxCrcVersion->setCurrentIndex(mhs32_VERSION_INDEX_V2);
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get the CRC version from the GUI (write to the property)
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpProperties::m_GetCrcVersion() const
+{
+   uint16_t u16_CrcVersion = 0U;
+
+   switch (this->mpc_Ui->pc_ComboBoxCrcVersion->currentIndex())
+   {
+   case mhs32_VERSION_INDEX_V1:
+      u16_CrcVersion = 1U;
+      break;
+   case mhs32_VERSION_INDEX_V2:
+      u16_CrcVersion = 2U;
+      break;
+   default:
+      u16_CrcVersion = 2U;
+      break;
+   }
+
+   this->mpc_OscDataPool->u16_DefinitionCrcVersion = u16_CrcVersion;
 }

@@ -135,6 +135,7 @@ int32_t C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pa
          mh_LoadCommon(orc_UserSettings, c_Ini);
          mh_LoadColors(orc_UserSettings, c_Ini);
          mh_LoadNextRecentColorButtonNumber(orc_UserSettings, c_Ini);
+         mh_LoadScreenshotGifSucessTimeout(orc_UserSettings, c_Ini);
          if (orc_ActiveProject == "")
          {
             // load recent projects only if no active project is given
@@ -2355,4 +2356,16 @@ void C_UsFiler::mh_LoadColumns(C_SclIniFile & orc_Ini, const QString & orc_Secti
       orc_ColumnWidths.push_back(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
                                                      c_IdColumn.toStdString().c_str(), 0));
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load Screenshot GIF Play timer from user settings .ini
+
+   \param[in,out]  orc_UserSettings    User settings
+   \param[in,out]  orc_Ini             Current ini
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadScreenshotGifSucessTimeout(C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
+{
+   orc_UserSettings.SetScreenshotGifSucessTimeout(orc_Ini.ReadInteger("Common", "ScreenshotGifSucessTimeout", 3000));
 }

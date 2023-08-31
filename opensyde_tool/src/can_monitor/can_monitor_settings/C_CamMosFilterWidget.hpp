@@ -61,6 +61,7 @@ Q_SIGNALS:
    void SigRemoveAllFilters(void);
    void SigHide(void);
    void SigSendCanFilterMsgDroppedToParentWidget(void);
+   void SigAddFilterToExistingFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
 
 private:
    Ui::C_CamMosFilterWidget * mpc_Ui;
@@ -87,6 +88,9 @@ private:
    void m_GetActiveFilterItems(QList<stw::opensyde_gui_logic::C_CamProFilterItemData> & orc_ActiveFilterItems) const;
    void m_OnExpand(const bool oq_Expand) const;
    void m_UpdateTitleFilterCount(void) const;
+   int32_t ms32_LastMessageFilterItemDropPosition;
+   void m_SetAddFilterToExistingFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd,
+                                       const uint32_t ou32_ExistingFilterIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

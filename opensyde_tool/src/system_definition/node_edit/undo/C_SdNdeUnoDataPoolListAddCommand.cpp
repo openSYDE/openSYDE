@@ -35,11 +35,11 @@ using namespace stw::opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     oru32_NodeIndex             Node index
-   \param[in]     oru32_DataPoolIndex         Node data pool index
-   \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
-   \param[in]     orc_Indices                 Node data pool list indices
-   \param[in,out] opc_Parent                  Optional pointer to parent
+   \param[in]      oru32_NodeIndex              Node index
+   \param[in]      oru32_DataPoolIndex          Node data pool index
+   \param[in,out]  opc_DataPoolListsTreeWidget  Data pool lists tree widget to perform actions on
+   \param[in]      orc_Indices                  Node data pool list indices
+   \param[in,out]  opc_Parent                   Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32_t & oru32_NodeIndex,
@@ -67,6 +67,11 @@ C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32_
          {
             C_PuiSdHandler::h_InitDataElement(pc_DataPool->e_Type, pc_DataPool->q_IsSafety,
                                               rc_List.c_Elements[u32_ItElement]);
+         }
+         if (pc_DataPool->e_Type == C_OscNodeDataPool::eNVM)
+         {
+            //lint -e{1938} static const is guaranteed preinitialized before main
+            rc_List.u32_NvmSize = C_OscNodeDataPoolList::hu32_DEFAULT_NVM_SIZE;
          }
          if ((pc_DataPool->e_Type == C_OscNodeDataPool::eNVM) && (pc_DataPool->q_IsSafety == true))
          {

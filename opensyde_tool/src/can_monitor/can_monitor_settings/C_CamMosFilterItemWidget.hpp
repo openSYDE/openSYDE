@@ -39,6 +39,8 @@ public:
                                      QWidget * const opc_Parent = NULL);
    ~C_CamMosFilterItemWidget(void) override;
 
+   void SetAddFilterToExistingFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:
@@ -65,6 +67,7 @@ private:
    void m_ButtonPressed(void);
    void m_ButtonReleased(void);
    void m_SetFilterNameElided(void) const;
+   void m_OnAddToExistingFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
 
 protected:
    bool event(QEvent * const opc_Event) override;

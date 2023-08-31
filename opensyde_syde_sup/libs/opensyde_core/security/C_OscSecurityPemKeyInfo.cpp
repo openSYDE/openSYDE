@@ -87,6 +87,55 @@ const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPubKeySerialNumber() co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check valid key
+
+   \param[in,out]  orc_ErrorMessage       Error message
+   \param[in]      oq_CheckSerialNumber   Check serial number
+
+   \return
+   Flags
+
+   \retval   True    Is valid key
+   \retval   False   Is not valid key
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscSecurityPemKeyInfo::CheckValidKey(std::string & orc_ErrorMessage, const bool oq_CheckSerialNumber) const
+{
+   bool q_Retval = false;
+
+   if (this->GetPubKeyTextDecoded().size() > 0UL)
+   {
+      if (this->GetPrivKeyTextDecoded().size() > 0UL)
+      {
+         if (oq_CheckSerialNumber)
+         {
+            if (this->GetPubKeySerialNumber().size() > 0UL)
+            {
+               q_Retval = true;
+            }
+            else
+            {
+               orc_ErrorMessage = "could not find serial number in public key";
+            }
+         }
+         else
+         {
+            q_Retval = true;
+         }
+      }
+      else
+      {
+         orc_ErrorMessage = "could not find private key";
+      }
+   }
+   else
+   {
+      orc_ErrorMessage = "could not find public key";
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set private key text decoded
 
    \param[in]  orc_Value   Value

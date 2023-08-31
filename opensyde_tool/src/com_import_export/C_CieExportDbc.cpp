@@ -32,6 +32,9 @@
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_OscLoggingHandler.hpp"
 
+#include <algorithm>
+#include <unordered_set>
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
 using namespace stw::opensyde_gui_logic;
@@ -470,25 +473,28 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
 
       if (s32_Return == C_NO_ERR)
       {
+         const std::unordered_set<std::string> c_ReceiverNodes(c_DbcSignal.receivers.begin(),
+                                                               c_DbcSignal.receivers.end());
+
          // fill up receivers for signal
-         for (auto c_Node : orc_CieNodes)
+         for (const auto & rc_Node : orc_CieNodes)
          {
-            const std::string c_NodeName = mh_NiceifyStringForDbcSymbol(c_Node.c_Properties.c_Name).c_str();
-            for (auto c_Receiver : c_Node.c_RxMessages)
+            const std::string c_NodeName = mh_NiceifyStringForDbcSymbol(rc_Node.c_Properties.c_Name).c_str();
+            if (c_ReceiverNodes.find(c_NodeName) == c_ReceiverNodes.end())
             {
-               // if we have the same message, then check if message is receiver of signal
-               if (c_Receiver.c_CanMessage.c_Name.AnsiCompare(orc_DbcMessage.name.c_str()) == 0)
+               for (const auto & rc_Receiver : rc_Node.c_RxMessages)
                {
-                  std::vector<C_CieConverter::C_CieCanSignal> & rc_Signals = c_Receiver.c_CanMessage.c_Signals;
-                  for (const auto c_Signal : rc_Signals)
+                  // if we have the same message, then check if message is receiver of signal
+                  if (rc_Receiver.c_CanMessage.c_Name.AnsiCompare(orc_DbcMessage.name.c_str()) == 0)
                   {
-                     // check if node with Rx messages has signal
-                     if (c_Signal.c_Element.c_Name.AnsiCompare(c_DbcSignal.name.c_str()) == 0)
+                     const std::vector<C_CieConverter::C_CieCanSignal> & rc_Signals =
+                        rc_Receiver.c_CanMessage.c_Signals;
+                     for (const auto & rc_Signal : rc_Signals)
                      {
-                        // receiver for signal found -> add node as receiver if not already exists
-                        const std::set<std::string>::iterator c_Iter = c_DbcSignal.receivers.find(c_NodeName);
-                        if (c_Iter == c_DbcSignal.receivers.end())
+                        // check if node with Rx messages has signal
+                        if (rc_Signal.c_Element.c_Name.AnsiCompare(c_DbcSignal.name.c_str()) == 0)
                         {
+                           // receiver for signal found -> add node as receiver if not already exists
                            c_DbcSignal.receivers.insert(c_NodeName);
                         }
                      }

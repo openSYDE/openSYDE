@@ -157,7 +157,7 @@ void C_SyvUpPacParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissin
                //Datapool name
                this->m_CompareString(rc_InDp.c_DataPoolInfo.c_Name.c_str(),
                                      rc_NoDp.c_Name.c_str(), C_GtGetText::h_GetText("Datapool name"), 1UL);
-               rc_NoDp.CalcDefinitionHash(u32_DpHash);
+               rc_NoDp.CalcGeneratedDefinitionHash(u32_DpHash);
                //Datapool CRC
                this->m_CompareString(static_cast<QString>("0x%1").arg(rc_InDp.c_DataPoolInfo.u32_DataPoolCrc, 0, 16),
                                      static_cast<QString>("0x%1").arg(u32_DpHash, 0, 16),

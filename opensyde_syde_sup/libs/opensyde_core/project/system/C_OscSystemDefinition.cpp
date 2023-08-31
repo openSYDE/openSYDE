@@ -399,7 +399,7 @@ bool C_OscSystemDefinition::CheckBusIdAvailable(const uint8_t ou8_BusId,
       if (q_Skip == false)
       {
          const C_OscSystemBus & rc_Bus = this->c_Buses[u32_ItBus];
-         if (rc_Bus.u8_BusId == ou8_BusId)
+         if ((rc_Bus.q_UseableForRouting == true) && (rc_Bus.u8_BusId == ou8_BusId))
          {
             q_Retval = false;
          }
@@ -455,7 +455,8 @@ int32_t C_OscSystemDefinition::GetNextFreeBusId(uint8_t & oru8_BusId) const
    \param[out]     opq_DataPoolsInvalid            true: error in data pool was detected
    \param[out]     opq_ApplicationsInvalid         true: error in application was detected
    \param[out]     opq_DomainsInvalid              true: error in HALC configuration was detected
-   \param[out]     opq_CommSignalCountInvalid      true: error in COMM protocol with invalid signal count was detected
+   \param[out]     opq_CommMinSignalCountInvalid   true: error in COMM protocol with invalid min signal count was detected
+   \param[out]     opq_CommMaxSignalCountInvalid   true: error in COMM protocol with invalid max signal count was detected
    \param[out]     opq_CoPdoCountInvalid           true: error in CANopen protocol with invalid PDO count was detected
    \param[out]     opq_CoNodeIdInvalid             true: error with CANopen Node ID detected
    \param[out]     opq_CoHearbeatTimeInvalid       true: error with hearbeat time of Manager detected
@@ -475,7 +476,8 @@ int32_t C_OscSystemDefinition::CheckErrorNode(const uint32_t ou32_NodeIndex, boo
                                               bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                               bool * const opq_IpInvalid, bool * const opq_DataPoolsInvalid,
                                               bool * const opq_ApplicationsInvalid, bool * const opq_DomainsInvalid,
-                                              bool * const opq_CommSignalCountInvalid,
+                                              bool * const opq_CommMinSignalCountInvalid,
+                                              bool * const opq_CommMaxSignalCountInvalid,
                                               bool * const opq_CoPdoCountInvalid, bool * const opq_CoNodeIdInvalid,
                                               bool * const opq_CoHearbeatTimeInvalid,
                                               const bool & orq_AllowComDataPoolException,
@@ -807,17 +809,23 @@ const
       }
 
       // COMM protocol check
-      if ((opq_CommSignalCountInvalid != NULL) || (opq_CoPdoCountInvalid != NULL))
+      if ((opq_CommMinSignalCountInvalid != NULL) || (opq_CommMaxSignalCountInvalid != NULL) ||
+          (opq_CoPdoCountInvalid != NULL))
       {
          bool q_TempCommRxSignalCountInvalid = false;
          bool q_TempCommTxSignalCountInvalid = false;
          bool q_TempCoRxPdoCountInvalid = false;
          bool q_TempCoTxPdoCountInvalid = false;
+         bool q_TempMinSignalCountInvalid = false;
          uint32_t u32_ProtCounter;
 
-         if (opq_CommSignalCountInvalid != NULL)
+         if (opq_CommMinSignalCountInvalid != NULL)
          {
-            *opq_CommSignalCountInvalid = false;
+            *opq_CommMinSignalCountInvalid = false;
+         }
+         if (opq_CommMaxSignalCountInvalid != NULL)
+         {
+            *opq_CommMaxSignalCountInvalid = false;
          }
          if (opq_CoPdoCountInvalid != NULL)
          {
@@ -833,14 +841,24 @@ const
                                                  q_TempCommRxSignalCountInvalid,
                                                  q_TempCommTxSignalCountInvalid,
                                                  q_TempCoRxPdoCountInvalid,
-                                                 q_TempCoTxPdoCountInvalid);
+                                                 q_TempCoTxPdoCountInvalid, q_TempMinSignalCountInvalid);
 
-            if ((opq_CommSignalCountInvalid != NULL) &&
+            if (((opq_CommMinSignalCountInvalid != NULL) || (opq_CommMaxSignalCountInvalid != NULL)) &&
                 ((q_TempCommRxSignalCountInvalid == true) ||
-                 (q_TempCommTxSignalCountInvalid == true)))
+                 (q_TempCommTxSignalCountInvalid == true) ||
+                 (q_TempMinSignalCountInvalid == true)))
             {
                // Merge TX and RX error
-               *opq_CommSignalCountInvalid = true;
+               if ((opq_CommMinSignalCountInvalid != NULL) && (q_TempMinSignalCountInvalid == true))
+               {
+                  *opq_CommMinSignalCountInvalid = true;
+               }
+
+               if ((opq_CommMaxSignalCountInvalid != NULL) && ((q_TempCommRxSignalCountInvalid == true) ||
+                                                               (q_TempCommTxSignalCountInvalid == true)))
+               {
+                  *opq_CommMaxSignalCountInvalid = true;
+               }
 
                if (opc_InvalidProtocolTypes != NULL)
                {
@@ -975,21 +993,28 @@ int32_t C_OscSystemDefinition::CheckErrorBus(const uint32_t ou32_BusIndex, bool 
       if (ou32_BusIndex < this->c_Buses.size())
       {
          const C_OscSystemBus & rc_SystemBus = this->c_Buses[ou32_BusIndex];
-         *opq_IdInvalid = rc_SystemBus.CheckErrorBusId();
-         //Duplicate check
-         if (*opq_IdInvalid == false)
+         if (rc_SystemBus.q_UseableForRouting == true)
          {
-            for (uint32_t u32_ItBus = 0; u32_ItBus < this->c_Buses.size(); ++u32_ItBus)
+            *opq_IdInvalid = rc_SystemBus.CheckErrorBusId();
+            //Duplicate check
+            if (*opq_IdInvalid == false)
             {
-               if (u32_ItBus != ou32_BusIndex)
+               for (uint32_t u32_ItBus = 0; u32_ItBus < this->c_Buses.size(); ++u32_ItBus)
                {
-                  const C_OscSystemBus & rc_Bus = this->c_Buses[u32_ItBus];
-                  if (rc_SystemBus.u8_BusId == rc_Bus.u8_BusId)
+                  if (u32_ItBus != ou32_BusIndex)
                   {
-                     *opq_IdInvalid = true;
+                     const C_OscSystemBus & rc_Bus = this->c_Buses[u32_ItBus];
+                     if ((rc_Bus.q_UseableForRouting == true) && (rc_SystemBus.u8_BusId == rc_Bus.u8_BusId))
+                     {
+                        *opq_IdInvalid = true;
+                     }
                   }
                }
             }
+         }
+         else
+         {
+            *opq_IdInvalid = false;
          }
       }
       else

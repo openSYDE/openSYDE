@@ -142,6 +142,7 @@ private:
    void m_AdaptSize(const QSize & orc_WidgetSize);
    void m_UpdateCounters(const bool oq_ForceRearrageItems = false);
    void m_RearrangeItems(void);
+   static void mh_HandleDefaultNvmSize(stw::opensyde_core::C_OscNodeDataPool & orc_DataPool);
    void m_UpdateItemErrorToolTip(const uint32_t ou32_Index) const;
    bool m_IsItemComCanOpenDatapool(const C_SdNdeDpSelectorItemWidget * const opc_Item) const;
 

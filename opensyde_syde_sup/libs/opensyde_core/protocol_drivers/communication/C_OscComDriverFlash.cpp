@@ -2082,6 +2082,39 @@ int32_t C_OscComDriverFlash::SendOsyWriteDebuggerEnabled(const C_OscProtocolDriv
 
    return s32_Return;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Call factory mode master reset on an openSYDE server
+
+   \param[in]   orc_ServerId  Server id for communication
+   \param[out]  opu8_NrCode   if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR   factory mode master reset was successful
+   C_RANGE    openSYDE protocol not found
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscComDriverFlash::SendOsyFactoryModeMasterReset(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                           uint8_t * const opu8_NrCode) const
+{
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyFactoryMode(C_OscProtocolDriverOsy::hu8_OSY_FACTORY_MODE_MASTER_RESET,
+                                                       opu8_NrCode);
+   }
+
+   return s32_Return;
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send reset request for all STW flashloader by specific reset message
 

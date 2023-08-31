@@ -34,6 +34,7 @@ public:
    const std::vector<uint8_t> & GetPubKeyTextDecoded(void) const;
    const std::vector<uint8_t> & GetPubKeySerialNumber(void) const;
 
+   bool CheckValidKey(std::string & orc_ErrorMessage, const bool oq_CheckSerialNumber) const;
    void SetPrivKeyTextDecoded(const std::vector<uint8_t> & orc_Value);
    void SetPubKeyTextDecoded(const std::vector<uint8_t> & orc_Value);
    void SetPubKeySerialNumber(const std::vector<uint8_t> & orc_Value);

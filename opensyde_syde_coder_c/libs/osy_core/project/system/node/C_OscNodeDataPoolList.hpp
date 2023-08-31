@@ -60,6 +60,7 @@ public:
    uint32_t u32_NvmCrc;                                  ///< NvM list checksum
    uint32_t u32_NvmStartAddress;                         ///< NvM start address of data list
    uint32_t u32_NvmSize;                                 ///< NvM size of data list
+   static const uint32_t hu32_DEFAULT_NVM_SIZE;          ///< Default NvM size of data list
    std::vector<C_OscNodeDataPoolListElement> c_Elements; ///< List variables
    std::vector<C_OscNodeDataPoolDataSet> c_DataSets;     ///< Data sets
 };

@@ -25,6 +25,7 @@ using namespace stw::opensyde_core;
 using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const uint32_t C_OscNodeDataPool::hu32_DEFAULT_NVM_SIZE = 1000UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -43,12 +44,13 @@ using namespace stw::errors;
 C_OscNodeDataPool::C_OscNodeDataPool(void) :
    e_Type(eDIAG),
    c_Name("NewDataPool"),
+   u16_DefinitionCrcVersion(2),
    c_Comment(""),
    s32_RelatedDataBlockIndex(-1),
    q_IsSafety(false),
    q_ScopeIsPrivate(true),
    u32_NvmStartAddress(0),
-   u32_NvmSize(1000),
+   u32_NvmSize(0),
    c_Lists()
 {
    this->au8_Version[0] = 0;
@@ -79,6 +81,8 @@ void C_OscNodeDataPool::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_ScopeIsPrivate, sizeof(this->q_ScopeIsPrivate), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmStartAddress, sizeof(this->u32_NvmStartAddress), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmSize, sizeof(this->u32_NvmSize), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_DefinitionCrcVersion, sizeof(this->u16_DefinitionCrcVersion),
+                                       oru32_HashValue);
 
    for (uint32_t u32_Counter = 0U; u32_Counter < this->c_Lists.size(); ++u32_Counter)
    {
@@ -96,27 +100,103 @@ void C_OscNodeDataPool::CalcHash(uint32_t & oru32_HashValue) const
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscNodeDataPool::CalcDefinitionHash(uint32_t & oru32_HashValue) const
+void C_OscNodeDataPool::CalcGeneratedDefinitionHash(uint32_t & oru32_HashValue) const
+{
+   if (this->u16_DefinitionCrcVersion == 1)
+   {
+      this->CalcDefinitionHash(oru32_HashValue, eCT_COMPAT_V1);
+   }
+   else
+   {
+      if ((this->e_Type == eNVM) || (this->e_Type == eHALC_NVM))
+      {
+         this->CalcDefinitionHash(oru32_HashValue, eCT_NVM);
+      }
+      else
+      {
+         this->CalcDefinitionHash(oru32_HashValue, eCT_NON_NVM);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over data pool definition
+
+   The hash value is a 32 bit CRC value.
+   Only essential data are covered.
+   It is endian-safe, so it may be used on systems with different endianness.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+   \param[in]      oe_CrcType       Crc type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNodeDataPool::CalcDefinitionHash(uint32_t & oru32_HashValue, const E_CrcType oe_CrcType) const
 {
    uint8_t au8_Data[4];
 
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_Type, 1U, oru32_HashValue);
 
-   au8_Data[0] = static_cast<uint8_t>(this->u32_NvmStartAddress);
-   au8_Data[1] = static_cast<uint8_t>(this->u32_NvmStartAddress >> 8U);
-   au8_Data[2] = static_cast<uint8_t>(this->u32_NvmStartAddress >> 16U);
-   au8_Data[3] = static_cast<uint8_t>(this->u32_NvmStartAddress >> 24U);
-   stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(this->u32_NvmStartAddress), oru32_HashValue);
+   if ((oe_CrcType == eCT_COMPAT_V1) || (oe_CrcType == eCT_NVM) ||
+       (oe_CrcType == eCT_NON_NVM_DEFAULT_COMPAT_V1))
+   {
+      uint32_t u32_DpNvmStartAddress;
+      uint32_t u32_DpNvmSize;
+      if (oe_CrcType == eCT_NON_NVM_DEFAULT_COMPAT_V1)
+      {
+         u32_DpNvmStartAddress = 0UL;
+         u32_DpNvmSize = C_OscNodeDataPool::hu32_DEFAULT_NVM_SIZE;
+      }
+      else
+      {
+         u32_DpNvmStartAddress = this->u32_NvmStartAddress;
+         u32_DpNvmSize = this->u32_NvmSize;
+      }
+      au8_Data[0] = static_cast<uint8_t>(u32_DpNvmStartAddress);
+      au8_Data[1] = static_cast<uint8_t>(u32_DpNvmStartAddress >> 8U);
+      au8_Data[2] = static_cast<uint8_t>(u32_DpNvmStartAddress >> 16U);
+      au8_Data[3] = static_cast<uint8_t>(u32_DpNvmStartAddress >> 24U);
+      stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(u32_DpNvmStartAddress), oru32_HashValue);
 
-   au8_Data[0] = static_cast<uint8_t>(this->u32_NvmSize);
-   au8_Data[1] = static_cast<uint8_t>(this->u32_NvmSize >> 8U);
-   au8_Data[2] = static_cast<uint8_t>(this->u32_NvmSize >> 16U);
-   au8_Data[3] = static_cast<uint8_t>(this->u32_NvmSize >> 24U);
-   stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(this->u32_NvmSize), oru32_HashValue);
+      au8_Data[0] = static_cast<uint8_t>(u32_DpNvmSize);
+      au8_Data[1] = static_cast<uint8_t>(u32_DpNvmSize >> 8U);
+      au8_Data[2] = static_cast<uint8_t>(u32_DpNvmSize >> 16U);
+      au8_Data[3] = static_cast<uint8_t>(u32_DpNvmSize >> 24U);
+      stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(u32_DpNvmSize), oru32_HashValue);
+   }
 
    for (uint32_t u32_ListCount = 0U; u32_ListCount < this->c_Lists.size(); u32_ListCount++)
    {
-      stw::scl::C_SclChecksums::CalcCRC32(&this->c_Lists[u32_ListCount].q_NvmCrcActive, 1U, oru32_HashValue);
+      if ((oe_CrcType == eCT_COMPAT_V1) || (oe_CrcType == eCT_NVM) ||
+          (oe_CrcType == eCT_NON_NVM_DEFAULT_COMPAT_V1))
+      {
+         bool q_ListNvmCrcActive;
+         if (oe_CrcType == eCT_NON_NVM_DEFAULT_COMPAT_V1)
+         {
+            q_ListNvmCrcActive = false;
+         }
+         else
+         {
+            q_ListNvmCrcActive = this->c_Lists[u32_ListCount].q_NvmCrcActive;
+         }
+         stw::scl::C_SclChecksums::CalcCRC32(&q_ListNvmCrcActive, 1U, oru32_HashValue);
+      }
+
+      if  (oe_CrcType == eCT_NVM)
+      {
+         au8_Data[0] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmStartAddress);
+         au8_Data[1] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmStartAddress >> 8U);
+         au8_Data[2] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmStartAddress >> 16U);
+         au8_Data[3] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmStartAddress >> 24U);
+         stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(this->c_Lists[u32_ListCount].u32_NvmStartAddress),
+                                             oru32_HashValue);
+
+         au8_Data[0] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmSize);
+         au8_Data[1] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmSize >> 8U);
+         au8_Data[2] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmSize >> 16U);
+         au8_Data[3] = static_cast<uint8_t>(this->c_Lists[u32_ListCount].u32_NvmSize >> 24U);
+         stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(this->c_Lists[u32_ListCount].u32_NvmSize),
+                                             oru32_HashValue);
+      }
 
       for (uint32_t u32_ElementCount = 0U; u32_ElementCount < this->c_Lists[u32_ListCount].c_Elements.size();
            u32_ElementCount++)
@@ -130,6 +210,24 @@ void C_OscNodeDataPool::CalcDefinitionHash(uint32_t & oru32_HashValue) const
          au8_Data[3] = static_cast<uint8_t>(u32_Size >> 24U);
          stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0], sizeof(u32_Size), oru32_HashValue);
          stw::scl::C_SclChecksums::CalcCRC32(&u8_Type, sizeof(u8_Type), oru32_HashValue);
+
+         if  (oe_CrcType == eCT_NVM)
+         {
+            au8_Data[0] =
+               static_cast<uint8_t>(this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].u32_NvmStartAddress);
+            au8_Data[1] =
+               static_cast<uint8_t>(this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].u32_NvmStartAddress >>
+                                    8U);
+            au8_Data[2] =
+               static_cast<uint8_t>(this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].u32_NvmStartAddress >>
+                                    16U);
+            au8_Data[3] =
+               static_cast<uint8_t>(this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].u32_NvmStartAddress >>
+                                    24U);
+            stw::scl::C_SclChecksums::CalcCRC32(&au8_Data[0],
+                                                sizeof(this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].u32_NvmStartAddress),
+                                                oru32_HashValue);
+         }
       }
    }
 }

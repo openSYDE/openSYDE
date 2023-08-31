@@ -630,135 +630,6 @@ p, li { white-space: pre-wrap; }
         <property name="verticalSpacing">
          <number>3</number>
         </property>
-        <item row="8" column="1">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelDataPoolReservation">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Estimated NVM reservation: 0%</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolSize">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Datapool size...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="3" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonBreakRelation">
-          <property name="minimumSize">
-           <size>
-            <width>160</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>160</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Break Rel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="4">
-         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxSize">
-          <property name="minimumSize">
-           <size>
-            <width>120</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="accelerated">
-           <bool>true</bool>
-          </property>
-          <property name="correctionMode">
-           <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
-          </property>
-          <property name="showGroupSeparator" stdset="0">
-           <bool>true</bool>
-          </property>
-          <property name="suffix">
-           <string> Bytes</string>
-          </property>
-          <property name="singleStep">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>99</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelRelatedApplication">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Related application...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolShareConfiguration">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Share Config</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0" colspan="5">
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <property name="spacing">
@@ -823,192 +694,7 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="3" column="2">
-         <spacer name="horizontalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>1</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="3" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <item>
-           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelApplicationReadOnly">
-            <property name="text">
-             <string>Application</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxApplication">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>160</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="currentText">
-             <string comment="asdf" extracomment="asdf"/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSafetyContent">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Safety relevant content...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolStartAddress">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Datapool start address</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxScope">
-          <property name="minimumSize">
-           <size>
-            <width>160</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>160</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelScope">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Scope...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxProtocol">
-          <property name="minimumSize">
-           <size>
-            <width>160</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>160</width>
-            <height>30</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>OSI Layer 2</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string extracomment="Test">ECeS</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>ECoS</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <spacer name="pc_SpacerSize">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>14</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelComProt">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Communication protocol...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
+        <item row="9" column="1">
          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelDataPoolUsage">
           <property name="minimumSize">
            <size>
@@ -1027,41 +713,22 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="10" column="1">
-         <widget class="stw::opensyde_gui::C_SdNdeDpSelectorAddListWidget" name="pc_ListWidgetSharedDatapoolInfo">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+        <item row="11" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolShareConfiguration">
           <property name="minimumSize">
            <size>
-            <width>350</width>
-            <height>62</height>
+            <width>0</width>
+            <height>40</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>350</width>
-            <height>62</height>
+            <width>16777215</width>
+            <height>40</height>
            </size>
           </property>
-         </widget>
-        </item>
-        <item row="5" column="4">
-         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxDatapoolStartAddress">
-          <property name="minimumSize">
-           <size>
-            <width>120</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>30</height>
-           </size>
+          <property name="text">
+           <string>Share Config</string>
           </property>
          </widget>
         </item>
@@ -1121,6 +788,378 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="text">
              <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="6" column="3" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelApplicationReadOnly">
+            <property name="text">
+             <string>Application</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxApplication">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>160</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="currentText">
+             <string comment="asdf" extracomment="asdf"/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="10" column="1">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelDataPoolReservation">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Estimated NVM reservation: 0%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolSize">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Datapool size...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="3" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonBreakRelation">
+          <property name="minimumSize">
+           <size>
+            <width>160</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>160</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Break Rel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelComProt">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Communication protocol...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolStartAddress">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Datapool start address</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="4">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxDatapoolStartAddress">
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelScope">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Scope...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <spacer name="pc_SpacerSize">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>14</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="3" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxScope">
+          <property name="minimumSize">
+           <size>
+            <width>160</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>160</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="4">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxSize">
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="accelerated">
+           <bool>true</bool>
+          </property>
+          <property name="correctionMode">
+           <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+          </property>
+          <property name="showGroupSeparator" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="suffix">
+           <string> Bytes</string>
+          </property>
+          <property name="singleStep">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>99</number>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="stw::opensyde_gui::C_SdNdeDpSelectorAddListWidget" name="pc_ListWidgetSharedDatapoolInfo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>350</width>
+            <height>62</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>350</width>
+            <height>62</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelRelatedApplication">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Related application...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>1</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSafetyContent">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Safety relevant content...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxProtocol">
+          <property name="minimumSize">
+           <size>
+            <width>160</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>160</width>
+            <height>30</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>OSI Layer 2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Test">ECeS</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ECoS</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="2">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCrcVersion">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>40</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>CRC Version</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxCrcVersion">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>160</width>
+              <height>30</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -1279,15 +1318,25 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabSvgOnly.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
@@ -1311,16 +1360,6 @@ p, li { white-space: pre-wrap; }
    <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
    <header>C_OgeCbxText.hpp</header>
@@ -1336,14 +1375,14 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui::C_SdNdeDpSelectorAddListWidget</class>
    <extends>QListWidget</extends>
    <header>C_SdNdeDpSelectorAddListWidget.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeGbxGrayed</class>

@@ -162,6 +162,10 @@ public:
                                       const stw::scl::C_SclString & orc_ChannelName,
                                       const uint32_t * const opu32_ChannelIndexToSkip = NULL) const;
 
+protected:
+   void m_HandleSyncNodeAdded(const uint32_t ou32_Index) override;
+   void m_HandleSyncNodeAboutToBeDeleted(const uint32_t ou32_Index) override;
+
 private:
    static C_PuiSdNodeDataPool mh_GetUiDatapoolForOscDataPool(
       const stw::opensyde_core::C_OscNodeDataPool & orc_OscDatapool);

@@ -43,7 +43,8 @@ C_OscSystemBus::C_OscSystemBus(void) :
    c_Comment(""),
    u64_BitRate(125000ULL),
    u8_BusId(0),
-   u16_RxTimeoutOffsetMs(0)
+   u16_RxTimeoutOffsetMs(0),
+   q_UseableForRouting(true)
 {
 }
 
@@ -63,7 +64,7 @@ C_OscSystemBus::~C_OscSystemBus(void)
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscSystemBus::CalcHash(uint32_t & oru32_HashValue) const
@@ -74,6 +75,7 @@ void C_OscSystemBus::CalcHash(uint32_t & oru32_HashValue) const
    C_SclChecksums::CalcCRC32(&this->u64_BitRate, sizeof(this->u64_BitRate), oru32_HashValue);
    C_SclChecksums::CalcCRC32(&this->u8_BusId, sizeof(this->u8_BusId), oru32_HashValue);
    C_SclChecksums::CalcCRC32(&this->u16_RxTimeoutOffsetMs, sizeof(this->u16_RxTimeoutOffsetMs), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_UseableForRouting, sizeof(this->q_UseableForRouting), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,8 +85,8 @@ void C_OscSystemBus::CalcHash(uint32_t & oru32_HashValue) const
    Primary sorting criteria: Name length: Shortest first
    Secondary sorting criteria: First difference in alphabetic ordering
 
-   \param[in] orc_Bus1 Bus 1
-   \param[in] orc_Bus2 Bus 2
+   \param[in]  orc_Bus1    Bus 1
+   \param[in]  orc_Bus2    Bus 2
 
    \return
    true:  Bus 1 smaller than Bus 2

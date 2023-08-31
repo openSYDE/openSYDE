@@ -1445,9 +1445,9 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(const uint32_t ou32_Acti
    the security access request. The reason is to avoid brute force attacks. Waiting for one second before try again
    in this case.
 
-   \param[in]     opc_ExistingProtocol  Protocol to use for communication
-   \param[in]     ou8_SecurityLevel     level of requested security
-   \param[out]    opu8_NrCode           if != NULL: negative response code
+   \param[in]   opc_ExistingProtocol   Protocol to use for communication
+   \param[in]   ou8_SecurityLevel      level of requested security
+   \param[out]  opu8_NrCode            if != NULL: negative response code
 
    \return
    C_NO_ERR    All nodes set to session successfully
@@ -1504,87 +1504,112 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
          {
             if (q_SecureMode == false)
             {
-               const uint32_t u32_KEY = 23U; // fixed in UDS stack for non secure mode
-               if (u64_Seed != 42U)
+               if (ou8_SecurityLevel == 7U)
                {
-                  C_SclString c_Tmp;
-                  c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
-                                       "expected value, expected: 42, got %i", u64_Seed);
-                  // Should be a fixed value too
-                  osc_write_log_warning("Security Access", c_Tmp.c_str());
+                  s32_Return = C_CHECKSUM;
+                  osc_write_log_error("Security Access",
+                                      "Unexpected secure mode: disabled. For level 7 secure mode should always be enabled. (No need to use level 7 without secure mode)");
                }
+               else
+               {
+                  const uint32_t u32_KEY = 23U; // fixed in UDS stack for non secure mode
+                  if (u64_Seed != 42U)
+                  {
+                     C_SclString c_Tmp;
+                     c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
+                                          "expected value, expected: 42, got %i", u64_Seed);
+                     // Should be a fixed value too
+                     osc_write_log_warning("Security Access", c_Tmp.c_str());
+                  }
 
-               s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel, u32_KEY, opu8_NrCode);
+                  s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel, u32_KEY, opu8_NrCode);
+               }
             }
             else
             {
                //check pem database on NULL
                if (mpc_SecurityPemDb != NULL)
                {
-                  //we need the server's certificate snr to look up the correct key
-                  std::vector<uint8_t> c_CertSnr;
-                  s32_Return = opc_ExistingProtocol->OsyReadCertificateSerialNumber(c_CertSnr, opu8_NrCode);
-
-                  if (s32_Return == C_NO_ERR)
+                  const C_OscSecurityPemKeyInfo * pc_PemKeyInfo = NULL;
+                  if (ou8_SecurityLevel == 7U)
                   {
-                     //get PEM file by serial number from database
-                     const C_OscSecurityPemKeyInfo * const pc_PemKeyInfo =
-                        this->mpc_SecurityPemDb->GetPemFileBySerialNumber(c_CertSnr);
+                     pc_PemKeyInfo =
+                        this->mpc_SecurityPemDb->GetLevel7PemInformation();
+                  }
+                  else
+                  {
+                     //we need the server's certificate snr to look up the correct key
+                     std::vector<uint8_t> c_CertSnr;
+                     s32_Return = opc_ExistingProtocol->OsyReadCertificateSerialNumber(c_CertSnr, opu8_NrCode);
 
-                     if (pc_PemKeyInfo != NULL)
+                     if (s32_Return == C_NO_ERR)
                      {
-                        std::vector<uint8_t> c_Signature;
-                        std::vector<uint8_t> c_RandomValue;
-                        std::vector<uint8_t> c_PrivKey;
-                        c_Signature.resize(128, 0U);
-                        c_RandomValue.resize(8, 0U);
+                        //get PEM file by serial number from database
+                        pc_PemKeyInfo =
+                           this->mpc_SecurityPemDb->GetPemFileBySerialNumber(c_CertSnr);
+                     }
+                  }
 
-                        c_RandomValue[0] = static_cast<uint8_t>(u64_Seed >> 56U);
-                        c_RandomValue[1] = static_cast<uint8_t>(u64_Seed >> 48U);
-                        c_RandomValue[2] = static_cast<uint8_t>(u64_Seed >> 40U);
-                        c_RandomValue[3] = static_cast<uint8_t>(u64_Seed >> 32U);
-                        c_RandomValue[4] = static_cast<uint8_t>(u64_Seed >> 24U);
-                        c_RandomValue[5] = static_cast<uint8_t>(u64_Seed >> 16U);
-                        c_RandomValue[6] = static_cast<uint8_t>(u64_Seed >> 8U);
-                        c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
+                  if (pc_PemKeyInfo != NULL)
+                  {
+                     std::vector<uint8_t> c_Signature;
+                     std::vector<uint8_t> c_RandomValue;
+                     std::vector<uint8_t> c_PrivKey;
+                     c_Signature.resize(128, 0U);
+                     c_RandomValue.resize(8, 0U);
 
-                        //get private key from PEM file
-                        c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
+                     c_RandomValue[0] = static_cast<uint8_t>(u64_Seed >> 56U);
+                     c_RandomValue[1] = static_cast<uint8_t>(u64_Seed >> 48U);
+                     c_RandomValue[2] = static_cast<uint8_t>(u64_Seed >> 40U);
+                     c_RandomValue[3] = static_cast<uint8_t>(u64_Seed >> 32U);
+                     c_RandomValue[4] = static_cast<uint8_t>(u64_Seed >> 24U);
+                     c_RandomValue[5] = static_cast<uint8_t>(u64_Seed >> 16U);
+                     c_RandomValue[6] = static_cast<uint8_t>(u64_Seed >> 8U);
+                     c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
 
-                        //calculate RSA signature with private key and random value from server (u64_Seed)
-                        s32_Return = C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);
+                     //get private key from PEM file
+                     c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
 
-                        if (s32_Return != C_NO_ERR)
+                     //calculate RSA signature with private key and random value from server (u64_Seed)
+                     s32_Return = C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);
+
+                     if (s32_Return != C_NO_ERR)
+                     {
+                        C_SclString c_Tmp;
+                        c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
+                        osc_write_log_error("Security Access", c_Tmp.c_str());
+                        s32_Return = C_CHECKSUM;
+                     }
+                     else
+                     {
+                        //sanity check: calculated rsa signature 128 byte long?
+                        if (c_Signature.size() == 128U)
                         {
-                           C_SclString c_Tmp;
-                           c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
-                           osc_write_log_error("Security Access", c_Tmp.c_str());
-                           s32_Return = C_CHECKSUM;
-                        }
-                        else
-                        {
-                           //sanity check: calculated rsa signature 128 byte long?
-                           if (c_Signature.size() == 128U)
+                           //send signature back to server
+                           s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel,
+                                                                                       c_Signature,
+                                                                                       opu8_NrCode);
+                           if (s32_Return != C_NO_ERR)
                            {
-                              //send signature back to server
-                              s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel,
-                                                                                          c_Signature,
-                                                                                          opu8_NrCode);
-                              if (s32_Return != C_NO_ERR)
-                              {
-                                 C_SclString c_Tmp;
-                                 c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
-                                 osc_write_log_error("Security Access", c_Tmp.c_str());
-                                 s32_Return = C_CHECKSUM;
-                              }
+                              C_SclString c_Tmp;
+                              c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
+                              osc_write_log_error("Security Access", c_Tmp.c_str());
+                              s32_Return = C_CHECKSUM;
                            }
                         }
+                     }
+                  }
+                  else
+                  {
+                     if (ou8_SecurityLevel == 7U)
+                     {
+                        osc_write_log_error("Security Access", "No level 7 PEM file found in database.");
                      }
                      else
                      {
                         osc_write_log_error("Security Access", "No PEM file found for received serial number.");
-                        s32_Return = C_CHECKSUM;
                      }
+                     s32_Return = C_CHECKSUM;
                   }
                }
                else

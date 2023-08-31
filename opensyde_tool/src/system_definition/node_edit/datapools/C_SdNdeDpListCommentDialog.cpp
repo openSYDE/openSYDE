@@ -70,8 +70,6 @@ C_SdNdeDpListCommentDialog::C_SdNdeDpListCommentDialog(stw::opensyde_gui_element
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeDpListCommentDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked,
            this, &C_SdNdeDpListCommentDialog::m_CancelClicked);
-   connect(this->mpc_Ui->pc_TextEditComment, &C_OgeTedPropertiesComment::SigCommentConfirmed, this,
-           &C_SdNdeDpListCommentDialog::m_CommentConfirmed);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,7 +92,7 @@ void C_SdNdeDpListCommentDialog::InitStaticNames(void) const
 
    if (pc_List != NULL)
    {
-      mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("List %1")).arg(pc_List->c_Name.c_str()));
+      mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("List \"%1\"")).arg(pc_List->c_Name.c_str()));
       this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
       this->mpc_Ui->pc_TextEditComment->setText(pc_List->c_Comment.c_str());
    }
@@ -114,6 +112,28 @@ void C_SdNdeDpListCommentDialog::InitStaticNames(void) const
 QString C_SdNdeDpListCommentDialog::GetComment(void) const
 {
    return this->mpc_Ui->pc_TextEditComment->toPlainText();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get existing comment to comment editor popup text edit
+
+   \param[in]       oc_Comment     String to be placed in editor popup text edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListCommentDialog::GetCommentToEditor(const QString oc_Comment) const
+{
+   this->mpc_Ui->pc_TextEditComment->setText(oc_Comment);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set title for edit comment popup dialog
+
+   \param[in]       oc_Title     Title for popup dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListCommentDialog::SetTitle(const QString oc_Title)
+{
+   mrc_ParentDialog.SetTitle(oc_Title);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,14 +185,4 @@ void C_SdNdeDpListCommentDialog::m_OkClicked(void)
 void C_SdNdeDpListCommentDialog::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot to set focus of comment field after user confirms with defined keys of KeyPressEvent in
- *  C_OgeTedPropertiesComment
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListCommentDialog::m_CommentConfirmed(void)
-{
-   this->mpc_Ui->pc_PushButtonCancel->setFocus();
 }

@@ -681,7 +681,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex
       bool q_DataPoolsInvalid;
       bool q_ApplicationsInvalid;
       bool q_DomainsInvalid;
-      bool q_CommSignalCountInvalid;
+      bool q_CommMinSignalCountInvalid;
+      bool q_CommMaxSignalCountInvalid;
       bool q_CoPdoCountInvalid;
       bool q_CoNodeIdInvalid;
       bool q_CoHeartbeatInvalid;
@@ -689,7 +690,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid,
                                                  &q_IpInvalid,
                                                  &q_DataPoolsInvalid, &q_ApplicationsInvalid, &q_DomainsInvalid,
-                                                 &q_CommSignalCountInvalid, &q_CoPdoCountInvalid,
+                                                 &q_CommMinSignalCountInvalid,
+                                                 &q_CommMaxSignalCountInvalid, &q_CoPdoCountInvalid,
                                                  &q_CoNodeIdInvalid, &q_CoHeartbeatInvalid,
                                                  true, NULL, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
@@ -698,7 +700,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex
              (q_DataPoolsInvalid == true) ||
              (q_ApplicationsInvalid == true) || (q_DomainsInvalid == true) || (q_NameEmpty == true) ||
              (q_NvmSizeConflict == true) ||
-             (q_CommSignalCountInvalid == true) ||
+             (q_CommMinSignalCountInvalid == true) ||
+             (q_CommMaxSignalCountInvalid == true) ||
              (q_CoPdoCountInvalid == true) ||
              (q_CoNodeIdInvalid == true) ||
              (q_CoHeartbeatInvalid == true))
@@ -712,7 +715,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex
          //Store for future reference
          if ((q_DataPoolsInvalid == true) || (q_ApplicationsInvalid == true) || (q_DomainsInvalid == true) ||
              (q_NameEmpty == true) || (q_NvmSizeConflict == true) ||
-             (q_CoNodeIdInvalid == true) || (q_CommSignalCountInvalid == true) || (q_CoPdoCountInvalid == true) ||
+             (q_CoNodeIdInvalid == true) || (q_CommMinSignalCountInvalid == true) ||
+             (q_CommMaxSignalCountInvalid == true) || (q_CoPdoCountInvalid == true) ||
              (q_CoHeartbeatInvalid == true))
          {
             hc_PreviousResult.insert(u32_Hash, true);
@@ -735,7 +739,7 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex
       bool q_IpInvalid;
 
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, NULL, &q_NodeIdInvalid, &q_IpInvalid,
-                                                 NULL, NULL, NULL, NULL, NULL, NULL,
+                                                 NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                                  NULL, true, NULL, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
          if ((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true))

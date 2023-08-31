@@ -70,6 +70,7 @@ public:
    QString GetCurrentSaveAsPath(void) const;
    QVector<QColor> GetRecentColors(void) const;
    int32_t GetNextRecentColorButtonNumber(void) const;
+   int32_t GetScreenshotGifSucessTimeout(void) const;
 
    void GetMostRecentFolder(QString & orc_Str) const;
    void GetRecentFolders(QStringList & orc_Folders) const;
@@ -132,6 +133,7 @@ public:
    void AddToRecentProjects(const QString & orc_Str);
    void RemoveOfRecentProjects(const QString & orc_Str);
    void ClearRecentProjects(void);
+   void SetScreenshotGifSucessTimeout(const int32_t os32_ScreenshotGifSucessTimer);
 
    // Project specific set
    void SetProjLastMode(const int32_t os32_New);
@@ -317,6 +319,7 @@ private:
    uint32_t mu32_SysViewFlag;                            ///< History of last known system view flag
    int32_t ms32_SysDefNodeEditTabIndex;                  ///< History of last known tab index in node edit
    int32_t ms32_SysDefBusEditTabIndex;                   ///< History of last known tab index in bus edit
+   int32_t ms32_ScreenshotGifSucessTimeout;              ///< Screenshot GIF Play timer
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

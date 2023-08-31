@@ -201,6 +201,47 @@ void C_OgeSpxToolTipBase::SetMaximumCustom(const int32_t os32_Value, const bool 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten key press event to handle copy paste like in context menu
+
+   The spinbox has a weird copy cut behavior when a prefix is set. The functions of the lineedit are working correctly
+   and are already used for the context menu. Therefore the functionality is redirected to the same
+   lineedit functions.
+
+   \param[in]       opc_KeyEvent     Qt key event to catch
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeSpxToolTipBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+{
+   bool q_CallOriginal = true;
+
+   if (opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true)
+   {
+      switch (opc_KeyEvent->key())
+      {
+      case Qt::Key_C:
+         this->m_Copy();
+         q_CallOriginal = false;
+         break;
+      case Qt::Key_X:
+         this->m_Cut();
+         q_CallOriginal = false;
+         break;
+      case Qt::Key_V:
+         this->m_Paste();
+         q_CallOriginal = false;
+         break;
+      default:
+         break;
+      }
+   }
+
+   if (q_CallOriginal == true)
+   {
+      QSpinBox::keyPressEvent(opc_KeyEvent);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize custom context menu functionality
 */
 //----------------------------------------------------------------------------------------------------------------------

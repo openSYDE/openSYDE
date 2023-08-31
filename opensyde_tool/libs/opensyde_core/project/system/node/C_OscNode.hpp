@@ -105,12 +105,13 @@ public:
    const C_OscCanProtocol * GetRelatedCanProtocolConst(const uint32_t ou32_DataPoolIndex) const;
    C_OscCanProtocol * GetRelatedCanProtocol(const uint32_t ou32_DataPoolIndex);
    void CheckErrorCanProtocol(const C_OscCanProtocol::E_Type oe_ComProtocol, const bool oq_ComProtocolUsedByInterface,
-                              bool & orq_InvalidRxSignalCount, bool & orq_InvalidTxSignalCount,
-                              bool & orq_InvalidCoRxPdoCount, bool & orq_InvalidCoTxPdoCount) const;
+                              bool & orq_InvalidMaxRxSignalCount, bool & orq_InvalidMaxTxSignalCount,
+                              bool & orq_InvalidCoRxPdoCount, bool & orq_InvalidCoTxPdoCount,
+                              bool & orq_InvalidMinSignalCount) const;
    void CheckErrorCanProtocol(const uint32_t ou32_InterfaceIndex, const C_OscCanProtocol::E_Type oe_ComProtocol,
-                              const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidRxSignalCount,
-                              bool & orq_InvalidTxSignalCount, bool & orq_InvalidCoRxPdoCount,
-                              bool & orq_InvalidCoTxPdoCount) const;
+                              const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidMaxRxSignalCount,
+                              bool & orq_InvalidMaxTxSignalCount, bool & orq_InvalidCoRxPdoCount,
+                              bool & orq_InvalidCoTxPdoCount, bool & orq_InvalidMinSignalCount) const;
 
    void CheckErrorDataPoolNumListsAndElements(const uint32_t ou32_DataPoolIndex,
                                               bool & orq_InvalidNumberOfListsOrElements) const;
@@ -185,7 +186,8 @@ private:
    uint32_t m_GetContainerHash(const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ContainerIndex) const;
    static void mh_CheckErrorCanProtocolDirection(const std::vector<C_OscCanMessage> & orc_Messages,
                                                  const C_OscCanProtocol::E_Type oe_ComProtocol,
-                                                 bool & orq_InvalidSignalCount, bool & orq_InvalidCoPdoCount);
+                                                 bool & orq_InvalidMaxSignalCount, bool & orq_InvalidCoPdoCount,
+                                                 bool & orq_InvalidMinSignalCount);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

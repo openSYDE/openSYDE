@@ -25,12 +25,18 @@
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_OgePopUpDialog.hpp"
 #include "C_SyvDaDashboardTabProperties.hpp"
+#include "C_PuiProject.hpp"
+#include "C_SyvDaDashboardScreenshot.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SclString.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -156,7 +162,31 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32_t ou32_ViewIndex, const 
            &C_SyvDaTearOffWidget::SigDataPoolRead);
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigNvmReadList, this,
            &C_SyvDaTearOffWidget::SigNvmReadList);
+
+   this->mpc_Ui->pc_ScreenshotButton->setText("");
+   mpc_ScreenshotDashboardTab = new C_SyvDaDashboardScreenshot(this->mpc_Dashboard, this->mpc_Ui->pc_ScreenshotButton);
+   mpc_ScreenshotDashboardTab->setAccessibleName(orc_Name);
+   connect(this->mpc_Ui->pc_ScreenshotButton, &C_OgePubIconEvents::SigPubIconClicked, this,
+           &C_SyvDaTearOffWidget::m_PerformScreenshot);
 } //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Performing screenshot action and decides to open screenshot save location in file explorer
+
+   \param[in]       oq_IsControlButtonPressed     Is Control Key pressed or not
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaTearOffWidget::m_PerformScreenshot(const bool oq_IsControlButtonPressed)
+{
+   if (oq_IsControlButtonPressed == true)
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithCtrlPress();
+   }
+   else
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithoutCtrlPress();
+   }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -281,6 +311,8 @@ void C_SyvDaTearOffWidget::SetDarkMode(const bool oq_Active)
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "DarkMode", oq_Active);
    this->mpc_Ui->pc_WidgetTab->SetDarkMode(oq_Active);
    this->m_AdaptSpaceHolderWidgetColor();
+
+   mpc_ScreenshotDashboardTab->SetDarkModeActive(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -414,6 +446,27 @@ void C_SyvDaTearOffWidget::closeEvent(QCloseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Over written keyPressEvent
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaTearOffWidget::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   QWidget::keyPressEvent(opc_Event);
+   if ((opc_Event->modifiers().testFlag(Qt::ControlModifier) == true) &&
+       (opc_Event->key() == static_cast<int32_t>(Qt::Key_F10)))
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithCtrlPress();
+   }
+   if ((opc_Event->modifiers().testFlag(Qt::ControlModifier) == false) &&
+       (opc_Event->key() == static_cast<int32_t>(Qt::Key_F10)))
+   {
+      mpc_ScreenshotDashboardTab->PerformScreenshotWithoutCtrlPress();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle active flag changed
 
    \param[in]  opc_Source  Signal source widget
@@ -501,6 +554,7 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
             //Apply text
             opc_Source->SetText(pc_Dialog->GetDashboardTabName());
             opc_Source->SetToolTip(pc_Dialog->GetDashboardTabName(), pc_Dialog->GetDashboardTabComment());
+            mpc_ScreenshotDashboardTab->setAccessibleName(pc_Dialog->GetDashboardTabName());
          }
       }
 

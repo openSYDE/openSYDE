@@ -1521,6 +1521,55 @@ int32_t C_OscProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  FactoryMode implementation.
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   Request the server to do the called operation.
+   Currently the only known operation is "master reset" with ou8_Operation = hu8_OSY_FACTORY_MODE_MASTER_RESET
+
+   \param[in]   ou8_Operation    factory mode operation: 0 = MasterReset, 1..255 reserved
+   \param[out]  opu8_NrCode      if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::OsyFactoryMode(const uint8_t ou8_Operation, uint8_t * const opu8_NrCode)
+{
+   int32_t s32_Return;
+
+   std::vector<uint8_t> c_ReceiveData;
+   std::vector<uint8_t> c_SendData;
+   uint8_t u8_NrErrorCode = 0U;
+
+   c_SendData.resize(2);
+   c_SendData[0] = ou8_Operation;
+   c_SendData[1] = 0U; // reserved byte for future usage
+
+   s32_Return = m_RoutineControl(mhu16_OSY_RC_SID_FACTORY_MODE, mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE,
+                                 c_SendData, 0U, true, c_ReceiveData, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+   if (s32_Return != C_NO_ERR)
+   {
+      C_SclString c_ErrorText;
+      c_ErrorText.PrintFormatted("RoutineControl::FactoryMode(Operation: %d)", ou8_Operation);
+      m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   ReadCertificateSerialNumber service implementation
 
    Send request and wait for response.
@@ -5272,10 +5321,10 @@ int32_t C_OscProtocolDriverOsy::OsyEcuReset(const uint8_t ou8_ResetType)
    Send format: 2 bytes channel identifier, 2 bytes new node identifier
    Example: (0x00, 0x03, 0x01, 0x09) -> , type:CAN, channel:3, bus id:1, node id:9
 
-   \param[in]  ou8_ChannelType       selected channel type (0 equals CAN, 1 equals Ethernet)
-   \param[in]  ou8_ChannelIndex      selected channel index
-   \param[in]  orc_NewNodeId         new bus id (0..15) and node id (0..126) configuration for the server
-   \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
+   \param[in]   ou8_ChannelType     selected channel type (0 equals CAN, 1 equals Ethernet)
+   \param[in]   ou8_ChannelIndex    selected channel index
+   \param[in]   orc_NewNodeId       new bus id (0..15) and node id (0..126) configuration for the server
+   \param[out]  opu8_NrCode         if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received

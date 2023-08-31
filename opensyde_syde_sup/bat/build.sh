@@ -20,14 +20,16 @@ while getopts ':l' flag; do
     esac
 done
 
-# create build directory "temp"
+echo "create build directory 'temp'"
 rm -rf ../temp
 mkdir ../temp
 cd ../temp
 
 # this step is always needed
-# run cmake with toolchain file to force 32 bit compilation
+echo "run cmake with toolchain file for 64bit compilation"
+
 cmake ../pjt -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_ubuntu.cmake 
+
 # only build the whole thing if no flag was given
 if [ "$build_only_lint_config" = false ] ; then
     echo "build and install"

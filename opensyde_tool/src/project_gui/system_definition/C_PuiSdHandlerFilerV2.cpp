@@ -1454,8 +1454,8 @@ void C_PuiSdHandlerFilerV2::mh_SaveNode(const C_PuiSdNode & orc_Node, C_OscXmlPa
    Load GUI-specific information about bus.
    Also uses base class function to load basic information.
 
-   \param[in,out]  orc_Bus        UI bus data container
-   \param[in,out]  orc_XmlParser  XML parser with the "current" element set to the "bus" element
+   \param[in,out]  orc_Bus          UI bus data container
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "bus" element
 
    \return
    C_NO_ERR    information loaded

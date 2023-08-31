@@ -16,6 +16,7 @@
 #include <QHeaderView>
 #include <QApplication>
 #include <algorithm> //for std::sort
+#include <QDrag>
 
 #include "stwerrors.hpp"
 #include "constants.hpp"
@@ -142,12 +143,6 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
       &C_CamMetTreeView::m_RestoreUserSettings);
 
    connect(this, &C_CamMetTreeView::SigEmitAddFilter, this, &C_CamMetTreeView::m_AddFilter);
-
-   this->setDropIndicatorShown(true);
-   this->setDragEnabled(true);
-   this->setDragDropMode(QAbstractItemView::DragDrop);
-   this->setDefaultDropAction(Qt::MoveAction);
-   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default destructor
@@ -759,6 +754,36 @@ int32_t C_CamMetTreeView::sizeHintForColumn(const int32_t os32_Column) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event
+
+   \param[in,out] oc_SupportedActions Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::startDrag(const Qt::DropActions oc_SupportedActions)
+{
+   if (this->selectedIndexes().size() > 0)
+   {
+      QModelIndexList pc_Item = this->selectedIndexes();
+
+      QPixmap c_Pix;
+      QDrag * const pc_Drag = new QDrag(this);
+      QMimeData * const pc_MimeData = new QMimeData();
+
+      pc_MimeData->setData("application/x-qabstractitemmodeldatalist", this->model()->data(pc_Item[0]).toByteArray());
+
+      const QIcon c_Icon("://images/IconMessageSelected.svg");
+      c_Pix = c_Icon.pixmap(25, 25);
+      pc_Drag->setPixmap(c_Pix);
+      pc_Drag->setHotSpot(c_Pix.rect().center());
+      pc_Drag->setMimeData(pc_MimeData);
+
+      pc_Drag->exec(oc_SupportedActions);
+      this->clearSelection();
+   } //lint !e429  //no memory leak because of the parent and the Qt memory management
+     //              and QDrag does take ownership on setMimeData
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize context menu entries
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1094,7 +1119,15 @@ void C_CamMetTreeView::m_AddFilter()
       for (QModelIndexList::const_iterator c_It = c_Indices.begin(); c_It != c_Indices.end(); ++c_It)
       {
          const QModelIndex & rc_Index = *c_It;
-         const int32_t s32_Row = this->mc_SortProxyModel.mapToSource(rc_Index).row();
+         int32_t s32_Row = 0;
+         if (this->currentIndex().parent().row() == -1)
+         {
+            s32_Row = this->mc_SortProxyModel.mapToSource(rc_Index).row();
+         }
+         else
+         {
+            s32_Row = this->mc_SortProxyModel.mapToSource(this->currentIndex().parent()).row();
+         }
          c_SelectedRowIndexs << s32_Row;
          if (((c_SelectedRowIndexs.size() % 7) == 1) || (c_SelectedRowIndexs.size() == 1))
          {

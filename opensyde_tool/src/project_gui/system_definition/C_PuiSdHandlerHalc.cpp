@@ -1799,6 +1799,7 @@ int32_t C_PuiSdHandlerHalc::HalcGenerateDatapools(const uint32_t ou32_NodeIndex)
                            {
                               rc_Datapool.q_ScopeIsPrivate = rc_Tmp.q_ScopeIsPrivate;
                               rc_Datapool.s32_RelatedDataBlockIndex = rc_Tmp.s32_RelatedDataBlockIndex;
+                              rc_Datapool.u16_DefinitionCrcVersion = rc_Tmp.u16_DefinitionCrcVersion;
                            }
                         }
 
@@ -1978,6 +1979,64 @@ bool C_PuiSdHandlerHalc::CheckHalcChannelNameAvailable(const uint32_t ou32_NodeI
       }
    }
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node added
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerHalc::m_HandleSyncNodeAdded(const uint32_t ou32_Index)
+{
+   std::map<uint32_t, uint32_t> c_NewContent;
+   C_PuiSdHandlerNodeLogic::m_HandleSyncNodeAdded(ou32_Index);
+   for (std::map<uint32_t, uint32_t>::iterator c_It = this->mc_PreviousHashes.begin();
+        c_It != this->mc_PreviousHashes.end(); ++c_It)
+   {
+      if (c_It->first >= ou32_Index)
+      {
+         //Adapt
+         c_NewContent[c_It->first + 1] = c_It->second;
+      }
+      else
+      {
+         //No adaptation necessary
+         c_NewContent[c_It->first] = c_It->second;
+      }
+   }
+   this->mc_PreviousHashes = c_NewContent;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node about to be deleted
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerHalc::m_HandleSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
+{
+   std::map<uint32_t, uint32_t> c_NewContent;
+   C_PuiSdHandlerNodeLogic::m_HandleSyncNodeAboutToBeDeleted(ou32_Index);
+   for (std::map<uint32_t, uint32_t>::iterator c_It = this->mc_PreviousHashes.begin();
+        c_It != this->mc_PreviousHashes.end(); ++c_It)
+   {
+      if (c_It->first > ou32_Index)
+      {
+         //Adapt
+         c_NewContent[c_It->first - 1] = c_It->second;
+      }
+      else if (c_It->first == ou32_Index)
+      {
+         //Remove == don't add
+      }
+      else
+      {
+         //No adaptation necessary
+         c_NewContent[c_It->first] = c_It->second;
+      }
+   }
+   this->mc_PreviousHashes = c_NewContent;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

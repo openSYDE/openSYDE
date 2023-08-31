@@ -812,12 +812,12 @@ void C_OscExportDataPool::mh_AddGlobalVariables(C_SclStringList & orc_Data,  con
 
    Implementation file only.
 
-   \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             Datapool configuration
-   \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
-   \param[in]  ou8_ProcessId            ID of process owning this Datapool
-   \param[in]  ou8_DataPoolIndexRemote  index of Datapool within remote process (only used for remote Datapools)
-   \param[in]  oe_Linkage               flag for linkage context
+   \param[out]  orc_Data                  converted data to string list
+   \param[in]   orc_DataPool              Datapool configuration
+   \param[in]   ou16_GenCodeVersion       version of structure (generate code as specified for this version)
+   \param[in]   ou8_ProcessId             ID of process owning this Datapool
+   \param[in]   ou8_DataPoolIndexRemote   index of Datapool within remote process (only used for remote Datapools)
+   \param[in]   oe_Linkage                flag for linkage context
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscExportDataPool::mh_AddModuleGlobal(C_SclStringList & orc_Data, const C_OscNodeDataPool & orc_DataPool,
@@ -828,7 +828,7 @@ void C_OscExportDataPool::mh_AddModuleGlobal(C_SclStringList & orc_Data, const C
    C_SclString c_String;
    uint32_t u32_HashValue = 0U;
 
-   orc_DataPool.CalcDefinitionHash(u32_HashValue);
+   orc_DataPool.CalcGeneratedDefinitionHash(u32_HashValue);
 
    orc_Data.Append(C_OscExportUti::h_GetSectionSeparator("Module Global Variables"));
 

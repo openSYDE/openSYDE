@@ -17,7 +17,6 @@
 #include "stwerrors.hpp"
 
 #include "C_SyvComDriverDiag.hpp"
-#include "C_OscDiagProtocolOsy.hpp"
 #include "C_PuiSvHandler.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_PuiSvData.hpp"
@@ -2235,8 +2234,8 @@ int32_t C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32_t ou32_ActiveD
 
    m_GetAllDatapoolMetadata must be called before calling m_CheckDatapoolsAndCreateMapping
 
-   \param[in]      ou32_ActiveDiagNodeIndex   Active diag node index (mc_ActiveDiagNodes)
-   \param[in,out]  orc_ErrorDetails           Details for current error
+   \param[in]      ou32_ActiveDiagNodeIndex  Active diag node index (mc_ActiveDiagNodes)
+   \param[in,out]  orc_ErrorDetails          Details for current error
 
    \return
    C_NO_ERR   Datapools are as expected
@@ -2342,17 +2341,9 @@ int32_t C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const uint32_t o
                else
                {
                   bool q_Match = false;
-                  uint32_t u32_DataPoolChecksum = 0U;
-
-                  // Check checksum
-                  rc_Datapool.CalcDefinitionHash(u32_DataPoolChecksum);
-
-                  s32_Return = pc_Protocol->DataPoolVerify(
-                     static_cast<uint8_t>(u32_ServerDatapoolIndex),
-                     0U, //N/A for openSYDE protocol
-                     0U, //N/A for openSYDE protocol
-                     u32_DataPoolChecksum,
-                     q_Match);
+                  s32_Return = C_SyvComDriverDiag::mh_HandleDatapoolCrcVerification(rc_Datapool, *pc_Protocol,
+                                                                                    u32_ServerDatapoolIndex,
+                                                                                    q_Match, c_ErrorReason);
 
                   if (s32_Return == C_NO_ERR)
                   {
@@ -2387,13 +2378,6 @@ int32_t C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const uint32_t o
                                               C_SclString::IntToStr(u32_ServerDatapoolIndex) + ").");
                         }
                      }
-                  }
-                  else
-                  {
-                     // Service error
-                     c_ErrorReason = "The verify of the Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
-                                     " failed with error " +
-                                     static_cast<QString>(C_OscLoggingHandler::h_StwError(s32_Return).c_str());
                   }
                }
             }
@@ -2537,6 +2521,107 @@ uint32_t C_SyvComDriverDiag::m_GetActiveDiagIndex(const uint32_t ou32_NodeIndex,
    }
 
    return u32_DiagNodeIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle datapool crc verification
+
+   \param[in]      orc_Datapool              Datapool
+   \param[in,out]  orc_Protocol              Protocol
+   \param[in]      ou32_ServerDatapoolIndex  Server datapool index
+   \param[out]     orq_Match                 Match
+   \param[in,out]  orc_ErrorReason           Error reason
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response
+   C_RD_WR    unexpected content in response (here: wrong data pool index)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_SyvComDriverDiag::mh_HandleDatapoolCrcVerification(const C_OscNodeDataPool & orc_Datapool,
+                                                             stw::opensyde_core::C_OscDiagProtocolOsy & orc_Protocol,
+                                                             const uint32_t ou32_ServerDatapoolIndex, bool & orq_Match,
+                                                             QString & orc_ErrorReason)
+{
+   int32_t s32_Return = C_SyvComDriverDiag::mh_DoDatapoolCrcVerification(orc_Datapool, orc_Protocol,
+                                                                         ou32_ServerDatapoolIndex, true,
+                                                                         orq_Match, orc_ErrorReason);
+
+   if (s32_Return == C_NO_ERR)
+   {
+      if (orq_Match == false)
+      {
+         if ((orc_Datapool.e_Type != C_OscNodeDataPool::eNVM) &&
+             (orc_Datapool.e_Type != C_OscNodeDataPool::eHALC_NVM))
+         {
+            osc_write_log_info("connect", "CRC mismatch, trying V1 compatibility CRC with adapted default values ...");
+            s32_Return = C_SyvComDriverDiag::mh_DoDatapoolCrcVerification(orc_Datapool, orc_Protocol,
+                                                                          ou32_ServerDatapoolIndex, false,
+                                                                          orq_Match, orc_ErrorReason);
+         }
+      }
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Do datapool crc verification
+
+   \param[in]      orc_Datapool              Datapool
+   \param[in,out]  orc_Protocol              Protocol
+   \param[in]      ou32_ServerDatapoolIndex  Server datapool index
+   \param[in]      oq_UseGeneratedVariant    Use generated variant
+   \param[out]     orq_Match                 Match
+   \param[in,out]  orc_ErrorReason           Error reason
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response
+   C_RD_WR    unexpected content in response (here: wrong data pool index)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_SyvComDriverDiag::mh_DoDatapoolCrcVerification(const C_OscNodeDataPool & orc_Datapool,
+                                                         C_OscDiagProtocolOsy & orc_Protocol,
+                                                         const uint32_t ou32_ServerDatapoolIndex,
+                                                         const bool oq_UseGeneratedVariant, bool & orq_Match,
+                                                         QString & orc_ErrorReason)
+{
+   int32_t s32_Return;
+   uint32_t u32_DataPoolChecksum = 0U;
+
+   // Check checksum
+   if (oq_UseGeneratedVariant)
+   {
+      orc_Datapool.CalcGeneratedDefinitionHash(u32_DataPoolChecksum);
+   }
+   else
+   {
+      orc_Datapool.CalcDefinitionHash(u32_DataPoolChecksum,
+                                      C_OscNodeDataPool::eCT_NON_NVM_DEFAULT_COMPAT_V1);
+   }
+
+   s32_Return = orc_Protocol.DataPoolVerify(
+      static_cast<uint8_t>(ou32_ServerDatapoolIndex),
+      0U, //N/A for openSYDE protocol
+      0U, //N/A for openSYDE protocol
+      u32_DataPoolChecksum,
+      orq_Match);
+   if (s32_Return != C_NO_ERR)
+   {
+      // Service error
+      orc_ErrorReason = "The verify of the Datapool " + static_cast<QString>(orc_Datapool.c_Name.c_str()) +
+                        " failed with error " +
+                        static_cast<QString>(C_OscLoggingHandler::h_StwError(s32_Return).c_str());
+   }
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

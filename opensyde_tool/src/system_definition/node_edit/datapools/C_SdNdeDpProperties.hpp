@@ -90,7 +90,12 @@ private:
    void m_BreakSharedRelation(void);
    bool m_IsRelatedAppValid(const int32_t os32_RelatedDataBlockIndex) const;
    int32_t m_GetCurrentDataBlockIndex(void) const;
+   void m_SetCrcVersion();
+   void m_GetCrcVersion() const;
    bool mq_IsDatapoolShared;
+
+   static const int32_t mhs32_VERSION_INDEX_V1;
+   static const int32_t mhs32_VERSION_INDEX_V2;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

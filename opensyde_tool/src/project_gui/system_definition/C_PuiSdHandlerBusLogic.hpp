@@ -43,6 +43,11 @@ public:
                                     std::vector<QString> * const opc_InvalidNodesForBitRate = NULL, std::vector<stw::opensyde_core::C_OscCanProtocol::E_Type> * const opc_InvalidProtocols =
                                        NULL) const;
    uint32_t GetOscBusesSize(void) const;
+   int32_t SetAutomaticBusRoutingSettings(const uint32_t ou32_BusIndex);
+   int32_t SetAutomaticNodeInterfaceRoutingSettings(const uint32_t ou32_NodeIndex,
+                                                    const opensyde_core::C_OscSystemBus::E_Type oe_ComType,
+                                                    const uint8_t ou8_InterfaceNumber);
+   int32_t SetAutomaticNodeInterfaceRoutingSettings(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex);
 
    //Connections
    void AddConnection(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber,
@@ -175,6 +180,8 @@ public:
                            const C_PuiSdNodeCanSignal & orc_UiSignal);
    int32_t DeleteCanSignal(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                            const uint32_t & oru32_SignalIndex);
+
+   //Misc util
    void ConvertElementIndexToSignalIndex(
       const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_NodeDatapoolListElementId,
       stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
@@ -182,8 +189,6 @@ public:
    int32_t CheckMessageMatch(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId1,
                              const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId2,
                              bool & orq_IsMatch, const bool oq_IgnoreMessageDirection = false) const;
-
-   //Misc util
    int32_t MapBusNameToIndex(const QString & orc_BusName, uint32_t & oru32_BusIndex) const;
    int32_t MapBusIndexToName(const uint32_t ou32_BusIndex, QString & orc_BusName) const;
    QString GetCanSignalDisplayName(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,

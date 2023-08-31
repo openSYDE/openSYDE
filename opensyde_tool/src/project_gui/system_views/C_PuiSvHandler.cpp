@@ -4399,7 +4399,7 @@ const
                   {
                      const QString c_Text = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
                                             C_GtGetText::h_GetText(
-                        " (Communication interface flags \"Routing\" disabled)");
+                        " (Communication interface flags \"Routing\" disabled or not supported.)");
 
                      // Generic routing error independent of the functionality
                      orc_ErrorRoutingDetails[ms32_SUBMODE_SYSVIEW_SETUP][u32_Counter] = c_Text;

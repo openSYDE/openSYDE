@@ -53,9 +53,9 @@ C_OscNodeDataPoolFilerV2::C_OscNodeDataPoolFilerV2(void)
    pre-condition: the passed XML parser has the active node set to "data-pool"
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
-   \param[in]     ou16_XmlFormatVersion  version of XML format
-   \param[out]    orc_NodeDataPool data storage
-   \param[in,out] orc_XmlParser    XML with data-pool active
+   \param[in]      ou16_XmlFormatVersion  version of XML format
+   \param[out]     orc_NodeDataPool       data storage
+   \param[in,out]  orc_XmlParser          XML with data-pool active
 
    \return
    C_NO_ERR   data read
@@ -78,6 +78,8 @@ int32_t C_OscNodeDataPoolFilerV2::h_LoadDataPool(const uint16_t ou16_XmlFormatVe
       orc_NodeDataPool.s32_RelatedDataBlockIndex = -1;
    }
    orc_NodeDataPool.q_IsSafety = orc_XmlParser.GetAttributeBool("is-safety");
+   // probably deprecated project -> default to first version
+   orc_NodeDataPool.u16_DefinitionCrcVersion = 1U;
    orc_NodeDataPool.u32_NvmStartAddress = orc_XmlParser.GetAttributeUint32("nvm-start-address");
    orc_NodeDataPool.u32_NvmSize = orc_XmlParser.GetAttributeUint32("nvm-size");
    if (orc_XmlParser.SelectNodeChild("type") == "type")
