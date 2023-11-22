@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLTREMODEL_H
-#define C_TBLTREMODEL_H
+#ifndef C_TBLTREMODEL_HPP
+#define C_TBLTREMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreSimpleModel.hpp"

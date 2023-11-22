@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISYCOLORSELECTWIDGET_H
-#define C_GISYCOLORSELECTWIDGET_H
+#ifndef C_GISYCOLORSELECTWIDGET_HPP
+#define C_GISYCOLORSELECTWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVector>

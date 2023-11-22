@@ -198,6 +198,30 @@ void C_GiSvDaToggleBase::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaToggleBase::UpdateShowValue(void)
+{
+   if (this->mpc_CheckBoxWidget != NULL)
+   {
+      // Poll only when something is expected
+      if (this->mq_ManualReadStarted == true)
+      {
+         QString c_Value;
+         float64_t f64_UnscaledValue;
+         if (this->m_GetLastValue(0UL, c_Value, &f64_UnscaledValue, NULL) == C_NO_ERR)
+         {
+            this->mpc_CheckBoxWidget->setChecked(static_cast<bool>(f64_UnscaledValue));
+            this->mq_ManualReadStarted = false;
+         }
+      }
+   }
+
+   // For write widget calling base class is not necessary
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sends the current set value of the element
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -205,8 +229,17 @@ void C_GiSvDaToggleBase::SendCurrentValue(void)
 {
    if (this->mpc_CheckBoxWidget != NULL)
    {
+      C_PuiSvDbDataElementScaling c_Scaling;
+      tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
+
       // Prepare the value
       this->mf64_WriteValue = static_cast<float64_t>(this->mpc_CheckBoxWidget->isChecked());
+      if (C_OscUtils::h_IsScalingActive(c_Scaling.f64_Factor, c_Scaling.f64_Offset) == true)
+      {
+         // Scaling necessary to prevent a rounding error to get 0 instead of 1
+         this->mf64_WriteValue = C_OscUtils::h_GetValueScaled(this->mf64_WriteValue, c_Scaling.f64_Factor,
+                                                              c_Scaling.f64_Offset);
+      }
 
       // Send the value
       C_GiSvDaRectBaseGroup::SendCurrentValue();
@@ -272,10 +305,12 @@ bool C_GiSvDaToggleBase::CallProperties(void)
             pc_Dialog->SetTheme(pc_Box->e_DisplayStyle);
 
             //Resize
-            c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter());
+            c_New->SetSize(C_SyvDaPeBase::h_GetTogglePopupSizeWithDashboardConnect());
 
             pc_PropertiesWidget->SetType(pc_Box->e_Type);
             pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);
+            pc_Dialog->SetAutoWriteOnConnect(pc_Box->q_AutoWriteOnConnect);
+            pc_Dialog->SetDashboardConnectInitialValue(pc_Box->e_InitialValueMode, pc_Box->c_InitialValue, true);
 
             if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
             {
@@ -295,11 +330,16 @@ bool C_GiSvDaToggleBase::CallProperties(void)
                   c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
                }
                c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
+               c_Box.q_AutoWriteOnConnect = pc_Dialog->GetAutoWriteOnConnect();
+               c_Box.e_InitialValueMode = pc_Dialog->GetDashboardConnectInitialValueMode();
+               c_Box.c_InitialValue = pc_Dialog->GetDashboardConnectInitialValue();
 
                //Force update
                this->mq_InitialStyleCall = true;
                //Apply
                this->me_WriteMode = pc_Dialog->GetWriteMode();
+               this->me_WriteInitialValueMode = c_Box.e_InitialValueMode;
+               this->mq_AutoWriteOnConnect = c_Box.q_AutoWriteOnConnect;
                this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
                this->UpdateType(c_Box.e_Type);
                this->ClearDataPoolElements();
@@ -337,20 +377,42 @@ void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
-   C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
    if (pc_Dashboard != NULL)
    {
       const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32_t>(this->ms32_Index));
-      if ((pc_Box != NULL) && (pc_Box->e_ElementWriteMode == C_PuiSvDbToggle::eWM_ON_CHANGE))
+      if (pc_Box != NULL)
       {
-         if (oq_Active == true)
+         if ((oq_Active == true) &&
+             (this->GetWidgetDataPoolElementCount() > 0U) &&
+             (pc_Box->e_InitialValueMode == C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE))
          {
-            connect(this->mpc_CheckBoxWidget, &C_OgePubDashboard::toggled, this, &C_GiSvDaToggleBase::SendCurrentValue);
+            // Special case: Defined constant value as start value is set
+            // Update before calling base class implementation
+            // Scaling is here necessary
+            C_PuiSvDbDataElementScaling c_Scaling;
+            QVariant c_VariantValue;
+            tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
+            c_VariantValue = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Box->c_InitialValue,
+                                                                                   c_Scaling.f64_Factor,
+                                                                                   c_Scaling.f64_Offset,
+                                                                                   0UL);
+            this->mpc_CheckBoxWidget->setChecked(c_VariantValue.toBool());
          }
-         else
+
+         C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
+
+         if (pc_Box->e_ElementWriteMode == C_PuiSvDbToggle::eWM_ON_CHANGE)
          {
-            disconnect(this->mpc_CheckBoxWidget, &C_OgePubDashboard::toggled, this,
+            if (oq_Active == true)
+            {
+               connect(this->mpc_CheckBoxWidget, &C_OgePubDashboard::toggled, this,
                        &C_GiSvDaToggleBase::SendCurrentValue);
+            }
+            else
+            {
+               disconnect(this->mpc_CheckBoxWidget, &C_OgePubDashboard::toggled, this,
+                          &C_GiSvDaToggleBase::SendCurrentValue);
+            }
          }
       }
    }

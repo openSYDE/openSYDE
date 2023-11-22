@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETREEWIDGETTOOLTIPBASE_H
-#define C_OGETREEWIDGETTOOLTIPBASE_H
+#ifndef C_OGETREEWIDGETTOOLTIPBASE_HPP
+#define C_OGETREEWIDGETTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeWidget>

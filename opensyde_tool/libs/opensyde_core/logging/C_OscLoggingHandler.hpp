@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCLOGGINGHANDLER_H
-#define C_OSCLOGGINGHANDLER_H
+#ifndef C_OSCLOGGINGHANDLER_HPP
+#define C_OSCLOGGINGHANDLER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <fstream>

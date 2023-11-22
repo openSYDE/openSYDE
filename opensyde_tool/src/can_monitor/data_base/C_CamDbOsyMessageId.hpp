@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMDBOSYMESSAGEID_H
-#define C_CAMDBOSYMESSAGEID_H
+#ifndef C_CAMDBOSYMESSAGEID_HPP
+#define C_CAMDBOSYMESSAGEID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscCanMessageIdentificationIndices.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBSVGICONONLY_H
-#define C_OGEPUBSVGICONONLY_H
+#ifndef C_OGEPUBSVGICONONLY_HPP
+#define C_OGEPUBSVGICONONLY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSvgRenderer>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABSTATUSINFORMATIONSMALL_H
-#define C_OGELABSTATUSINFORMATIONSMALL_H
+#ifndef C_OGELABSTATUSINFORMATIONSMALL_HPP
+#define C_OGELABSTATUSINFORMATIONSMALL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

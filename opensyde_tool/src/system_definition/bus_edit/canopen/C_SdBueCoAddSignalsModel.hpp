@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUECOADDSIGNALSMODEL_H
-#define C_SDBUECOADDSIGNALSMODEL_H
+#ifndef C_SDBUECOADDSIGNALSMODEL_HPP
+#define C_SDBUECOADDSIGNALSMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreItem.hpp"

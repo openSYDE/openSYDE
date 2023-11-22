@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDMANTOPOLOGYCOPYPASTEMANAGER_H
-#define C_SDMANTOPOLOGYCOPYPASTEMANAGER_H
+#ifndef C_SDMANTOPOLOGYCOPYPASTEMANAGER_HPP
+#define C_SDMANTOPOLOGYCOPYPASTEMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiNode.hpp"

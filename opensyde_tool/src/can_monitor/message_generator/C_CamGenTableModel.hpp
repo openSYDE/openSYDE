@@ -8,14 +8,15 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENTABLEMODEL_H
-#define C_CAMGENTABLEMODEL_H
+#ifndef C_CAMGENTABLEMODEL_HPP
+#define C_CAMGENTABLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
 #include "C_TblModelAction.hpp"
 #include "C_CamProMessageData.hpp"
 #include "C_OgeWiCustomMessage.hpp"
+#include "C_OscCanProtocol.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -43,13 +44,13 @@ public:
       eCYCLIC_TRIGGER,
       eCYCLIC_TIME,
       eKEY,
-      eMANUAL_TRIGGER
+      eMANUAL_TRIGGER,
+      eAUTO_SUPPORT
    };
 
    C_CamGenTableModel(QObject * const opc_Parent = NULL);
 
    void UpdateMessageKey(const uint32_t ou32_MessageIndex);
-   void UpdateMessageData(const uint32_t ou32_MessageIndex);
    void TriggerModelUpdateCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active);
 
    QVariant headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
@@ -69,6 +70,10 @@ public:
 
    std::vector<uint32_t> AddSpecificNewItems(const std::vector<uint32_t> & orc_SelectedIndex,
                                              const std::vector<C_CamProMessageData> & orc_Messages);
+   QString UpdateDataForAutoProtocol(const QModelIndex & orc_Index) const;
+   void UpdateMessageData(const uint32_t ou32_MessageIndex);
+   void UpdateAutoProtocolCellData(const uint32_t ou32_MessageIndex);
+   void TriggerMessageReload(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -80,6 +85,7 @@ Q_SIGNALS:
                   const QString & orc_Description);
    void SigUpdateMessageDlc(const uint32_t ou32_MessageIndex);
    void SigRegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active);
+   void SigAutoProtocolSupport(const uint32_t ou32_MessageIndex, const bool oq_Active);
 
 protected:
    uint32_t m_AddNewItem(const uint32_t ou32_SelectedIndex) override;
@@ -94,6 +100,7 @@ private:
 
    void m_CheckAndHandleRegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active);
    void m_SpecialXtdFlagSetHandling(const int32_t os32_Row, const uint32_t ou32_Index, const int32_t os32_Role);
+   stw::opensyde_core::C_OscCanProtocol::E_Type m_GetCurrentMessageProtocolType(const uint32_t ou32_MessageIndex) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USNODEDATAPOOLLIST_H
-#define C_USNODEDATAPOOLLIST_H
+#ifndef C_USNODEDATAPOOLLIST_HPP
+#define C_USNODEDATAPOOLLIST_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -5,8 +5,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDSCREENSHOT_H
-#define C_SYVDADASHBOARDSCREENSHOT_H
+#ifndef C_SYVDADASHBOARDSCREENSHOT_HPP
+#define C_SYVDADASHBOARDSCREENSHOT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

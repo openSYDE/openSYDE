@@ -156,6 +156,7 @@ void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message
    orc_XmlParser.SetAttributeBool("do-cyclic-trigger", orc_Message.q_DoCyclicTrigger);
    orc_XmlParser.SetAttributeUint32("interval", orc_Message.u32_CyclicTriggerTime);
    orc_XmlParser.SetAttributeUint32("key-press-offset", orc_Message.u32_KeyPressOffset);
+   orc_XmlParser.SetAttributeBool("auto-protocol-support", orc_Message.q_SetAutoSupportMode);
    orc_XmlParser.CreateNodeChild("name", orc_Message.c_Name);
    orc_XmlParser.CreateNodeChild("key", orc_Message.c_Key);
    orc_XmlParser.CreateNodeChild("database", orc_Message.c_DataBaseFilePath);
@@ -360,6 +361,15 @@ int32_t C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C
    else
    {
       s32_Retval = C_CONFIG;
+   }
+   if (orc_XmlParser.AttributeExists("auto-protocol-support") == true)
+   {
+      orc_Message.q_SetAutoSupportMode = orc_XmlParser.GetAttributeBool("auto-protocol-support");
+   }
+   else
+   {
+      //Default
+      orc_Message.q_SetAutoSupportMode = false;
    }
 
    if (orc_XmlParser.SelectNodeChild("name") == "name")

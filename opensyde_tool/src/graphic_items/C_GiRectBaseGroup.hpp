@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIRECTBASEGROUP_H
-#define C_GIRECTBASEGROUP_H
+#ifndef C_GIRECTBASEGROUP_HPP
+#define C_GIRECTBASEGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiBiRectBaseGroup.hpp"

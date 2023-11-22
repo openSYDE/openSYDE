@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXALLBASE_H
-#define C_OGESPXALLBASE_H
+#ifndef C_OGESPXALLBASE_HPP
+#define C_OGESPXALLBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QEvent>

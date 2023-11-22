@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABNAVIGATIONSUBHEADING_H
-#define C_OGELABNAVIGATIONSUBHEADING_H
+#ifndef C_OGELABNAVIGATIONSUBHEADING_HPP
+#define C_OGELABNAVIGATIONSUBHEADING_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

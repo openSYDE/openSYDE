@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIPORT_H
-#define C_GILIPORT_H
+#ifndef C_GILIPORT_HPP
+#define C_GILIPORT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>

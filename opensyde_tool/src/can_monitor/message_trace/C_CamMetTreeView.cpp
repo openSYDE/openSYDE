@@ -143,6 +143,12 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
       &C_CamMetTreeView::m_RestoreUserSettings);
 
    connect(this, &C_CamMetTreeView::SigEmitAddFilter, this, &C_CamMetTreeView::m_AddFilter);
+
+   this->setDropIndicatorShown(true);
+   this->setDragEnabled(true);
+   this->setDragDropMode(QAbstractItemView::DragDrop);
+   this->setDefaultDropAction(Qt::MoveAction);
+   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default destructor
@@ -233,6 +239,7 @@ void C_CamMetTreeView::ActionClearData(void)
    this->mc_GuiBuffer.ClearBuffer();
    this->mc_Model.ActionClearData();
    this->ResetCounter();
+   this->ResetEcesMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

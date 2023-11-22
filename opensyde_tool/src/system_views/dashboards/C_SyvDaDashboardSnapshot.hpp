@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDSNAPSHOT_H
-#define C_SYVDADASHBOARDSNAPSHOT_H
+#ifndef C_SYVDADASHBOARDSNAPSHOT_HPP
+#define C_SYVDADASHBOARDSNAPSHOT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDashboard.hpp"

@@ -374,6 +374,8 @@ void C_SdBueMessageSelectorWidget::OnNodeDisconnected(const uint32_t ou32_NodeIn
 void C_SdBueMessageSelectorWidget::RecheckErrorGlobal(void) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->RecheckErrorGlobal();
+   //Can also affect protocol
+   this->RecheckProtocolError();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISYCOLORBRIGHTNESSPICKER_H
-#define C_GISYCOLORBRIGHTNESSPICKER_H
+#ifndef C_GISYCOLORBRIGHTNESSPICKER_HPP
+#define C_GISYCOLORBRIGHTNESSPICKER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDesktopWidget>

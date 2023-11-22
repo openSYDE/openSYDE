@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREEVIEW_H
-#define C_CAMMETTREEVIEW_H
+#ifndef C_CAMMETTREEVIEW_HPP
+#define C_CAMMETTREEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <mutex>

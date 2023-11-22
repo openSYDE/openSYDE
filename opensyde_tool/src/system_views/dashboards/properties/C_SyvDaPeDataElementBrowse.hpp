@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEDATAELEMENTBROWSE_H
-#define C_SYVDAPEDATAELEMENTBROWSE_H
+#ifndef C_SYVDAPEDATAELEMENTBROWSE_HPP
+#define C_SYVDAPEDATAELEMENTBROWSE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

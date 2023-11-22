@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPVIEWWIDGET_H
-#define C_SDNDEDPVIEWWIDGET_H
+#ifndef C_SDNDEDPVIEWWIDGET_HPP
+#define C_SDNDEDPVIEWWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -102,4 +102,4 @@ private:
 }
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
-#endif // C_SDNDEDPVIEWWIDGET_H
+#endif // C_SDNDEDPVIEWWIDGET_HPP

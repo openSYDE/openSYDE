@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXINT64PROPERTIES_H
-#define C_OGESPXINT64PROPERTIES_H
+#ifndef C_OGESPXINT64PROPERTIES_HPP
+#define C_OGESPXINT64PROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

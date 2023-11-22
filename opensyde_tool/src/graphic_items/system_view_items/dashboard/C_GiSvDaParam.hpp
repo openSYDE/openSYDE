@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDAPARAM_H
-#define C_GISVDAPARAM_H
+#ifndef C_GISVDAPARAM_HPP
+#define C_GISVDAPARAM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvDaItPaWidgetNew.hpp"

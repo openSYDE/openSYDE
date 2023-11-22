@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSFILTERITEMWIDGET_H
-#define C_CAMMOSFILTERITEMWIDGET_H
+#ifndef C_CAMMOSFILTERITEMWIDGET_HPP
+#define C_CAMMOSFILTERITEMWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiOnlyBackground.hpp"

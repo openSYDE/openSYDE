@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEIMPORTDATAPOOLSELECTWIDGET_H
-#define C_CIEIMPORTDATAPOOLSELECTWIDGET_H
+#ifndef C_CIEIMPORTDATAPOOLSELECTWIDGET_HPP
+#define C_CIEIMPORTDATAPOOLSELECTWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

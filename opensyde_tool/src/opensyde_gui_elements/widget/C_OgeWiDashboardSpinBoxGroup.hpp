@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIDASHBOARDSPINBOXGROUP_H
-#define C_OGEWIDASHBOARDSPINBOXGROUP_H
+#ifndef C_OGEWIDASHBOARDSPINBOXGROUP_HPP
+#define C_OGEWIDASHBOARDSPINBOXGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbSpinBox.hpp"

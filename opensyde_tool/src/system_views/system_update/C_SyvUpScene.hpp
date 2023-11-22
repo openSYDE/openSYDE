@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPSCENE_H
-#define C_SYVUPSCENE_H
+#ifndef C_SYVUPSCENE_HPP
+#define C_SYVUPSCENE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

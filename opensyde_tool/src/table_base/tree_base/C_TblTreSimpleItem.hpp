@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLTRESIMPLEITEM_H
-#define C_TBLTRESIMPLEITEM_H
+#ifndef C_TBLTRESIMPLEITEM_HPP
+#define C_TBLTRESIMPLEITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBPARAM_H
-#define C_PUISVDBPARAM_H
+#ifndef C_PUISVDBPARAM_HPP
+#define C_PUISVDBPARAM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -69,6 +69,7 @@ public:
    virtual void UpdateShowValue(void);
    virtual void UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value);
    virtual void ConnectionActiveChanged(const bool oq_Active);
+   void ConnectionActiveStarted();
    virtual void EditModeActiveChanged(const bool oq_Active);
    virtual void SendCurrentValue(void);
    virtual bool CallProperties(void);
@@ -101,7 +102,8 @@ Q_SIGNALS:
    void SigSelected(QGraphicsItem * const opc_Item, const bool oq_ClearSelection);
    void SigDataPoolWrite(const uint32_t ou32_NodeIndex, const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                          const uint16_t ou16_ElementIndex);
-   void SigDataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index);
+   void SigDataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index,
+                        stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
    void SigTriggerUpdateTransmissionConfiguration(void);
    void SigDataElementsChanged(void);
    void SigHideToolTip(void);
@@ -110,7 +112,8 @@ protected:
    const stw::opensyde_gui_logic::C_PuiSvDashboard * m_GetSvDashboard(void) const;
 
    int32_t m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex, QString & orc_ScaledValue,
-                          float64_t * const opf64_UnscaledValueAsFloat) override;
+                          float64_t * const opf64_UnscaledValueAsFloat,
+                          float64_t * const opf64_ScaledValueAsFloat) override;
    int32_t m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex, std::vector<QString> & orc_ScaledValues,
                           std::vector<float64_t> & orc_UnscaledValues) override;
 
@@ -141,7 +144,9 @@ protected:
 
    C_SyvDaItDashboardBaseWidget * mpc_Widget;
    stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style me_Style;
-   stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_WriteMode me_WriteMode;
+   bool mq_AutoWriteOnConnect;
+   stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase::E_WriteMode me_WriteMode;
+   stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase::E_InitialValueModeType me_WriteInitialValueMode;
    bool mq_DarkMode;
    float64_t mf64_WriteValue;
    QMap<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString> mc_CommmunicationErrors;
@@ -149,12 +154,14 @@ protected:
    bool mq_InitialStyleCall;
    bool mq_EditModeActive;         // Edit mode of dashboard
    bool mq_EditContentModeEnabled; // Edit content mode of specific widget
+   bool mq_ManualReadStarted;      // Flag when a manual read operation was started. Can be used by the derived classes
 
 private:
    C_GiWiProxyBase * mpc_ProxyWidget;
    C_GiSvgGraphicsItem * mpc_WarningIcon;
    C_GiSvgGraphicsItem * mpc_ConflictIcon;
-   C_GiSvgGraphicsItem * mpc_RefreshIcon;
+   C_GiSvgGraphicsItem * mpc_ReadIcon;
+   C_GiSvgGraphicsItem * mpc_SendIcon;
    QGraphicsItemGroup * mpc_ButtonGroup;
    int32_t ms32_IconSize;
    static const float64_t mhf64_ACTION_POINT_OFFSET;
@@ -183,10 +190,13 @@ private:
    void m_InitConflictIcon(void);
    void m_InitButton(void);
    void m_ManualRead(void);
-   void m_HandleGenericButtonClick(void);
+   void m_HandleReadButtonClick(void);
    void m_UpdateErrorIconToolTip(void);
-   void m_ManualOperationStarted(void);
-   void m_ManualOperationFinished(void);
+   void m_ManualOperationStarted(const bool oq_IsRead);
+   void m_ManualOperationFinished();
+   void m_LoadSvWriteData(const stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase & orc_Data);
+   void m_UpdateSvWriteData(stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase & orc_Data) const;
+   QString m_GetItemsForButtonToolTip(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

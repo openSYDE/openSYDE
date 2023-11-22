@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDTOPOLOGYTOOLBOX_H
-#define C_SDTOPOLOGYTOOLBOX_H
+#ifndef C_SDTOPOLOGYTOOLBOX_HPP
+#define C_SDTOPOLOGYTOOLBOX_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

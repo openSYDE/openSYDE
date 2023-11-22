@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GICHECKBOX_H
-#define C_GICHECKBOX_H
+#ifndef C_GICHECKBOX_HPP
+#define C_GICHECKBOX_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPixmap>

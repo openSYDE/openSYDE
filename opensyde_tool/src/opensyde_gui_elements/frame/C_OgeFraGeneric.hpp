@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEFRAGENERIC_H
-#define C_OGEFRAGENERIC_H
+#ifndef C_OGEFRAGENERIC_HPP
+#define C_OGEFRAGENERIC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFrame>

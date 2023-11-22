@@ -159,6 +159,8 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32_t ou32_ViewIndex, QWidget 
    connect(this->mpc_Scene, &C_SyvUpScene::SigDiscardInfo, this, &C_SyvUpUpdateWidget::m_DiscardInfo);
    connect(this, &C_SyvUpUpdateWidget::SigNodeConnectStates, this->mpc_Scene, &C_SyvUpScene::SetNodeConnectStates);
    connect(this, &C_SyvUpUpdateWidget::SigNodeUpdateStates, this->mpc_Scene, &C_SyvUpScene::SetNodeUpdateStates);
+   connect(this, &C_SyvUpUpdateWidget::SigInvalidView, this->mpc_Ui->pc_WiUpdateInformation,
+           &C_SyvUpInformationWidget::SigInvalidView);
 
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvUpUpdateWidget::m_Timer);
 
@@ -698,6 +700,10 @@ void C_SyvUpUpdateWidget::m_UpdatePackageState(const int32_t os32_State)
    {
       this->mpc_Ui->pc_PbConnect->setEnabled(false);
       this->mpc_Ui->pc_PbUpdate->setEnabled(false);
+
+      //disable button "CreateUpdatePackage"
+      //when Connect and Update is enabled we also want to lock the Update Package creation
+      Q_EMIT this->SigInvalidView();
    }
    //Update scene as well
    if (this->mpc_Scene != NULL)

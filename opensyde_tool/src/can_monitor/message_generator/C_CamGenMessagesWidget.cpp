@@ -79,6 +79,8 @@ C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
            &C_CamGenMessagesWidget::SigSendMessage);
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigRegisterCyclicMessage, this,
            &C_CamGenMessagesWidget::SigRegisterCyclicMessage);
+   connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigAutoProtocolSupport, this,
+           &C_CamGenMessagesWidget::SigAutoProtocolSupport);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,6 +197,15 @@ void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const uint32_t ou32
                                                              const bool oq_Active) const
 {
    this->mpc_Ui->pc_TableView->TriggerModelUpdateCyclicMessage(ou32_MessageIndex, oq_Active);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Request trigger of model function for updating message AutoProtocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenMessagesWidget::TriggerMessageReload()
+{
+   this->mpc_Ui->pc_TableView->TriggerMessageReload();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

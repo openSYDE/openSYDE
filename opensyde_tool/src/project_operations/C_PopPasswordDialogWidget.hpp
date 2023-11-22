@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPPASSWORDDIALOGWIDGET_H
-#define C_POPPASSWORDDIALOGWIDGET_H
+#ifndef C_POPPASSWORDDIALOGWIDGET_HPP
+#define C_POPPASSWORDDIALOGWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDialog>

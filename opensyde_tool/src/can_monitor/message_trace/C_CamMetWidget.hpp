@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETWIDGET_H
-#define C_CAMMETWIDGET_H
+#ifndef C_CAMMETWIDGET_HPP
+#define C_CAMMETWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -93,6 +93,7 @@ Q_SIGNALS:
    void SigStopLogging(void);
    void SigEmitAddFilterToParentWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
    void SigSendCanMsgDroppedToChildrenWidget(void);
+   void SigClearData(void);
 
    // Values of os32_Result:
    // C_NO_ERR    required data from file successfully stored in orc_Definition and DBC file added to interpretation

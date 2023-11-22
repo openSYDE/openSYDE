@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMUTISTYLESHEETS_H
-#define C_CAMUTISTYLESHEETS_H
+#ifndef C_CAMUTISTYLESHEETS_HPP
+#define C_CAMUTISTYLESHEETS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

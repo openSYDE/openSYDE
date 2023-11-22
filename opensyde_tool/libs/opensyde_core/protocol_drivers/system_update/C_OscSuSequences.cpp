@@ -22,12 +22,13 @@
 #include "TglUtils.hpp"
 #include "TglTime.hpp"
 #include "TglFile.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscDataDealerNvmSafe.hpp"
 #include "C_OscDiagProtocolOsy.hpp"
 #include "C_OscSecurityPem.hpp"
+#include "C_OscUpdateUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -305,12 +306,12 @@ int32_t C_OscSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SclString> 
 
    std::vector<uint32_t> c_SignatureAddresses(orc_FilesToFlash.size()); ///< addresses of signatures within hex files
 
-   //C_OsyHexFile cannot be copied; so we cannot put it into a resizable vector
+   //C_OscHexFile cannot be copied; so we cannot put it into a resizable vector
    //-> create instances manually
-   std::vector<C_OsyHexFile *> c_Files(orc_FilesToFlash.size());
+   std::vector<C_OscHexFile *> c_Files(orc_FilesToFlash.size());
    for (uint32_t u32_File = 0U; u32_File < c_Files.size(); u32_File++)
    {
-      c_Files[u32_File] = new C_OsyHexFile();
+      c_Files[u32_File] = new C_OscHexFile();
    }
 
    //try to open files to check whether we have valid hex files before we start messing with the target's flash memory:
@@ -2506,7 +2507,7 @@ int32_t C_OscSuSequences::h_CreateTemporaryFolder(const std::vector<C_OscNode> &
    Workflow:
    * Read application properties from servers (e.g. using ReadDeviceInformation())
    * Parse application properties from client side hex files
-        (e.g. using C_OsyHexFile::ScanApplicationInformationBlockFromHexFile())
+        (e.g. using C_OscHexFile::ScanApplicationInformationBlockFromHexFile())
    * call this function
    * set up parameter for UpdateSystem() based on the results of this function
 
@@ -4228,7 +4229,7 @@ void C_OscSuSequences::h_FillDoFlashWithPemStates(const C_OscViewNodeUpdate::E_S
 void C_OscSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceInformation & orc_Info,
                                                               C_SclStringList & orc_Text)
 {
-   C_SclString c_Line;
+   const C_SclStringList c_MoreInformation = orc_Info.c_MoreInformation.FlashloaderInformationToText();
 
    orc_Text.Clear();
    orc_Text.Add("Device name: " + orc_Info.c_DeviceName);
@@ -4250,67 +4251,7 @@ void C_OscSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
                    ((orc_Info.c_Applications[u8_Application].u8_SignatureValid == 0) ? "yes" : "no"));
       orc_Text.Add(" Additional information: " + orc_Info.c_Applications[u8_Application].c_AdditionalInformation);
    }
-
-   c_Line.PrintFormatted("Flashloader software version: V%d.%02dr%d",
-                         orc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[0],
-                         orc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[1],
-                         orc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[2]);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Flashloader protocol version: V%d.%02dr%d",
-                         orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[0],
-                         orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[1],
-                         orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[2]);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Protocol version: V%d.%02dr%d", orc_Info.c_MoreInformation.au8_ProtocolVersion[0],
-                         orc_Info.c_MoreInformation.au8_ProtocolVersion[1],
-                         orc_Info.c_MoreInformation.au8_ProtocolVersion[2]);
-   orc_Text.Add(c_Line);
-   orc_Text.Add("Flash count: " + C_SclString::IntToStr(orc_Info.c_MoreInformation.u32_FlashCount));
-   c_Line = "Device serial number: " + orc_Info.c_MoreInformation.GetEcuSerialNumber() + " " +
-            orc_Info.c_MoreInformation.GetEcuSerialNumberFormatDescription();
-   orc_Text.Add(c_Line);
-   orc_Text.Add("Device article number: " + C_SclString::IntToStr(orc_Info.c_MoreInformation.u32_EcuArticleNumber));
-   orc_Text.Add("Device article version: " + orc_Info.c_MoreInformation.c_EcuHardwareVersionNumber);
-   c_Line.PrintFormatted("Flash fingerprint date: %02d-%02d-%02d (yy-mm-dd)",
-                         orc_Info.c_MoreInformation.au8_FlashFingerprintDate[0],
-                         orc_Info.c_MoreInformation.au8_FlashFingerprintDate[1],
-                         orc_Info.c_MoreInformation.au8_FlashFingerprintDate[2]);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Flash fingerprint time: %02d:%02d:%02d",
-                         orc_Info.c_MoreInformation.au8_FlashFingerprintTime[0],
-                         orc_Info.c_MoreInformation.au8_FlashFingerprintTime[1],
-                         orc_Info.c_MoreInformation.au8_FlashFingerprintTime[2]);
-   orc_Text.Add(c_Line);
-   orc_Text.Add("Flash fingerprint username: " + orc_Info.c_MoreInformation.c_FlashFingerprintUserName);
-   c_Line.PrintFormatted("NVM writing available: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_FlashloaderCanWriteToNvm == true) ? 1 : 0);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Security supported: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurity == true) ? 1 : 0);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Disabling debugger supported: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOff == true) ? 1 : 0);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Enabling debugger supported: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOn == true) ? 1 : 0);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("Maximum block size information available: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable ==
-                          true) ? 1 : 0);
-   orc_Text.Add(c_Line);
-   if (orc_Info.c_MoreInformation.c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable == true)
-   {
-      c_Line.PrintFormatted("Maximum block size: %d", orc_Info.c_MoreInformation.u16_MaxNumberOfBlockLength);
-      orc_Text.Add(c_Line);
-   }
-   c_Line.PrintFormatted("Ethernet2Ethernet routing supported: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_EthernetToEthernetRoutingSupported ==
-                          true) ? 1 : 0);
-   orc_Text.Add(c_Line);
-   c_Line.PrintFormatted("FileBasedTransferExitResult available: %d",
-                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_FileBasedTransferExitResultAvailable ==
-                          true) ? 1 : 0);
-   orc_Text.Add(c_Line);
+   orc_Text.AddStrings(&c_MoreInformation);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -4743,16 +4684,7 @@ int32_t C_OscSuSequences::m_DisconnectFromTargetServer(const bool oq_DisconnectO
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns an adapted device transfer data timeout time for compensating a potential higher bus load
 
-   The device specific time does only cover the needed time of the device itself, but not the real communication
-   time. In case of a high bus load this time can vary a lot.
-
-   Information for the calculation:
-   * Adding the result of the calculation as offset to the original time
-   * Assuming we have 7 bytes per CAN frame
-   * The lowest supported bitrate is 100kB/s
-   * -> 2ms for each CAN message roughly results in the number of messages for each block * 2ms
-   * Assuming a high "Alien" busload of 80% we need to multiply by 5
-   -> (((ou32_MaxBlockLength / 7) * 2ms) * 5) + original device timeout time
+   See C_OscUpdateUtil::h_GetAdaptedTransferDataTimeout for detailed calculation description.
 
    In a routing scenario when considering the transfer time we need to consider the slowest possible bus.
    As we support routing from Ethernet to CAN, but not the other way around this means that the last bus
@@ -4797,24 +4729,9 @@ uint32_t C_OscSuSequences::m_GetAdaptedTransferDataTimeout(const uint32_t ou32_D
    // In case of Ethernet no offset is necessary
    if (q_IsCan == true)
    {
-      const uint32_t u32_Offset = (ou32_MaxBlockLength * 10U) / 7U;
-
-      tgl_assert(u32_Bitrate != 0U);
-
-      if (u32_Bitrate == 0U)
-      {
-         //this should not happen ... assume the slowest we support (100kBit/s)
-         u32_Bitrate = 100U;
-      }
-
-      // Scale the offset to the expected bitrate on the bus in relation to the slowest bitrate of 100 kBit/s
-      u32_AdaptedTime += (u32_Offset * 100U) / u32_Bitrate;
+      u32_AdaptedTime = C_OscUpdateUtil::h_GetAdaptedTransferDataTimeout(ou32_DeviceTransferDataTimeout,
+                                                                         ou32_MaxBlockLength, u32_Bitrate);
    }
-
-   osc_write_log_info("Update Node",
-                      "Used \"transferdatatimeout\" by adding an offset for compensating a "
-                      "potential high bus load: " +
-                      C_SclString::IntToStr(u32_AdaptedTime) + "ms");
 
    return u32_AdaptedTime;
 }

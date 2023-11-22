@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDCODEGENERATIONMODEL_H
-#define C_SDCODEGENERATIONMODEL_H
+#ifndef C_SDCODEGENERATIONMODEL_HPP
+#define C_SDCODEGENERATIONMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

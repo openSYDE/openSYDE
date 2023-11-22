@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXDEFAULTCHECKEDDISABLED_H
-#define C_OGECHXDEFAULTCHECKEDDISABLED_H
+#ifndef C_OGECHXDEFAULTCHECKEDDISABLED_HPP
+#define C_OGECHXDEFAULTCHECKEDDISABLED_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeChxToolTipBase.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILILINE_H
-#define C_GILILINE_H
+#ifndef C_GILILINE_HPP
+#define C_GILILINE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTimer>

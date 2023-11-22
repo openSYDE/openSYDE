@@ -210,6 +210,10 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
    connect(this, &C_CamMainWindow::SigSendCanMsgDroppedToChildrenWidget, this->mpc_Ui->pc_TraceWidget,
            &C_CamMetWidget::CanFilterMsgDropped);
 
+   connect(this->mpc_Ui->pc_TraceWidget, &C_CamMetWidget::SigClearData, this, &C_CamMainWindow::m_ClearData);
+   connect(this->mpc_Ui->pc_GeneratorWidget, &C_CamGenWidget::SigAutoProtocolSupport, this,
+           &C_CamMainWindow::m_UpdateAutoSupportProtocol);
+
    this->m_LoadUserSettings();
 }
 
@@ -272,6 +276,30 @@ void C_CamMainWindow::CanFilterMsgDropped()
 void C_CamMainWindow::m_AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd)
 {
    Q_EMIT C_CamMainWindow::SigEmitAddFilterToChildWidget(oc_CanMsgId, oc_CanMsgXtd);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On Update of AutoSupportProtocol to send information for stop/start Message counter
+
+   \param[in]       ou32_MessageIndex     Current message index
+   \param[in]      oq_Active             Is AutoSupport activated
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMainWindow::m_UpdateAutoSupportProtocol(const uint32_t ou32_MessageIndex, const bool oq_Active)
+{
+   const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(ou32_MessageIndex);
+
+   if (pc_Message != NULL)
+   {
+      C_OscCanProtocol::E_Type e_ProtocolType = C_OscCanProtocol::eCAN_OPEN;
+      C_CamDbHandler::h_GetInstance()->GetOscMessage(pc_Message->c_DataBaseFilePath.c_str(),
+                                                     pc_Message->c_Name.c_str(),
+                                                     pc_Message->q_ContainsValidHash,
+                                                     pc_Message->u32_Hash,
+                                                     &e_ProtocolType);
+
+      this->mc_ComDriver.UpdateAutoSupportProtocol(pc_Message->ToCanMessage().u32_ID, oq_Active, e_ProtocolType);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -545,6 +573,28 @@ void C_CamMainWindow::m_StopLogging(void)
    this->mpc_Ui->pc_SettingsWidget->OnCommunicationStarted(false);
    //Clear bitrate
    this->mpc_Ui->pc_TraceWidget->SetCanBitrate(0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+
+   Detailed function description (optional). The function shall be described detailed if it is not described completely
+   by short function description and parameter description.
+
+   \param[in]       ou8_Aa     Detailed input parameter description
+   \param[out]      opu32_Bb   Detailed output parameter description
+   \param[in,out]   opu16_Cc   Detailed input/output parameter description
+
+   \return
+   Type of return values, e.g. STW error codes
+
+   \retval   Return value 1   Detailed description of 1st return value
+   \retval   Return value 2   Detailed description of 2nd return value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMainWindow::m_ClearData()
+{
+   this->mc_ComDriver.ClearData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1046,6 +1096,13 @@ void C_CamMainWindow::m_RegisterCyclicMessage(const uint32_t ou32_MessageIndex, 
 
    if (pc_Message != NULL)
    {
+      C_OscCanProtocol::E_Type e_ProtocolType = C_OscCanProtocol::eCAN_OPEN;
+      C_CamDbHandler::h_GetInstance()->GetOscMessage(pc_Message->c_DataBaseFilePath.c_str(),
+                                                     pc_Message->c_Name.c_str(),
+                                                     pc_Message->q_ContainsValidHash,
+                                                     pc_Message->u32_Hash,
+                                                     &e_ProtocolType);
+
       //Prepare necessary parameter
       stw::opensyde_core::C_OscComDriverBaseCanMessage c_Message;
       c_Message.c_Msg = pc_Message->ToCanMessage();
@@ -1054,11 +1111,11 @@ void C_CamMainWindow::m_RegisterCyclicMessage(const uint32_t ou32_MessageIndex, 
       //Send
       if (oq_Active)
       {
-         this->mc_ComDriver.AddCyclicCanMessage(c_Message);
+         this->mc_ComDriver.AddCyclicCanMessage(c_Message, pc_Message->q_SetAutoSupportMode, e_ProtocolType);
       }
       else
       {
-         this->mc_ComDriver.RemoveCyclicCanMessage(c_Message);
+         this->mc_ComDriver.RemoveCyclicCanMessage(c_Message, pc_Message->q_SetAutoSupportMode, e_ProtocolType);
       }
    }
 }
@@ -1076,13 +1133,20 @@ void C_CamMainWindow::m_SendMessage(const uint32_t ou32_MessageIndex, const uint
 
    if (pc_Message != NULL)
    {
+      C_OscCanProtocol::E_Type e_ProtocolType = C_OscCanProtocol::eCAN_OPEN;
+      C_CamDbHandler::h_GetInstance()->GetOscMessage(pc_Message->c_DataBaseFilePath.c_str(),
+                                                     pc_Message->c_Name.c_str(),
+                                                     pc_Message->q_ContainsValidHash,
+                                                     pc_Message->u32_Hash,
+                                                     &e_ProtocolType);
+
       //Prepare necessary parameter
       stw::opensyde_core::C_OscComDriverBaseCanMessage c_Message;
       c_Message.c_Msg = pc_Message->ToCanMessage();
       c_Message.u32_Interval = 0UL;
       c_Message.u32_TimeToSend = ou32_TimeToSend;
       //Send
-      this->mc_ComDriver.SendCanMessage(c_Message);
+      this->mc_ComDriver.SendCanMessage(c_Message, pc_Message->q_SetAutoSupportMode, e_ProtocolType);
    }
 }
 

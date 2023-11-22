@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANMESSAGECONTAINER_H
-#define C_OSCCANMESSAGECONTAINER_H
+#ifndef C_OSCCANMESSAGECONTAINER_HPP
+#define C_OSCCANMESSAGECONTAINER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -50,6 +50,7 @@ public:
 
    bool ContainsAtLeastOneMessage(void) const;
    bool ContainsAtLeastOneActiveMessage(void) const;
+   bool CheckMinSignalError(void) const;
 
    std::vector<C_OscCanMessage> c_TxMessages; ///< Transmitted message types
    std::vector<C_OscCanMessage> c_RxMessages; ///< Received message types
@@ -60,6 +61,8 @@ public:
 private:
    std::vector<uint32_t> m_GetHashes(const C_OscNodeDataPoolList & orc_ListTx,
                                      const C_OscNodeDataPoolList & orc_ListRx) const;
+
+   static bool mh_CheckMinSignalErrorPerVector(const std::vector<C_OscCanMessage> & orc_Messages);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

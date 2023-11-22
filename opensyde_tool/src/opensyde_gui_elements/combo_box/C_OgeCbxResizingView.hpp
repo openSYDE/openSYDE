@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXRESIZINGVIEW_H
-#define C_OGECBXRESIZINGVIEW_H
+#ifndef C_OGECBXRESIZINGVIEW_HPP
+#define C_OGECBXRESIZINGVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QComboBox>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODECOMMFILER_H
-#define C_OSCNODECOMMFILER_H
+#ifndef C_OSCNODECOMMFILER_HPP
+#define C_OSCNODECOMMFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

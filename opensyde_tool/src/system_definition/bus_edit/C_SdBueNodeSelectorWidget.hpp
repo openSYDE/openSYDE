@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUENODESELECTORWIDGET_H
-#define C_SDBUENODESELECTORWIDGET_H
+#ifndef C_SDBUENODESELECTORWIDGET_HPP
+#define C_SDBUENODESELECTORWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

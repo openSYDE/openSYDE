@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMLVSIGNALMANAGER_H
-#define C_SDBUEMLVSIGNALMANAGER_H
+#ifndef C_SDBUEMLVSIGNALMANAGER_HPP
+#define C_SDBUEMLVSIGNALMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

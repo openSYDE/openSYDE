@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCDEFCHANNELVALUES_H
-#define C_OSCHALCDEFCHANNELVALUES_H
+#ifndef C_OSCHALCDEFCHANNELVALUES_HPP
+#define C_OSCHALCDEFCHANNELVALUES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscHalcDefStruct.hpp"

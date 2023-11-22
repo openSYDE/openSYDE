@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPESLIDER_H
-#define C_SYVDAPESLIDER_H
+#ifndef C_SYVDAPESLIDER_HPP
+#define C_SYVDAPESLIDER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

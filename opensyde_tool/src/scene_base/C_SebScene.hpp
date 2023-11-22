@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBSCENE_H
-#define C_SEBSCENE_H
+#ifndef C_SEBSCENE_HPP
+#define C_SEBSCENE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsScene>

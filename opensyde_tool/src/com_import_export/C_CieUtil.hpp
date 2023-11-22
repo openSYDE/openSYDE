@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEUTIL_H
-#define C_CIEUTIL_H
+#ifndef C_CIEUTIL_HPP
+#define C_CIEUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -37,10 +37,12 @@ public:
    static int32_t h_ExportFile(const stw::opensyde_gui_logic::C_CieConverter::C_CieCommDefinition & orc_CommDef,
                                QWidget * const opc_Parent, const uint32_t ou32_NumOfNodes,
                                const uint32_t ou32_NumOfMessages, const uint32_t ou32_NumOfSignals);
-   static void h_AdaptName(stw::scl::C_SclString & orc_Name, stw::scl::C_SclString & orc_Comment);
+   static void h_AdaptName(stw::scl::C_SclString & orc_Name, stw::scl::C_SclString & orc_Comment,
+                           const bool oq_AlwaysAppendNameInComment);
    static void h_AdaptImportMessages(
       std::vector<stw::opensyde_gui::C_CieImportDataAssignment> & orc_ImportDataAssignment,
-      const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
+      const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType,
+      const bool oq_AlwaysAppendNameInComment);
    static void h_InsertMessages(
       const std::vector<stw::opensyde_gui::C_CieImportDataAssignment> & orc_ImportDataAssignment,
       const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType, const bool oq_UniqueAddRequested);
@@ -69,7 +71,8 @@ private:
                                       std::vector<uint32_t> & orc_NodeIndexes,
                                       std::vector<uint32_t> & orc_InterfaceIndexes);
    static void mh_AdaptMessageNames(
-      std::vector<stw::opensyde_gui::C_CieImportDataAssignment> & orc_ImportDataAssignment);
+      std::vector<stw::opensyde_gui::C_CieImportDataAssignment> & orc_ImportDataAssignment,
+      const bool oq_AlwaysAppendNameInComment);
    static void mh_AdaptMessagesToProtocolType(
       std::vector<stw::opensyde_gui::C_CieImportDataAssignment> & orc_ImportDataAssignment,
       const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);

@@ -6,8 +6,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDECOOVERVIEWTABLEVIEW_H
-#define C_SDNDECOOVERVIEWTABLEVIEW_H
+#ifndef C_SDNDECOOVERVIEWTABLEVIEW_HPP
+#define C_SDNDECOOVERVIEWTABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSortFilterProxyModel>

@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXMULTISELECTTABLEHALC_H
-#define C_OGECBXMULTISELECTTABLEHALC_H
+#ifndef C_OGECBXMULTISELECTTABLEHALC_HPP
+#define C_OGECBXMULTISELECTTABLEHALC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeCbxMultiSelect.hpp"

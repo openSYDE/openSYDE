@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEUPDATEMODETABLEMODEL_H
-#define C_SYVDAPEUPDATEMODETABLEMODEL_H
+#ifndef C_SYVDAPEUPDATEMODETABLEMODEL_HPP
+#define C_SYVDAPEUPDATEMODETABLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractTableModel>

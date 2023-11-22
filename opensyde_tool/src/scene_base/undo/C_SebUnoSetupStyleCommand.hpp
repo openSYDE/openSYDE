@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOSETUPSTYLECOMMAND_H
-#define C_SEBUNOSETUPSTYLECOMMAND_H
+#ifndef C_SEBUNOSETUPSTYLECOMMAND_HPP
+#define C_SEBUNOSETUPSTYLECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SebUnoBaseCommand.hpp"

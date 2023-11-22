@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCOVTABLEVIEW_H
-#define C_SDNDEHALCOVTABLEVIEW_H
+#ifndef C_SDNDEHALCOVTABLEVIEW_HPP
+#define C_SDNDEHALCOVTABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QScrollBar>

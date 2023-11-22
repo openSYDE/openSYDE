@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOTOPBUSCONNECTORMOVECOMMAND_H
-#define C_SEBUNOTOPBUSCONNECTORMOVECOMMAND_H
+#ifndef C_SEBUNOTOPBUSCONNECTORMOVECOMMAND_HPP
+#define C_SEBUNOTOPBUSCONNECTORMOVECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPointF>

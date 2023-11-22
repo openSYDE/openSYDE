@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLVIEWTOOLTIPBASE_H
-#define C_TBLVIEWTOOLTIPBASE_H
+#ifndef C_TBLVIEWTOOLTIPBASE_HPP
+#define C_TBLVIEWTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTableView>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGECBXTABLE_H
-#define C_CAMOGECBXTABLE_H
+#ifndef C_CAMOGECBXTABLE_HPP
+#define C_CAMOGECBXTABLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeCbxTableBase.hpp"

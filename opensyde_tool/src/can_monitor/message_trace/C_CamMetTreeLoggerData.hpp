@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREELOGGERDATA_H
-#define C_CAMMETTREELOGGERDATA_H
+#ifndef C_CAMMETTREELOGGERDATA_HPP
+#define C_CAMMETTREELOGGERDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscComMessageLoggerData.hpp"

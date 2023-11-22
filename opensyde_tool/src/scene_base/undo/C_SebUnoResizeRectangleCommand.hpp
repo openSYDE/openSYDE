@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNORESIZERECTANGLECOMMAND_H
-#define C_SEBUNORESIZERECTANGLECOMMAND_H
+#ifndef C_SEBUNORESIZERECTANGLECOMMAND_HPP
+#define C_SEBUNORESIZERECTANGLECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

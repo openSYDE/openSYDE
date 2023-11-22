@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANOPENOBJECTDICTIONARYHPP
-#define C_OSCCANOPENOBJECTDICTIONARYHPP
+#ifndef C_OSCCANOPENOBJECTDICTIONARY_HPP
+#define C_OSCCANOPENOBJECTDICTIONARY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <set>
@@ -129,6 +129,7 @@ public:
    static const uint16_t hu16_OD_INDEX_EMCY = 0x1014U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_CONSUMER = 0x1016U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_PRODUCER = 0x1017U;
+   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1300U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO = 0x1400U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO = 0x1800U;
    static const uint8_t hu8_OD_SUB_INDEX_COB_ID = 0x1U;
@@ -136,6 +137,11 @@ public:
    static const uint8_t hu8_OD_SUB_INDEX_INHIBIT_TIME = 0x3U;
    static const uint8_t hu8_OD_SUB_INDEX_EVENT_TIMER = 0x5U;
    static const uint8_t hu8_OD_SUB_INDEX_SYNC_START_VALUE = 0x6U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_INFORMATION_DIRECTION = 0x1U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_CYCLE_TIME = 0x2U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_SRVT = 0x3U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_TRANSMISSION_TYPE = 0x4U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_COB_ID = 0x5U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO_MAPPING = 0x1600U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO_MAPPING = 0x1A00U;
    static const uint16_t hu16_OD_PDO_MAPPING_OFFSET = 0x200U;

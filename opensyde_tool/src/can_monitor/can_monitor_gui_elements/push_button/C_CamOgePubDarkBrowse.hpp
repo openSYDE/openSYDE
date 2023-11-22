@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEPUBDARKBROWSE_H
-#define C_CAMOGEPUBDARKBROWSE_H
+#ifndef C_CAMOGEPUBDARKBROWSE_HPP
+#define C_CAMOGEPUBDARKBROWSE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLVIEWINTERACTION_H
-#define C_TBLVIEWINTERACTION_H
+#ifndef C_TBLVIEWINTERACTION_HPP
+#define C_TBLVIEWINTERACTION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblViewToolTipBase.hpp"

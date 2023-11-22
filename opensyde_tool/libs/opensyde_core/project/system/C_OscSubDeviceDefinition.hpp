@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSUBDEVICEDEFINITION_H
-#define C_OSCSUBDEVICEDEFINITION_H
+#ifndef C_OSCSUBDEVICEDEFINITION_HPP
+#define C_OSCSUBDEVICEDEFINITION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>

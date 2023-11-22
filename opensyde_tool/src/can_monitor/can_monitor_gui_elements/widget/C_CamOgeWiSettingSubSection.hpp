@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEWISETTINGSUBSECTION_H
-#define C_CAMOGEWISETTINGSUBSECTION_H
+#ifndef C_CAMOGEWISETTINGSUBSECTION_HPP
+#define C_CAMOGEWISETTINGSUBSECTION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiOnlyBackground.hpp"

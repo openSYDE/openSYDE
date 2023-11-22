@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIARROW_H
-#define C_GILIARROW_H
+#ifndef C_GILIARROW_HPP
+#define C_GILIARROW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

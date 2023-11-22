@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABFRAMEERROR_H
-#define C_OGELABFRAMEERROR_H
+#ifndef C_OGELABFRAMEERROR_HPP
+#define C_OGELABFRAMEERROR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFontMetrics>

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_COLORSHOWER_H
-#define C_COLORSHOWER_H
+#ifndef C_COLORSHOWER_HPP
+#define C_COLORSHOWER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPushButton>

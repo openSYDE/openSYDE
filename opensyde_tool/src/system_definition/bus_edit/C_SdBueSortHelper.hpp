@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUESORTHELPER_H
-#define C_SDBUESORTHELPER_H
+#ifndef C_SDBUESORTHELPER_HPP
+#define C_SDBUESORTHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSdNodeCanMessage.hpp"

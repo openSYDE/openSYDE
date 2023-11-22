@@ -8,8 +8,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSUSEQUENCESNODESTATES_H
-#define C_OSCSUSEQUENCESNODESTATES_H
+#ifndef C_OSCSUSEQUENCESNODESTATES_HPP
+#define C_OSCSUSEQUENCESNODESTATES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

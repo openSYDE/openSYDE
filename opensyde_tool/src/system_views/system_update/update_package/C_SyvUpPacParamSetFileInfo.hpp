@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACPARAMSETFILEINFO_H
-#define C_SYVUPPACPARAMSETFILEINFO_H
+#ifndef C_SYVUPPACPARAMSETFILEINFO_HPP
+#define C_SYVUPPACPARAMSETFILEINFO_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

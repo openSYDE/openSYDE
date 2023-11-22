@@ -158,8 +158,8 @@ void C_SdNdeCoDeviceEdsWidget::m_OnUpdateClicked(void)
                   std::vector<C_CieImportDataAssignment> c_NodeAssignmenVector = {c_NodeAssignment};
                   std::vector<C_CieImportDataAssignment> c_InvalidNodeAssignmentVector = {c_InvalidNodeAssignment};
                   //Prepare data
-                  C_CieUtil::h_AdaptImportMessages(c_NodeAssignmenVector, C_OscCanProtocol::eCAN_OPEN);
-                  C_CieUtil::h_AdaptImportMessages(c_InvalidNodeAssignmentVector, C_OscCanProtocol::eCAN_OPEN);
+                  C_CieUtil::h_AdaptImportMessages(c_NodeAssignmenVector, C_OscCanProtocol::eCAN_OPEN, true);
+                  C_CieUtil::h_AdaptImportMessages(c_InvalidNodeAssignmentVector, C_OscCanProtocol::eCAN_OPEN, true);
                   {
                      const C_OscCanOpenManagerDeviceInfo c_NewConfig = C_SdNdeCoConfigTreeView::h_CreateNewDevice(
                         c_FilePath);

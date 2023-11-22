@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDTOPOLOGYSCENE_H
-#define C_SDTOPOLOGYSCENE_H
+#ifndef C_SDTOPOLOGYSCENE_HPP
+#define C_SDTOPOLOGYSCENE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMimeData>

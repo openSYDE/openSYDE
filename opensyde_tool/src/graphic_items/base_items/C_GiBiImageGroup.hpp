@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIIMAGEGROUP_H
-#define C_GIIMAGEGROUP_H
+#ifndef C_GIIMAGEGROUP_HPP
+#define C_GIIMAGEGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

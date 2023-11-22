@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIBOPPERLE_H
-#define C_OGEWIBOPPERLE_H
+#ifndef C_OGEWIBOPPERLE_HPP
+#define C_OGEWIBOPPERLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABPROPERTIESSUBHEADING_H
-#define C_OGELABPROPERTIESSUBHEADING_H
+#ifndef C_OGELABPROPERTIESSUBHEADING_HPP
+#define C_OGELABPROPERTIESSUBHEADING_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

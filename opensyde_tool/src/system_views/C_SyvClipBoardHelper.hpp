@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVCLIPBOARDHELPER_H
-#define C_SYVCLIPBOARDHELPER_H
+#ifndef C_SYVCLIPBOARDHELPER_HPP
+#define C_SYVCLIPBOARDHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscXmlParser.hpp"

@@ -585,6 +585,17 @@ void C_SyvComMessageMonitor::UpdateTxErrors(const uint32_t ou32_TxErrors)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Resets ECeS messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvComMessageMonitor::ResetEcesMessages(void)
+{
+   this->mc_CriticalSectionCounter.Acquire();
+   C_OscComMessageLogger::ResetEcesMessages();
+   this->mc_CriticalSectionCounter.Release();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the current bus load
 
    This function is thread safe

@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGETOBRECENTPROJECTS_H
-#define C_CAMOGETOBRECENTPROJECTS_H
+#ifndef C_CAMOGETOBRECENTPROJECTS_HPP
+#define C_CAMOGETOBRECENTPROJECTS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTobToolTipBase.hpp"

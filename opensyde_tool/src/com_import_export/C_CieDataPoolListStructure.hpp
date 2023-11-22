@@ -9,8 +9,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEDATAPOOLLISTSTRUCTURE_H
-#define C_CIEDATAPOOLLISTSTRUCTURE_H
+#ifndef C_CIEDATAPOOLLISTSTRUCTURE_HPP
+#define C_CIEDATAPOOLLISTSTRUCTURE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

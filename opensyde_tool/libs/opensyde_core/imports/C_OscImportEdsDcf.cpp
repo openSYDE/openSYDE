@@ -49,28 +49,16 @@ using namespace stw::opensyde_core;
    * Cyclic transmission types are only partially supported because the cycle time can not be imported
    * Signal parsing errors are not reported by return value (only by string)
 
-   \param[in]   orc_FilePath                                File to import, file type is based on file ending
-   \param[in]   ou8_NodeId                                  Node ID
-   \param[out]  orc_OscRxMessageData                        Imported core Rx message data
-   \param[out]  orc_OscRxSignalData                         Imported core Rx signal data
-   \param[out]  orc_RxSignalDefaultMinMaxValuesUsed         Flag if imported core Rx signal data uses the default min
-                                                            max values or or specific set values
-   \param[out]  orc_OscTxMessageData                        Imported core Tx message data
-   \param[out]  orc_OscTxSignalData                         Imported core Tx signal data
-   \param[out]  orc_TxSignalDefaultMinMaxValuesUsed         Flag if imported core Rx signal data uses the default min
-                                                            max values or or specific set values
-   \param[out]  orc_ImportMessagesPerMessage                Import result messages
-   \param[out]  orc_ParsingError                            Optional parsing error message
-   \param[in]   oq_RestrictForCanOpenUsage                  Flag to restrict for CANopen usage
-   \param[out]  orc_InvalidOscRxMessageData                 Invalid core Rx message data
-   \param[out]  orc_InvalidOscRxSignalData                  Invalid core Rx signal data
-   \param[out]  orc_InvalidRxSignalDefaultMinMaxValuesUsed  Flag if invalid core Rx signal data uses the default min
-                                                            max values or or specific set values
-   \param[out]  orc_InvalidOscTxMessageData                 Invalid core Tx message data
-   \param[out]  orc_InvalidOscTxSignalData                  Invalid core Tx signal data
-   \param[out]  orc_InvalidTxSignalDefaultMinMaxValuesUsed  Flag if invalid core Tx signal data uses the default min
-                                                            max values or or specific set values
-   \param[out]  orc_InvalidImportMessagesPerMessage         Import result messages per invalid message
+   \param[in]   orc_FilePath                          File to import, file type is based on file ending
+   \param[in]   ou8_NodeId                            Node ID
+   \param[out]  orc_AllRxMessageData                  All imported core Rx message data
+   \param[out]  orc_AllTxMessageData                  All imported core Tx message data
+   \param[out]  orc_ImportMessagesPerMessage          Import result messages
+   \param[out]  orc_ParsingError                      Optional parsing error message
+   \param[in]   oe_ImportForProtocol                  For which protocol to import, to apply protocol specific restrictions
+   \param[out]  orc_AllInvalidRxMessageData           All invalid core Rx message data
+   \param[out]  orc_AllInvalidTxMessageData           All invalid core Tx message data
+   \param[out]  orc_InvalidImportMessagesPerMessage   Import result messages per invalid message
 
    \return
    C_NO_ERR Operation success
@@ -80,31 +68,21 @@ using namespace stw::opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint8_t ou8_NodeId,
-                                    std::vector<C_OscCanMessage> & orc_OscRxMessageData,
-                                    std::vector<C_OscNodeDataPoolListElement> & orc_OscRxSignalData,
-                                    std::vector<uint8_t> & orc_RxSignalDefaultMinMaxValuesUsed,
-                                    std::vector<C_OscCanMessage> & orc_OscTxMessageData,
-                                    std::vector<C_OscNodeDataPoolListElement> & orc_OscTxSignalData,
-                                    std::vector<uint8_t> & orc_TxSignalDefaultMinMaxValuesUsed,
+                                    C_OscEdsDcfImportMessageGroup & orc_AllRxMessageData,
+                                    C_OscEdsDcfImportMessageGroup & orc_AllTxMessageData,
                                     std::vector<std::vector<C_SclString> > & orc_ImportMessagesPerMessage,
-                                    C_SclString & orc_ParsingError, const bool oq_RestrictForCanOpenUsage,
-                                    std::vector<C_OscCanMessage> & orc_InvalidOscRxMessageData,
-                                    std::vector<C_OscNodeDataPoolListElement> & orc_InvalidOscRxSignalData,
-                                    std::vector<uint8_t> & orc_InvalidRxSignalDefaultMinMaxValuesUsed,
-                                    std::vector<C_OscCanMessage> & orc_InvalidOscTxMessageData,
-                                    std::vector<C_OscNodeDataPoolListElement> & orc_InvalidOscTxSignalData,
-                                    std::vector<uint8_t> & orc_InvalidTxSignalDefaultMinMaxValuesUsed,
+                                    C_SclString & orc_ParsingError, const C_OscCanProtocol::E_Type oe_ImportForProtocol,
+                                    C_OscEdsDcfImportMessageGroup & orc_AllInvalidRxMessageData,
+                                    C_OscEdsDcfImportMessageGroup & orc_AllInvalidTxMessageData,
                                     std::vector<std::vector<C_SclString> > & orc_InvalidImportMessagesPerMessage)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    //Clear data
-   orc_OscRxMessageData.clear();
-   orc_OscRxSignalData.clear();
-   orc_RxSignalDefaultMinMaxValuesUsed.clear();
-   orc_OscTxMessageData.clear();
-   orc_OscTxSignalData.clear();
-   orc_TxSignalDefaultMinMaxValuesUsed.clear();
+   orc_AllRxMessageData.Clear();
+   orc_AllTxMessageData.Clear();
+   orc_AllInvalidRxMessageData.Clear();
+   orc_AllInvalidTxMessageData.Clear();
    orc_ImportMessagesPerMessage.clear();
    orc_ParsingError = "";
 
@@ -136,7 +114,7 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
             std::vector<uint32_t> c_Dummies;
             uint32_t u32_StartId;
             mh_LoadDummies(orc_FilePath, c_Dummies);
-            if (oq_RestrictForCanOpenUsage)
+            if (oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN)
             {
                u32_StartId = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_TX_PDO;
             }
@@ -144,17 +122,16 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
             {
                u32_StartId = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_RX_PDO;
             }
-            s32_Retval = mh_ParseMessages(u32_StartId, ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
-                                          orc_OscRxMessageData,
-                                          orc_OscRxSignalData,
-                                          orc_RxSignalDefaultMinMaxValuesUsed,
-                                          q_Eds, orc_ImportMessagesPerMessage, false, oq_RestrictForCanOpenUsage,
-                                          orc_InvalidOscRxMessageData, orc_InvalidOscRxSignalData,
-                                          orc_InvalidRxSignalDefaultMinMaxValuesUsed,
+            s32_Retval = mh_ParseMessages(u32_StartId,
+                                          ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
+                                          orc_AllRxMessageData,
+                                          q_Eds, orc_ImportMessagesPerMessage, false,
+                                          oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN, false,
+                                          orc_AllInvalidRxMessageData,
                                           orc_InvalidImportMessagesPerMessage);
             if (s32_Retval == C_NO_ERR)
             {
-               if (oq_RestrictForCanOpenUsage)
+               if (oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN)
                {
                   u32_StartId = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_RX_PDO;
                }
@@ -162,14 +139,38 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
                {
                   u32_StartId = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_TX_PDO;
                }
-               s32_Retval = mh_ParseMessages(u32_StartId, ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
-                                             orc_OscTxMessageData,
-                                             orc_OscTxSignalData,
-                                             orc_TxSignalDefaultMinMaxValuesUsed,
-                                             q_Eds, orc_ImportMessagesPerMessage, true, oq_RestrictForCanOpenUsage,
-                                             orc_InvalidOscTxMessageData, orc_InvalidOscTxSignalData,
-                                             orc_InvalidTxSignalDefaultMinMaxValuesUsed,
+               s32_Retval = mh_ParseMessages(u32_StartId,
+                                             ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
+                                             orc_AllTxMessageData,
+                                             q_Eds, orc_ImportMessagesPerMessage, true,
+                                             oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN, false,
+                                             orc_AllInvalidTxMessageData,
                                              orc_InvalidImportMessagesPerMessage);
+            }
+            if (s32_Retval == C_NO_ERR)
+            {
+               if (oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN_SAFETY)
+               {
+                  s32_Retval = mh_ParseMessages(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_SRDO,
+                                                ou8_NodeId,
+                                                c_Dictionary.c_Objects, c_Dummies,
+                                                orc_AllTxMessageData,
+                                                q_Eds, orc_ImportMessagesPerMessage, true,
+                                                false, true,
+                                                orc_AllInvalidTxMessageData,
+                                                orc_InvalidImportMessagesPerMessage);
+                  if (s32_Retval == C_NO_ERR)
+                  {
+                     s32_Retval = mh_ParseMessages(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_SRDO,
+                                                   ou8_NodeId,
+                                                   c_Dictionary.c_Objects, c_Dummies,
+                                                   orc_AllRxMessageData,
+                                                   q_Eds, orc_ImportMessagesPerMessage, false,
+                                                   false, true,
+                                                   orc_AllInvalidRxMessageData,
+                                                   orc_InvalidImportMessagesPerMessage);
+                  }
+               }
             }
          }
          else
@@ -490,23 +491,18 @@ const C_OscCanOpenObject * C_OscImportEdsDcf::mh_GetCoObject(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load core messages data
 
-   \param[in]      ou32_StartingId                             Starting ID for message section
-   \param[in]      ou8_NodeId                                  Node ID
-   \param[in]      orc_CoObjects                               All CO objects of the current file
-   \param[in]      orc_Dummies                                 Found and valid dummy data types
-   \param[in,out]  orc_OscMessageData                          Imported core message data
-   \param[in,out]  orc_OscSignalData                           Imported core signal data
-   \param[in,out]  orc_SignalDefaultMinMaxValuesUsed           Flag if imported core signal data uses the default min max
-                                                               values or specific set values
-   \param[in]      oq_IsEds                                    Flag if current file is an EDS file
-   \param[in,out]  orc_ImportMessages                          Import result messages
-   \param[in]      oq_IsTx                                     Flag if message is a Tx message
-   \param[in]      oq_RestrictForCanOpenUsage                  Restrict for can open usage
-   \param[in,out]  orc_InvalidOscMessageData                   Invalid core message data
-   \param[in,out]  orc_InvalidOscSignalData                    Invalid core signal data
-   \param[in,out]  orc_InvalidSignalDefaultMinMaxValuesUsed    Flag if invalid core signal data uses the default min max
-                                                               values or specific set values
-   \param[in,out]  orc_InvalidImportMessages                   Import result messages per invalid message
+   \param[in]      ou32_StartingId              Starting ID for message section
+   \param[in]      ou8_NodeId                   Node ID
+   \param[in]      orc_CoObjects                All CO objects of the current file
+   \param[in]      orc_Dummies                  Found and valid dummy data types
+   \param[in,out]  orc_AllMessageData           All imported core message data
+   \param[in]      oq_IsEds                     Flag if current file is an EDS file
+   \param[in,out]  orc_ImportMessages           Import result messages
+   \param[in]      oq_IsTx                      Flag if message is a Tx message
+   \param[in]      oq_RestrictForCanOpenUsage   Restrict for can open usage
+   \param[in]      oq_ImportSrdoUseCase         Import SRDO use case
+   \param[in,out]  orc_AllInvalidMessageData    All invalid core message data
+   \param[in,out]  orc_InvalidImportMessages    Import result messages per invalid message
 
    \return
    C_NO_ERR Operation success
@@ -516,18 +512,18 @@ const C_OscCanOpenObject * C_OscImportEdsDcf::mh_GetCoObject(
 int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, const uint8_t ou8_NodeId,
                                             const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
                                             const std::vector<uint32_t> & orc_Dummies,
-                                            std::vector<C_OscCanMessage> & orc_OscMessageData,
-                                            std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
-                                            std::vector<uint8_t> & orc_SignalDefaultMinMaxValuesUsed,
-                                            const bool oq_IsEds,
+                                            C_OscEdsDcfImportMessageGroup & orc_AllMessageData, const bool oq_IsEds,
                                             std::vector<std::vector<C_SclString> > & orc_ImportMessages,
                                             const bool oq_IsTx, const bool oq_RestrictForCanOpenUsage,
-                                            std::vector<C_OscCanMessage> & orc_InvalidOscMessageData,
-                                            std::vector<C_OscNodeDataPoolListElement> & orc_InvalidOscSignalData,
-                                            std::vector<uint8_t> & orc_InvalidSignalDefaultMinMaxValuesUsed,
+                                            const bool oq_ImportSrdoUseCase,
+                                            C_OscEdsDcfImportMessageGroup & orc_AllInvalidMessageData,
                                             std::vector<std::vector<stw::scl::C_SclString> > & orc_InvalidImportMessages)
 {
    int32_t s32_Retval = C_NO_ERR;
+   const uint16_t u16_EndIdOffset = oq_ImportSrdoUseCase ? 0x40U : 0x200U;
+   const uint8_t u8_CobIdSubIndex = oq_ImportSrdoUseCase ?
+                                    C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_COB_ID :
+                                    C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID;
 
    for (int32_t s32_ItObject = 0; (s32_ItObject < orc_CoObjects.GetLength()) && (s32_Retval == C_NO_ERR);
         ++s32_ItObject)
@@ -537,14 +533,13 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
       //Check if relevant object
       if ((rc_CoMessageMainObject.u8_NumSubs != 255) &&
           ((rc_CoMessageMainObject.u16_Index >= ou32_StartingId) &&
-           (rc_CoMessageMainObject.u16_Index < (ou32_StartingId + 0x200))))
+           (rc_CoMessageMainObject.u16_Index < (ou32_StartingId + u16_EndIdOffset))))
       {
          const uint32_t u32_ItMessage = rc_CoMessageMainObject.u16_Index - ou32_StartingId;
          //COB-ID section
          //--------------
          const C_OscCanOpenObject * const pc_CoMessageCobIdObject =
-            mh_GetCoObject(orc_CoObjects, ou32_StartingId + u32_ItMessage,
-                           C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID);
+            mh_GetCoObject(orc_CoObjects, ou32_StartingId + u32_ItMessage, u8_CobIdSubIndex);
          if (pc_CoMessageCobIdObject != NULL)
          {
             bool q_CobIdIncludesNodeId;
@@ -555,35 +550,53 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
                //Check if message active
                if ((u32_CobId & 0x80000000UL) == 0UL)
                {
-                  s32_Retval = C_OscImportEdsDcf::mh_ParseMessageContent(ou32_StartingId, ou8_NodeId, orc_CoObjects,
-                                                                         orc_Dummies,
-                                                                         orc_OscMessageData, orc_OscSignalData,
-                                                                         orc_SignalDefaultMinMaxValuesUsed,
-                                                                         oq_IsEds,
-                                                                         orc_ImportMessages, oq_IsTx,
-                                                                         oq_RestrictForCanOpenUsage,
-                                                                         rc_CoMessageMainObject, u32_ItMessage,
-                                                                         u32_CobId, orc_InvalidOscMessageData,
-                                                                         orc_InvalidOscSignalData,
-                                                                         orc_InvalidSignalDefaultMinMaxValuesUsed,
-                                                                         orc_InvalidImportMessages,
-                                                                         q_CobIdIncludesNodeId);
+                  bool q_Continue = false;
+                  if (oq_ImportSrdoUseCase)
+                  {
+                     //Information direction section
+                     //-----------------------------
+                     s32_Retval = C_OscImportEdsDcf::mh_DoesInformationDirectionMatchToParsedMessages(ou32_StartingId,
+                                                                                                      ou8_NodeId,
+                                                                                                      orc_CoObjects,
+                                                                                                      oq_IsEds, oq_IsTx,
+                                                                                                      u32_ItMessage,
+                                                                                                      q_Continue);
+                  }
+                  else
+                  {
+                     q_Continue = true;
+                  }
+                  if (q_Continue)
+                  {
+                     s32_Retval = C_OscImportEdsDcf::mh_ParseMessageContent(ou32_StartingId,
+                                                                            ou8_NodeId,
+                                                                            orc_CoObjects,
+                                                                            orc_Dummies,
+                                                                            orc_AllMessageData,
+                                                                            oq_IsEds,
+                                                                            orc_ImportMessages, oq_IsTx,
+                                                                            oq_RestrictForCanOpenUsage,
+                                                                            oq_ImportSrdoUseCase,
+                                                                            rc_CoMessageMainObject, u32_ItMessage,
+                                                                            u32_CobId, orc_AllInvalidMessageData,
+                                                                            orc_InvalidImportMessages,
+                                                                            q_CobIdIncludesNodeId);
+                  }
                }
                else
                {
                   if (oq_RestrictForCanOpenUsage)
                   {
-                     s32_Retval = C_OscImportEdsDcf::mh_ParseMessageContent(ou32_StartingId, ou8_NodeId, orc_CoObjects,
+                     s32_Retval = C_OscImportEdsDcf::mh_ParseMessageContent(ou32_StartingId,
+                                                                            ou8_NodeId, orc_CoObjects,
                                                                             orc_Dummies,
-                                                                            orc_OscMessageData, orc_OscSignalData,
-                                                                            orc_SignalDefaultMinMaxValuesUsed,
+                                                                            orc_AllMessageData,
                                                                             oq_IsEds,
                                                                             orc_ImportMessages, oq_IsTx,
                                                                             oq_RestrictForCanOpenUsage,
+                                                                            oq_ImportSrdoUseCase,
                                                                             rc_CoMessageMainObject, u32_ItMessage,
-                                                                            u32_CobId, orc_InvalidOscMessageData,
-                                                                            orc_InvalidOscSignalData,
-                                                                            orc_InvalidSignalDefaultMinMaxValuesUsed,
+                                                                            u32_CobId, orc_AllInvalidMessageData,
                                                                             orc_InvalidImportMessages,
                                                                             q_CobIdIncludesNodeId);
                   }
@@ -594,7 +607,7 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
                      c_Stream << "Skipped message as marked as inactive (highest bit set in COB_ID) ";
                      c_Stream << &std::hex << u32_Id;
                      mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "COB-ID used by PDO",
-                                       c_Stream.str().c_str(), C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID,
+                                       c_Stream.str().c_str(), u8_CobIdSubIndex,
                                        true);
                   }
                }
@@ -602,15 +615,14 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
             else
             {
                mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "COB-ID used by PDO",
-                                 "empty or not a number",
-                                 C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID, true);
+                                 "empty or not a number", u8_CobIdSubIndex, true);
                s32_Retval = C_CONFIG;
             }
          }
          else
          {
             mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "COB-ID used by PDO",
-                              "does not exist", C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID,
+                              "does not exist", u8_CobIdSubIndex,
                               true);
             s32_Retval = C_CONFIG;
          }
@@ -621,29 +633,85 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Does information direction match to parsed messages
+
+   \param[in]   ou32_StartingId     Starting ID for message section
+   \param[in]   ou8_NodeId          Node ID
+   \param[in]   orc_CoObjects       All CO objects of the current file
+   \param[in]   oq_IsEds            Flag if current file is an EDS file
+   \param[in]   oq_IsTx             Flag if message is a Tx message
+   \param[in]   ou32_MessageIndex   Message index
+   \param[out]  orq_Matches         Flag if direction matches
+
+   \return
+   C_NO_ERR Operation success
+   C_CONFIG Operation failure: configuration invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscImportEdsDcf::mh_DoesInformationDirectionMatchToParsedMessages(const uint32_t ou32_StartingId,
+                                                                            const uint8_t ou8_NodeId,
+                                                                            const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_IsTx, const uint32_t ou32_MessageIndex,
+                                                                            bool & orq_Matches)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   orq_Matches = false;
+   //Information direction section
+   //-----------------------------
+   const C_OscCanOpenObject * const pc_CoMessageInfoDirObject =
+      mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_MessageIndex,
+                     C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_INFORMATION_DIRECTION);
+   if (pc_CoMessageInfoDirObject != NULL)
+   {
+      uint32_t u32_InfoDir;
+      if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageInfoDirObject, oq_IsEds), ou8_NodeId,
+                             u32_InfoDir, NULL) == C_NO_ERR)
+      {
+         if (((u32_InfoDir == 1UL) && (oq_IsTx == true)) ||
+             ((u32_InfoDir == 2UL) && (oq_IsTx == false)))
+         {
+            orq_Matches = true;
+         }
+      }
+      else
+      {
+         mh_AddUserMessage(ou32_StartingId + ou32_MessageIndex, "Information direction",
+                           "empty or not a number",
+                           C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_INFORMATION_DIRECTION,
+                           true);
+         s32_Retval = C_CONFIG;
+      }
+   }
+   else
+   {
+      mh_AddUserMessage(ou32_StartingId + ou32_MessageIndex, "Information direction",
+                        "does not exist",
+                        C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_INFORMATION_DIRECTION,
+                        true);
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load core messages data
 
-   \param[in]      ou32_StartingId                             Starting ID for message section
-   \param[in]      ou8_NodeId                                  Node ID
-   \param[in]      orc_CoObjects                               All CO objects of the current file
-   \param[in]      orc_Dummies                                 Found and valid dummy data types
-   \param[in,out]  orc_OscMessageData                          Imported core message data
-   \param[in,out]  orc_OscSignalData                           Imported core signal data
-   \param[in,out]  orc_SignalDefaultMinMaxValuesUsed           Flag if imported core signal data uses the default min max
-                                                               values or specific set values
-   \param[in]      oq_IsEds                                    Flag if current file is an EDS file
-   \param[in,out]  orc_ImportMessages                          Import result messages
-   \param[in]      oq_IsTx                                     Flag if message is a Tx message
-   \param[in]      oq_RestrictForCanOpenUsage                  Restrict for can open usage
-   \param[in]      orc_CoMessageMainObject                     CANOpen message main object
-   \param[in]      ou32_ItMessage                              Current message index
-   \param[in]      ou32_CobId                                  Message COB-ID
-   \param[in,out]  orc_InvalidOscMessageData                   Invalid core message data
-   \param[in,out]  orc_InvalidOscSignalData                    Invalid core signal data
-   \param[in,out]  orc_InvalidSignalDefaultMinMaxValuesUsed    Flag if invalid core signal data uses the default min max
-                                                               values or specific set values
-   \param[in,out]  orc_InvalidImportMessages                   Import result messages per invalid message
-   \param[in]      oq_CobIdIncludesNodeId                      Flag if message COB-ID includes node id
+   \param[in]      ou32_StartingId              Starting ID for message section
+   \param[in]      ou8_NodeId                   Node ID
+   \param[in]      orc_CoObjects                All CO objects of the current file
+   \param[in]      orc_Dummies                  Found and valid dummy data types
+   \param[in,out]  orc_AllMessageData           All imported core message data
+   \param[in]      oq_IsEds                     Flag if current file is an EDS file
+   \param[in,out]  orc_ImportMessages           Import result messages
+   \param[in]      oq_IsTx                      Flag if message is a Tx message
+   \param[in]      oq_RestrictForCanOpenUsage   Restrict for can open usage
+   \param[in]      oq_ImportSrdoUseCase         Import SRDO use case
+   \param[in]      orc_CoMessageMainObject      CANOpen message main object
+   \param[in]      ou32_ItMessage               Current message index
+   \param[in]      ou32_CobId                   Message COB-ID
+   \param[in,out]  orc_AllInvalidMessageData    All invalid core message data
+   \param[in,out]  orc_InvalidImportMessages    Import result messages per invalid message
+   \param[in]      oq_CobIdIncludesNodeId       Flag if message COB-ID includes node id
 
    \return
    C_NO_ERR Operation success
@@ -653,20 +721,18 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
 int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId, const uint8_t ou8_NodeId,
                                                   const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
                                                   const std::vector<uint32_t> & orc_Dummies,
-                                                  std::vector<C_OscCanMessage> & orc_OscMessageData,
-                                                  std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
-                                                  std::vector<uint8_t> & orc_SignalDefaultMinMaxValuesUsed,
+                                                  C_OscEdsDcfImportMessageGroup & orc_AllMessageData,
                                                   const bool oq_IsEds,
                                                   std::vector<std::vector<C_SclString> > & orc_ImportMessages,
                                                   const bool oq_IsTx, const bool oq_RestrictForCanOpenUsage,
+                                                  const bool oq_ImportSrdoUseCase,
                                                   const C_OscCanOpenObject & orc_CoMessageMainObject,
                                                   const uint32_t ou32_ItMessage, const uint32_t ou32_CobId,
-                                                  std::vector<C_OscCanMessage> & orc_InvalidOscMessageData,
-                                                  std::vector<C_OscNodeDataPoolListElement> & orc_InvalidOscSignalData,
-                                                  std::vector<uint8_t> & orc_InvalidSignalDefaultMinMaxValuesUsed,
+                                                  C_OscEdsDcfImportMessageGroup & orc_AllInvalidMessageData,
                                                   std::vector<std::vector<stw::scl::C_SclString> > & orc_InvalidImportMessages,
                                                   const bool oq_CobIdIncludesNodeId)
 {
+   const uint16_t u16_MappingOffset = oq_ImportSrdoUseCase ? 0x80U : 0x200U;
    int32_t s32_Retval = C_NO_ERR;
    bool q_AddToSkippedMessages = false;
 
@@ -724,7 +790,8 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
    else
    {
       s32_Retval = C_OscImportEdsDcf::mh_LoadMessageTransmissionType(ou32_StartingId, ou32_ItMessage, ou8_NodeId,
-                                                                     orc_CoObjects, oq_IsEds, c_CurMessages, c_Message);
+                                                                     orc_CoObjects, oq_IsEds, oq_ImportSrdoUseCase,
+                                                                     c_CurMessages, c_Message);
    }
    //Optional
    //Event-timer section
@@ -736,8 +803,16 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
    }
    else
    {
-      C_OscImportEdsDcf::mh_LoadEventTimerSection(ou32_StartingId, ou32_ItMessage, ou8_NodeId,
-                                                  orc_CoObjects, oq_IsEds, oq_IsTx, c_CurMessages, c_Message);
+      if (oq_ImportSrdoUseCase)
+      {
+         C_OscImportEdsDcf::mh_LoadSrdoCyclicSection(ou32_StartingId, ou32_ItMessage, ou8_NodeId,
+                                                     orc_CoObjects, oq_IsEds, c_CurMessages, c_Message);
+      }
+      else
+      {
+         C_OscImportEdsDcf::mh_LoadEventTimerSection(ou32_StartingId, ou32_ItMessage, ou8_NodeId,
+                                                     orc_CoObjects, oq_IsEds, oq_IsTx, c_CurMessages, c_Message);
+      }
    }
 
    //Inhibit-time section
@@ -754,36 +829,36 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
 
       if (q_AddToSkippedMessages)
       {
-         s32_Retval = mh_ParseSignals(ou32_StartingId + ou32_ItMessage, ou8_NodeId,
-                                      orc_CoObjects, orc_Dummies, c_Message, orc_InvalidOscSignalData,
-                                      orc_InvalidSignalDefaultMinMaxValuesUsed,
-                                      oq_IsEds, oq_RestrictForCanOpenUsage, c_CurMessages);
+         s32_Retval = mh_ParseSignals(ou32_StartingId + ou32_ItMessage, u16_MappingOffset, ou8_NodeId,
+                                      orc_CoObjects, orc_Dummies, c_Message, orc_AllInvalidMessageData.c_OscSignalData,
+                                      orc_AllInvalidMessageData.c_SignalDefaultMinMaxValuesUsed,
+                                      oq_IsEds, oq_RestrictForCanOpenUsage, oq_ImportSrdoUseCase, c_CurMessages);
       }
       else
       {
-         s32_Retval = mh_ParseSignals(ou32_StartingId + ou32_ItMessage, ou8_NodeId,
-                                      orc_CoObjects, orc_Dummies, c_Message, orc_OscSignalData,
-                                      orc_SignalDefaultMinMaxValuesUsed,
-                                      oq_IsEds, oq_RestrictForCanOpenUsage, c_CurMessages);
+         s32_Retval = mh_ParseSignals(ou32_StartingId + ou32_ItMessage, u16_MappingOffset, ou8_NodeId,
+                                      orc_CoObjects, orc_Dummies, c_Message, orc_AllMessageData.c_OscSignalData,
+                                      orc_AllMessageData.c_SignalDefaultMinMaxValuesUsed,
+                                      oq_IsEds, oq_RestrictForCanOpenUsage, oq_ImportSrdoUseCase, c_CurMessages);
       }
       if (s32_Retval != C_NO_ERR)
       {
          //Ignore signal parsing errors, at least message was valid
          s32_Retval = C_NO_ERR;
-         mh_AddUserMessage(ou32_StartingId + ou32_ItMessage + 0x200UL, "",
+         mh_AddUserMessage(ou32_StartingId + ou32_ItMessage + u16_MappingOffset, "",
                            "Information: PDO has no mapping.",
                            -1L, false, &c_CurMessages);
       }
       if (q_AddToSkippedMessages)
       {
          //Should be in sync
-         orc_InvalidOscMessageData.push_back(c_Message);
+         orc_AllInvalidMessageData.c_OscMessageData.push_back(c_Message);
          orc_InvalidImportMessages.push_back(c_CurMessages);
       }
       else
       {
          //Should be in sync
-         orc_OscMessageData.push_back(c_Message);
+         orc_AllMessageData.c_OscMessageData.push_back(c_Message);
          orc_ImportMessages.push_back(c_CurMessages);
       }
    }
@@ -793,30 +868,33 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load message transmission type
 
-   \param[in]      ou32_StartingId  Starting ID for message section
-   \param[in]      ou32_ItMessage   Current message index
-   \param[in]      ou8_NodeId       Node ID
-   \param[in]      orc_CoObjects    All CO objects of the current file
-   \param[in]      oq_IsEds         Flag if current file is an EDS file
-   \param[in,out]  orc_CurMessages  Current import result messages
-   \param[in,out]  orc_Message      Message
+   \param[in]      ou32_StartingId        Starting ID for message section
+   \param[in]      ou32_ItMessage         Current message index
+   \param[in]      ou8_NodeId             Node ID
+   \param[in]      orc_CoObjects          All CO objects of the current file
+   \param[in]      oq_IsEds               Flag if current file is an EDS file
+   \param[in]      oq_ImportSrdoUseCase   Import SRDO use case
+   \param[in,out]  orc_CurMessages        Current import result messages
+   \param[in,out]  orc_Message            Message
 
    \return
    STW error codes
 
-   \retval   C_NO_ERR   Detailed description
-   \retval   C_CONFIG   Detailed description
+   \retval   C_NO_ERR   Operation success
+   \retval   C_CONFIG   Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::mh_LoadMessageTransmissionType(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
                                                           const uint8_t ou8_NodeId,
-                                                          const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, std::vector<C_SclString> & orc_CurMessages,
+                                                          const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_ImportSrdoUseCase, std::vector<C_SclString> & orc_CurMessages,
                                                           C_OscCanMessage & orc_Message)
 {
    int32_t s32_Retval = C_NO_ERR;
+   const uint8_t u8_ActualSubIndex =
+      oq_ImportSrdoUseCase ? C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_TRANSMISSION_TYPE :
+      C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE;
    const C_OscCanOpenObject * const pc_CoMessageTransTypeObject =
-      mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
-                     C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE);
+      mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage, u8_ActualSubIndex);
 
    if (pc_CoMessageTransTypeObject != NULL)
    {
@@ -831,15 +909,13 @@ int32_t C_OscImportEdsDcf::mh_LoadMessageTransmissionType(const uint32_t ou32_St
                               "the message type \"synchronous\" was converted to \"cyclic\".\n"
                               "Cycle time set default to " +
                               C_SclString::IntToStr(
-                                 orc_Message.u32_CycleTimeMs) + "ms.",
-                              C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE, false,
+                                 orc_Message.u32_CycleTimeMs) + "ms.", u8_ActualSubIndex, false,
                               &orc_CurMessages);
          }
          else if ((u32_TransmissionType == 0xFCUL) || (u32_TransmissionType == 0xFDUL))
          {
             mh_AddUserMessage(ou32_StartingId + ou32_ItMessage, "Transmission type",
-                              "not supported",
-                              C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE, true);
+                              "not supported", u8_ActualSubIndex, true);
             s32_Retval = C_CONFIG;
          }
          else
@@ -850,8 +926,7 @@ int32_t C_OscImportEdsDcf::mh_LoadMessageTransmissionType(const uint32_t ou32_St
       else
       {
          mh_AddUserMessage(ou32_StartingId + ou32_ItMessage, "Transmission type",
-                           "empty or not a number, default set to: \"on event\"",
-                           C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE, false,
+                           "empty or not a number, default set to: \"on event\"", u8_ActualSubIndex, false,
                            &orc_CurMessages);
          orc_Message.e_TxMethod = C_OscCanMessage::eTX_METHOD_ON_EVENT;
       }
@@ -859,7 +934,7 @@ int32_t C_OscImportEdsDcf::mh_LoadMessageTransmissionType(const uint32_t ou32_St
    else
    {
       mh_AddUserMessage(ou32_StartingId + ou32_ItMessage, "Transmission type",
-                        "does not exist, default set to: \"on event\"", 2L, false, &orc_CurMessages);
+                        "does not exist, default set to: \"on event\"", u8_ActualSubIndex, false, &orc_CurMessages);
       orc_Message.e_TxMethod = C_OscCanMessage::eTX_METHOD_ON_EVENT;
    }
    return s32_Retval;
@@ -1042,6 +1117,88 @@ void C_OscImportEdsDcf::mh_LoadEventTimerSection(const uint32_t ou32_StartingId,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load SRDO cyclic section
+
+   \param[in]      ou32_StartingId  Starting ID for message section
+   \param[in]      ou32_ItMessage   Current message index
+   \param[in]      ou8_NodeId       Node ID
+   \param[in]      orc_CoObjects    All CO objects of the current file
+   \param[in]      oq_IsEds         Flag if current file is an EDS file
+   \param[in,out]  orc_CurMessages  Current import result messages
+   \param[in,out]  orc_Message      Message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscImportEdsDcf::mh_LoadSrdoCyclicSection(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
+                                                 const uint8_t ou8_NodeId,
+                                                 const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
+                                                 const bool oq_IsEds, std::vector<C_SclString> & orc_CurMessages,
+                                                 C_OscCanMessage & orc_Message)
+{
+   bool q_UseDefault = false;
+   C_SclString c_Reason;
+
+   const C_OscCanOpenObject * const pc_CoMessageCycleTimeObject =
+      mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
+                     C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_CYCLE_TIME);
+
+   if (pc_CoMessageCycleTimeObject != NULL)
+   {
+      uint32_t u32_CycleTime;
+      if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageCycleTimeObject, oq_IsEds),
+                             ou8_NodeId,
+                             u32_CycleTime) == C_NO_ERR)
+      {
+         if ((orc_Message.e_TxMethod == C_OscCanMessage::eTX_METHOD_ON_EVENT) ||
+             (u32_CycleTime > 0U))
+         {
+            orc_Message.u32_CycleTimeMs = u32_CycleTime;
+            orc_Message.u32_TimeoutMs = (u32_CycleTime * 3UL) + 10UL;
+         }
+         else
+         {
+            // In case of cyclic or change, 0ms is not supported.
+            // In case of on event, timeout is disabled
+            q_UseDefault = true;
+            c_Reason = "was 0ms";
+         }
+      }
+      else
+      {
+         q_UseDefault = true;
+         c_Reason = "empty or not a number";
+      }
+   }
+   else
+   {
+      q_UseDefault = true;
+      c_Reason = "does not exist";
+   }
+
+   if (q_UseDefault == true)
+   {
+      // In case of cyclic or change, set to default.
+      // In case of on event, timeout is disabled
+      if (orc_Message.e_TxMethod != C_OscCanMessage::eTX_METHOD_ON_EVENT)
+      {
+         mh_AddUserMessage(ou32_StartingId + ou32_ItMessage, "Cycle-time",
+                           c_Reason + ", default set to: " +
+                           C_SclString::IntToStr(
+                              orc_Message.u32_TimeoutMs) + "ms", C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_CYCLE_TIME, false,
+                           &orc_CurMessages);
+      }
+      else
+      {
+         mh_AddUserMessage(ou32_StartingId + ou32_ItMessage, "Cycle-time",
+                           c_Reason + ", default set to: disabled (0)",
+                           C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_CYCLE_TIME, false,
+                           &orc_CurMessages);
+         orc_Message.u32_CycleTimeMs = 0U;
+         orc_Message.u32_TimeoutMs = 0U;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load event timer section in CANopen use-case
 
    \param[in]      ou32_StartingId  Starting ID for message section
@@ -1157,6 +1314,7 @@ void C_OscImportEdsDcf::mh_LoadInhibitTimeSectionCanOpen(const uint32_t ou32_Sta
 /*! \brief   Load core signal data
 
    \param[in]      ou32_CoMessageId                   ID for CO message section
+   \param[in]      ou16_MappingOffset                 Mapping offset for message section
    \param[in]      ou8_NodeId                         Node ID
    \param[in]      orc_CoObjects                      All CO objects of the current file
    \param[in]      orc_Dummies                        Found and valid dummy data types
@@ -1166,6 +1324,7 @@ void C_OscImportEdsDcf::mh_LoadInhibitTimeSectionCanOpen(const uint32_t ou32_Sta
                                                       or specific set values
    \param[in]      oq_IsEds                           Flag if current file is an EDS file
    \param[in]      oq_RestrictForCanOpenUsage         Restrict for can open usage
+   \param[in]      oq_ImportSrdoUseCase               Import SRDO use case
    \param[in,out]  orc_ImportMessages                 Import result messages
 
    \return
@@ -1173,20 +1332,22 @@ void C_OscImportEdsDcf::mh_LoadInhibitTimeSectionCanOpen(const uint32_t ou32_Sta
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, const uint8_t ou8_NodeId,
+int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, const uint16_t ou16_MappingOffset,
+                                           const uint8_t ou8_NodeId,
                                            const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
                                            const std::vector<uint32_t> & orc_Dummies,
                                            C_OscCanMessage & orc_OscMessageData,
                                            std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
                                            std::vector<uint8_t> & orc_SignalDefaultMinMaxValuesUsed,
                                            const bool oq_IsEds, const bool oq_RestrictForCanOpenUsage,
+                                           const bool oq_ImportSrdoUseCase,
                                            std::vector<C_SclString> & orc_ImportMessages)
 {
    int32_t s32_Retval = C_NO_ERR;
    //PDO mapping parameter
    //---------------------
    const C_OscCanOpenObject * const pc_CoMessageMappingObject =
-      mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + 0x200, 0);
+      mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset, 0);
 
    if (oq_RestrictForCanOpenUsage == true)
    {
@@ -1209,122 +1370,128 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
             {
                //Signal pointer section
                //----------------------
-               //Skip first section because this is just the number of sub segments
-               const C_OscCanOpenObject * const pc_CoMessageMappingSubObject =
-                  mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + 0x200UL, static_cast<int32_t>(u32_ItSignal + 1UL));
-
-               if (pc_CoMessageMappingSubObject != NULL)
+               //Skip every second signal for SRDOs (inverted signal)
+               if ((oq_ImportSrdoUseCase && ((u32_ItSignal % 2) == 0)) == false)
                {
-                  uint32_t u32_MappingSubIndexValue;
-                  if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageMappingSubObject, oq_IsEds), ou8_NodeId,
-                                         u32_MappingSubIndexValue) == C_NO_ERR)
+                  //Skip first section because this is just the number of sub segments
+                  const C_OscCanOpenObject * const pc_CoMessageMappingSubObject =
+                     mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset,
+                                    static_cast<int32_t>(u32_ItSignal + 1UL));
+
+                  if (pc_CoMessageMappingSubObject != NULL)
                   {
-                     bool q_Dummy = false;
-                     const uint32_t u32_CoRefId = (u32_MappingSubIndexValue & 0xFFFF0000UL) >> 16UL;
-                     //Search if this signal is a valid dummy signal
-                     for (uint32_t u32_ItDummy = 0; u32_ItDummy < orc_Dummies.size(); ++u32_ItDummy)
+                     uint32_t u32_MappingSubIndexValue;
+                     if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageMappingSubObject, oq_IsEds), ou8_NodeId,
+                                            u32_MappingSubIndexValue) == C_NO_ERR)
                      {
-                        if (u32_CoRefId == orc_Dummies[u32_ItDummy])
+                        bool q_Dummy = false;
+                        const uint32_t u32_CoRefId = (u32_MappingSubIndexValue & 0xFFFF0000UL) >> 16UL;
+                        //Search if this signal is a valid dummy signal
+                        for (uint32_t u32_ItDummy = 0; u32_ItDummy < orc_Dummies.size(); ++u32_ItDummy)
                         {
-                           q_Dummy = true;
-                           //Move start bit to expected position
-                           u32_StartBitCounter += (u32_MappingSubIndexValue & 0xFFU);
-                           break;
-                        }
-                     }
-                     //If not dummy signal check referenced CO object
-                     if (q_Dummy == false)
-                     {
-                        const uint32_t u32_CoRefIdSub = (u32_MappingSubIndexValue & 0xFF00UL) >> 8UL;
-                        const uint16_t u16_ExpectedLength = static_cast<uint16_t>(u32_MappingSubIndexValue & 0xFFUL);
-                        C_OscCanSignal c_CurSignal;
-                        C_OscNodeDataPoolListElement c_CurDataPoolSignal;
-                        bool q_DefaultMinMax = true;
-
-                        s32_Retval = C_OscImportEdsDcf::h_ParseSignalContent(orc_CoObjects, u32_CoRefId, u32_CoRefIdSub,
-                                                                             u32_StartBitCounter,
-                                                                             oq_RestrictForCanOpenUsage, oq_IsEds,
-                                                                             c_CurSignal, c_CurDataPoolSignal,
-                                                                             q_DefaultMinMax);
-                        if (u16_ExpectedLength != c_CurSignal.u16_ComBitLength)
-                        {
-                           mh_AddUserMessage(u32_CoRefId, "",
-                                             "mapping signal bit length " +
-                                             stw::scl::C_SclString::IntToStr(
-                                                u16_ExpectedLength) + " did not match to bit length from data type " +
-                                             stw::scl::C_SclString::IntToStr(
-                                                c_CurSignal.u16_ComBitLength) + ". Using bit length " +
-                                             stw::scl::C_SclString::IntToStr(c_CurSignal.u16_ComBitLength),
-                                             static_cast<int32_t>(u32_CoRefIdSub), false, &orc_ImportMessages);
-                        }
-                        u32_StartBitCounter += c_CurSignal.u16_ComBitLength;
-                        if (s32_Retval == C_NO_ERR)
-                        {
-                           //Handle index
-                           c_CurSignal.u32_ComDataElementIndex = static_cast<uint32_t>(orc_OscSignalData.size());
-                           //Add
-                           orc_OscMessageData.c_Signals.push_back(c_CurSignal);
-                           orc_OscSignalData.push_back(c_CurDataPoolSignal);
-                           orc_SignalDefaultMinMaxValuesUsed.push_back(static_cast<uint8_t>(q_DefaultMinMax));
-
-                           if (oq_RestrictForCanOpenUsage == true)
+                           if (u32_CoRefId == orc_Dummies[u32_ItDummy])
                            {
-                              // In case of CANopen the DLC is adapted automatically. Adapt to the added signals
-                              const uint16_t u16_LastBit = c_CurSignal.u16_ComBitStart +
-                                                           c_CurSignal.u16_ComBitLength;
-                              uint16_t u16_NeededBytes = u16_LastBit / 8U;
+                              q_Dummy = true;
+                              //Move start bit to expected position
+                              u32_StartBitCounter += (u32_MappingSubIndexValue & 0xFFU);
+                              break;
+                           }
+                        }
+                        //If not dummy signal check referenced CO object
+                        if (q_Dummy == false)
+                        {
+                           const uint32_t u32_CoRefIdSub = (u32_MappingSubIndexValue & 0xFF00UL) >> 8UL;
+                           const uint16_t u16_ExpectedLength = static_cast<uint16_t>(u32_MappingSubIndexValue & 0xFFUL);
+                           C_OscCanSignal c_CurSignal;
+                           C_OscNodeDataPoolListElement c_CurDataPoolSignal;
+                           bool q_DefaultMinMax = true;
 
-                              // Check for not byte aligned signals
-                              if ((u16_LastBit % 8U) != 0U)
+                           s32_Retval = C_OscImportEdsDcf::h_ParseSignalContent(orc_CoObjects, u32_CoRefId,
+                                                                                u32_CoRefIdSub,
+                                                                                u32_StartBitCounter,
+                                                                                oq_RestrictForCanOpenUsage, oq_IsEds,
+                                                                                c_CurSignal, c_CurDataPoolSignal,
+                                                                                q_DefaultMinMax);
+                           if (u16_ExpectedLength != c_CurSignal.u16_ComBitLength)
+                           {
+                              mh_AddUserMessage(u32_CoRefId, "",
+                                                "mapping signal bit length " +
+                                                stw::scl::C_SclString::IntToStr(
+                                                   u16_ExpectedLength) + " did not match to bit length from data type " +
+                                                stw::scl::C_SclString::IntToStr(
+                                                   c_CurSignal.u16_ComBitLength) + ". Using bit length " +
+                                                stw::scl::C_SclString::IntToStr(c_CurSignal.u16_ComBitLength),
+                                                static_cast<int32_t>(u32_CoRefIdSub), false, &orc_ImportMessages);
+                           }
+                           u32_StartBitCounter += c_CurSignal.u16_ComBitLength;
+                           if (s32_Retval == C_NO_ERR)
+                           {
+                              //Handle index
+                              c_CurSignal.u32_ComDataElementIndex = static_cast<uint32_t>(orc_OscSignalData.size());
+                              //Add
+                              orc_OscMessageData.c_Signals.push_back(c_CurSignal);
+                              orc_OscSignalData.push_back(c_CurDataPoolSignal);
+                              orc_SignalDefaultMinMaxValuesUsed.push_back(static_cast<uint8_t>(q_DefaultMinMax));
+
+                              if (oq_RestrictForCanOpenUsage == true)
                               {
-                                 ++u16_NeededBytes;
-                              }
+                                 // In case of CANopen the DLC is adapted automatically. Adapt to the added signals
+                                 const uint16_t u16_LastBit = c_CurSignal.u16_ComBitStart +
+                                                              c_CurSignal.u16_ComBitLength;
+                                 uint16_t u16_NeededBytes = u16_LastBit / 8U;
 
-                              if (u16_NeededBytes > orc_OscMessageData.u16_Dlc)
-                              {
-                                 orc_OscMessageData.u16_Dlc = u16_NeededBytes;
-
-                                 if (orc_OscMessageData.u16_Dlc > 8U)
+                                 // Check for not byte aligned signals
+                                 if ((u16_LastBit % 8U) != 0U)
                                  {
-                                    // 8 is maximum
-                                    orc_OscMessageData.u16_Dlc = 8U;
+                                    ++u16_NeededBytes;
+                                 }
+
+                                 if (u16_NeededBytes > orc_OscMessageData.u16_Dlc)
+                                 {
+                                    orc_OscMessageData.u16_Dlc = u16_NeededBytes;
+
+                                    if (orc_OscMessageData.u16_Dlc > 8U)
+                                    {
+                                       // 8 is maximum
+                                       orc_OscMessageData.u16_Dlc = 8U;
+                                    }
                                  }
                               }
                            }
                         }
                      }
+                     else
+                     {
+                        mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "",
+                                          "empty or not a number", static_cast<int32_t>(u32_ItSignal + 1UL), true);
+                        s32_Retval = C_CONFIG;
+                     }
                   }
                   else
                   {
-                     mh_AddUserMessage(ou32_CoMessageId + 0x200, "",
-                                       "empty or not a number", static_cast<int32_t>(u32_ItSignal + 1UL), true);
+                     mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "", "does not exist",
+                                       static_cast<int32_t>(u32_ItSignal + 1UL), true);
                      s32_Retval = C_CONFIG;
                   }
-               }
-               else
-               {
-                  mh_AddUserMessage(ou32_CoMessageId + 0x200, "", "does not exist",
-                                    static_cast<int32_t>(u32_ItSignal + 1UL), true);
-                  s32_Retval = C_CONFIG;
                }
             }
          }
          else
          {
-            mh_AddUserMessage(ou32_CoMessageId + 0x200, "", "has unexpected value", -1L, true);
+            mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "", "has unexpected value", -1L, true);
             s32_Retval = C_CONFIG;
          }
       }
       else
       {
-         mh_AddUserMessage(ou32_CoMessageId + 0x200, "",
+         mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "",
                            "empty or not a number", 0, true);
          s32_Retval = C_CONFIG;
       }
    }
    else
    {
-      mh_AddUserMessage(ou32_CoMessageId + 0x200, "", "does not exist", 0, true);
+      mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "", "does not exist", 0, true);
       s32_Retval = C_CONFIG;
    }
 

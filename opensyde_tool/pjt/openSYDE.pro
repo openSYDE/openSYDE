@@ -50,6 +50,7 @@ SOURCES += ../src/main.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatter.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatterConfig.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCrcGroup.cpp \
+    ../src/project_gui/system_views/dashboard/C_PuiSvDbWriteWidgetBase.cpp \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.cpp \
     ../src/project_operations/C_PopPasswordDialogWidget.cpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.cpp \
@@ -59,8 +60,8 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.cpp \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogDialog.cpp \
-    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableModel.cpp \
-    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableView.cpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTreeModel.cpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTreeView.cpp \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.cpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.cpp \
@@ -953,6 +954,7 @@ HEADERS  += \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatter.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatterConfig.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCrcGroup.hpp \
+    ../src/project_gui/system_views/dashboard/C_PuiSvDbWriteWidgetBase.hpp \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.hpp \
     ../src/project_operations/C_PopPasswordDialogWidget.hpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.hpp \
@@ -962,8 +964,8 @@ HEADERS  += \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.hpp \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogDialog.hpp \
-    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableModel.hpp \
-    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableView.hpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTreeModel.hpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTreeView.hpp \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.hpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.hpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.hpp \

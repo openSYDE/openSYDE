@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDCONTEXTMENUENTRY_H
-#define C_SDCONTEXTMENUENTRY_H
+#ifndef C_SDCONTEXTMENUENTRY_HPP
+#define C_SDCONTEXTMENUENTRY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

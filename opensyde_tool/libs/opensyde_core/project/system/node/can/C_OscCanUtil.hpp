@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANUTIL_H
-#define C_OSCCANUTIL_H
+#ifndef C_OSCCANUTIL_HPP
+#define C_OSCCANUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscNodeDataPoolContent.hpp"

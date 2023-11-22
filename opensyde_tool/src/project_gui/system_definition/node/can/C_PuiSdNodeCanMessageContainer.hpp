@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDNODECANMESSAGECONTAINER_H
-#define C_PUISDNODECANMESSAGECONTAINER_H
+#ifndef C_PUISDNODECANMESSAGECONTAINER_HPP
+#define C_PUISDNODECANMESSAGECONTAINER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

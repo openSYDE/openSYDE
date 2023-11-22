@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USNODE_H
-#define C_USNODE_H
+#ifndef C_USNODE_HPP
+#define C_USNODE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

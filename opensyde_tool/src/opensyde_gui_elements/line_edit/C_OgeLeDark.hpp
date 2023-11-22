@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELEDARK_H
-#define C_OGELEDARK_H
+#ifndef C_OGELEDARK_HPP
+#define C_OGELEDARK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeContextMenuBase.hpp"

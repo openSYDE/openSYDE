@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSFILTERPOPUP_H
-#define C_CAMMOSFILTERPOPUP_H
+#ifndef C_CAMMOSFILTERPOPUP_HPP
+#define C_CAMMOSFILTERPOPUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

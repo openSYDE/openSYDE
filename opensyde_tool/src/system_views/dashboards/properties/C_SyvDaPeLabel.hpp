@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPELABEL_H
-#define C_SYVDAPELABEL_H
+#ifndef C_SYVDAPELABEL_HPP
+#define C_SYVDAPELABEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

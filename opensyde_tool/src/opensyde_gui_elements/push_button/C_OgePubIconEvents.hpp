@@ -6,8 +6,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBICONEVENTS_H
-#define C_OGEPUBICONEVENTS_H
+#ifndef C_OGEPUBICONEVENTS_HPP
+#define C_OGEPUBICONEVENTS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"

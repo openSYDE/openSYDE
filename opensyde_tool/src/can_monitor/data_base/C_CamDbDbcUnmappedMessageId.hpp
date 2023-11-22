@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMDBDBCUNMAPPEDMESSAGEID_H
-#define C_CAMDBDBCUNMAPPEDMESSAGEID_H
+#ifndef C_CAMDBDBCUNMAPPEDMESSAGEID_HPP
+#define C_CAMDBDBCUNMAPPEDMESSAGEID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

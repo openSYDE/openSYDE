@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEDATAELEMENTTREEVIEW_H
-#define C_SYVDAPEDATAELEMENTTREEVIEW_H
+#ifndef C_SYVDAPEDATAELEMENTTREEVIEW_HPP
+#define C_SYVDAPEDATAELEMENTTREEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTreeViewToolTipBase.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USCOMMUNICATION_H
-#define C_USCOMMUNICATION_H
+#ifndef C_USCOMMUNICATION_HPP
+#define C_USCOMMUNICATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

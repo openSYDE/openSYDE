@@ -6,8 +6,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPIMPORTRAMVIEWHPP
-#define C_SDNDEDPIMPORTRAMVIEWHPP
+#ifndef C_SDNDEDPIMPORTRAMVIE_HPP
+#define C_SDNDEDPIMPORTRAMVIE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

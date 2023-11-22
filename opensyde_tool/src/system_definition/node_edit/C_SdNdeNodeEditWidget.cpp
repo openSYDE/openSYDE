@@ -579,7 +579,7 @@ void C_SdNdeNodeEditWidget::m_OnDpChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger reload of data pools tab
+/*! \brief   Trigger reload of data pools tab and tabs that show information about owned data pools
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
@@ -592,6 +592,7 @@ void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
    {
       this->mpc_PropertiesWidget->UpdateApplications();
    }
+   this->m_ReloadHalc();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -637,7 +638,7 @@ void C_SdNdeNodeEditWidget::m_ReloadCommDatapools() const
    Necessary if Datapool assignment changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_ReloadHalc(void)
+void C_SdNdeNodeEditWidget::m_ReloadHalc(void) const
 {
    if (this->mpc_HalWidget != NULL)
    {
@@ -662,14 +663,6 @@ void C_SdNdeNodeEditWidget::m_HalcLoadedFromTsp(void) const
 
    // reload tabs to update GUI
    this->m_ReloadDataPools();
-   if (this->mpc_HalWidget != NULL)
-   {
-      this->mpc_HalWidget->SetNode(this->mu32_NodeIndex);
-   }
-   if (this->mpc_PropertiesWidget != NULL)
-   {
-      this->mpc_PropertiesWidget->UpdateApplications();
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

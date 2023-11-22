@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDENODEPROPERTIESWIDGET_H
-#define C_SDNDENODEPROPERTIESWIDGET_H
+#ifndef C_SDNDENODEPROPERTIESWIDGET_HPP
+#define C_SDNDENODEPROPERTIESWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

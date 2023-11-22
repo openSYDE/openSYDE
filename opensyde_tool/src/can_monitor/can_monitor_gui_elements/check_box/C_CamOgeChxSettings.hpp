@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGECHXSETTINGS_H
-#define C_CAMOGECHXSETTINGS_H
+#ifndef C_CAMOGECHXSETTINGS_HPP
+#define C_CAMOGECHXSETTINGS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeChxToolTipBase.hpp"

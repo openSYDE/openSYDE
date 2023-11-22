@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBGRAPHICSVIEW_H
-#define C_SEBGRAPHICSVIEW_H
+#ifndef C_SEBGRAPHICSVIEW_HPP
+#define C_SEBGRAPHICSVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

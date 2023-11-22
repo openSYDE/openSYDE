@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEGBXMESSAGEGENERATORBACKGROUND_H
-#define C_CAMOGEGBXMESSAGEGENERATORBACKGROUND_H
+#ifndef C_CAMOGEGBXMESSAGEGENERATORBACKGROUND_HPP
+#define C_CAMOGEGBXMESSAGEGENERATORBACKGROUND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

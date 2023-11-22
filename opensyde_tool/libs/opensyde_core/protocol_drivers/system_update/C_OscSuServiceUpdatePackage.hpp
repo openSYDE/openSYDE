@@ -11,8 +11,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSUSERVICEUPDATEPACKAGEH
-#define C_OSCSUSERVICEUPDATEPACKAGEH
+#ifndef C_OSCSUSERVICEUPDATEPACKAGE_HPP
+#define C_OSCSUSERVICEUPDATEPACKAGE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>

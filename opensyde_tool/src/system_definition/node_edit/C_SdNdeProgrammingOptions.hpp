@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEPROGRAMMINGOPTIONS_H
-#define C_SDNDEPROGRAMMINGOPTIONS_H
+#ifndef C_SDNDEPROGRAMMINGOPTIONS_HPP
+#define C_SDNDEPROGRAMMINGOPTIONS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

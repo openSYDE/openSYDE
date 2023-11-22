@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEIMPORTEDMESSAGEVECTORDATA_H
-#define C_CIEIMPORTEDMESSAGEVECTORDATA_H
+#ifndef C_CIEIMPORTEDMESSAGEVECTORDATA_HPP
+#define C_CIEIMPORTEDMESSAGEVECTORDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

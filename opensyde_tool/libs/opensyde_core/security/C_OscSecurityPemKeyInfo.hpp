@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSECURITYPEMKEYINFO_H
-#define C_OSCSECURITYPEMKEYINFO_H
+#ifndef C_OSCSECURITYPEMKEYINFO_HPP
+#define C_OSCSECURITYPEMKEYINFO_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

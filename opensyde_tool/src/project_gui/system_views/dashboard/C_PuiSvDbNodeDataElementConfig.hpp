@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBNODEDATAELEMENTCONFIG_H
-#define C_PUISVDBNODEDATAELEMENTCONFIG_H
+#ifndef C_PUISVDBNODEDATAELEMENTCONFIG_HPP
+#define C_PUISVDBNODEDATAELEMENTCONFIG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbDataElementScaling.hpp"

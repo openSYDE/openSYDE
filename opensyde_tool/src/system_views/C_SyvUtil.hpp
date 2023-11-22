@@ -8,15 +8,15 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUTIL_H
-#define C_SYVUTIL_H
+#ifndef C_SYVUTIL_HPP
+#define C_SYVUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include "stwtypes.hpp"
 #include "C_NagToolTip.hpp"
 #include "C_PuiSvDbNodeDataPoolListElementId.hpp"
-#include "C_PuiSvDbWidgetBase.hpp"
+#include "C_PuiSvDbWriteWidgetBase.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -59,7 +59,7 @@ public:
    static QString h_GetUpdateModeDescription(const uint32_t ou32_ViewIndex,
                                              const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    static QString h_GetCommonDashboardItemToolTip(const uint32_t ou32_ViewIndex,
-                                                  const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id, const bool oq_ReadItem = true, const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode = stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::eWM_MANUAL);
+                                                  const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id, const bool oq_ReadItem = true, const stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase::E_WriteMode oe_WriteMode = stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase::eWM_MANUAL);
    static void h_GetViewDisplayName(const uint32_t ou32_ViewIndex, const int32_t os32_SubMode, QString & orc_SubMode,
                                     QString & orc_SubSubMode);
 

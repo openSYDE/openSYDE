@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBTABCLOSE_H
-#define C_OGEPUBTABCLOSE_H
+#ifndef C_OGEPUBTABCLOSE_HPP
+#define C_OGEPUBTABCLOSE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

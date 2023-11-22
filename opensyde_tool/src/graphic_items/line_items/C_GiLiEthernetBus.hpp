@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIETHERNETBUS_H
-#define C_GILIETHERNETBUS_H
+#ifndef C_GILIETHERNETBUS_HPP
+#define C_GILIETHERNETBUS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItem>

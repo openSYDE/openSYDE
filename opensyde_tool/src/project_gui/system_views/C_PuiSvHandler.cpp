@@ -3591,8 +3591,11 @@ C_PuiSvHandler::C_PuiSvHandler(QObject * const opc_Parent) :
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementMoved, this,
       &C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved);
    connect(
-      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementChanged, this,
-      &C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged);
+      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementTypeChanged, this,
+      &C_PuiSvHandler::m_OnSyncElementTypeOrArrayChanged);
+   connect(
+      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementRangeChanged, this,
+      &C_PuiSvHandler::m_OnSyncElementRangeChanged);
    connect(
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementAccessChanged, this,
       &C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAccessChanged);
@@ -4187,22 +4190,44 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32_t ou32_No
    \param[in]  oq_IsString          Flag if new type is string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_NodeIndex,
-                                                                 const uint32_t ou32_DataPoolIndex,
-                                                                 const uint32_t ou32_ListIndex,
-                                                                 const uint32_t ou32_ElementIndex,
-                                                                 const C_OscNodeDataPoolContent::E_Type oe_Type,
-                                                                 const bool oq_IsArray, const uint32_t ou32_ArraySize,
-                                                                 const bool oq_IsString)
+void C_PuiSvHandler::m_OnSyncElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                       const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                       const C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                       const bool oq_IsArray, const uint32_t ou32_ArraySize,
+                                                       const bool oq_IsString)
 {
    for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
-      rc_View.OnSyncNodeDataPoolListElementArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                                                        ou32_ElementIndex, oe_Type, oq_IsArray, ou32_ArraySize,
-                                                        oq_IsString);
+      rc_View.OnSyncElementTypeOrArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                              ou32_ElementIndex, oe_Type, oq_IsArray, ou32_ArraySize,
+                                              oq_IsString);
    }
    //HALC not affected
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  orc_MinElement       New min element
+   \param[in]  orc_MaxElement       New max element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::m_OnSyncElementRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                 const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                 const C_OscNodeDataPoolContent & orc_MinElement,
+                                                 const C_OscNodeDataPoolContent & orc_MaxElement)
+{
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   {
+      C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
+      rc_View.OnSyncElementRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                        ou32_ElementIndex, orc_MinElement, orc_MaxElement);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -4321,18 +4346,30 @@ void C_PuiSvHandler::m_HandleCompatibilityChart(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fix dashboard write content type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::m_FixDashboardWriteContentType()
+{
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
+   {
+      this->mc_Views[u32_Counter].FixDashboardWriteContentType();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check routing error
 
-   \param[in]      ou32_ViewIndex                       View index
-   \param[in]      orc_CheckedNodeActiveFlags           Flags for active nodes
-   \param[in,out]  orc_SetupWarningRoutingDetails       Warning details for setup case: generic routing,
-                                                        update and dashboard routing
-   \param[in,out]  orc_ErrorRoutingDetails              Error details for each case: generic routing,
-                                                        update and dashboard routing
-   \param[in,out]  orc_NodesWithDashboardRoutingError   All nodes with dashboard specific routing errors
-   \param[in,out]  orc_NodesRelevantForDashboardRouting All nodes which are capable for dashboard communication
-                                                        or are involved in the route for dashboard communication
-                                                        without detected errors
+   \param[in]      ou32_ViewIndex                        View index
+   \param[in]      orc_CheckedNodeActiveFlags            Flags for active nodes
+   \param[in,out]  orc_SetupWarningRoutingDetails        Warning details for setup case: generic routing,
+                                                         update and dashboard routing
+   \param[in,out]  orc_ErrorRoutingDetails               Error details for each case: generic routing,
+                                                         update and dashboard routing
+   \param[in,out]  orc_NodesWithDashboardRoutingError    All nodes with dashboard specific routing errors
+   \param[in,out]  orc_NodesRelevantForDashboardRouting  All nodes which are capable for dashboard communication
+                                                         or are involved in the route for dashboard communication
+                                                         without detected errors
 
    \return
    C_NO_ERR Operation success

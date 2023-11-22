@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBGENERICTEXTWITHBACKGROUND_H
-#define C_OGEPUBGENERICTEXTWITHBACKGROUND_H
+#ifndef C_OGEPUBGENERICTEXTWITHBACKGROUND_HPP
+#define C_OGEPUBGENERICTEXTWITHBACKGROUND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

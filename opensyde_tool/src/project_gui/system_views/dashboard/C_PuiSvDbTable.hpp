@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBTABLE_H
-#define C_PUISVDBTABLE_H
+#ifndef C_PUISVDBTABLE_HPP
+#define C_PUISVDBTABLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbWidgetBase.hpp"

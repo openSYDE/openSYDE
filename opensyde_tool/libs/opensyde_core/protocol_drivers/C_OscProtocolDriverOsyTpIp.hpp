@@ -11,8 +11,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPROTOCOLDRIVEROSYTPIPH
-#define C_OSCPROTOCOLDRIVEROSYTPIPH
+#ifndef C_OSCPROTOCOLDRIVEROSYTPIP_HPP
+#define C_OSCPROTOCOLDRIVEROSYTPIP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

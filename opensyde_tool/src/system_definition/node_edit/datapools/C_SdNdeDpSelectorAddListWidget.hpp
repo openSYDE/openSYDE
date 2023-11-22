@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPSELECTORADDLISTWIDGET_H
-#define C_SDNDEDPSELECTORADDLISTWIDGET_H
+#ifndef C_SDNDEDPSELECTORADDLISTWIDGET_HPP
+#define C_SDNDEDPSELECTORADDLISTWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QListWidget>

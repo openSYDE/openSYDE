@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPARAMSETINTERPRETEDDATAPOOL_H
-#define C_OSCPARAMSETINTERPRETEDDATAPOOL_H
+#ifndef C_OSCPARAMSETINTERPRETEDDATAPOOL_HPP
+#define C_OSCPARAMSETINTERPRETEDDATAPOOL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscParamSetDataPoolInfo.hpp"

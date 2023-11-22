@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIFONTCONFIG_H
-#define C_OGEWIFONTCONFIG_H
+#ifndef C_OGEWIFONTCONFIG_HPP
+#define C_OGEWIFONTCONFIG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

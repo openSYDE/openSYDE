@@ -41,48 +41,6 @@ extern void XFLSetInternalKey(const uint16_t ou16_Key); //lint !e526 !e2701 !e80
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the Ecu serial number dependent of the extended serial number flag and the manufacturer format
-
-   \return
-   Formatted serial number string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SclString C_OscComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumber(void) const
-{
-   return this->c_SerialNumber.GetSerialNumberAsFormattedString();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the Ecu serial number description
-
-   Formats:
-   * Standard
-   * Extended
-   ** Manufacturer format
-
-   \return
-   String with description of the serial number format
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SclString C_OscComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFormatDescription(void) const
-{
-   C_SclString c_Return = "(Format: ";
-
-   if (this->c_AvailableFeatures.q_ExtendedSerialNumberModeImplemented == false)
-   {
-      c_Return += "Standard";
-   }
-   else
-   {
-      c_Return += "Extended with Manufacturer Format " +
-                  C_SclString::IntToStr(this->c_SerialNumber.u8_SerialNumberManufacturerFormat);
-   }
-   c_Return += ")";
-
-   return c_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive              Flag for activating routing
@@ -1074,7 +1032,7 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                                   C_FlashloaderInformation & orc_Information,
+                                                                   C_OscComFlashloaderInformation & orc_Information,
                                                                    uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;

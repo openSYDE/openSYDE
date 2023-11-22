@@ -10,8 +10,8 @@
    Here: for Linux using BSD Socket API
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCIPDISPATCHERLINUXSOCKHPP
-#define C_OSCIPDISPATCHERLINUXSOCKHPP
+#ifndef C_OSCIPDISPATCHERLINUXSOCK_HPP
+#define C_OSCIPDISPATCHERLINUXSOCK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

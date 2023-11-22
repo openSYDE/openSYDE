@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVREADDATACONFIGURATION_H
-#define C_PUISVREADDATACONFIGURATION_H
+#ifndef C_PUISVREADDATACONFIGURATION_HPP
+#define C_PUISVREADDATACONFIGURATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

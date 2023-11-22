@@ -285,6 +285,22 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Disables the Update Package creation when the selected View is invalid.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacWidget::DisableUpdatePackage()
+{
+   this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled(false);
+   //give explanation why creation is disabled
+   this->mpc_Ui->pc_PushButtonCreatePackage->SetToolTipInformation(
+      C_GtGetText::h_GetText("Create Service Update Package"),
+      C_GtGetText::h_GetText(
+         "Update Package creation is currently disabled. Possible reasons:\n- current view is invalid.\n"
+         "- no files to be updated.\n"
+         "- specific files are missing."));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the progress for a specific node
 
    \param[in]     ou32_NodeIndex         Index of node

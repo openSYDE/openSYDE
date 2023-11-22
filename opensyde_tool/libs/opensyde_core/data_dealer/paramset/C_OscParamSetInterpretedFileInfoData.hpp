@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPARAMSETINTERPRETEDFILEINFODATA_H
-#define C_OSCPARAMSETINTERPRETEDFILEINFODATA_H
+#ifndef C_OSCPARAMSETINTERPRETEDFILEINFODATA_HPP
+#define C_OSCPARAMSETINTERPRETEDFILEINFODATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

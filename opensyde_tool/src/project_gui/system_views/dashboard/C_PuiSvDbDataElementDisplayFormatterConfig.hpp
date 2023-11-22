@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBDATAELEMENTDISPLAYFORMATTERCONFIG_H
-#define C_PUISVDBDATAELEMENTDISPLAYFORMATTERCONFIG_H
+#ifndef C_PUISVDBDATAELEMENTDISPLAYFORMATTERCONFIG_HPP
+#define C_PUISVDBDATAELEMENTDISPLAYFORMATTERCONFIG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbDataElementDisplayFormatter.hpp"
@@ -31,7 +31,8 @@ public:
 
    QString GetSingleValueContentFormatted(const C_PuiSvDbDataElementContent & orc_Value, const uint32_t ou32_Index,
                                           const C_PuiSvDbDataElementScaling & orc_Scaling,
-                                          float64_t * const opf64_UnscaledValueAsFloat) const;
+                                          float64_t * const opf64_UnscaledValueAsFloat,
+                                          float64_t * const opf64_ScaledValueAsFloat = NULL) const;
    std::vector<QString> GetValuesContentFormatted(const C_PuiSvDbDataElementContent & orc_Value,
                                                   const C_PuiSvDbDataElementScaling & orc_Scaling,
                                                   std::vector<float64_t> & orc_UnscaledValueAsFloat) const;

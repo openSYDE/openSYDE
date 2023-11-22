@@ -1766,6 +1766,7 @@ void C_SdNdeDpListTableModel::DoDeleteDataSet(const uint32_t ou32_DataSetIndex)
 void C_SdNdeDpListTableModel::Reset(void)
 {
    this->beginResetModel();
+   this->m_FillDpListInfo();
    this->endResetModel();
 }
 

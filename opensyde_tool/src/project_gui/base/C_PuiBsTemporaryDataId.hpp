@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSTEMPORARYDATAID_H
-#define C_PUIBSTEMPORARYDATAID_H
+#ifndef C_PUIBSTEMPORARYDATAID_HPP
+#define C_PUIBSTEMPORARYDATAID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <exception>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSYCOMDRIVERFLASH_H
-#define C_OSYCOMDRIVERFLASH_H
+#ifndef C_OSYCOMDRIVERFLASH_HPP
+#define C_OSYCOMDRIVERFLASH_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -17,7 +17,7 @@
 #include "C_OscProtocolSerialNumber.hpp"
 #include "C_OscComDriverProtocol.hpp"
 #include "C_OscProtocolDriverOsy.hpp"
-
+#include "C_OscComFlashloaderInformation.hpp"
 #include "C_OscFlashProtocolStwFlashloader.hpp"
 #include "C_SclString.hpp"
 
@@ -34,32 +34,6 @@ class C_OscComDriverFlash :
    public C_OscComDriverProtocol
 {
 public:
-   ///collection of information that can be read from the flashloader
-   class C_FlashloaderInformation
-   {
-   public:
-      uint8_t au8_FlashloaderSoftwareVersion[3]; ///< Mmr
-      uint8_t au8_FlashloaderProtocolVersion[3]; ///< Mmr
-      uint8_t au8_ProtocolVersion[3];            ///< Mmr
-      uint32_t u32_FlashCount;                   ///< how often was this device flashed already ?
-      C_OscProtocolSerialNumber c_SerialNumber;  ///< serial number of node
-                                                 // holds both variants: POS and FSN depending of
-                                                 // c_AvailableFeatures.
-                                                 // q_ExtendedSerialNumberModeImplemented
-                                                 // and the manufacturer format
-      uint32_t u32_EcuArticleNumber;             ///< article number of device
-      stw::scl::C_SclString c_EcuHardwareVersionNumber;
-      uint8_t au8_FlashFingerprintDate[3]; ///< last date of flashing yy.mm.dd
-      uint8_t au8_FlashFingerprintTime[3]; ///< last time of flashing hh.mm.ss
-      stw::scl::C_SclString c_FlashFingerprintUserName;
-
-      C_OscProtocolDriverOsy::C_ListOfFeatures c_AvailableFeatures; ///< Available features of flashloader
-      uint16_t u16_MaxNumberOfBlockLength;                          ///< maximum size of service the server can handle
-
-      stw::scl::C_SclString GetEcuSerialNumber(void) const;
-      stw::scl::C_SclString GetEcuSerialNumberFormatDescription(void) const;
-   };
-
    //Description of types see C_OscDeviceDefinition::u32_FlashloaderResetWaitTimeXXX
    enum E_MinimumFlashloaderResetWaitTimeType
    {
@@ -149,7 +123,7 @@ public:
                                         std::vector<C_OscProtocolDriverOsy::C_FlashBlockInfo> & orc_BlockInfo,
                                         uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyReadInformationFromFlashloader(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                 C_FlashloaderInformation & orc_Information,
+                                                 C_OscComFlashloaderInformation & orc_Information,
                                                  uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyCheckFlashMemoryAvailable(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                             const uint32_t ou32_StartAddress, const uint32_t ou32_Size,

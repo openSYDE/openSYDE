@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABGROUPSUBITEM_H
-#define C_OGELABGROUPSUBITEM_H
+#ifndef C_OGELABGROUPSUBITEM_HPP
+#define C_OGELABGROUPSUBITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

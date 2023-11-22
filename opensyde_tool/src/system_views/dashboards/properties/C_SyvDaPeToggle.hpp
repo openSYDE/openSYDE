@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPETOGGLE_H
-#define C_SYVDAPETOGGLE_H
+#ifndef C_SYVDAPETOGGLE_HPP
+#define C_SYVDAPETOGGLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

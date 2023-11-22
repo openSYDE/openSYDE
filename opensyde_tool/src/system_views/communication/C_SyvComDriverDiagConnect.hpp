@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVCOMDRIVERDIAGCONNECT_H
-#define C_SYVCOMDRIVERDIAGCONNECT_H
+#ifndef C_SYVCOMDRIVERDIAGCONNECT_HPP
+#define C_SYVCOMDRIVERDIAGCONNECT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QThread>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDHANDLERH
-#define C_PUISDHANDLERH
+#ifndef C_PUISDHANDLE_HPP
+#define C_PUISDHANDLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSdHandlerCanOpenLogic.hpp"

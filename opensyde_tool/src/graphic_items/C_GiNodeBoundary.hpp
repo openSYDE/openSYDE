@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GINODEBOUNDARY_H
-#define C_GINODEBOUNDARY_H
+#ifndef C_GINODEBOUNDARY_HPP
+#define C_GINODEBOUNDARY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>

@@ -340,7 +340,7 @@ void C_SdBueMessageSelectorTreeWidget::AddMessageFromCatalog(void)
       new C_SdBueJ1939AddMessagesFromCatalogDialog(*c_PopUpCatalog);
 
    //Resize
-   c_PopUpCatalog->SetSize(QSize(800, 900));
+   c_PopUpCatalog->SetSize(QSize(1000, 900));
 
    Q_UNUSED(pc_AddMessageFromCatalogDialog)
 

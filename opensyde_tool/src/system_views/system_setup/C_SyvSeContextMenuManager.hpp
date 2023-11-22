@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVSECONTEXTMENUMANAGER_H
-#define C_SYVSECONTEXTMENUMANAGER_H
+#ifndef C_SYVSECONTEXTMENUMANAGER_HPP
+#define C_SYVSECONTEXTMENUMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SebTopologyBaseContextMenuManager.hpp"

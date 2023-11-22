@@ -1122,7 +1122,7 @@ void C_SyvDaChaWidget::m_ManualRead(void)
                //-1 because we already prepared for the next element!
                if (this->m_CheckElementAlreadyRead(this->mu32_ManualOperationActionIndex - 1UL, c_ElementId) == false)
                {
-                  Q_EMIT (this->SigDataPoolRead(c_ElementId));
+                  Q_EMIT (this->SigDataPoolRead(c_ElementId, NULL));
                }
                else
                {

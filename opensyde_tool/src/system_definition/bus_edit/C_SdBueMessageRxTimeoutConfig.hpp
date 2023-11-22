@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGERXTIMEOUTCONFIG_H
-#define C_SDBUEMESSAGERXTIMEOUTCONFIG_H
+#ifndef C_SDBUEMESSAGERXTIMEOUTCONFIG_HPP
+#define C_SDBUEMESSAGERXTIMEOUTCONFIG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

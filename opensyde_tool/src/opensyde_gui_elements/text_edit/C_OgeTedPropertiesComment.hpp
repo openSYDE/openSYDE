@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEDPROPERTIESCOMMENT_H
-#define C_OGETEDPROPERTIESCOMMENT_H
+#ifndef C_OGETEDPROPERTIESCOMMENT_HPP
+#define C_OGETEDPROPERTIESCOMMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFocusEvent>

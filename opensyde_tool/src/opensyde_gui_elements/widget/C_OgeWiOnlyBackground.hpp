@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIONLYBACKGROUND_H
-#define C_OGEWIONLYBACKGROUND_H
+#ifndef C_OGEWIONLYBACKGROUND_HPP
+#define C_OGEWIONLYBACKGROUND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

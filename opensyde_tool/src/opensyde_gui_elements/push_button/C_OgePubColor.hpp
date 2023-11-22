@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBCOLOR_H
-#define C_OGEPUBCOLOR_H
+#ifndef C_OGEPUBCOLOR_HPP
+#define C_OGEPUBCOLOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPushButton>

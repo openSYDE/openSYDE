@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCOMMESSAGELOGGERDATA_H
-#define C_OSCCOMMESSAGELOGGERDATA_H
+#ifndef C_OSCCOMMESSAGELOGGERDATA_HPP
+#define C_OSCCOMMESSAGELOGGERDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <algorithm>
@@ -71,6 +71,7 @@ public:
    stw::scl::C_SclString c_ProtocolTextDec;
    stw::scl::C_SclString c_ProtocolTextHex;
    stw::scl::C_SclString c_Counter;
+   stw::scl::C_SclString c_Status;
 
    std::vector<C_OscComMessageLoggerDataSignal> c_Signals;
 

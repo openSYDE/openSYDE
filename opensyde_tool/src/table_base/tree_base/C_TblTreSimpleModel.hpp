@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLTRESIMPLEMODEL_H
-#define C_TBLTRESIMPLEMODEL_H
+#ifndef C_TBLTRESIMPLEMODEL_HPP
+#define C_TBLTRESIMPLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractItemModel>

@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGESELECTORWIDGET_H
-#define C_SDBUEMESSAGESELECTORWIDGET_H
+#ifndef C_SDBUEMESSAGESELECTORWIDGET_HPP
+#define C_SDBUEMESSAGESELECTORWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -136,4 +136,4 @@ private:
 }
 }
 
-#endif // C_SDBUEMESSAGESELECTORWIDGET_H
+#endif // C_SDBUEMESSAGESELECTORWIDGET_HPP

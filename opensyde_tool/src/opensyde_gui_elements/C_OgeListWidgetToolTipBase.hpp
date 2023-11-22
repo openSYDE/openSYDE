@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELISTWIDGETTOOLTIPBASE_H
-#define C_OGELISTWIDGETTOOLTIPBASE_H
+#ifndef C_OGELISTWIDGETTOOLTIPBASE_HPP
+#define C_OGELISTWIDGETTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QListWidget>

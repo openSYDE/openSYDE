@@ -5,8 +5,8 @@
    \copyright     Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEJ1939ADDMESSAGESFROMCATALOGDIALOG_H
-#define C_SDBUEJ1939ADDMESSAGESFROMCATALOGDIALOG_H
+#ifndef C_SDBUEJ1939ADDMESSAGESFROMCATALOGDIALOG_HPP
+#define C_SDBUEJ1939ADDMESSAGESFROMCATALOGDIALOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -64,7 +64,7 @@ private:
    void m_LoadCatalog();
    void m_SetStatus() const;
    void m_UpdateUi() const;
-   void m_UpdateSelection(const int32_t os32_SelectionCount) const;
+   void m_UpdateSelection(const uint32_t ou32_SelectionCount) const;
    void m_ShowCatalogImportError();
    void m_ExtractMessagesFromDbc(const stw::opensyde_gui_logic::C_CieConverter::C_CieCommDefinition & orc_CieCommDef);
    QString m_GetCatalogFilePath(QWidget * const opc_BaseWidget);
@@ -76,6 +76,7 @@ private:
    void m_FilterJ1939SpecificMessages(
       std::vector<stw::opensyde_gui_logic::C_CieConverter::C_CieNodeMessage> & orc_FilteredMessages);
    void m_SetMessageMode();
+   void m_SelectAllMessages();
 
    //Avoid call
    C_SdBueJ1939AddMessagesFromCatalogDialog(const C_SdBueJ1939AddMessagesFromCatalogDialog &);

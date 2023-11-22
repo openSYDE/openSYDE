@@ -29,7 +29,7 @@
 #include "C_SupSuSequences.hpp"
 #include "C_SupCreatePackage.hpp"
 #include "C_OscBinaryHash.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -1339,7 +1339,7 @@ int32_t C_SydeSup::m_UpdateSystem(C_SupSuSequences & orc_Sequence, const C_OscSy
                   // Path is already relative to the execution folder
                   const stw::scl::C_SclString c_Path = c_IterFiles->c_str();
 
-                  C_OsyHexFile c_HexFile;
+                  C_OscHexFile c_HexFile;
 
                   const uint32_t u32_Result = c_HexFile.LoadFromFile(c_Path.c_str());
                   if (u32_Result == stw::hex_file::NO_ERR)

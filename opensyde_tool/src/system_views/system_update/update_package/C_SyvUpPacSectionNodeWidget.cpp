@@ -30,7 +30,7 @@
 #include "TglUtils.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_ImpUtil.hpp"
 #include "C_PuiUtil.hpp"

@@ -9,8 +9,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMTITLEBARWIDGET_H
-#define C_CAMTITLEBARWIDGET_H
+#ifndef C_CAMTITLEBARWIDGET_HPP
+#define C_CAMTITLEBARWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiOnlyBackground.hpp"
@@ -42,8 +42,8 @@ public:
    void InitStaticNames(void) const;
    void UpdateRecentProjectsAndWindowTitle(void);
    bool HandleProjectComparison(void);
-   void SaveConfig(void);
-   void SaveAsConfig(void);
+   bool SaveConfig(void);
+   bool SaveAsConfig(void);
    int32_t LoadConfig(const QString & orc_FilePath);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -69,7 +69,7 @@ private:
    void m_ShowAbout(void);
    void m_TriggerHelp(void);
    void m_NewConfig(void);
-   void m_DoSaveToFileAction(const QString & orc_File);
+   bool m_DoSaveToFileAction(const QString & orc_File);
    void m_OnOpenProjectClicked(void);
    void m_OnRecentProjectSelected(const QAction * const opc_Action);
    void m_RemapOnSaveAs(const QString & orc_NewFileName) const;

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXDEFAULTSMALL_H
-#define C_OGECHXDEFAULTSMALL_H
+#ifndef C_OGECHXDEFAULTSMALL_HPP
+#define C_OGECHXDEFAULTSMALL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

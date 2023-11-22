@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEPUBPATHVARIABLES_H
-#define C_CAMOGEPUBPATHVARIABLES_H
+#ifndef C_CAMOGEPUBPATHVARIABLES_HPP
+#define C_CAMOGEPUBPATHVARIABLES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDHANDLERDATA_H
-#define C_PUISDHANDLERDATA_H
+#ifndef C_PUISDHANDLERDATA_HPP
+#define C_PUISDHANDLERDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
@@ -112,11 +112,15 @@ Q_SIGNALS:
    void SigSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                             const uint32_t ou32_ListIndex, const uint32_t ou32_ElementSourceIndex,
                                             const uint32_t ou32_ElementTargetIndex);
-   void SigSyncNodeDataPoolListElementChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
-                                              const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
-                                              const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
-                                              const bool oq_IsArray, const uint32_t ou32_ArraySize,
-                                              const bool oq_IsString);
+   void SigSyncNodeDataPoolListElementTypeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                  const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                  const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                  const bool oq_IsArray, const uint32_t ou32_ArraySize,
+                                                  const bool oq_IsString);
+   void SigSyncNodeDataPoolListElementRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                   const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                   const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MinElement,
+                                                   const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MaxElement);
    void SigSyncNodeDataPoolListElementAccessChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                                     const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
                                                     const stw::opensyde_core::C_OscNodeDataPoolListElement::E_Access oe_Access);

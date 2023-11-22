@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREEGUIBUFFER_H
-#define C_CAMMETTREEGUIBUFFER_H
+#ifndef C_CAMMETTREEGUIBUFFER_HPP
+#define C_CAMMETTREEGUIBUFFER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>

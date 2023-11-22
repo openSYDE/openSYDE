@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABGENERICBUBBLE_H
-#define C_OGELABGENERICBUBBLE_H
+#ifndef C_OGELABGENERICBUBBLE_HPP
+#define C_OGELABGENERICBUBBLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabGenericNoPaddingNoMargins.hpp"

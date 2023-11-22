@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUECOADDSIGNALSVIEW_H
-#define C_SDBUECOADDSIGNALSVIEW_H
+#ifndef C_SDBUECOADDSIGNALSVIEW_HPP
+#define C_SDBUECOADDSIGNALSVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTreeViewToolTipBase.hpp"

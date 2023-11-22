@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELECONTEXTMENUBASE_H
-#define C_OGELECONTEXTMENUBASE_H
+#ifndef C_OGELECONTEXTMENUBASE_HPP
+#define C_OGELECONTEXTMENUBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLineEdit>

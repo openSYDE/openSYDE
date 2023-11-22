@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABGENERICNOPADDINGNOMARGINS_H
-#define C_OGELABGENERICNOPADDINGNOMARGINS_H
+#ifndef C_OGELABGENERICNOPADDINGNOMARGINS_HPP
+#define C_OGELABGENERICNOPADDINGNOMARGINS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabToolTipBase.hpp"

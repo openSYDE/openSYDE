@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDECODEVICEEDSWIDGET_H
-#define C_SDNDECODEVICEEDSWIDGET_H
+#ifndef C_SDNDECODEVICEEDSWIDGET_HPP
+#define C_SDNDECODEVICEEDSWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

@@ -887,7 +887,7 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDeviceEdsPart(const C_OscCanO
          "Saving CANopen manager data");
       if (opc_CreatedFiles != NULL)
       {
-         opc_CreatedFiles->push_back(c_CompleteFileName);
+         opc_CreatedFiles->push_back(c_FileNameWithPrefix);
       }
    }
    return s32_Retval;

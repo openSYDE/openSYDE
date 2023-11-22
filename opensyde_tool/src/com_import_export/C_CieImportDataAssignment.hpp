@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEIMPORTDATAASSIGNMENT_H
-#define C_CIEIMPORTDATAASSIGNMENT_H
+#ifndef C_CIEIMPORTDATAASSIGNMENT_HPP
+#define C_CIEIMPORTDATAASSIGNMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_CieDataPoolListStructure.hpp"

@@ -63,7 +63,7 @@ C_SdBueUnoMessageBaseCommand::C_SdBueUnoMessageBaseCommand(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check messages sorted
+/*! \brief  Check messages sorted for each direction
 
    \return
    Flags
@@ -73,6 +73,29 @@ C_SdBueUnoMessageBaseCommand::C_SdBueUnoMessageBaseCommand(
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueUnoMessageBaseCommand::m_CheckMessagesSortedAscending() const
+{
+   bool q_Sorted = m_CheckMessagesSortedAscendingWithDirection(true);
+
+   if (q_Sorted)
+   {
+      q_Sorted = m_CheckMessagesSortedAscendingWithDirection(false);
+   }
+   return q_Sorted;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check messages sorted
+
+   \param[in]  oq_IsTx  Flag to check tx direction
+
+   \return
+   Flags
+
+   \retval   True    Sorted
+   \retval   False   Not sorted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueUnoMessageBaseCommand::m_CheckMessagesSortedAscendingWithDirection(const bool oq_IsTx) const
 {
    bool q_Sorted = true;
 
@@ -87,9 +110,10 @@ bool C_SdBueUnoMessageBaseCommand::m_CheckMessagesSortedAscending() const
             this->mc_UniqueId[u32_It]);
          if (q_PrevIdValid)
          {
-            if ((((c_Id.u32_NodeIndex == c_PrevId.u32_NodeIndex) && (c_Id.e_ComProtocol == c_PrevId.e_ComProtocol)) &&
-                 (c_Id.u32_DatapoolIndex == c_PrevId.u32_DatapoolIndex)) &&
-                (c_Id.u32_InterfaceIndex == c_PrevId.u32_InterfaceIndex))
+            if (((((c_Id.u32_NodeIndex == c_PrevId.u32_NodeIndex) && (c_Id.e_ComProtocol == c_PrevId.e_ComProtocol)) &&
+                  (c_Id.u32_DatapoolIndex == c_PrevId.u32_DatapoolIndex)) &&
+                 (c_Id.u32_InterfaceIndex == c_PrevId.u32_InterfaceIndex)) &&
+                (c_Id.q_MessageIsTx == oq_IsTx))
             {
                if (c_Id.u32_MessageIndex >= c_PrevId.u32_MessageIndex)
                {
@@ -103,8 +127,11 @@ bool C_SdBueUnoMessageBaseCommand::m_CheckMessagesSortedAscending() const
             }
          }
          //prep next iteration
-         c_PrevId = c_Id;
-         q_PrevIdValid = true;
+         if (c_Id.q_MessageIsTx == oq_IsTx)
+         {
+            c_PrevId = c_Id;
+            q_PrevIdValid = true;
+         }
       }
    }
    return q_Sorted;

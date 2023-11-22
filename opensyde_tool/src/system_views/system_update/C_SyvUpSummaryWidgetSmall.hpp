@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPSUMMARYWIDGETSMALL_H
-#define C_SYVUPSUMMARYWIDGETSMALL_H
+#ifndef C_SYVUPSUMMARYWIDGETSMALL_HPP
+#define C_SYVUPSUMMARYWIDGETSMALL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

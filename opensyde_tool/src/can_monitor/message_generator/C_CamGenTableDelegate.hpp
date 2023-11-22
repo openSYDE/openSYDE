@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENTABLEDELEGATE_H
-#define C_CAMGENTABLEDELEGATE_H
+#ifndef C_CAMGENTABLEDELEGATE_HPP
+#define C_CAMGENTABLEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_CamTblDelegate.hpp"

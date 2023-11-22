@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDACOPYPASTEMANAGER_H
-#define C_SYVDACOPYPASTEMANAGER_H
+#ifndef C_SYVDACOPYPASTEMANAGER_HPP
+#define C_SYVDACOPYPASTEMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvDaDashboardSnapshot.hpp"

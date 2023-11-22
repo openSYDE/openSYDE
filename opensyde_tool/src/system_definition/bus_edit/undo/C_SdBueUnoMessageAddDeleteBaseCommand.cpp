@@ -81,7 +81,10 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
          //Adapt default values for protocol
          C_SdUtil::h_AdaptMessageToProtocolType(this->mc_Message[u32_ItStep], &c_UiMessage,
                                                 this->mc_OscSignalCommons[u32_ItStep],
-                                                this->mc_LastMessageId[u32_ItStep].e_ComProtocol, NULL);
+                                                this->mc_LastMessageId[u32_ItStep].e_ComProtocol, NULL, false);
+         C_SdBueUnoMessageAddDeleteBaseCommand::mh_UpdateSignalsToProtocol(this->mc_Message[u32_ItStep],
+                                                                           this->mc_OscSignalCommons[u32_ItStep],
+                                                                           this->mc_LastMessageId[u32_ItStep].e_ComProtocol);
          //Cycle time
          if (this->mc_Message[u32_ItStep].u32_CycleTimeMs == 0U)
          {
@@ -250,6 +253,29 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
          //At this point we can't get the message ID by unique ID because it was already deleted
          // but this should be no problem as we do always remember the message ID anyways
          this->mpc_MessageTreeWidget->InternalDeleteMessageCommit(u32_InternalMessageIndex);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update signals to protocol
+
+   \param[in,out]  orc_Message      Message
+   \param[in,out]  orc_Signals      Signals
+   \param[in]      oe_ProtocolType  Protocol type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueUnoMessageAddDeleteBaseCommand::mh_UpdateSignalsToProtocol(
+   stw::opensyde_core::C_OscCanMessage & orc_Message, std::vector<C_OscNodeDataPoolListElement> & orc_Signals,
+   const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType)
+{
+   tgl_assert(orc_Message.c_Signals.size() == orc_Signals.size());
+   if (orc_Message.c_Signals.size() == orc_Signals.size())
+   {
+      for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
+      {
+         C_SdUtil::h_AdaptSignalToProtocolType(orc_Message.c_Signals[u32_ItSig], orc_Signals[u32_ItSig],
+                                               oe_ProtocolType, NULL);
       }
    }
 }

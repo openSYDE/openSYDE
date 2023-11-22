@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACPEMFILEOPTIONSPOPUP_H
-#define C_SYVUPPACPEMFILEOPTIONSPOPUP_H
+#ifndef C_SYVUPPACPEMFILEOPTIONSPOPUP_HPP
+#define C_SYVUPPACPEMFILEOPTIONSPOPUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

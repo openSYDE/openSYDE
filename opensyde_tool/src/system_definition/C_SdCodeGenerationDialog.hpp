@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDCODEGENERATIONDIALOG_H
-#define C_SDCODEGENERATIONDIALOG_H
+#ifndef C_SDCODEGENERATIONDIALOG_HPP
+#define C_SDCODEGENERATIONDIALOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

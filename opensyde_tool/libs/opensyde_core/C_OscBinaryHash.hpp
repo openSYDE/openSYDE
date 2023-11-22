@@ -7,8 +7,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCBINARYHASH_H
-#define C_OSCBINARYHASH_H
+#ifndef C_OSCBINARYHASH_HPP
+#define C_OSCBINARYHASH_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

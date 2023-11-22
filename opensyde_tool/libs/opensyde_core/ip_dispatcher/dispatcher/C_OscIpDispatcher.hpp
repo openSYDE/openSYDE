@@ -18,8 +18,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCIPDISPATCHERH
-#define C_OSCIPDISPATCHERH
+#ifndef C_OSCIPDISPATCHER_HPP
+#define C_OSCIPDISPATCHER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

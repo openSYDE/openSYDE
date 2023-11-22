@@ -26,7 +26,7 @@
 #include "ui_C_SyvUpPacListNodeItemWidget.h"
 
 #include "C_PuiSvHandler.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_SyvUpPacHexFileView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -192,7 +192,7 @@ void C_SyvUpPacListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_Fil
 
       if (this->mq_FileBased == false)
       {
-         C_OsyHexFile * const pc_HexFile = new C_OsyHexFile();
+         C_OscHexFile * const pc_HexFile = new C_OscHexFile();
 
          // File information
          if (pc_HexFile->LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str()) == stw::hex_file::NO_ERR)

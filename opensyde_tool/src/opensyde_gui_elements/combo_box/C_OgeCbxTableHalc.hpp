@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXTABLEHALC_H
-#define C_OGECBXTABLEHALC_H
+#ifndef C_OGECBXTABLEHALC_HPP
+#define C_OGECBXTABLEHALC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeCbxTableBase.hpp"

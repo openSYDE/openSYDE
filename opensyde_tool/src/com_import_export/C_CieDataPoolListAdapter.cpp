@@ -89,47 +89,41 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDbcFileIm
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add all necessary elements to the imported core elements
 
-   \param[in]  orc_OscRxMessageData                Imported core Rx message data
-   \param[in]  orc_OscRxSignalData                 Imported core Rx signal data
-   \param[in]  orc_RxSignalDefaultMinMaxValuesUsed Flag if imported core Rx signal data uses the default min
-                                                   max values or or specific set values
-   \param[in]  orc_OscTxMessageData                Imported core Tx message data
-   \param[in]  orc_OscTxSignalData                 Imported core Tx signal data
-   \param[in]  orc_TxSignalDefaultMinMaxValuesUsed Flag if imported core Rx signal data uses the default min
-                                                   max values or or specific set values
-   \param[in]  orc_InfoMessagesPerMessage          Information messages per message
+   \param[in]  orc_OscRxMessageData          Imported core Rx message data
+   \param[in]  orc_OscTxMessageData          Imported core Tx message data
+   \param[in]  orc_InfoMessagesPerMessage    Information messages per message
 
    \return
    Complete structure as required by our interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEdsFileImport(
-   const std::vector<C_OscCanMessage> & orc_OscRxMessageData,
-   const std::vector<C_OscNodeDataPoolListElement> & orc_OscRxSignalData,
-   const std::vector<uint8_t> & orc_RxSignalDefaultMinMaxValuesUsed,
-   const std::vector<C_OscCanMessage> & orc_OscTxMessageData,
-   const std::vector<C_OscNodeDataPoolListElement> & orc_OscTxSignalData,
-   const std::vector<uint8_t> & orc_TxSignalDefaultMinMaxValuesUsed,
+   const C_OscEdsDcfImportMessageGroup & orc_OscRxMessageData,
+   const C_OscEdsDcfImportMessageGroup & orc_OscTxMessageData,
    const std::vector<std::vector<stw::scl::C_SclString> > & orc_InfoMessagesPerMessage)
 {
    C_CieDataPoolListStructure c_Retval;
 
    //Copy
-   c_Retval.c_Core.c_OscRxMessageData = orc_OscRxMessageData;
-   c_Retval.c_Core.c_OscRxSignalData = orc_OscRxSignalData;
-   c_Retval.c_Core.c_OscTxMessageData = orc_OscTxMessageData;
-   c_Retval.c_Core.c_OscTxSignalData = orc_OscTxSignalData;
+   c_Retval.c_Core.c_OscRxMessageData = orc_OscRxMessageData.c_OscMessageData;
+   c_Retval.c_Core.c_OscRxSignalData = orc_OscRxMessageData.c_OscSignalData;
+   c_Retval.c_Core.c_OscTxMessageData = orc_OscTxMessageData.c_OscMessageData;
+   c_Retval.c_Core.c_OscTxSignalData = orc_OscTxMessageData.c_OscSignalData;
 
    //Check the flags
-   tgl_assert(orc_RxSignalDefaultMinMaxValuesUsed.size() == orc_OscRxSignalData.size());
-   tgl_assert(orc_TxSignalDefaultMinMaxValuesUsed.size() == orc_OscTxSignalData.size());
+   tgl_assert(orc_OscRxMessageData.c_SignalDefaultMinMaxValuesUsed.size() ==
+              orc_OscRxMessageData.c_OscSignalData.size());
+   tgl_assert(orc_OscTxMessageData.c_SignalDefaultMinMaxValuesUsed.size() ==
+              orc_OscTxMessageData.c_OscSignalData.size());
 
    //Handle messages
-   tgl_assert(orc_InfoMessagesPerMessage.size() == (orc_OscRxMessageData.size() + orc_OscTxMessageData.size()));
-   if (orc_InfoMessagesPerMessage.size() == (orc_OscRxMessageData.size() + orc_OscTxMessageData.size()))
+   tgl_assert(orc_InfoMessagesPerMessage.size() ==
+              (orc_OscRxMessageData.c_OscMessageData.size() + orc_OscTxMessageData.c_OscMessageData.size()));
+   if (orc_InfoMessagesPerMessage.size() ==
+       (orc_OscRxMessageData.c_OscMessageData.size() + orc_OscTxMessageData.c_OscMessageData.size()))
    {
-      c_Retval.c_Core.c_WarningMessagesPerRxMessage.reserve(orc_OscRxMessageData.size());
-      c_Retval.c_Core.c_WarningMessagesPerTxMessage.reserve(orc_OscTxMessageData.size());
+      c_Retval.c_Core.c_WarningMessagesPerRxMessage.reserve(orc_OscRxMessageData.c_OscMessageData.size());
+      c_Retval.c_Core.c_WarningMessagesPerTxMessage.reserve(orc_OscTxMessageData.c_OscMessageData.size());
       for (uint32_t u32_ItInfoMessage = 0; u32_ItInfoMessage < orc_InfoMessagesPerMessage.size(); ++u32_ItInfoMessage)
       {
          QString c_CombinedMessages;
@@ -142,7 +136,7 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEds
             c_CombinedMessages += rc_OneMessage.c_str();
             c_CombinedMessages += mc_MessageLineBreak.c_str();
          }
-         if (u32_ItInfoMessage < orc_OscRxMessageData.size())
+         if (u32_ItInfoMessage < orc_OscRxMessageData.c_OscMessageData.size())
          {
             c_Retval.c_Core.c_WarningMessagesPerRxMessage.push_back(c_CombinedMessages);
          }
@@ -154,7 +148,8 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEds
    }
 
    //Ui
-   mh_FillUpUiStructure(c_Retval, true, &orc_RxSignalDefaultMinMaxValuesUsed, &orc_TxSignalDefaultMinMaxValuesUsed);
+   mh_FillUpUiStructure(c_Retval, true, &orc_OscRxMessageData.c_SignalDefaultMinMaxValuesUsed,
+                        &orc_OscTxMessageData.c_SignalDefaultMinMaxValuesUsed);
    return c_Retval;
 }
 

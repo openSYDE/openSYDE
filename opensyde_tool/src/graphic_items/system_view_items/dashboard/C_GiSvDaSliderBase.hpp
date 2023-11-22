@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDASLIDERBASE_H
-#define C_GISVDASLIDERBASE_H
+#ifndef C_GISVDASLIDERBASE_HPP
+#define C_GISVDASLIDERBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiSvDaRectBaseGroup.hpp"
@@ -42,6 +42,7 @@ public:
    void UpdateData(void) override;
    void DeleteData(void) override;
 
+   void UpdateShowValue(void) override;
    void ConnectionActiveChanged(const bool oq_Active) override;
    void SendCurrentValue(void) override;
    bool CallProperties(void) override;
@@ -63,6 +64,7 @@ private:
 
    void m_UpdateStaticValues(void);
    bool m_IsOnChange(void) const;
+   void m_SetUnscaledValueToSliderWidget(const float64_t of64_NewValue) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDHANDLERNODELOGIC_H
-#define C_PUISDHANDLERNODELOGIC_H
+#ifndef C_PUISDHANDLERNODELOGIC_HPP
+#define C_PUISDHANDLERNODELOGIC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSdHandlerData.hpp"

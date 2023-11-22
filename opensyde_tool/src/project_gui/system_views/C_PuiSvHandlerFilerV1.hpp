@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVHANDLERFILERV1_H
-#define C_PUISVHANDLERFILERV1_H
+#ifndef C_PUISVHANDLERFILERV1_HPP
+#define C_PUISVHANDLERFILERV1_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -87,6 +87,8 @@ private:
                                  stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadWidgetBase(C_PuiSvDbWidgetBase & orc_Widget,
                                     stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadWriteWidgetBase(C_PuiSvDbWriteWidgetBase & orc_WriteWidget,
+                                         stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                               stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadParamDataSetIndices(std::vector<int32_t> & orc_Values,
@@ -99,7 +101,7 @@ private:
                                       stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_LoadDataElement(stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id,
                                   const stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static int32_t mh_StringToWriteMode(const QString & orc_String, C_PuiSvDbWidgetBase::E_WriteMode & ore_Mode);
+   static int32_t mh_StringToWriteMode(const QString & orc_String, C_PuiSvDbWriteWidgetBase::E_WriteMode & ore_Mode);
    static int32_t mh_StringToDisplayStyle(const QString & orc_String, C_PuiSvDbWidgetBase::E_Style & ore_Style);
    static int32_t mh_StringToToggleType(const QString & orc_String, C_PuiSvDbToggle::E_Type & ore_Type);
    static int32_t mh_StringToSpinBoxType(const QString & orc_String, C_PuiSvDbSpinBox::E_Type & ore_Type);
@@ -146,12 +148,14 @@ private:
                               stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveWidgetBase(const C_PuiSvDbWidgetBase & orc_Widget,
                                  stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveWriteWidgetBase(const C_PuiSvDbWriteWidgetBase & orc_WriteWidget,
+                                      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                               stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveDataElement(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id,
                                   stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static QString mh_DeviceConfigModeToString(const C_PuiSvData::E_DeviceConfigurationMode oe_Mode);
-   static QString mh_WriteModeToString(const C_PuiSvDbWidgetBase::E_WriteMode oe_Mode);
+   static QString mh_WriteModeToString(const C_PuiSvDbWriteWidgetBase::E_WriteMode oe_Mode);
    static QString mh_DisplayStyleToString(const C_PuiSvDbWidgetBase::E_Style oe_Style);
    static QString mh_ToggleTypeToString(const C_PuiSvDbToggle::E_Type oe_Type);
    static QString mh_SpinBoxTypeToString(const C_PuiSvDbSpinBox::E_Type oe_Type);

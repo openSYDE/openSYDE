@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBDIALOG_H
-#define C_OGEPUBDIALOG_H
+#ifndef C_OGEPUBDIALOG_HPP
+#define C_OGEPUBDIALOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

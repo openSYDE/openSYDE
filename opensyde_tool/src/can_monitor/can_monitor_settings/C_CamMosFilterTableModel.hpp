@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSFILTERTABLEMODEL_H
-#define C_CAMMOSFILTERTABLEMODEL_H
+#ifndef C_CAMMOSFILTERTABLEMODEL_HPP
+#define C_CAMMOSFILTERTABLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblModelAction.hpp"

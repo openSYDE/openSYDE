@@ -40,7 +40,6 @@ using namespace stw::opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbWidgetBase::C_PuiSvDbWidgetBase(void) :
    C_PuiBsBox(),
-   e_ElementWriteMode(eWM_MANUAL),
    e_DisplayStyle(eOPENSYDE)
 {
 }
@@ -61,7 +60,6 @@ void C_PuiSvDbWidgetBase::CalcHash(uint32_t & oru32_HashValue) const
    {
       this->c_DataPoolElementsConfig[u32_Counter].CalcHash(oru32_HashValue);
    }
-   stw::scl::C_SclChecksums::CalcCRC32(&this->e_ElementWriteMode, sizeof(this->e_ElementWriteMode), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_DisplayStyle, sizeof(this->e_DisplayStyle), oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);

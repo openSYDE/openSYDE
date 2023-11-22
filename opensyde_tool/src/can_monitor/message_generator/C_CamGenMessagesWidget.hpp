@@ -45,6 +45,7 @@ public:
    bool CheckAndHandleKey(const QString & orc_Input) const;
    void UpdateMessageData(const uint32_t ou32_MessageIndex) const;
    void TriggerModelUpdateCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active) const;
+   void TriggerMessageReload(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -56,6 +57,7 @@ Q_SIGNALS:
    void SigSendMessage(const uint32_t ou32_MessageIndex, const uint32_t ou32_TimeToSend);
    void SigUpdateMessageDlc(const uint32_t ou32_MessageIndex);
    void SigSelected(const uint32_t ou32_NumSelectedItems, const uint32_t ou32_Row);
+   void SigAutoProtocolSupport(const uint32_t ou32_MessageIndex, const bool oq_Active);
 
 protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;

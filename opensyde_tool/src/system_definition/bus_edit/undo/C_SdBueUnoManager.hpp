@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEUNOMANAGER_H
-#define C_SDBUEUNOMANAGER_H
+#ifndef C_SDBUEUNOMANAGER_HPP
+#define C_SDBUEUNOMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeWidget>

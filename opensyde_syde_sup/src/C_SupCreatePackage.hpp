@@ -5,8 +5,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SUPCREATEPACKAGE_H
-#define C_SUPCREATEPACKAGE_H
+#ifndef C_SUPCREATEPACKAGE_HPP
+#define C_SUPCREATEPACKAGE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SydeSup.hpp"

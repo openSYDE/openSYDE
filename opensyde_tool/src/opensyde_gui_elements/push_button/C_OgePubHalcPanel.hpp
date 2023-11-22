@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBHALCPANEL_H
-#define C_OGEPUBHALCPANEL_H
+#ifndef C_OGEPUBHALCPANEL_HPP
+#define C_OGEPUBHALCPANEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

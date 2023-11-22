@@ -45,7 +45,7 @@ C_PuiSvDbSpinBox::C_PuiSvDbSpinBox(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbSpinBox::CalcHash(uint32_t & oru32_HashValue) const
@@ -53,7 +53,7 @@ void C_PuiSvDbSpinBox::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_ShowUnit, sizeof(this->q_ShowUnit), oru32_HashValue);
    this->c_Value.CalcHash(oru32_HashValue);
-   C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
+   C_PuiSvDbWriteWidgetBase::CalcHash(oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

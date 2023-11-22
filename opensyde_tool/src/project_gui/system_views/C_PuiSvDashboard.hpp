@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDASHBOARD_H
-#define C_PUISVDASHBOARD_H
+#ifndef C_PUISVDASHBOARD_HPP
+#define C_PUISVDASHBOARD_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -128,11 +128,14 @@ public:
    void OnSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                            const uint32_t ou32_ListIndex, const uint32_t ou32_ElementSourceIndex,
                                            const uint32_t ou32_ElementTargetIndex);
-   bool OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
-                                                  const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
-                                                  const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
-                                                  const bool oq_IsArray, const uint32_t ou32_ArraySize,
-                                                  const bool oq_IsString);
+   bool OnSyncElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                        const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                        const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
+                                        const bool oq_IsArray, const uint32_t ou32_ArraySize, const bool oq_IsString);
+   void OnSyncElementRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                  const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                  const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MinElement,
+                                  const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MaxElement);
    void OnSyncNodeDataPoolListElementAccessChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                                    const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
                                                    const stw::opensyde_core::C_OscNodeDataPoolListElement::E_Access oe_Access);
@@ -197,6 +200,7 @@ public:
    //Util
    bool DiscardInvalidIndices(void);
    void HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & orc_NewCharts);
+   void FixDashboardWriteContentType();
    static C_PuiSvDbDataElement::E_Type h_GetWidgetType(const C_PuiSvDbWidgetBase * const opc_Box);
 
    //Clear
@@ -228,6 +232,19 @@ private:
                                              const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_NewId,
                                              int32_t * const ops32_DatasetIndex);
    void m_SyncCleanUpParams(void);
+   static void mh_FixDashboardWriteContentType(C_PuiSvDbWriteWidgetBase & orc_Element);
+   void m_SyncWriteElementsOnElementTypeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type);
+   static void mh_SyncContentTypeToTypeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                               const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                               const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
+                                               C_PuiSvDbWriteWidgetBase & orc_Element);
+   static void mh_SyncContentToRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                            const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                            const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MinElement,
+                                            const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MaxElement,
+                                            C_PuiSvDbWriteWidgetBase & orc_Element);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

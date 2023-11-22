@@ -511,6 +511,9 @@ void C_SdNdeDbViewWidget::m_OnDelete(const uint32_t ou32_NodeIndex, const uint32
 
    //Trigger reload (also important for index update)
    this->SetNodeIndex(ou32_NodeIndex);
+
+   // inform about changes of owned Datapools because they are now not assigned anymore
+   Q_EMIT (this->SigOwnedDataPoolsChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -530,6 +533,9 @@ void C_SdNdeDbViewWidget::m_DeleteAllDatablocks(const uint32_t ou32_NodeIndex,
       tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(ou32_NodeIndex, 0) == C_NO_ERR);
    }
    this->SetNodeIndex(ou32_NodeIndex);
+
+   // inform about changes of owned Datapools because they are now not assigned anymore
+   Q_EMIT (this->SigOwnedDataPoolsChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

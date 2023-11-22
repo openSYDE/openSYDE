@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENSIGUTIL_H
-#define C_CAMGENSIGUTIL_H
+#ifndef C_CAMGENSIGUTIL_HPP
+#define C_CAMGENSIGUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETREETOOLTIPBASE_H
-#define C_OGETREETOOLTIPBASE_H
+#ifndef C_OGETREETOOLTIPBASE_HPP
+#define C_OGETREETOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QHeaderView>

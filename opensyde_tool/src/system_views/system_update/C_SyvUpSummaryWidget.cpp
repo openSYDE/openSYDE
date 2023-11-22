@@ -13,7 +13,7 @@
 #include "constants.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_GtGetText.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_PuiProject.hpp"
 #include "C_PuiSvHandler.hpp"
 #include "C_SyvUpSummaryWidget.hpp"

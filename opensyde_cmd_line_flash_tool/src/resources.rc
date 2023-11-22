@@ -1,0 +1,29 @@
+//-----------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Version information resource file
+
+   Resource file containing information to be embedded into Windows binary header.
+
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//-----------------------------------------------------------------------------
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+   FILEVERSION     1, 0, 0, 0
+BEGIN
+   BLOCK "StringFileInfo"
+BEGIN
+   BLOCK "040904E4"
+BEGIN
+   VALUE "CompanyName", "Sensor-Technik Wiedemann GmbH\0"
+VALUE "FileDescription", "opeSYDE command line flash tool\n"
+END
+END
+
+   BLOCK "VarFileInfo"
+BEGIN
+   VALUE "Translation", 0x409, 1252
+END
+   END

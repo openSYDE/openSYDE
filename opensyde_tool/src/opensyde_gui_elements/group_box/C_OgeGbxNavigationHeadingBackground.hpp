@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXNAVIGATIONHEADINGBACKGROUND_H
-#define C_OGEGBXNAVIGATIONHEADINGBACKGROUND_H
+#ifndef C_OGEGBXNAVIGATIONHEADINGBACKGROUND_HPP
+#define C_OGEGBXNAVIGATIONHEADINGBACKGROUND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

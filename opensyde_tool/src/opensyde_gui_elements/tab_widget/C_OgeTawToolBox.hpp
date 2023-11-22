@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETAWTOOLBOX_H
-#define C_OGETAWTOOLBOX_H
+#ifndef C_OGETAWTOOLBOX_HPP
+#define C_OGETAWTOOLBOX_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

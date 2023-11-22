@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGESPI_H
-#define C_CAMOGESPI_H
+#ifndef C_CAMOGESPI_HPP
+#define C_CAMOGESPI_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeSpiBase.hpp"

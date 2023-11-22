@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABNODEPROPCOMIFTABLE_H
-#define C_OGELABNODEPROPCOMIFTABLE_H
+#ifndef C_OGELABNODEPROPCOMIFTABLE_HPP
+#define C_OGELABNODEPROPCOMIFTABLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

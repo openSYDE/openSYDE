@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CONSTANTS_HPP
+#define CONSTANTS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QColor>
@@ -300,4 +300,4 @@ const int32_t ms32_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
 }
 } //end of namespace
 
-#endif // CONSTANTS_H
+#endif // CONSTANTS_HPP

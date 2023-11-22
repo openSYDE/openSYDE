@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIRECT_H
-#define C_GIRECT_H
+#ifndef C_GIRECT_HPP
+#define C_GIRECT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

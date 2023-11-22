@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVCOMMESSAGELOGGERFILEBLF_H
-#define C_SYVCOMMESSAGELOGGERFILEBLF_H
+#ifndef C_SYVCOMMESSAGELOGGERFILEBLF_HPP
+#define C_SYVCOMMESSAGELOGGERFILEBLF_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

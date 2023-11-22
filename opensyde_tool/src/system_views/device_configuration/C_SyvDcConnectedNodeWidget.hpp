@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDCCONNECTEDNODEWIDGET_H
-#define C_SYVDCCONNECTEDNODEWIDGET_H
+#ifndef C_SYVDCCONNECTEDNODEWIDGET_HPP
+#define C_SYVDCCONNECTEDNODEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

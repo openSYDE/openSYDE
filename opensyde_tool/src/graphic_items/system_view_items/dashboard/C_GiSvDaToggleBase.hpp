@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDATOGGLEBASE_H
-#define C_GISVDATOGGLEBASE_H
+#ifndef C_GISVDATOGGLEBASE_HPP
+#define C_GISVDATOGGLEBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubDashboard.hpp"
@@ -41,6 +41,7 @@ public:
    void LoadData(void) override;
    void UpdateData(void) override;
    void DeleteData(void) override;
+   void UpdateShowValue(void) override;
 
    void SendCurrentValue(void) override;
    bool CallProperties(void) override;

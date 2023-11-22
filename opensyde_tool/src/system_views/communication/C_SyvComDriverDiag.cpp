@@ -721,6 +721,9 @@ int32_t C_SyvComDriverDiag::SendTesterPresentToActiveNodes(void)
    \param[in]  ou8_DataPoolIndex    data pool to read from
    \param[in]  ou16_ListIndex       list index to read from
    \param[in]  ou16_ElementIndex    element index to read from
+   \param[in]  opc_DashboardWidget   Optional pointer to dashboard widget data element
+                                        Valid pointer: read value only for this widget with this Datapool element
+                                        NULL pointer:  read value for all widgets with this Datapool element
 
    \return
    C_RANGE   node index out of range
@@ -728,7 +731,8 @@ int32_t C_SyvComDriverDiag::SendTesterPresentToActiveNodes(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvComDriverDiag::PollDataPoolRead(const uint32_t ou32_NodeIndex, const uint8_t ou8_DataPoolIndex,
-                                             const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
+                                             const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
+                                             stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget)
 {
    int32_t s32_Return;
    const uint32_t u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
@@ -740,7 +744,8 @@ int32_t C_SyvComDriverDiag::PollDataPoolRead(const uint32_t ou32_NodeIndex, cons
    else
    {
       s32_Return = mc_PollingThread.StartDataPoolRead((*mc_DataDealers[u32_ActiveIndex]), ou8_DataPoolIndex,
-                                                      ou16_ListIndex, ou16_ElementIndex);
+                                                      ou16_ListIndex, ou16_ElementIndex,
+                                                      opc_DashboardWidget);
    }
    return s32_Return;
 }

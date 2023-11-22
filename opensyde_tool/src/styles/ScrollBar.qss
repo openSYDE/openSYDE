@@ -188,14 +188,24 @@ padding-bottom: 6px;
 padding-top: 6px;
 }
 
-stw--opensyde_gui--C_SdBueCoAddSignalsView QScrollBar:vertical,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QScrollBar::vertical
+stw--opensyde_gui--C_SdBueCoAddSignalsView QScrollBar:vertical
 {
 width: 20px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right: 3px;
 padding-bottom: 3px;
 padding-left: 12px;
+
 }
+
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QScrollBar::vertical
+{
+width: 15px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right: 0px;
+padding-bottom: 3px;
+padding-left: 10px;
+padding-top: 25px;
+}
+
 
 stw--opensyde_gui_elements--C_OgeTableWidgetComIf QScrollBar:vertical
 {
@@ -204,8 +214,7 @@ padding-top: 28px; /* Header size */
 
 stw--opensyde_gui--C_SyvDaItPaTreeView QScrollBar:vertical,
 stw--opensyde_gui--C_SyvDaItTaView QScrollBar:vertical,
-stw--opensyde_gui--C_SdBueCoAddSignalsView QScrollBar:vertical,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QScrollBar::vertical
+stw--opensyde_gui--C_SdBueCoAddSignalsView QScrollBar:vertical
 {
 padding-top: 30px; /* Header size */
 }
@@ -418,7 +427,7 @@ stw--opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar:horizontal,
 stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar:horizontal,
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar:horizontal,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar:horizontal,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QScrollBar::horizontal
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QScrollBar::horizontal
 {
 height: 5px; /*real width of scroll bar is 5px; Real width = width - padding-bottom/top */
 padding-bottom: 0px;

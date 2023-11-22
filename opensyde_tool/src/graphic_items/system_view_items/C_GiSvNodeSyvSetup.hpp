@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GINODESYVSETUP_H
-#define C_GINODESYVSETUP_H
+#ifndef C_GINODESYVSETUP_HPP
+#define C_GINODESYVSETUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

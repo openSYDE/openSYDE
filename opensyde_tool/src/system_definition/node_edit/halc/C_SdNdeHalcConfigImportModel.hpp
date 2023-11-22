@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCCONFIGIMPORTMODEL_H
-#define C_SDNDEHALCCONFIGIMPORTMODEL_H
+#ifndef C_SDNDEHALCCONFIGIMPORTMODEL_HPP
+#define C_SDNDEHALCCONFIGIMPORTMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

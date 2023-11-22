@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCEXPORTDATAPOOLH
-#define C_OSCEXPORTDATAPOOLH
+#ifndef C_OSCEXPORTDATAPOOL_HPP
+#define C_OSCEXPORTDATAPOOL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

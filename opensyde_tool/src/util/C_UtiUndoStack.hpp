@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_UTIUNDOSTACK_H
-#define C_UTIUNDOSTACK_H
+#ifndef C_UTIUNDOSTACK_HPP
+#define C_UTIUNDOSTACK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QUndoStack>

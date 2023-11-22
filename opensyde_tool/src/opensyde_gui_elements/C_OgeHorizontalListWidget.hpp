@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEHORIZONTALLISTWIDGET_H
-#define C_OGEHORIZONTALLISTWIDGET_H
+#ifndef C_OGEHORIZONTALLISTWIDGET_HPP
+#define C_OGEHORIZONTALLISTWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTimer>

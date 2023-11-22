@@ -950,6 +950,8 @@ void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, cons
          break;
       case ms32_SUBMODE_SYSDEF_BUSEDIT:
          m_UpdateBusErrors();
+         //Signal count can affect datapool validity
+         m_UpdateNodeErrors();
          break;
       case ms32_SUBMODE_SYSDEF_TOPOLOGY:
          //Update all errors

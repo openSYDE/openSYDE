@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXMULTISELECT_H
-#define C_OGECBXMULTISELECT_H
+#ifndef C_OGECBXMULTISELECT_HPP
+#define C_OGECBXMULTISELECT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QComboBox>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETAWTOOLTIPBASE_H
-#define C_OGETAWTOOLTIPBASE_H
+#ifndef C_OGETAWTOOLTIPBASE_HPP
+#define C_OGETAWTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>

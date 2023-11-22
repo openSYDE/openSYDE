@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBLABEL_H
-#define C_PUISVDBLABEL_H
+#ifndef C_PUISVDBLABEL_HPP
+#define C_PUISVDBLABEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

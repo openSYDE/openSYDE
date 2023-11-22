@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEUPDATEMODETABLEVIEW_H
-#define C_SYVDAPEUPDATEMODETABLEVIEW_H
+#ifndef C_SYVDAPEUPDATEMODETABLEVIEW_HPP
+#define C_SYVDAPEUPDATEMODETABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeWidget>

@@ -76,6 +76,10 @@ C_CamGenWidget::C_CamGenWidget(QWidget * const opc_Parent) :
            this, &C_CamGenWidget::SigRegisterCyclicMessage);
    connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigRemoveAllCyclicMessages,
            this, &C_CamGenWidget::SigRemoveAllCyclicMessages);
+   connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigAutoProtocolSupport,
+           this, &C_CamGenWidget::SigAutoProtocolSupport);
+   connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigAutoProtocolSupport,
+           this->mpc_Ui->pc_WidgetSignals, &C_CamGenSigWidget::UpdateAutoProtocolSupport);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,6 +135,7 @@ void C_CamGenWidget::SaveUserSettings(void) const
 void C_CamGenWidget::TriggerSignalReload(void) const
 {
    this->mpc_Ui->pc_WidgetSignals->TriggerSignalReload();
+   this->mpc_Ui->pc_WidgetMessages->TriggerMessageReload();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

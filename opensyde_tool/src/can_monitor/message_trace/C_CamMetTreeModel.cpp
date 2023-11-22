@@ -539,6 +539,9 @@ QVariant C_CamMetTreeModel::headerData(const int32_t os32_Section, const Qt::Ori
          case eCAN_COUNTER:
             c_Retval = C_GtGetText::h_GetText("Counter");
             break;
+         case eCAN_STATUS:
+            c_Retval = C_GtGetText::h_GetText("Status");
+            break;
          default:
             break;
          }
@@ -567,6 +570,9 @@ QVariant C_CamMetTreeModel::headerData(const int32_t os32_Section, const Qt::Ori
             break;
          case eCAN_COUNTER:
             c_Retval = C_GtGetText::h_GetText("Counter");
+            break;
+         case eCAN_STATUS:
+            c_Retval = C_GtGetText::h_GetText("Status");
             break;
          default:
             break;
@@ -609,6 +615,9 @@ QVariant C_CamMetTreeModel::headerData(const int32_t os32_Section, const Qt::Ori
          case eCAN_COUNTER:
             c_Retval = C_GtGetText::h_GetText("Indicates the number of times the event has appeared since "
                                               "measurement start.");
+            break;
+         case eCAN_STATUS:
+            c_Retval = C_GtGetText::h_GetText("Indicates the validity of a (ECeS/ECoS) message.");
             break;
          default:
             break;
@@ -685,7 +694,7 @@ int32_t C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
    if (orc_Parent.isValid() == false)
    {
       //Top level
-      s32_Retval = 7;
+      s32_Retval = 8;
    }
    else if (orc_Parent.parent().isValid() == false)
    {
@@ -862,6 +871,9 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const int32_t os
                      c_Retval = pc_CurMessage->c_Counter.c_str();
                   }
                   break;
+               case eCAN_STATUS:
+                  c_Retval = pc_CurMessage->c_Status.c_str();
+                  break;
                default:
                   break;
                }
@@ -1030,6 +1042,20 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const int32_t os
                      }
                   }
                }
+               else if (e_Col == eCAN_STATUS)
+               {
+                  if (this->m_IsStatusValid(*pc_CurMessage) == false)
+                  {
+                     c_Retval = mc_STYLE_GUIDE_COLOR_18;
+                  }
+               }
+               else if (e_Col == eCAN_NAME)
+               {
+                  if (this->m_IsStatusValid(*pc_CurMessage) == false)
+                  {
+                     c_Retval = mc_STYLE_GUIDE_COLOR_18;
+                  }
+               }
                else
                {
                   if (pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg <
@@ -1181,8 +1207,10 @@ C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const int32_t os3
       e_Retval = eCAN_DATA;
       break;
    case 6:
-   default:
       e_Retval = eCAN_COUNTER;
+      break;
+   default:
+      e_Retval = eCAN_STATUS;
       break;
    }
 
@@ -1225,6 +1253,9 @@ int32_t C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_
       break;
    case eCAN_COUNTER:
       s32_Retval = 6;
+      break;
+   case eCAN_STATUS:
+      s32_Retval = 7;
       break;
    default:
       s32_Retval = -1;
@@ -1848,6 +1879,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
       const int32_t s32_ColIdData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
       const int32_t s32_ColIdTime = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
       const int32_t s32_ColIdCounter = C_CamMetTreeModel::h_EnumToColumn(eCAN_COUNTER);
+      const int32_t s32_ColIdStatus = C_CamMetTreeModel::h_EnumToColumn(eCAN_STATUS);
       //Notification for possible new child
       this->dataChanged(this->index(s32_MessageCounter, s32_ColIdTime), this->index(s32_MessageCounter, s32_ColIdTime));
       this->dataChanged(this->index(s32_MessageCounter, s32_ColIdCounter),
@@ -1856,6 +1888,8 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
       this->dataChanged(this->index(s32_MessageCounter, s32_ColIdName), this->index(s32_MessageCounter, s32_ColIdName));
       this->dataChanged(this->index(s32_MessageCounter, s32_ColIdDlc), this->index(s32_MessageCounter, s32_ColIdDlc));
       this->dataChanged(this->index(s32_MessageCounter, s32_ColIdData), this->index(s32_MessageCounter, s32_ColIdData));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIdStatus),
+                        this->index(s32_MessageCounter, s32_ColIdStatus));
    }
 }
 
@@ -3147,6 +3181,33 @@ void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OscComMessageLog
          break;
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if status of the message is valid
+
+   Checks status for an ECeS message
+
+   \param[in]       opc_CurrentMessage     Detailed input parameter description
+
+   \return
+   true if valid
+   false otherwise
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMetTreeModel::m_IsStatusValid(const C_CamMetTreeLoggerData & orc_CurrentMessage) const
+{
+   bool q_StatusValid = true;
+
+   // If status is "invalid" (Invalid counter or CRC for ECeS message)
+   const QString c_Status(orc_CurrentMessage.c_Status.AsStdString()->c_str());
+
+   if ((c_Status.contains("invalid", Qt::CaseInsensitive)) || (c_Status.contains("incorrect", Qt::CaseInsensitive)))
+   {
+      q_StatusValid = false;
+   }
+
+   return q_StatusValid;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

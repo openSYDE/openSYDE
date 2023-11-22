@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACLISTNODEITEMDATABLOCKWIDGET_H
-#define C_SYVUPPACLISTNODEITEMDATABLOCKWIDGET_H
+#ifndef C_SYVUPPACLISTNODEITEMDATABLOCKWIDGET_HPP
+#define C_SYVUPPACLISTNODEITEMDATABLOCKWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

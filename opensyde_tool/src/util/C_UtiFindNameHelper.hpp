@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_UTIFINDNAMEHELPERH
-#define C_UTIFINDNAMEHELPERH
+#ifndef C_UTIFINDNAMEHELPE_HPP
+#define C_UTIFINDNAMEHELPE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIINFO_H
-#define C_GIINFO_H
+#ifndef C_GIINFO_HPP
+#define C_GIINFO_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

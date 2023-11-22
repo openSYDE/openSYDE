@@ -132,6 +132,57 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
    \param[in]     ou8_DataPoolIndex    data pool index
    \param[in]     ou16_ListIndex       list index
    \param[in]     ou16_ElementIndex    element index
+   \param[in]     opc_DashboardWidget  Optional pointer to dashboard widget data element
+                                             Valid pointer: read value only for this widget with this Datapool element
+                                             NULL pointer:  read value for all widgets with this Datapool element
+   \param[out]    opu8_NrCode          if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR    data read and placed in data pool
+   C_CONFIG    no node or diagnostic protocol are known (was this class properly Initialize()d ?)
+               protocol driver reported configuration error (was the protocol driver properly initialized ?)
+   C_RANGE     specified data pool, list, element does not exist in data pools of configured node
+               protocol driver reported parameter out of range (does the protocol support the index range ?)
+   C_TIMEOUT   expected response not received within timeout
+   C_NOACT     could not send request (e.g. Tx buffer full)
+   C_RD_WR     protocol driver reported protocol violation
+   C_WARN      error response reveived
+   C_OVERFLOW  size of data received from server does not match size of specified data pool element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_SyvComDataDealer::DataPoolReadWithWidget(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                   const uint16_t ou16_ElementIndex,
+                                                   stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget,
+                                                   uint8_t * const opu8_NrCode)
+{
+   int32_t s32_Return;
+
+   s32_Return = C_OscDataDealer::DataPoolRead(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, opu8_NrCode);
+
+   if (s32_Return == C_NO_ERR)
+   {
+      if (opc_DashboardWidget == NULL)
+      {
+         this->m_OnReadDataPoolEventReceived(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex);
+      }
+      else
+      {
+         this->m_OnReadDataPoolEventReceivedForWidget(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex,
+                                                      opc_DashboardWidget);
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from server's data pool and updates the associated widgets
+
+   Calls DataPoolRead of C_OscDataDealer and updates the registered widgets.
+
+   \param[in]     ou8_DataPoolIndex    data pool index
+   \param[in]     ou16_ListIndex       list index
+   \param[in]     ou16_ElementIndex    element index
    \param[out]    opu8_NrCode          if != NULL: negative response code in case of an error response
 
    \return
@@ -249,6 +300,43 @@ int32_t C_SyvComDataDealer::NvmReadList(const uint32_t ou32_DataPoolIndex, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+
+   Detailed function description (optional). The function shall be described detailed if it is not described completely
+   by short function description and parameter description.
+
+   \param[in]     ou8_DataPoolIndex    data pool index
+   \param[in]     ou16_ListIndex       list index
+   \param[in]     ou16_ElementIndex    element index
+   \param[in]     opc_DashboardWidget  Optional pointer to dashboard widget data element
+                                             Valid pointer: read value only for this widget with this Datapool element
+                                             NULL pointer:  read value for all widgets with this Datapool element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvComDataDealer::m_OnReadDataPoolEventReceivedForWidget(const uint8_t ou8_DataPoolIndex,
+                                                                const uint16_t ou16_ListIndex,
+                                                                const uint16_t ou16_ElementIndex,
+                                                                C_PuiSvDbDataElementHandler * const opc_DashboardWidget)
+{
+   if ((this->mpc_Node != NULL) &&
+       (opc_DashboardWidget != NULL))
+   {
+      const C_OscNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+                                                       ou16_ElementIndex);
+      const C_OscNodeDataPoolContent * const pc_ElementContent =
+         &this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex)->c_Value;
+      // Create the necessary instance with a copy of the content. The timestamp will be filled in the constructor
+      const C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
+
+      // Update the value
+      opc_DashboardWidget->InsertNewValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
+                                                                                      C_PuiSvDbNodeDataPoolListElementId
+                                                                                      ::eDATAPOOL_ELEMENT, false, 0UL),
+                                                   c_DbContent);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                                                        const uint16_t ou16_ElementIndex)
@@ -274,11 +362,16 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8_t ou8_DataPoo
 
          for (c_ItWidget = rc_ListWidgets.begin(); c_ItWidget != rc_ListWidgets.end(); ++c_ItWidget)
          {
-            // Update the value
-            (*c_ItWidget)->InsertNewValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
-                                                                                      C_PuiSvDbNodeDataPoolListElementId
-                                                                                      ::eDATAPOOL_ELEMENT, false, 0UL),
-                                                   c_DbContent);
+            // Update only read items here
+            if ((*c_ItWidget)->IsReadItem() == true)
+            {
+               // Update the value
+               (*c_ItWidget)->InsertNewValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
+                                                                                         C_PuiSvDbNodeDataPoolListElementId
+                                                                                         ::eDATAPOOL_ELEMENT, false,
+                                                                                         0UL),
+                                                      c_DbContent);
+            }
          }
       }
       else

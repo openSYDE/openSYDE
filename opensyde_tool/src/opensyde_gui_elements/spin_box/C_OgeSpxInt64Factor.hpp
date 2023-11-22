@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXINT64FACTOR_H
-#define C_OGESPXINT64FACTOR_H
+#ifndef C_OGESPXINT64FACTOR_HPP
+#define C_OGESPXINT64FACTOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeSpxInt64ToolTipBase.hpp"

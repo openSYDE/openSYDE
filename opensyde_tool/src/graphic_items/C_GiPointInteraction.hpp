@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIPOINTINTERACTION_H
-#define C_GILIPOINTINTERACTION_H
+#ifndef C_GILIPOINTINTERACTION_HPP
+#define C_GILIPOINTINTERACTION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsEllipseItem>

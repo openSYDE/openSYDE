@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACCONFIGFILER_H
-#define C_SYVUPPACCONFIGFILER_H
+#ifndef C_SYVUPPACCONFIGFILER_HPP
+#define C_SYVUPPACCONFIGFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

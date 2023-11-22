@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMLVSIGNALRESIZEITEM_H
-#define C_SDBUEMLVSIGNALRESIZEITEM_H
+#ifndef C_SDBUEMLVSIGNALRESIZEITEM_HPP
+#define C_SDBUEMLVSIGNALRESIZEITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

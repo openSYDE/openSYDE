@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCDEFBASE_H
-#define C_OSCHALCDEFBASE_H
+#ifndef C_OSCHALCDEFBASE_HPP
+#define C_OSCHALCDEFBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

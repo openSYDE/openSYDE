@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDACHAWIDGET_H
-#define C_SYVDACHAWIDGET_H
+#ifndef C_SYVDACHAWIDGET_HPP
+#define C_SYVDACHAWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvDaDashboardContentBaseWidget.hpp"

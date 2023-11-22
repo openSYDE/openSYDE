@@ -89,6 +89,7 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
    mq_UniqueAddRequested(oq_UniqueAddRequested)
 {
    const QFileInfo c_FileInfo(orc_FilePath);
+   const bool q_IsEdsOrDcfImport = C_CieImportReportWidget::mh_IsEdsOrDcfImport(c_FileInfo.completeSuffix().toUpper());
 
    mpc_Ui->setupUi(this);
 
@@ -104,8 +105,8 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    //Trigger report
-   C_CieUtil::h_AdaptImportMessages(this->mc_ImportedAssignedData, this->me_ProtocolType);
-   C_CieUtil::h_AdaptImportMessages(this->mc_SkippedImportedAssignedData, this->me_ProtocolType);
+   C_CieUtil::h_AdaptImportMessages(this->mc_ImportedAssignedData, this->me_ProtocolType, q_IsEdsOrDcfImport);
+   C_CieUtil::h_AdaptImportMessages(this->mc_SkippedImportedAssignedData, this->me_ProtocolType, q_IsEdsOrDcfImport);
    tgl_assert(m_ShowReport(c_FileInfo.
                            completeSuffix().
                            toUpper(), oq_IsCanOpen) == C_NO_ERR);
@@ -949,7 +950,7 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32_t ou32_Index, c
    c_Retval += C_CieImportReportWidget::hc_HTML_TABLE_DATA_START + QString::number(ou32_Index + 1U) +
                c_TableEntryEnd;
    //Message name
-   if ((orc_Suffix.toUpper() == "EDS") || (orc_Suffix.toUpper() == "DCF"))
+   if (C_CieImportReportWidget::mh_IsEdsOrDcfImport(orc_Suffix))
    {
       QString c_MessageName = "NodeName";
       if (oq_ReplaceMessageNames)
@@ -1012,4 +1013,21 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32_t ou32_Index, c
    }
    c_Retval += C_CieImportReportWidget::hc_HTML_TABLE_DATA_START + c_Tmp + c_TableEntryEnd;
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is eds or dcf import
+
+   \param[in]  orc_Suffix  Suffix
+
+   \return
+   Flags
+
+   \retval   True    Is eds or dcf import
+   \retval   False   Is not eds or dcf import
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CieImportReportWidget::mh_IsEdsOrDcfImport(const QString & orc_Suffix)
+{
+   return (orc_Suffix.toUpper() == "EDS") || (orc_Suffix.toUpper() == "DCF");
 }

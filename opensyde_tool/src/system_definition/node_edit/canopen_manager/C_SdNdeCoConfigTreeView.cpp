@@ -1073,7 +1073,7 @@ void C_SdNdeCoConfigTreeView::mh_InitMappableSignals(
                                                      c_Entry.c_DatapoolData,
                                                      c_Entry.q_AutoMinMaxUsed) == C_NO_ERR)
          {
-            C_CieUtil::h_AdaptName(c_Entry.c_DatapoolData.c_Name, c_Entry.c_DatapoolData.c_Comment);
+            C_CieUtil::h_AdaptName(c_Entry.c_DatapoolData.c_Name, c_Entry.c_DatapoolData.c_Comment, false);
             orc_MappableSignals.push_back(c_Entry);
          }
       }

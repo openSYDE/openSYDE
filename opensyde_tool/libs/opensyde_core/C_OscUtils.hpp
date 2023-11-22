@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef OSCUTILS_H
-#define OSCUTILS_H
+#ifndef OSCUTILS_HPP
+#define OSCUTILS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

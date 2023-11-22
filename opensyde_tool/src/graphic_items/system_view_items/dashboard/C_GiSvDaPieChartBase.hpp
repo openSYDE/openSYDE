@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDAPIECHARTBASE_H
-#define C_GISVDAPIECHARTBASE_H
+#ifndef C_GISVDAPIECHARTBASE_HPP
+#define C_GISVDAPIECHARTBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiDashboardPieChart.hpp"

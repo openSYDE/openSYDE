@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXGRAYEDEDIT_H
-#define C_OGEGBXGRAYEDEDIT_H
+#ifndef C_OGEGBXGRAYEDEDIT_HPP
+#define C_OGEGBXGRAYEDEDIT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

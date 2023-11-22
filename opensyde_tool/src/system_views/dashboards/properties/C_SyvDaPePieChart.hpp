@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEPIECHART_H
-#define C_SYVDAPEPIECHART_H
+#ifndef C_SYVDAPEPIECHART_HPP
+#define C_SYVDAPEPIECHART_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

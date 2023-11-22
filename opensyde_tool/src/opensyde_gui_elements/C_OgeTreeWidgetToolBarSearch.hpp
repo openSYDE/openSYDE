@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETREEWIDGETTOOLBARSEARCH_H
-#define C_OGETREEWIDGETTOOLBARSEARCH_H
+#ifndef C_OGETREEWIDGETTOOLBARSEARCH_HPP
+#define C_OGETREEWIDGETTOOLBARSEARCH_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

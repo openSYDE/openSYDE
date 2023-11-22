@@ -9,8 +9,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSDLLWIDGET_H
-#define C_CAMMOSDLLWIDGET_H
+#ifndef C_CAMMOSDLLWIDGET_HPP
+#define C_CAMMOSDLLWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiOnlyBackground.hpp"

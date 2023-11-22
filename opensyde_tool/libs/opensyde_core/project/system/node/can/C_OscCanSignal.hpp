@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANSIGNAL_H
-#define C_OSCCANSIGNAL_H
+#ifndef C_OSCCANSIGNAL_HPP
+#define C_OSCCANSIGNAL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <set>

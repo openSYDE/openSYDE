@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_UTICLIPBOARDHELPER_H
-#define C_UTICLIPBOARDHELPER_H
+#ifndef C_UTICLIPBOARDHELPER_HPP
+#define C_UTICLIPBOARDHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

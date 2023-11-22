@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUTIL_H
-#define C_SEBUTIL_H
+#ifndef C_SEBUTIL_HPP
+#define C_SEBUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_SDNDENODEEDITWIDGET_H
-#define C_SDNDENODEEDITWIDGET_H
+#ifndef C_SDNDENODEEDITWIDGET_HPP
+#define C_SDNDENODEEDITWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -108,7 +108,7 @@ private:
    void m_ReloadCanOpenConfig(void) const;
    void m_ReloadCommMessages(void) const;
    void m_ReloadCommDatapools(void) const;
-   void m_ReloadHalc(void);
+   void m_ReloadHalc(void) const;
    void m_HalcLoadedFromTsp(void) const;
    void m_CreatePropertiesTab(const bool oq_AdaptCursor);
    void m_CreateDpTab(const bool oq_AdaptCursor);

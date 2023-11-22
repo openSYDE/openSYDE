@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDASPINBOXBASE_H
-#define C_GISVDASPINBOXBASE_H
+#ifndef C_GISVDASPINBOXBASE_HPP
+#define C_GISVDASPINBOXBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiDashboardSpinBoxGroup.hpp"
@@ -41,6 +41,7 @@ public:
    void LoadData(void) override;
    void UpdateData(void) override;
    void DeleteData(void) override;
+   void UpdateShowValue(void) override;
 
    void ConnectionActiveChanged(const bool oq_Active) override;
    void EditModeActiveChanged(const bool oq_Active) override;

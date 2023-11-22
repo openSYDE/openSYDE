@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEUNOBUSPROTNODECONNECTANDCREATECOMMAND_H
-#define C_SDBUEUNOBUSPROTNODECONNECTANDCREATECOMMAND_H
+#ifndef C_SDBUEUNOBUSPROTNODECONNECTANDCREATECOMMAND_HPP
+#define C_SDBUEUNOBUSPROTNODECONNECTANDCREATECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand.hpp"

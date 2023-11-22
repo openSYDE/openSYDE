@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBZOOMNOTIFICATION_H
-#define C_OGEPUBZOOMNOTIFICATION_H
+#ifndef C_OGEPUBZOOMNOTIFICATION_HPP
+#define C_OGEPUBZOOMNOTIFICATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

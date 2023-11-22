@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIBISIZEABLEITEM_H
-#define C_GIBISIZEABLEITEM_H
+#ifndef C_GIBISIZEABLEITEM_HPP
+#define C_GIBISIZEABLEITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

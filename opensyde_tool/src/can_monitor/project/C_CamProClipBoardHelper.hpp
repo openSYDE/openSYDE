@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMPROCLIPBOARDHELPER_H
-#define C_CAMPROCLIPBOARDHELPER_H
+#ifndef C_CAMPROCLIPBOARDHELPER_HPP
+#define C_CAMPROCLIPBOARDHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscXmlParser.hpp"

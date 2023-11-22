@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVHANDLERFILER_H
-#define C_PUISVHANDLERFILER_H
+#ifndef C_PUISVHANDLERFILER_HPP
+#define C_PUISVHANDLERFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

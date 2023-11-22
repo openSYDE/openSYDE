@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOBASEMANAGER_H
-#define C_SEBUNOBASEMANAGER_H
+#ifndef C_SEBUNOBASEMANAGER_HPP
+#define C_SEBUNOBASEMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsScene>

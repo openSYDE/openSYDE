@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOTOPBENDPOINTBASECOMMAND_H
-#define C_SEBUNOTOPBENDPOINTBASECOMMAND_H
+#ifndef C_SEBUNOTOPBENDPOINTBASECOMMAND_HPP
+#define C_SEBUNOTOPBENDPOINTBASECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

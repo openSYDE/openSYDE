@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVCANBUS_H
-#define C_GISVCANBUS_H
+#ifndef C_GISVCANBUS_HPP
+#define C_GISVCANBUS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiLiCanBus.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDCEXISTINGNODELIST_H
-#define C_SYVDCEXISTINGNODELIST_H
+#ifndef C_SYVDCEXISTINGNODELIST_HPP
+#define C_SYVDCEXISTINGNODELIST_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QListWidget>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDESTWFLASHLOADEROPTIONS_H
-#define C_SDNDESTWFLASHLOADEROPTIONS_H
+#ifndef C_SDNDESTWFLASHLOADEROPTIONS_HPP
+#define C_SDNDESTWFLASHLOADEROPTIONS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

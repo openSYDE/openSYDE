@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABDASHBOARDPROGRESSBARMAXIMUM_H
-#define C_OGELABDASHBOARDPROGRESSBARMAXIMUM_H
+#ifndef C_OGELABDASHBOARDPROGRESSBARMAXIMUM_HPP
+#define C_OGELABDASHBOARDPROGRESSBARMAXIMUM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabAdaptiveSize.hpp"

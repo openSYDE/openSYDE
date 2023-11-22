@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELEPROPERTIES_H
-#define C_OGELEPROPERTIES_H
+#ifndef C_OGELEPROPERTIES_HPP
+#define C_OGELEPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

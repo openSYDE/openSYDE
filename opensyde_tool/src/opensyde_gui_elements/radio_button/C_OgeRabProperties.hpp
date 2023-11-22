@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGERABPROPERTIES_H
-#define C_OGERABPROPERTIES_H
+#ifndef C_OGERABPROPERTIES_HPP
+#define C_OGERABPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeRabToolTipBase.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIERROR_H
-#define C_OGEWIERROR_H
+#ifndef C_OGEWIERROR_HPP
+#define C_OGEWIERROR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

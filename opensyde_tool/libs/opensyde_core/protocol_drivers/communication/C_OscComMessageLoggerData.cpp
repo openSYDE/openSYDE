@@ -89,6 +89,7 @@ C_OscComMessageLoggerData::C_OscComMessageLoggerData(void) :
    c_ProtocolTextDec(""),
    c_ProtocolTextHex(""),
    c_Counter(""),
+   c_Status(""),
    c_CanMsg(stw::can::T_STWCAN_Msg_RX()),
    q_IsTx(false)
 {

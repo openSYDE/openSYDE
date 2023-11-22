@@ -12,8 +12,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCXMLPARSERHPP
-#define C_OSCXMLPARSERHPP
+#ifndef C_OSCXMLPARSER_HPP
+#define C_OSCXMLPARSER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>

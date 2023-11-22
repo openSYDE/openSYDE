@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBSTYLE_H
-#define C_SEBSTYLE_H
+#ifndef C_SEBSTYLE_HPP
+#define C_SEBSTYLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QProxyStyle>

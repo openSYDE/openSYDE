@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDECOCONFIGTREEMODEL_H
-#define C_SDNDECOCONFIGTREEMODEL_H
+#ifndef C_SDNDECOCONFIGTREEMODEL_HPP
+#define C_SDNDECOCONFIGTREEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QIcon>

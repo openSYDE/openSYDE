@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPFILETABLEVIEW_H
-#define C_POPFILETABLEVIEW_H
+#ifndef C_POPFILETABLEVIEW_HPP
+#define C_POPFILETABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PopFileTableModel.hpp"

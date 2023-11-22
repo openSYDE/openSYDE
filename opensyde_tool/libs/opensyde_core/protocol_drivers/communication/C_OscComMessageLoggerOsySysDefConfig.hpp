@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCOMMESSAGELOGGEROSYSYSDEFCONFIG_H
-#define C_OSCCOMMESSAGELOGGEROSYSYSDEFCONFIG_H
+#ifndef C_OSCCOMMESSAGELOGGEROSYSYSDEFCONFIG_HPP
+#define C_OSCCOMMESSAGELOGGEROSYSYSDEFCONFIG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

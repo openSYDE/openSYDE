@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDTOPOLOGYLISTWIDGET_H
-#define C_SDTOPOLOGYLISTWIDGET_H
+#ifndef C_SDTOPOLOGYLISTWIDGET_HPP
+#define C_SDTOPOLOGYLISTWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeListWidgetToolTipBase.hpp"

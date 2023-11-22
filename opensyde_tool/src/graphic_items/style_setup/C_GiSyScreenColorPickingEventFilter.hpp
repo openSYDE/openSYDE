@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISYSCREENCOLORPICKINGEVENTFILTER_H
-#define C_GISYSCREENCOLORPICKINGEVENTFILTER_H
+#ifndef C_GISYSCREENCOLORPICKINGEVENTFILTER_HPP
+#define C_GISYSCREENCOLORPICKINGEVENTFILTER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

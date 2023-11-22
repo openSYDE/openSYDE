@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPLISTHEADERWIDGET_H
-#define C_SDNDEDPLISTHEADERWIDGET_H
+#ifndef C_SDNDEDPLISTHEADERWIDGET_HPP
+#define C_SDNDEDPLISTHEADERWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

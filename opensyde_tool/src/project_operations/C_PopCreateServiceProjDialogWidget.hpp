@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPCREATESERVICEPROJDIALOGWIDGET_H
-#define C_POPCREATESERVICEPROJDIALOGWIDGET_H
+#ifndef C_POPCREATESERVICEPROJDIALOGWIDGET_HPP
+#define C_POPCREATESERVICEPROJDIALOGWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

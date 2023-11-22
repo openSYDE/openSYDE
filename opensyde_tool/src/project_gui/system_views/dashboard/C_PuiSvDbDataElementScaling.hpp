@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBDATAELEMENTSCALING_H
-#define C_PUISVDBDATAELEMENTSCALING_H
+#ifndef C_PUISVDBDATAELEMENTSCALING_HPP
+#define C_PUISVDBDATAELEMENTSCALING_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

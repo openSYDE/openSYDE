@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDALABELBASE_H
-#define C_GISVDALABELBASE_H
+#ifndef C_GISVDALABELBASE_HPP
+#define C_GISVDALABELBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiSvDaRectBaseGroup.hpp"

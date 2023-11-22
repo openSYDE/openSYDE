@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGESPXPROPERTIES_H
-#define C_CAMOGESPXPROPERTIES_H
+#ifndef C_CAMOGESPXPROPERTIES_HPP
+#define C_CAMOGESPXPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeSpxToolTipBase.hpp"

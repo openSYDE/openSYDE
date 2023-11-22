@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITDASHBOARDSLIDERWIDGET_H
-#define C_SYVDAITDASHBOARDSLIDERWIDGET_H
+#ifndef C_SYVDAITDASHBOARDSLIDERWIDGET_HPP
+#define C_SYVDAITDASHBOARDSLIDERWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

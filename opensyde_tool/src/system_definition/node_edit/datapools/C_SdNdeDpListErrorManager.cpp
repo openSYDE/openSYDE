@@ -47,8 +47,8 @@ C_SdNdeDpListErrorManager::C_SdNdeDpListErrorManager(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListErrorManager::Init(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex)
@@ -60,7 +60,7 @@ void C_SdNdeDpListErrorManager::Init(const uint32_t & oru32_NodeIndex, const uin
    pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    if (pc_Node != NULL)
    {
-      pc_Node->CheckErrorDataPool(this->mu32_DataPoolIndex, NULL, NULL, &this->mq_ErrorInList, NULL, NULL);
+      pc_Node->CheckErrorDataPool(this->mu32_DataPoolIndex, NULL, NULL, &this->mq_ErrorInList, NULL, NULL, NULL);
    }
 }
 
@@ -75,7 +75,7 @@ void C_SdNdeDpListErrorManager::OnErrorChange(void)
 
    if (pc_Node != NULL)
    {
-      pc_Node->CheckErrorDataPool(this->mu32_DataPoolIndex, NULL, NULL, &this->mq_ErrorInList, NULL, NULL);
+      pc_Node->CheckErrorDataPool(this->mu32_DataPoolIndex, NULL, NULL, &this->mq_ErrorInList, NULL, NULL, NULL);
    }
    if (q_PreviousErrorState != this->mq_ErrorInList)
    {

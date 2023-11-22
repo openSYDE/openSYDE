@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXFONTPROPERTIES_H
-#define C_OGECBXFONTPROPERTIES_H
+#ifndef C_OGECBXFONTPROPERTIES_HPP
+#define C_OGECBXFONTPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFontComboBox>

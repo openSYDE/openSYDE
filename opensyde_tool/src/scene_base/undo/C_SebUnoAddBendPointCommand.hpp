@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOTOPADDBENDPOINTCOMMAND_H
-#define C_SEBUNOTOPADDBENDPOINTCOMMAND_H
+#ifndef C_SEBUNOTOPADDBENDPOINTCOMMAND_HPP
+#define C_SEBUNOTOPADDBENDPOINTCOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

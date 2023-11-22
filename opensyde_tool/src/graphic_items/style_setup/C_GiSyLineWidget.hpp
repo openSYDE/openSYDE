@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISYLINEWIDGET_H
-#define C_GISYLINEWIDGET_H
+#ifndef C_GISYLINEWIDGET_HPP
+#define C_GISYLINEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

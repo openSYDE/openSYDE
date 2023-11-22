@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSIMAGE_H
-#define C_PUIBSIMAGE_H
+#ifndef C_PUIBSIMAGE_HPP
+#define C_PUIBSIMAGE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPixmap>

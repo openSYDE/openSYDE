@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCDATADEALERNVMSAFE_H
-#define C_OSCDATADEALERNVMSAFE_H
+#ifndef C_OSCDATADEALERNVMSAFE_HPP
+#define C_OSCDATADEALERNVMSAFE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <set>

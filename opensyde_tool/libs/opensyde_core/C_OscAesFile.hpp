@@ -12,8 +12,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCAESFILEHPP
-#define C_OSCAESFILEHPP
+#ifndef C_OSCAESFILE_HPP
+#define C_OSCAESFILE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

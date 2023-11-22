@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEMUTABCHARTFIT_H
-#define C_OGEMUTABCHARTFIT_H
+#ifndef C_OGEMUTABCHARTFIT_HPP
+#define C_OGEMUTABCHARTFIT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMenu>

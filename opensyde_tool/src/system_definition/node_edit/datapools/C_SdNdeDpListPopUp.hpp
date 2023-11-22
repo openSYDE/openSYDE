@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPLISTPOPUP_H
-#define C_SDNDEDPLISTPOPUP_H
+#ifndef C_SDNDEDPLISTPOPUP_HPP
+#define C_SDNDEDPLISTPOPUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -91,4 +91,4 @@ private:
 }
 } //end of namespace
 
-#endif // C_SDNDEDPLISTPOPUP_H
+#endif // C_SDNDEDPLISTPOPUP_HPP

@@ -82,7 +82,6 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    mu32_BusIndex(0),
    mc_BusName("")
 {
-   QPixmap c_ImgLogo;
    QSizePolicy c_SizePolicy;
 
    // init UI
@@ -95,13 +94,6 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    this->mpc_Ui->pc_LabSubNodeName->SetBackgroundColor(11);
    this->mpc_Ui->pc_LabSubNodeName->SetForegroundColor(1);
    this->mpc_Ui->pc_LabSubNodeName->SetFontPixel(13);
-
-   //load STW logo
-   c_ImgLogo.load("://images/STW_Logo_Dark.png");
-   c_ImgLogo = c_ImgLogo.scaled((c_ImgLogo.width() / 22), (c_ImgLogo.height() / 22),
-                                Qt::KeepAspectRatio,
-                                Qt::SmoothTransformation);
-   this->mpc_Ui->pc_StwLogo->setPixmap(c_ImgLogo);
 
    //Options buttons
    this->mpc_Ui->pc_PushButtonFlashloaderOptions->SetCustomIcon("://images/SettingsIcon.svg",

@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCTARGETSUPPORTPACKAGE_H
-#define C_OSCTARGETSUPPORTPACKAGE_H
+#ifndef C_OSCTARGETSUPPORTPACKAGE_HPP
+#define C_OSCTARGETSUPPORTPACKAGE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

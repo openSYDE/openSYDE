@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDESFORESETMESSAGETABLEVIEW_H
-#define C_SDNDESFORESETMESSAGETABLEVIEW_H
+#ifndef C_SDNDESFORESETMESSAGETABLEVIEW_HPP
+#define C_SDNDESFORESETMESSAGETABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblViewScroll.hpp"

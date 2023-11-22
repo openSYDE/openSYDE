@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILILABEL_H
-#define C_GILILABEL_H
+#ifndef C_GILILABEL_HPP
+#define C_GILILABEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

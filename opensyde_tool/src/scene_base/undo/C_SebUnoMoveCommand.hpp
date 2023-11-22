@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOMOVECOMMAND_H
-#define C_SEBUNOMOVECOMMAND_H
+#ifndef C_SEBUNOMOVECOMMAND_HPP
+#define C_SEBUNOMOVECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

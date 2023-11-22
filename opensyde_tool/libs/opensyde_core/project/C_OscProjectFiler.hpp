@@ -11,8 +11,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPROJECTFILERH
-#define C_OSCPROJECTFILERH
+#ifndef C_OSCPROJECTFILER_HPP
+#define C_OSCPROJECTFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

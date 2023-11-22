@@ -53,6 +53,32 @@ using namespace stw::opensyde_gui_logic;
    \param[in]      ou8_DataPoolIndex   Data pool index
    \param[in]      ou16_ListIndex      List index
    \param[in]      ou16_ElementIndex   Element index
+   \param[in]      opc_DashboardWidget Optional pointer to dashboard widget data element
+                                          Valid pointer: read value only for this widget with this Datapool element
+                                          NULL pointer:  read value for all widgets with this Datapool element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
+                                               C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                               const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
+                                               stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget)
+{
+   me_Service = oe_Service;
+   mpc_Dealer = &orc_Dealer;
+   mu8_DataPoolIndex = ou8_DataPoolIndex;
+   mu16_ListIndex = ou16_ListIndex;
+   mu16_ElementIndex = ou16_ElementIndex;
+   mpc_DashboardWidget = opc_DashboardWidget;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: remember parameters for service execution
+
+   \param[in]      oe_Service          Service
+   \param[in,out]  orc_Dealer          Dealer
+   \param[in]      ou8_DataPoolIndex   Data pool index
+   \param[in]      ou16_ListIndex      List index
+   \param[in]      ou16_ElementIndex   Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
@@ -127,7 +153,8 @@ void C_SyvComPollingThreadDiag::run(void)
    switch (me_Service)
    {
    case eDPREAD:
-      ms32_Result = mpc_Dealer->DataPoolRead(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_Nrc);
+      ms32_Result = mpc_Dealer->DataPoolReadWithWidget(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex,
+                                                       mpc_DashboardWidget, &mu8_Nrc);
       break;
    case eDPWRITE:
       ms32_Result = mpc_Dealer->DataPoolWrite(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_Nrc);
@@ -178,6 +205,7 @@ C_SyvComPollingThreadDiag::C_SyvComPollingThreadDiag(void) :
    mu8_DataPoolIndex(0U),
    mu16_ListIndex(0U),
    mu16_ElementIndex(0U),
+   mpc_DashboardWidget(NULL),
    mpc_ParamNodeValues(NULL),
    mq_ApplicationAcknowledge(false),
    ms32_Result(C_UNKNOWN_ERR),
@@ -205,6 +233,9 @@ C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
    \param[in]  ou8_DataPoolIndex    index of data pool to read from
    \param[in]  ou16_ListIndex       index of list to read from
    \param[in]  ou16_ElementIndex    index of element to read from
+   \param[in]  opc_DashboardWidget  Optional pointer to dashboard widget data element
+                                       Valid pointer: read value only for this widget with this Datapool element
+                                       NULL pointer:  read value for all widgets with this Datapool element
 
    \return
    C_NO_ERR   started polling
@@ -212,7 +243,8 @@ C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
-                                                     const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
+                                                     const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
+                                                     stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -223,7 +255,8 @@ int32_t C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_De
    else
    {
       this->mq_AcceptNextRequest = false;
-      this->m_SetRunParams(eDPREAD, orc_Dealer, ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex);
+      this->m_SetRunParams(eDPREAD, orc_Dealer, ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex,
+                           opc_DashboardWidget);
       this->start();
    }
    return s32_Return;

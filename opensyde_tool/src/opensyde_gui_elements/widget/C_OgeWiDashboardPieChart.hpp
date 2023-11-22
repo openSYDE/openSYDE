@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIDASHBOARDPIECHART_H
-#define C_OGEWIDASHBOARDPIECHART_H
+#ifndef C_OGEWIDASHBOARDPIECHART_HPP
+#define C_OGEWIDASHBOARDPIECHART_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

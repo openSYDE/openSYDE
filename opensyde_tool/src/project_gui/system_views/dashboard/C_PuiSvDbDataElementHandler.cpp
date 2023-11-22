@@ -472,6 +472,18 @@ bool C_PuiSvDbDataElementHandler::IsDataElementRegistered(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if element is a read or write item
+
+   \retval   true    Read item
+   \retval   false   Write item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::IsReadItem() const
+{
+   return this->mq_ReadItem;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Inserts a new received value to the widget queue
 
    This function is thread safe.
@@ -663,6 +675,7 @@ void C_PuiSvDbDataElementHandler::m_OnDataElementRegistered(const uint32_t ou32_
    \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[out]    orc_ScaledValue                 String with result string
    \param[out]    opf64_UnscaledValueAsFloat      Optional float with unscaled value
+   \param[out]    opf64_ScaledValueAsFloat        Optional float with scaled value
 
    \return
    C_NO_ERR    Value read
@@ -672,7 +685,8 @@ void C_PuiSvDbDataElementHandler::m_OnDataElementRegistered(const uint32_t ou32_
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex,
                                                     QString & orc_ScaledValue,
-                                                    float64_t * const opf64_UnscaledValueAsFloat)
+                                                    float64_t * const opf64_UnscaledValueAsFloat,
+                                                    float64_t * const opf64_ScaledValueAsFloat)
 {
    int32_t s32_Return = C_RANGE;
    C_PuiSvDbNodeDataPoolListElementId c_Id;
@@ -689,7 +703,7 @@ int32_t C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32_t ou32_WidgetDa
 
          orc_ScaledValue = this->mc_UsedConfig[ou32_WidgetDataPoolElementIndex].GetSingleValueContentFormatted(
             this->mc_VecDataValues[ou32_WidgetDataPoolElementIndex][s32_LastIndex],
-            u32_ArrayIndex, opf64_UnscaledValueAsFloat);
+            u32_ArrayIndex, opf64_UnscaledValueAsFloat, opf64_ScaledValueAsFloat);
 
          this->m_SaveTimeStamp(ou32_WidgetDataPoolElementIndex, s32_LastIndex);
 
@@ -1762,7 +1776,8 @@ void C_PuiSvDbDataElementHandler::m_GetAllRegisteredElements(
 
    \param[in]     orc_Value                       Dp content to convert, format and scale
    \param[in]     ou32_Index                      Array index in content (0 in case of no array)
-   \param[out]    opf64_UnscaledValueAsFloat        Optional float with unscaled value
+   \param[out]    opf64_UnscaledValueAsFloat      Optional float with unscaled value
+   \param[out]    opf64_ScaledValueAsFloat        Optional float with scaled value
 
    \return
    Formatted and scaled string
@@ -1770,11 +1785,11 @@ void C_PuiSvDbDataElementHandler::m_GetAllRegisteredElements(
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvDbDataElementHandler::C_DpElementConfig::GetSingleValueContentFormatted(
    const C_PuiSvDbDataElementContent & orc_Value, const uint32_t ou32_Index,
-   float64_t * const opf64_UnscaledValueAsFloat)
-const
+   float64_t * const opf64_UnscaledValueAsFloat, float64_t * const opf64_ScaledValueAsFloat) const
 {
    return this->c_FormatterConfig.GetSingleValueContentFormatted(orc_Value, ou32_Index, this->c_Scaling,
-                                                                 opf64_UnscaledValueAsFloat);
+                                                                 opf64_UnscaledValueAsFloat,
+                                                                 opf64_ScaledValueAsFloat);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

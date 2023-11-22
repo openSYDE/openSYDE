@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDCLIPBOARDHELPER_H
-#define C_SDCLIPBOARDHELPER_H
+#ifndef C_SDCLIPBOARDHELPER_HPP
+#define C_SDCLIPBOARDHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

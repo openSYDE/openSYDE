@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSECURITYPEM_H
-#define C_OSCSECURITYPEM_H
+#ifndef C_OSCSECURITYPEM_HPP
+#define C_OSCSECURITYPEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

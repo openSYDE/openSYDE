@@ -626,11 +626,13 @@ void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
             bool q_NameConflict;
             bool q_NameInvalid;
             bool q_IsErrorInListOrMessage;
-            bool q_IsErrorInListOrElementLength;
+            bool q_TooFewListsOrElementsError;
+            bool q_TooManyListsOrElementsError;
             pc_Node->CheckErrorDataPool(static_cast<uint32_t>(s32_Index), &q_NameConflict, &q_NameInvalid,
-                                        &q_IsErrorInListOrMessage, &q_IsErrorInListOrElementLength, NULL);
+                                        &q_IsErrorInListOrMessage, &q_TooFewListsOrElementsError,
+                                        &q_TooManyListsOrElementsError, NULL);
             if (((q_NameConflict == true) || (q_NameInvalid == true)) || (q_IsErrorInListOrMessage == true) ||
-                (q_IsErrorInListOrElementLength == true))
+                (q_TooFewListsOrElementsError == true) || (q_TooManyListsOrElementsError == true))
             {
                q_Error = true;
                c_InvalidDataPoolIndices.push_back(static_cast<uint32_t>(s32_Index));

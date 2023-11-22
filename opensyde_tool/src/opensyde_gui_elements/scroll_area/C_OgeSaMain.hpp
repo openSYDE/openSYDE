@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESAMAIN_H
-#define C_OGESAMAIN_H
+#ifndef C_OGESAMAIN_HPP
+#define C_OGESAMAIN_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QScrollArea>

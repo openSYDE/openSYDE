@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLTREDELEGATEUTIL_H
-#define C_TBLTREDELEGATEUTIL_H
+#ifndef C_TBLTREDELEGATEUTIL_HPP
+#define C_TBLTREDELEGATEUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>

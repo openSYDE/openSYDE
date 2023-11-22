@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAUNODELETECOMMAND_H
-#define C_SYVDAUNODELETECOMMAND_H
+#ifndef C_SYVDAUNODELETECOMMAND_HPP
+#define C_SYVDAUNODELETECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvDaUnoAddDeleteBaseCommand.hpp"

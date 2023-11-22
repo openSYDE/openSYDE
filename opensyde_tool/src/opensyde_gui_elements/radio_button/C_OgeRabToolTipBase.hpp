@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGERABTOOLTIPBASE_H
-#define C_OGERABTOOLTIPBASE_H
+#ifndef C_OGERABTOOLTIPBASE_HPP
+#define C_OGERABTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QRadioButton>

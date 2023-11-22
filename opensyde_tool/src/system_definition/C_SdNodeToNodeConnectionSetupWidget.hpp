@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNODETONODECONNECTIONSETUPWIDGET_H
-#define C_SDNODETONODECONNECTIONSETUPWIDGET_H
+#ifndef C_SDNODETONODECONNECTIONSETUPWIDGET_HPP
+#define C_SDNODETONODECONNECTIONSETUPWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

@@ -582,3 +582,56 @@ bool C_OscCanMessageContainer::ContainsAtLeastOneActiveMessage(void) const
    }
    return q_Result;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check min signal error
+
+   \return
+   Flags
+
+   \retval   True    Min signals not present
+   \retval   False   Number of signals valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscCanMessageContainer::CheckMinSignalError() const
+{
+   bool q_Retval = C_OscCanMessageContainer::mh_CheckMinSignalErrorPerVector(this->c_RxMessages);
+
+   if (q_Retval == false)
+   {
+      q_Retval = C_OscCanMessageContainer::mh_CheckMinSignalErrorPerVector(this->c_TxMessages);
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check min signal error per vector
+
+   \param[in]  orc_Messages   Messages
+
+   \return
+   Flags
+
+   \retval   True    Min signals not present
+   \retval   False   Number of signals valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscCanMessageContainer::mh_CheckMinSignalErrorPerVector(const std::vector<C_OscCanMessage> & orc_Messages)
+{
+   bool q_Retval = false;
+   bool q_SignalsPresent = false;
+
+   for (uint32_t u32_ItMessage = 0; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
+   {
+      if (orc_Messages[u32_ItMessage].c_Signals.size() > 0UL)
+      {
+         q_SignalsPresent = true;
+         break;
+      }
+   }
+   if ((q_SignalsPresent == false) && (orc_Messages.size() > 0UL))
+   {
+      q_Retval = true;
+   }
+   return q_Retval;
+}

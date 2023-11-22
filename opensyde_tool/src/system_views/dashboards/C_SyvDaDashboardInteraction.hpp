@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDINTERACTION_H
-#define C_SYVDADASHBOARDINTERACTION_H
+#ifndef C_SYVDADASHBOARDINTERACTION_HPP
+#define C_SYVDADASHBOARDINTERACTION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMovie>

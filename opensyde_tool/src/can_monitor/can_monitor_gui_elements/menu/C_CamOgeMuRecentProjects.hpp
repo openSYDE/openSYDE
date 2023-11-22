@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEMURECENTPROJECTS_H
-#define C_CAMOGEMURECENTPROJECTS_H
+#ifndef C_CAMOGEMURECENTPROJECTS_HPP
+#define C_CAMOGEMURECENTPROJECTS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMenu>

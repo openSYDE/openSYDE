@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACWIDGET_H
-#define C_SYVUPPACWIDGET_H
+#ifndef C_SYVUPPACWIDGET_HPP
+#define C_SYVUPPACWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -57,6 +57,7 @@ public:
    void UpdateDeviceInformation(const std::vector<uint32_t> & orc_NodeIndexes,
                                 const std::vector<stw::opensyde_gui_logic::C_SyvUpDeviceInfo> & orc_DeviceInformation)
    const;
+   void DisableUpdatePackage(void);
    void SetNodeProgress(const uint32_t ou32_NodeIndex, const uint8_t ou8_Progress) const;
 
    int32_t GetUpdatePackage(std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,

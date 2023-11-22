@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODESTWFLASHLOADEROPTIONS_H
-#define C_OSCNODESTWFLASHLOADEROPTIONS_H
+#ifndef C_OSCNODESTWFLASHLOADEROPTIONS_HPP
+#define C_OSCNODESTWFLASHLOADEROPTIONS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

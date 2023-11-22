@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDBVIEWWIDGET_H
-#define C_SDNDEDBVIEWWIDGET_H
+#ifndef C_SDNDEDBVIEWWIDGET_HPP
+#define C_SDNDEDBVIEWWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVGGRAPHICSITEM_H
-#define C_GISVGGRAPHICSITEM_H
+#ifndef C_GISVGGRAPHICSITEM_HPP
+#define C_GISVGGRAPHICSITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -55,4 +55,4 @@ private:
 }
 } //end of namespace
 
-#endif // C_GISVGGRAPHICSITEM_H
+#endif // C_GISVGGRAPHICSITEM_HPP

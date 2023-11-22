@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_IMPCODEGENERATIONREPORTWIDGET_H
-#define C_IMPCODEGENERATIONREPORTWIDGET_H
+#ifndef C_IMPCODEGENERATIONREPORTWIDGET_HPP
+#define C_IMPCODEGENERATIONREPORTWIDGET_HPP
 
 #include <QWidget>
 #include "stwtypes.hpp"

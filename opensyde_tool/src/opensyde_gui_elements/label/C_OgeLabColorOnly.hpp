@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABCOLORONLY_H
-#define C_OGELABCOLORONLY_H
+#ifndef C_OGELABCOLORONLY_HPP
+#define C_OGELABCOLORONLY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

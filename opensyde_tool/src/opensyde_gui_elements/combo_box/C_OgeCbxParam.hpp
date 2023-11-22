@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXPARAM_H
-#define C_OGECBXPARAM_H
+#ifndef C_OGECBXPARAM_HPP
+#define C_OGECBXPARAM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QComboBox>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPLISTDATASETVIEW_H
-#define C_SDNDEDPLISTDATASETVIEW_H
+#ifndef C_SDNDEDPLISTDATASETVIEW_HPP
+#define C_SDNDEDPLISTDATASETVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

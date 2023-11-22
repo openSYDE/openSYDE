@@ -272,7 +272,20 @@ int32_t C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
             {
                if (pc_OsyMessage != NULL)
                {
-                  s32_Retval = pc_OsyMessage->c_Signals.size();
+                  C_OscCanProtocol::E_Type e_ProtocolType = C_OscCanProtocol::eCAN_OPEN;
+                  m_GetSignalInterpretedOsy(this->mu32_MessageIndex, &e_ProtocolType);
+
+                  if ((C_CamProHandler::h_GetInstance()->GetMessageConst(this->mu32_MessageIndex)->
+                       q_SetAutoSupportMode == true) && (e_ProtocolType == C_OscCanProtocol::eECES))
+                  {
+                     s32_Retval = static_cast<int32_t>(pc_OsyMessage->c_Signals.size()) - 2; //Not showing Message
+                                                                                             // counter and Checksum
+                     // signals if is an ECES protocol
+                  }
+                  else
+                  {
+                     s32_Retval = pc_OsyMessage->c_Signals.size();
+                  }
                }
                else if (pc_DbcMessage != NULL)
                {

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMPROMESSAGEDATA_H
-#define C_CAMPROMESSAGEDATA_H
+#ifndef C_CAMPROMESSAGEDATA_HPP
+#define C_CAMPROMESSAGEDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <array>
@@ -45,6 +45,7 @@ public:
    uint16_t u16_Dlc;
    uint32_t u32_Id;
    std::vector<uint8_t> c_Bytes;
+   bool q_SetAutoSupportMode;
 
    void CalcHash(uint32_t & oru32_HashValue) const;
    stw::can::T_STWCAN_Msg_TX ToCanMessage(void) const;
@@ -68,7 +69,8 @@ public:
    {
       eGBODS_EXTENDED = 0,
       eGBODS_RTR,
-      eGBODS_DO_CYCLIC
+      eGBODS_DO_CYCLIC,
+      eGBODS_AUTO_SUPPORT
    };
 
    //Get

@@ -368,9 +368,12 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
          }
          else
          {
-            if (orc_Node.c_Applications.size() > 0)
+            // index of applications does not match index of HEX files if there exists a PSI Data Block
+            // so we need to only consider HEX file apps
+            const std::vector<C_OscNodeApplication> c_HexApps = orc_Node.GetHexApplications();
+            if (c_HexApps.size() > 0)
             {
-               if (orc_Node.c_Applications.size() == orc_NodeInfo.GetHexFileInfosCount())
+               if (c_HexApps.size() == orc_NodeInfo.GetHexFileInfosCount())
                {
                   for (uint32_t u32_ItFile = 0; u32_ItFile < orc_NodeInfo.GetHexFileInfosCount();
                        ++u32_ItFile)
@@ -378,7 +381,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
                      QString c_FileProjectName;
                      QString c_FileVersion;
                      QString c_FileBuild;
-                     QString c_ApplicationName;
+                     const QString c_ApplicationName = c_HexApps[u32_ItFile].c_Name.c_str();
                      QString c_Icon;
                      QString c_State;
                      QString c_DeviceProjectName;
@@ -387,9 +390,8 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
                      QString c_DeviceValid;
                      QString c_DetailsPart;
                      C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(
-                        orc_NodeInfo, orc_Node, u32_ItFile, c_ApplicationName, c_Icon, c_State, c_DeviceValid,
-                        c_FileProjectName, c_DeviceProjectName, c_FileVersion, c_DeviceVersion,
-                        c_FileBuild, c_DeviceBuild);
+                        orc_NodeInfo, u32_ItFile, c_Icon, c_State, c_DeviceValid, c_FileProjectName,
+                        c_DeviceProjectName, c_FileVersion, c_DeviceVersion, c_FileBuild, c_DeviceBuild);
                      C_SyvUpNodePropertiesDialog::mh_ExtractDetailsPartFromDataForNode(orc_NodeInfo.GetHexAppInfoAmbiguous(
                                                                                           u32_ItFile),
                                                                                        c_FileProjectName,
@@ -401,10 +403,6 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
                         u32_ItFile, c_ApplicationName, c_Icon, c_State, c_DeviceValid,
                         c_DetailsPart, c_NewContent);
                   }
-               }
-               else
-               {
-                  //No content if nothing found
                }
             }
             else
@@ -424,9 +422,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
 /*! \brief  Get application data for node
 
    \param[in]      orc_NodeInfo              Node info
-   \param[in]      orc_Node                  Node
-   \param[in]      ou32_ApplicationIndex     Application index
-   \param[in,out]  orc_ApplicationName       Application name
+   \param[in]      ou32_ApplicationIndex     Application index in list of all apps that are not HALC NVM Data Blocks
    \param[in,out]  orc_ApplicationStateIcon  Application state icon
    \param[in,out]  orc_ApplicationState      Application state
    \param[in,out]  orc_DeviceValidStatus     Device valid status
@@ -439,9 +435,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNodeData & orc_NodeInfo,
-                                                               const C_OscNode & orc_Node,
                                                                const uint32_t ou32_ApplicationIndex,
-                                                               QString & orc_ApplicationName,
                                                                QString & orc_ApplicationStateIcon,
                                                                QString & orc_ApplicationState,
                                                                QString & orc_DeviceValidStatus,
@@ -452,9 +446,7 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
                                                                QString & orc_FileBuildDate,
                                                                QString & orc_DeviceBuildDate)
 {
-   const C_XFLECUInformation * const pc_FileInfo = orc_NodeInfo.GetHexFileInfo(
-      ou32_ApplicationIndex);
-   const C_OscNodeApplication & rc_Application = orc_Node.c_Applications[ou32_ApplicationIndex];
+   const C_XFLECUInformation * const pc_FileInfo = orc_NodeInfo.GetHexFileInfo(ou32_ApplicationIndex);
    bool q_Missing = true;
    bool q_Match = true;
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
@@ -467,7 +459,6 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
       orc_FileBuildDate = (pc_FileInfo->GetDate() + " " + pc_FileInfo->GetTime()).c_str();
    }
 
-   orc_ApplicationName = rc_Application.c_Name.c_str();
    orc_ApplicationStateIcon = "";
    orc_ApplicationState = "";
    orc_DeviceProjectName = C_GtGetText::h_GetText("<b>Not present</b>");

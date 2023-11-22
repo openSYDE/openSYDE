@@ -6,8 +6,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCCONFIGTREEVIEW_H
-#define C_SDNDEHALCCONFIGTREEVIEW_H
+#ifndef C_SDNDEHALCCONFIGTREEVIEW_HPP
+#define C_SDNDEHALCCONFIGTREEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTreeViewToolTipBase.hpp"

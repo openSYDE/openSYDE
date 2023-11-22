@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSDATABASESELECTIONMODEL_H
-#define C_CAMMOSDATABASESELECTIONMODEL_H
+#ifndef C_CAMMOSDATABASESELECTIONMODEL_HPP
+#define C_CAMMOSDATABASESELECTIONMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <array>

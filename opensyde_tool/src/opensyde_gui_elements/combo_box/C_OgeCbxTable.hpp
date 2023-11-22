@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXTABLE_H
-#define C_OGECBXTABLE_H
+#ifndef C_OGECBXTABLE_HPP
+#define C_OGECBXTABLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeCbxResizingView.hpp"

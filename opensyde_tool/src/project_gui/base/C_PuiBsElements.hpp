@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSELEMENTS_H
-#define C_PUIBSELEMENTS_H
+#ifndef C_PUIBSELEMENTS_HPP
+#define C_PUIBSELEMENTS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

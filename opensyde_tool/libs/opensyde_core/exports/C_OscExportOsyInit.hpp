@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCEXPORTOSYINITH
-#define C_OSCEXPORTOSYINITH
+#ifndef C_OSCEXPORTOSYINIT_HPP
+#define C_OSCEXPORTOSYINIT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

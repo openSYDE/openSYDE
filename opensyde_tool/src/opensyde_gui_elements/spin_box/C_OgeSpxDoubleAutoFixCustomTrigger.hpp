@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXDOUBLEAUTOFIXCUSTOMTRIGGER_H
-#define C_OGESPXDOUBLEAUTOFIXCUSTOMTRIGGER_H
+#ifndef C_OGESPXDOUBLEAUTOFIXCUSTOMTRIGGER_HPP
+#define C_OGESPXDOUBLEAUTOFIXCUSTOMTRIGGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeSpxDoubleAutoFix.hpp"

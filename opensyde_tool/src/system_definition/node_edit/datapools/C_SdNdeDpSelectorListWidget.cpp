@@ -815,13 +815,14 @@ const
                   bool q_NameConflict;
                   bool q_NameInvalid;
                   bool q_IsErrorInListOrMessage;
-                  bool q_NumberOfListsOrElementsInvalid;
+                  bool q_TooFewListsOrElementsError;
+                  bool q_TooManyListsOrElementsError;
                   //Check error for one datapool
                   pc_Node->CheckErrorDataPool(u32_DpCounter, &q_NameConflict, &q_NameInvalid, &q_IsErrorInListOrMessage,
-                                              &q_NumberOfListsOrElementsInvalid, NULL);
+                                              &q_TooFewListsOrElementsError, &q_TooManyListsOrElementsError, NULL);
 
                   if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false) &&
-                      (q_NumberOfListsOrElementsInvalid == false))
+                      (q_TooFewListsOrElementsError == false) && (q_TooManyListsOrElementsError == false))
                   {
                      //No error
                      pc_WidgetItem->SetStateConflict(false);
@@ -2330,13 +2331,15 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(const uint32_t ou32_I
             bool q_NameConflict;
             bool q_NameInvalid;
             bool q_IsErrorInListOrMessage;
-            bool q_NumberOfListsOrElementsInvalid;
+            bool q_TooFewListsOrElementsError;
+            bool q_TooManyListsOrElementsError;
             std::vector<uint32_t> c_InvalidListIndices;
             pc_Node->CheckErrorDataPool(u32_DataPoolIndex, &q_NameConflict, &q_NameInvalid,
-                                        &q_IsErrorInListOrMessage, &q_NumberOfListsOrElementsInvalid,
+                                        &q_IsErrorInListOrMessage, &q_TooFewListsOrElementsError,
+                                        &q_TooManyListsOrElementsError,
                                         &c_InvalidListIndices);
             if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false) &&
-                (q_NumberOfListsOrElementsInvalid == false))
+                (q_TooFewListsOrElementsError == false) && (q_TooManyListsOrElementsError == false))
             {
                pc_Sender->SetErrorToolTip(C_GtGetText::h_GetText("No error found!"), "");
             }
@@ -2404,9 +2407,18 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(const uint32_t ou32_I
                      c_Content += "\n";
                   }
                }
-               if (q_NumberOfListsOrElementsInvalid == true)
+               if (q_TooFewListsOrElementsError == true)
                {
-                  c_Content += C_GtGetText::h_GetText("The number of lists or elements in the data pool is invalid.\n");
+                  c_Content += C_GtGetText::h_GetText("An interface is missing signals.\n"
+                                                      "Requirements:\n"
+                                                      "If there is a message associated with this interface\n"
+                                                      "there needs to be at least one signal on this interface.\n"
+                                                      "Both Rx and Tx need one signal separately if there is such a message.\n"
+                                                      "\n");
+               }
+               if (q_TooManyListsOrElementsError == true)
+               {
+                  c_Content += C_GtGetText::h_GetText("Too many lists or elements in the data pool.\n");
                }
 
                pc_Sender->SetErrorToolTip(c_Heading, c_Content);

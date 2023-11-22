@@ -176,6 +176,7 @@ void C_CamMetWidget::ClearData(void)
    this->mpc_Ui->pc_TraceView->ActionClearData();
    this->mpc_Ui->pc_StatusWidget->SetBusLoad(0U, this->ms32_CanBitrate);
    this->mpc_Ui->pc_StatusWidget->SetFilteredMessages(0U);
+   Q_EMIT (this->SigClearData());
 
    // transmit information is resetted by data reset (C_OscComDriverBase::StopLogging)
 }

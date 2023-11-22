@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDTOOLTIPUTIL_H
-#define C_SDTOOLTIPUTIL_H
+#ifndef C_SDTOOLTIPUTIL_HPP
+#define C_SDTOOLTIPUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

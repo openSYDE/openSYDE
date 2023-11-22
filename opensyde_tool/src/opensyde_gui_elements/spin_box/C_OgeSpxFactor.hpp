@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXFACTOR_H
-#define C_OGESPXFACTOR_H
+#ifndef C_OGESPXFACTOR_HPP
+#define C_OGESPXFACTOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

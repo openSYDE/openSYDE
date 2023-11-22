@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSTEXTELEMENT_H
-#define C_PUIBSTEXTELEMENT_H
+#ifndef C_PUIBSTEXTELEMENT_HPP
+#define C_PUIBSTEXTELEMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFont>

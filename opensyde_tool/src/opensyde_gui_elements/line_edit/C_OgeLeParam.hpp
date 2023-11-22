@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELEPARAM_H
-#define C_OGELEPARAM_H
+#ifndef C_OGELEPARAM_HPP
+#define C_OGELEPARAM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeContextMenuBase.hpp"

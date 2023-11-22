@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVHANDLER_H
-#define C_PUISVHANDLER_H
+#ifndef C_PUISVHANDLER_HPP
+#define C_PUISVHANDLER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -280,11 +280,14 @@ private:
    void m_OnSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                              const uint32_t ou32_ListIndex, const uint32_t ou32_ElementSourceIndex,
                                              const uint32_t ou32_ElementTargetIndex);
-   void m_OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
-                                                    const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
-                                                    const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
-                                                    const bool oq_IsArray, const uint32_t ou32_ArraySize,
-                                                    const bool oq_IsString);
+   void m_OnSyncElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                          const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                          const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type,
+                                          const bool oq_IsArray, const uint32_t ou32_ArraySize, const bool oq_IsString);
+   void m_OnSyncElementRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                    const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                    const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MinElement,
+                                    const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MaxElement);
    void m_OnSyncNodeDataPoolListElementAccessChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                                      const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
                                                      const stw::opensyde_core::C_OscNodeDataPoolListElement::E_Access oe_Access);
@@ -298,6 +301,7 @@ private:
    uint32_t m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
    void m_HandleCompatibilityChart(void);
+   void m_FixDashboardWriteContentType(void);
    int32_t m_CheckRoutingDetails(const uint32_t ou32_ViewIndex, const std::vector<uint8_t> & orc_CheckedNodeActiveFlags,
                                  std::map<uint32_t,
                                           QString> & orc_SetupWarningRoutingDetails, std::vector< std::map<uint32_t,

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXSYSTEMCOMMISIONINGEDIT_H
-#define C_OGECHXSYSTEMCOMMISIONINGEDIT_H
+#ifndef C_OGECHXSYSTEMCOMMISIONINGEDIT_HPP
+#define C_OGECHXSYSTEMCOMMISIONINGEDIT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeChxToolTipBase.hpp"

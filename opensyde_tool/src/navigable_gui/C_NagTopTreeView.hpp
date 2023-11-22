@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGTOPTREEVIEW_H
-#define C_NAGTOPTREEVIEW_H
+#ifndef C_NAGTOPTREEVIEW_HPP
+#define C_NAGTOPTREEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTreeViewToolTipBase.hpp"

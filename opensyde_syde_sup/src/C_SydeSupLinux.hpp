@@ -8,8 +8,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYDESUPLINUX_H
-#define C_SYDESUPLINUX_H
+#ifndef C_SYDESUPLINUX_HPP
+#define C_SYDESUPLINUX_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <pthread.h>

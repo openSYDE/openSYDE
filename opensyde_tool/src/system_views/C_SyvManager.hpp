@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVMANAGER_H
-#define C_SYVMANAGER_H
+#ifndef C_SYVMANAGER_HPP
+#define C_SYVMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

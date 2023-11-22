@@ -46,7 +46,7 @@ C_PuiSvDbSlider::C_PuiSvDbSlider(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbSlider::CalcHash(uint32_t & oru32_HashValue) const
@@ -54,7 +54,7 @@ void C_PuiSvDbSlider::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_ShowMinMax, sizeof(this->q_ShowMinMax), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->s32_Value, sizeof(this->s32_Value), oru32_HashValue);
-   C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
+   C_PuiSvDbWriteWidgetBase::CalcHash(oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

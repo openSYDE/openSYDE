@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPSELECTORADDWIDGET_H
-#define C_SDNDEDPSELECTORADDWIDGET_H
+#ifndef C_SDNDEDPSELECTORADDWIDGET_HPP
+#define C_SDNDEDPSELECTORADDWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

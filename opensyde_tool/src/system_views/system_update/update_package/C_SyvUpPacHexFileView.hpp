@@ -8,12 +8,12 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACHEXFILEVIEW_H
-#define C_SYVUPPACHEXFILEVIEW_H
+#ifndef C_SYVUPPACHEXFILEVIEW_HPP
+#define C_SYVUPPACHEXFILEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_OgePopUpDialog.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -56,8 +56,8 @@ private:
    void m_OkClicked(void);
    static void mh_AddFileSection(const QString & orc_Path, QString & orc_Content);
    static QString mh_GetMd5Hex(const QString & orc_Path);
-   static void mh_AddDataInformation(stw::opensyde_core::C_OsyHexFile & orc_HexFile, QString & orc_Content);
-   static void mh_AddApplicationInformation(stw::opensyde_core::C_OsyHexFile & orc_HexFile, QString & orc_Content);
+   static void mh_AddDataInformation(stw::opensyde_core::C_OscHexFile & orc_HexFile, QString & orc_Content);
+   static void mh_AddApplicationInformation(stw::opensyde_core::C_OscHexFile & orc_HexFile, QString & orc_Content);
 
    //Avoid call
    C_SyvUpPacHexFileView(const C_SyvUpPacHexFileView &);

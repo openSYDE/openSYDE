@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDCWIDGET_H
-#define C_SYVDCWIDGET_H
+#ifndef C_SYVDCWIDGET_HPP
+#define C_SYVDCWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

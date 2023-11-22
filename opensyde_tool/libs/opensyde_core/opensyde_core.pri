@@ -25,6 +25,7 @@ INCLUDEPATH += $${PWD} \
                $${PWD}/xml_parser/tinyxml2
 
 SOURCES += \
+    $$PWD/protocol_drivers/communication/C_OscComAutoSupport.cpp \
     $${PWD}/C_OscBinaryHash.cpp \
     $${PWD}/C_OscChecksummedIniFile.cpp \
     $${PWD}/C_OscUtils.cpp \
@@ -48,6 +49,7 @@ SOURCES += \
     $${PWD}/xml_parser/tinyxml2/tinyxml2.cpp
 
 HEADERS += \
+    $$PWD/protocol_drivers/communication/C_OscComAutoSupport.hpp \
     $${PWD}/C_OscBinaryHash.hpp \
     $${PWD}/C_OscChecksummedIniFile.hpp \
     $${PWD}/C_OscUtils.hpp \
@@ -267,6 +269,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/view/C_OscViewNodeUpdate.cpp \
        $${PWD}/project/view/C_OscViewNodeUpdateParamInfo.cpp \
        $${PWD}/project/view/C_OscViewFiler.cpp \
+       $${PWD}/imports/C_OscEdsDcfImportMessageGroup.cpp \
        $${PWD}/imports/C_OscCanOpenObjectDictionary.cpp \
        $${PWD}/imports/C_OscCanOpenEdsInfoBlock.cpp \
        $${PWD}/imports/C_OscCanOpenEdsDeviceInfoBlock.cpp \
@@ -357,6 +360,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/view/C_OscViewNodeUpdate.hpp \
        $${PWD}/project/view/C_OscViewNodeUpdateParamInfo.hpp \
        $${PWD}/project/view/C_OscViewFiler.hpp \
+       $${PWD}/imports/C_OscEdsDcfImportMessageGroup.hpp \
        $${PWD}/imports/C_OscCanOpenObjectDictionary.hpp \
        $${PWD}/imports/C_OscCanOpenEdsInfoBlock.hpp \
        $${PWD}/imports/C_OscCanOpenEdsDeviceInfoBlock.hpp \
@@ -427,16 +431,98 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_com_dispatchers) {
 }
 
 
-# optional: protocol drivers (openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# optional: protocol drivers common (openSYDE, STW Flashloader, KEFEX, Data Dealer)
 # Also requires CAN and Ethernet dispatchers
-contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
-   message("opensyde_core_skip_protocol_drivers detected ... skipping package")
+contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_common) {
+   message("opensyde_core_skip_protocol_drivers_common detected ... skipping package")
 } else {
-   message("opensyde_core_skip_protocol_drivers not detected ... dragging in package")
+   message("opensyde_core_skip_protocol_drivers_common not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/protocol_drivers \
+                  $${PWD}/protocol_drivers/communication \
+                  $${PWD}/kefex_diaglib/dl_pool \
+                  $${PWD}/kefex_diaglib/hexfile \
+                  $${PWD}/kefex_diaglib/dl_kefex \
+                  $${PWD}/kefex_diaglib/dl_stwflash
+
+   SOURCES += $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.cpp \
+              $${PWD}/kefex_diaglib/hexfile/C_HexFile.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.cpp \
+              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.cpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.cpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.cpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.cpp \
+              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.cpp \
+              $${PWD}/protocol_drivers/C_OscUpdateUtil.cpp \
+              $${PWD}/protocol_drivers/C_OscHexFile.cpp \
+              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.cpp
+
+   HEADERS += $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.hpp \
+              $${PWD}/kefex_diaglib/hexfile/C_HexFile.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.hpp \
+              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.hpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.hpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.hpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.hpp \
+              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.hpp \
+              $${PWD}/protocol_drivers/C_OscUpdateUtil.hpp \
+              $${PWD}/protocol_drivers/C_OscHexFile.hpp \
+              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.hpp
+}
+
+# optional: protocol drivers basic(openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# Also requires CAN and Ethernet dispatchers
+contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_basic) {
+   message("opensyde_core_skip_protocol_drivers_basic detected ... skipping package")
+} else {
+   message("opensyde_core_skip_protocol_drivers_basic not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/protocol_drivers/basic_update \
+
+   SOURCES += $${PWD}/protocol_drivers/basic_update/C_OscBuSequences.cpp \
+
+   HEADERS += $${PWD}/protocol_drivers/basic_update/C_OscBuSequences.hpp \
+}
+
+# optional: protocol drivers system(openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# Also requires CAN and Ethernet dispatchers
+contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_system) {
+   message("opensyde_core_skip_protocol_drivers_system detected ... skipping package")
+} else {
+   message("opensyde_core_skip_protocol_drivers_system not detected ... dragging in package")
 
    INCLUDEPATH += $${PWD}/data_dealer \
                   $${PWD}/security \
                   $${PWD}/protocol_drivers \
+                  $${PWD}/protocol_drivers/basic_update \
                   $${PWD}/protocol_drivers/routing \
                   $${PWD}/protocol_drivers/communication \
                   $${PWD}/protocol_drivers/system_update \
@@ -449,32 +535,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
    SOURCES += $${PWD}/data_dealer/C_OscDataDealer.cpp \
               $${PWD}/data_dealer/C_OscDataDealerNvm.cpp \
               $${PWD}/data_dealer/C_OscDataDealerNvmSafe.cpp \
-              $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.cpp \
-              $${PWD}/kefex_diaglib/hexfile/C_HexFile.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.cpp \
               $${PWD}/security/C_OscSecurityPem.cpp \
               $${PWD}/security/C_OscSecurityPemKeyInfo.cpp \
               $${PWD}/security/C_OscSecurityPemDatabase.cpp \
               $${PWD}/security/C_OscSecurityRsa.cpp \
-              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.cpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.cpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.cpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.cpp \
-              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.cpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverBase.cpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverFlash.cpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverProtocol.cpp \
@@ -484,37 +548,14 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/system_update/C_OscSuSequences.cpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.cpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.cpp \
-              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.cpp
 
    HEADERS += $${PWD}/data_dealer/C_OscDataDealer.hpp \
               $${PWD}/data_dealer/C_OscDataDealerNvm.hpp \
               $${PWD}/data_dealer/C_OscDataDealerNvmSafe.hpp \
-              $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.hpp \
-              $${PWD}/kefex_diaglib/hexfile/C_HexFile.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.hpp \
               $${PWD}/security/C_OscSecurityPem.hpp \
               $${PWD}/security/C_OscSecurityPemKeyInfo.hpp \
               $${PWD}/security/C_OscSecurityPemDatabase.hpp \
               $${PWD}/security/C_OscSecurityRsa.hpp \
-              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.hpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.hpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.hpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.hpp \
-              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.hpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverBase.hpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverFlash.hpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverProtocol.hpp \
@@ -524,7 +565,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/system_update/C_OscSuSequences.hpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.hpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.hpp \
-              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.hpp
 }
 
 # optional: protocol logging

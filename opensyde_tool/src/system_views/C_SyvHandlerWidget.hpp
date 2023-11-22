@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_SYVHANDLERWIDGET_H
-#define C_SYVHANDLERWIDGET_H
+#ifndef C_SYVHANDLERWIDGET_HPP
+#define C_SYVHANDLERWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPointer>

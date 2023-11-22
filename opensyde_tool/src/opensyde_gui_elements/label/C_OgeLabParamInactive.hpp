@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABPARAMINACTIVE_H
-#define C_OGELABPARAMINACTIVE_H
+#ifndef C_OGELABPARAMINACTIVE_HPP
+#define C_OGELABPARAMINACTIVE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

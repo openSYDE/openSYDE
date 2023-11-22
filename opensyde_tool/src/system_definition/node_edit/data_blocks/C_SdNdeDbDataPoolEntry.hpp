@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDBDATAPOOLENTRY_H
-#define C_SDNDEDBDATAPOOLENTRY_H
+#ifndef C_SDNDEDBDATAPOOLENTRY_HPP
+#define C_SDNDEDBDATAPOOLENTRY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiWithToolTip.hpp"

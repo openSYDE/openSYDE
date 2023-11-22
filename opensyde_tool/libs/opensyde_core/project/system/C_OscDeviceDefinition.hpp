@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCDEVICEDEFINITIONH
-#define C_OSCDEVICEDEFINITIONH
+#ifndef C_OSCDEVICEDEFINITION_HPP
+#define C_OSCDEVICEDEFINITION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

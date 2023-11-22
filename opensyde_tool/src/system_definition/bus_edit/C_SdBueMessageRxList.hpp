@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGERXLIST_H
-#define C_SDBUEMESSAGERXLIST_H
+#ifndef C_SDBUEMESSAGERXLIST_HPP
+#define C_SDBUEMESSAGERXLIST_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

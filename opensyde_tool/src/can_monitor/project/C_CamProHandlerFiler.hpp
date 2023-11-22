@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMPROHANDLERFILER_H
-#define C_CAMPROHANDLERFILER_H
+#ifndef C_CAMPROHANDLERFILER_HPP
+#define C_CAMPROHANDLERFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

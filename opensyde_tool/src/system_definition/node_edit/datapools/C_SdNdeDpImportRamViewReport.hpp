@@ -5,8 +5,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPIMPORTRAMVIEWREPORT_H
-#define C_SDNDEDPIMPORTRAMVIEWREPORT_H
+#ifndef C_SDNDEDPIMPORTRAMVIEWREPORT_HPP
+#define C_SDNDEDPIMPORTRAMVIEWREPORT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

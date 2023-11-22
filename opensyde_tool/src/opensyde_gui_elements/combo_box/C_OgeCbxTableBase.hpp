@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXTABLEBASE_H
-#define C_OGECBXTABLEBASE_H
+#ifndef C_OGECBXTABLEBASE_HPP
+#define C_OGECBXTABLEBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

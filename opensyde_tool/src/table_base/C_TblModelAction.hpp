@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLMODELACTION_H
-#define C_TBLMODELACTION_H
+#ifndef C_TBLMODELACTION_HPP
+#define C_TBLMODELACTION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractTableModel>

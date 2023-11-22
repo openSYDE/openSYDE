@@ -25,6 +25,7 @@
 #include "C_PuiSdHandler.hpp"
 #include "C_PuiSvHandler.hpp"
 #include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 #include "ui_C_SyvDaPeBase.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -42,6 +43,9 @@ const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE = 0;
 const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE_2 = 1;
 const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_FLAT = 2;
 const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_SKEUMORPH = 3;
+const int32_t C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_DISABLED = 0;
+const int32_t C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_SETCONSTANTVALUE = 1;
+const int32_t C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_READSERVERVALUE = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -110,6 +114,7 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_
    //Debug texts
    this->mpc_Ui->pc_GroupBoxWrite->setTitle("");
    this->mpc_Ui->pc_GroupBoxRead->setTitle("");
+   this->mpc_Ui->pc_GroupBoxInitialValue->setTitle("");
    this->mpc_Ui->pc_PushButtonClearDataElement->setText("");
    this->mpc_Ui->pc_PushButtonDataElement->setText("");
 
@@ -124,6 +129,8 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_
    if (oq_ReadElement == true)
    {
       this->mpc_Ui->pc_GroupBoxWrite->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxInitialValue->setVisible(false);
+      this->mpc_Ui->pc_ToggleInitialValue->setVisible(false);
    }
    else
    {
@@ -194,8 +201,21 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_
    connect(this->mpc_Ui->pc_ComboBoxTheme,
            static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged),
            this, &C_SyvDaPeBase::SigRefresh);
-   connect(this->mpc_Ui->pc_LineEditFormatterString,  &QLineEdit::textChanged, this,
+   connect(this->mpc_Ui->pc_LineEditFormatterString, &QLineEdit::textChanged, this,
            &C_SyvDaPeBase::m_CheckFormatterString);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_ComboBoxInitialValueMode,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged),
+           this, &C_SyvDaPeBase::m_OnInitialValueModeChange);
+   connect(this->mpc_Ui->pc_CheckBoxDefaultScaling, &C_OgeChxProperties::toggled,
+           this, &C_SyvDaPeBase::m_UpdateSpinboxMetaData);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_DoubleSpinBoxFactor,
+           static_cast<void (QDoubleSpinBox::*)(float64_t)>(&QDoubleSpinBox::valueChanged),
+           this, &C_SyvDaPeBase::m_UpdateSpinboxMetaData);
+   connect(this->mpc_Ui->pc_DoubleSpinBoxOffset,
+           static_cast<void (QDoubleSpinBox::*)(float64_t)>(&QDoubleSpinBox::valueChanged),
+           this, &C_SyvDaPeBase::m_UpdateSpinboxMetaData);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -246,6 +266,14 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Material"));
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Flat"));
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Skeuomorphic"));
+   this->mpc_Ui->pc_LabelDashboardConnectHandling->setText(C_GtGetText::h_GetText("Handling on Dashboard Connect"));
+   this->mpc_Ui->pc_LabelInitialValueMode->setText(C_GtGetText::h_GetText("Initial Value Mode"));
+   this->mpc_Ui->pc_LabelInitialValue->setText(C_GtGetText::h_GetText("Value"));
+   this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setText(C_GtGetText::h_GetText(
+                                                              "Auto write value on dashboard connect"));
+   this->mpc_Ui->pc_ComboBoxInitialValueMode->addItem(C_GtGetText::h_GetText("Disabled"));
+   this->mpc_Ui->pc_ComboBoxInitialValueMode->addItem(C_GtGetText::h_GetText("Set Constant Value"));
+   this->mpc_Ui->pc_ComboBoxInitialValueMode->addItem(C_GtGetText::h_GetText("Read Server Value"));
 
    //Tool tips
    this->mpc_Ui->pc_LabelTheme->SetToolTipInformation(
@@ -296,6 +324,18 @@ void C_SyvDaPeBase::InitStaticNames(void)
       this->mpc_Ui->pc_LabelOffset->SetToolTipInformation(C_GtGetText::h_GetText("Offset"),
                                                           c_PhysicalValueInfo);
    }
+
+   this->mpc_Ui->pc_LabelInitialValueMode->SetToolTipInformation(
+      C_GtGetText::h_GetText("Initial Value Mode"),
+      C_GtGetText::h_GetText("Options for handling of initial value on dashboard connect:\n\n"
+                             "Disabled: Use the value that was set before connecting.\n"
+                             "Set constant value: Set the value to a constant before connecting.\n"
+                             "Read server value: Read the current value from the server and set the widgets "
+                             "value to it before connecting.\n"));
+   this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->SetToolTipInformation(
+      C_GtGetText::h_GetText("Auto write value on dashboard connect"),
+      C_GtGetText::h_GetText(
+         "Option: Set value should be automatically sent once when connecting to the dashboard."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -319,16 +359,16 @@ void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
    \param[in]  oe_WriteMode   New write mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode) const
+void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWriteWidgetBase::E_WriteMode oe_WriteMode) const
 {
    if (this->mc_DataElement.GetIsValid() == true)
    {
       switch (oe_WriteMode)
       {
-      case C_PuiSvDbWidgetBase::eWM_MANUAL:
+      case C_PuiSvDbWriteWidgetBase::eWM_MANUAL:
          this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_MANUAL);
          break;
-      case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
+      case C_PuiSvDbWriteWidgetBase::eWM_ON_CHANGE:
          this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_ON_CHANGE);
          break;
       default:
@@ -488,19 +528,19 @@ C_PuiSvDbDataElementDisplayFormatter C_SyvDaPeBase::GetFormatterInformation(void
    Current write mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbWidgetBase::E_WriteMode C_SyvDaPeBase::GetWriteMode(void) const
+C_PuiSvDbWriteWidgetBase::E_WriteMode C_SyvDaPeBase::GetWriteMode(void) const
 {
-   C_PuiSvDbWidgetBase::E_WriteMode e_Retval;
+   C_PuiSvDbWriteWidgetBase::E_WriteMode e_Retval;
    switch (this->mpc_Ui->pc_ComboBoxTransmissionMode->currentIndex())
    {
    case C_SyvDaPeBase::mhs32_INDEX_MANUAL:
-      e_Retval = C_PuiSvDbWidgetBase::eWM_MANUAL;
+      e_Retval = C_PuiSvDbWriteWidgetBase::eWM_MANUAL;
       break;
    case C_SyvDaPeBase::mhs32_INDEX_ON_CHANGE:
-      e_Retval = C_PuiSvDbWidgetBase::eWM_ON_CHANGE;
+      e_Retval = C_PuiSvDbWriteWidgetBase::eWM_ON_CHANGE;
       break;
    default:
-      e_Retval = C_PuiSvDbWidgetBase::eWM_MANUAL;
+      e_Retval = C_PuiSvDbWriteWidgetBase::eWM_MANUAL;
       break;
    }
    return e_Retval;
@@ -606,6 +646,196 @@ QSize C_SyvDaPeBase::h_GetPopupSizeWithoutDesignAndPreview()
    const QSize c_SIZE(800, 723);
 
    return c_SIZE;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get slider popup size with dashboard connect
+ *
+ *   Provides the size for a slider popup widget with dashboard connect
+ *
+ *   \return
+ *    QSize
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QSize C_SyvDaPeBase::h_GetSliderPopupSizeWithDashboardConnect()
+{
+   const QSize c_SIZE(800, 1060);
+
+   return c_SIZE;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get spinbox popup size with dashboard connect
+ *
+ *   Provides the size for a spinbox popup widget with dashboard connect
+ *
+ *   \return
+ *    QSize
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QSize C_SyvDaPeBase::h_GetSpinBoxPopupSizeWithDashboardConnect()
+{
+   const QSize c_SIZE(800, 900);
+
+   return c_SIZE;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get toggle popup size with dashboard connect
+ *
+ *   Provides the size for a toggle popup widget with dashboard connect
+ *
+ *   \return
+ *    QSize
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QSize C_SyvDaPeBase::h_GetTogglePopupSizeWithDashboardConnect()
+{
+   const QSize c_SIZE(800, 850);
+
+   return c_SIZE;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard connect initial value mode and value
+
+   \param[in]  oe_DashboardConnectMode    New dashboard connect mode
+   \param[in]  orc_InitialValue           Initial value
+   \param[in]  oq_IsToggle                Flag to decide wether to show toggle or spinbox for initial value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::SetDashboardConnectInitialValue(
+   const C_PuiSvDbWriteWidgetBase::E_InitialValueModeType oe_DashboardConnectMode,
+   const C_OscNodeDataPoolContent & orc_InitialValue, const bool oq_IsToggle)
+{
+   if (this->mc_DataElement.GetIsValid() == true)
+   {
+      switch (oe_DashboardConnectMode)
+      {
+      case C_PuiSvDbWriteWidgetBase::eIVM_READ_SERVER_VALUE:
+         this->mpc_Ui->pc_ComboBoxInitialValueMode->setCurrentIndex(
+            C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_READSERVERVALUE);
+         break;
+      case C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE:
+         this->mpc_Ui->pc_ComboBoxInitialValueMode->setCurrentIndex(
+            C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_SETCONSTANTVALUE);
+         break;
+      case C_PuiSvDbWriteWidgetBase::eIVM_DISABLED:
+         this->mpc_Ui->pc_ComboBoxInitialValueMode->setCurrentIndex(
+            C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_DISABLED);
+         break;
+      default:
+         this->mpc_Ui->pc_ComboBoxInitialValueMode->setCurrentIndex(C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_DISABLED);
+         break;
+      }
+
+      this->m_SetDashboardConnectInitialValue(orc_InitialValue);
+   }
+   else
+   {
+      this->mpc_Ui->pc_ComboBoxInitialValueMode->setCurrentIndex(C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_DISABLED);
+      // no value initialization as the spinbox/toggle is invisible if "Disabled" is selected
+   }
+
+   // always set visibility of toggle and spinbox
+   this->mpc_Ui->pc_ToggleInitialValue->setVisible(oq_IsToggle);
+   this->mpc_Ui->pc_SpinBoxInitialValue->setVisible(!oq_IsToggle);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current dashboard connect mode
+
+   \return
+   Current dashboard connect mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDbWriteWidgetBase::E_InitialValueModeType C_SyvDaPeBase::GetDashboardConnectInitialValueMode(void) const
+{
+   C_PuiSvDbWriteWidgetBase::E_InitialValueModeType e_Retval;
+   switch (this->mpc_Ui->pc_ComboBoxInitialValueMode->currentIndex())
+   {
+   case C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_READSERVERVALUE:
+      e_Retval = C_PuiSvDbWriteWidgetBase::eIVM_READ_SERVER_VALUE;
+      break;
+   case C_SyvDaPeBase::mhs32_DASHBOARD_CONNECT_SETCONSTANTVALUE:
+      e_Retval = C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE;
+      break;
+   default:
+      e_Retval = C_PuiSvDbWriteWidgetBase::eIVM_DISABLED;
+      break;
+   }
+   return e_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get current dashboard connect initial value
+
+   \return
+   Current dashboard connect initial value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscNodeDataPoolContent C_SyvDaPeBase::GetDashboardConnectInitialValue(void) const
+{
+   C_OscNodeDataPoolContent c_Retval;
+
+   const C_OscNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                 this->mc_DataElement.u32_DataPoolIndex,
+                                                                 this->mc_DataElement.u32_ListIndex,
+                                                                 this->mc_DataElement.u32_ElementIndex);
+
+   if (pc_Element != NULL)
+   {
+      const C_PuiSvDbDataElementScaling c_Scaling = this->GetScalingInformation();
+
+      // set correct data type
+      c_Retval.SetType(pc_Element->GetType());
+      c_Retval.SetArray(false); // no array support in write widgets
+
+      // differ between spinbox (for spinbox and slider widget) and toggle (for toggle widget)
+      if (this->mpc_Ui->pc_ToggleInitialValue->isVisibleTo(this->mpc_Ui->pc_WidgetConstValue) == true)
+      {
+         float64_t f64_Value = static_cast<float64_t>(this->mpc_Ui->pc_ToggleInitialValue->isChecked());
+
+         if (C_OscUtils::h_IsScalingActive(c_Scaling.f64_Factor, c_Scaling.f64_Offset) == true)
+         {
+            // Scaling necessary to prevent a rounding error to get 0 instead of 1
+            f64_Value = C_OscUtils::h_GetValueScaled(f64_Value, c_Scaling.f64_Factor, c_Scaling.f64_Offset);
+         }
+         C_SdNdeDpContentUtil::h_SetScaledValueInContent(f64_Value, c_Retval,
+                                                         c_Scaling.f64_Factor, c_Scaling.f64_Offset);
+      }
+      else
+      {
+         C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(
+            this->mpc_Ui->pc_SpinBoxInitialValue->GetValue(), c_Retval,
+            c_Scaling.f64_Factor, c_Scaling.f64_Offset, 0UL);
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set auto write on connect state
+
+   \param[in]  oq_Value    New state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::SetAutoWriteOnConnect(const bool oq_Value)
+{
+   this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setChecked(oq_Value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get auto write on connect state
+
+   \return
+   Get auto write on connect state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaPeBase::GetAutoWriteOnConnect() const
+{
+   return this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->isChecked();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1147,6 +1377,79 @@ void C_SyvDaPeBase::m_CheckFormatterString(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set dashboard connect initial value
+
+   \param[in]  orc_InitialValue  Initial value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_SetDashboardConnectInitialValue(const C_OscNodeDataPoolContent & orc_InitialValue) const
+{
+   const C_PuiSvDbDataElementScaling c_Scaling = this->GetScalingInformation();
+   float64_t f64_UnscaledValue;
+
+   this->mpc_Ui->pc_SpinBoxInitialValue->SetValue(
+      C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(orc_InitialValue, c_Scaling.f64_Factor,
+                                                            c_Scaling.f64_Offset,
+                                                            0UL /*no array support in write widgets*/));
+
+   C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_InitialValue, f64_UnscaledValue, 0UL);
+   this->mpc_Ui->pc_ToggleInitialValue->setChecked(static_cast<bool>(f64_UnscaledValue));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for actions when changing initial value mode
+
+   \param[in]  os32_Index  Combobox index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_OnInitialValueModeChange(const int32_t os32_Index) const
+{
+   // spinbox visibility
+   if (os32_Index == mhs32_DASHBOARD_CONNECT_SETCONSTANTVALUE)
+   {
+      this->mpc_Ui->pc_WidgetConstValue->setVisible(true);
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetConstValue->setVisible(false);
+   }
+
+   // checkbox enabeling
+   if (os32_Index == mhs32_DASHBOARD_CONNECT_READSERVERVALUE)
+   {
+      this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setChecked(false);
+      this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setEnabled(false);
+   }
+   else
+   {
+      // keep check state as it is, only enable checkbox again
+      this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setEnabled(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update spinbox min, max, factor and offset. Necessary e.g. on scaling change.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_UpdateSpinboxMetaData(void) const
+{
+   const C_OscNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                 this->mc_DataElement.u32_DataPoolIndex,
+                                                                 this->mc_DataElement.u32_ListIndex,
+                                                                 this->mc_DataElement.u32_ElementIndex);
+
+   if (pc_Element != NULL)
+   {
+      const C_OscNodeDataPoolContent c_CurValue = GetDashboardConnectInitialValue();
+      const C_PuiSvDbDataElementScaling c_Scaling = this->GetScalingInformation();
+      this->mpc_Ui->pc_SpinBoxInitialValue->Init(pc_Element->c_MinValue, pc_Element->c_MaxValue,
+                                                 c_Scaling.f64_Factor, c_Scaling.f64_Offset);
+      this->m_SetDashboardConnectInitialValue(c_CurValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize no data element state
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1167,7 +1470,7 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
    this->mpc_Ui->pc_LineEditFormatterString->setText("");
    this->m_OnFormatterActiveChange();
 
-   //Write mode
+   //Update mode
    if (this->mq_ReadElement == false)
    {
       this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_MANUAL);
@@ -1177,6 +1480,13 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
    {
       this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setEnabled(false);
    }
+
+   //Dashboard connect handling
+   this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setEnabled(false);
+   this->mpc_Ui->pc_ComboBoxInitialValueMode->setEnabled(false);
+   this->mpc_Ui->pc_ComboBoxInitialValueMode->setCurrentIndex(mhs32_DASHBOARD_CONNECT_DISABLED);
+   m_OnInitialValueModeChange(mhs32_DASHBOARD_CONNECT_DISABLED);
+   m_UpdateSpinboxMetaData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1189,7 +1499,8 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                                       const C_PuiSvDbDataElementScaling & orc_Scaling,
-                                      const C_PuiSvDbDataElementDisplayFormatter & orc_FormatterConfig) const
+                                      const C_PuiSvDbDataElementDisplayFormatter & orc_FormatterConfig)
+const
 {
    if (orc_Id.GetIsValid() == true)
    {
@@ -1233,6 +1544,12 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
          this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setEnabled(true);
       }
       this->mpc_Ui->pc_CheckBoxFormatterActive->setEnabled(true);
+
+      //Dashboard connect handling
+      this->mpc_Ui->pc_ComboBoxInitialValueMode->setEnabled(true);
+      this->mpc_Ui->pc_CheckBoxDashboardConnectWrite->setEnabled(true);
+      m_OnInitialValueModeChange(this->mpc_Ui->pc_ComboBoxInitialValueMode->currentIndex());
+      m_UpdateSpinboxMetaData();
    }
    else
    {

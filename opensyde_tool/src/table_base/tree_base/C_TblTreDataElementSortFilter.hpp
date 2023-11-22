@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEDATAELEMENTTREESORTFILTER_H
-#define C_SYVDAPEDATAELEMENTTREESORTFILTER_H
+#ifndef C_SYVDAPEDATAELEMENTTREESORTFILTER_HPP
+#define C_SYVDAPEDATAELEMENTTREESORTFILTER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSortFilterProxyModel>

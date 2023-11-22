@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPARAMSETRAWENTRY_H
-#define C_OSCPARAMSETRAWENTRY_H
+#ifndef C_OSCPARAMSETRAWENTRY_HPP
+#define C_OSCPARAMSETRAWENTRY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

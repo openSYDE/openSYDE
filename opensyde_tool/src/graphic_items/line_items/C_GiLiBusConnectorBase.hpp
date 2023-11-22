@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIBUSCONNECTORBASE_H
-#define C_GILIBUSCONNECTORBASE_H
+#ifndef C_GILIBUSCONNECTORBASE_HPP
+#define C_GILIBUSCONNECTORBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiLiLineGroup.hpp"

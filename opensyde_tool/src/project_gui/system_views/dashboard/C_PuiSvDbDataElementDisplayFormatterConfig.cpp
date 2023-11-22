@@ -82,6 +82,7 @@ void C_PuiSvDbDataElementDisplayFormatterConfig::SetType(
    \param[in]     ou32_Index                      Array index in content (0 in case of no array)
    \param[in]     orc_Scaling                     Scaling configuration (Factor 1.0 and Offset 0.0 for deactivation)
    \param[out]    opf64_UnscaledValueAsFloat      Optional float with unscaled value
+   \param[out]    opf64_ScaledValueAsFloat        Optional float with scaled value
 
    \return
    Formatted and scaled string
@@ -89,17 +90,28 @@ void C_PuiSvDbDataElementDisplayFormatterConfig::SetType(
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvDbDataElementDisplayFormatterConfig::GetSingleValueContentFormatted(
    const C_PuiSvDbDataElementContent & orc_Value, const uint32_t ou32_Index,
-   const C_PuiSvDbDataElementScaling & orc_Scaling, float64_t * const opf64_UnscaledValueAsFloat) const
+   const C_PuiSvDbDataElementScaling & orc_Scaling, float64_t * const opf64_UnscaledValueAsFloat,
+   float64_t * const opf64_ScaledValueAsFloat) const
 {
    QString c_Return;
-   float64_t f64_Temp;
+   float64_t f64_Temp = 0.0;
 
-   if ((opf64_UnscaledValueAsFloat != NULL) &&
+   if (((opf64_UnscaledValueAsFloat != NULL) || (opf64_ScaledValueAsFloat != NULL)) &&
        (this->e_TypeCategory != C_PuiSvDbDataElementDisplayFormatter::eSTRING))
    {
       // When needed, get the unscaled float value. this is independent
       C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Value, f64_Temp, ou32_Index);
-      *opf64_UnscaledValueAsFloat = f64_Temp;
+
+      if (opf64_UnscaledValueAsFloat != NULL)
+      {
+         *opf64_UnscaledValueAsFloat = f64_Temp;
+      }
+
+      if (opf64_ScaledValueAsFloat != NULL)
+      {
+         *opf64_ScaledValueAsFloat = C_OscUtils::h_GetValueScaled(f64_Temp, orc_Scaling.f64_Factor,
+                                                                  orc_Scaling.f64_Offset);
+      }
    }
 
    if (this->q_IsActive == false)
@@ -134,14 +146,22 @@ QString C_PuiSvDbDataElementDisplayFormatterConfig::GetSingleValueContentFormatt
          }
          break;
       case C_PuiSvDbDataElementDisplayFormatter::eFLOAT:
-         if (opf64_UnscaledValueAsFloat == NULL)
+         if ((opf64_UnscaledValueAsFloat == NULL) && (opf64_ScaledValueAsFloat == NULL))
          {
             // Value was not read as float already
             C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Value, f64_Temp, ou32_Index);
          }
 
          // Scale the value
-         f64_Temp = C_OscUtils::h_GetValueScaled(f64_Temp, orc_Scaling.f64_Factor, orc_Scaling.f64_Offset);
+         if (opf64_ScaledValueAsFloat == NULL)
+         {
+            f64_Temp = C_OscUtils::h_GetValueScaled(f64_Temp, orc_Scaling.f64_Factor, orc_Scaling.f64_Offset);
+         }
+         else
+         {
+            // Was already scaled
+            f64_Temp = *opf64_ScaledValueAsFloat;
+         }
 
          // Let do the formatter its work
          c_Return = this->GetValueFormatted(f64_Temp);

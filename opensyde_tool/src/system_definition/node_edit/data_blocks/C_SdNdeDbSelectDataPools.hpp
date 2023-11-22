@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDBSELECTDATAPOOLS_H
-#define C_SDNDEDBSELECTDATAPOOLS_H
+#ifndef C_SDNDEDBSELECTDATAPOOLS_HPP
+#define C_SDNDEDBSELECTDATAPOOLS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

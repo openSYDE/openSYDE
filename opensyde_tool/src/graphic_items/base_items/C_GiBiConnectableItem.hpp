@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIBICONNECTABLEITEM_H
-#define C_GIBICONNECTABLEITEM_H
+#ifndef C_GIBICONNECTABLEITEM_HPP
+#define C_GIBICONNECTABLEITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

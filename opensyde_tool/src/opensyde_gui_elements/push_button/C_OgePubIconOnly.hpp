@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_OGEPUBICONONLY_H
-#define C_OGEPUBICONONLY_H
+#ifndef C_OGEPUBICONONLY_HPP
+#define C_OGEPUBICONONLY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

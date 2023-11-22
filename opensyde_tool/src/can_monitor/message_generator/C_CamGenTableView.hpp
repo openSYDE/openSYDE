@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENTABLEVIEW_H
-#define C_CAMGENTABLEVIEW_H
+#ifndef C_CAMGENTABLEVIEW_HPP
+#define C_CAMGENTABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSortFilterProxyModel>
@@ -58,6 +58,7 @@ public:
    void UpdateMessageData(const uint32_t ou32_MessageIndex);
    void TriggerModelUpdateCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active);
    bool CheckAndHandleKey(const QString & orc_Input);
+   void TriggerMessageReload(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -69,6 +70,7 @@ Q_SIGNALS:
    void SigRegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active);
    void SigSendMessage(const uint32_t ou32_MessageIndex, const uint32_t ou32_TimeToSend);
    void SigSelected(const uint32_t ou32_NumSelectedItems, const uint32_t ou32_Row);
+   void SigAutoProtocolSupport(const uint32_t ou32_MessageIndex, const bool oq_Active);
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_Event) override;

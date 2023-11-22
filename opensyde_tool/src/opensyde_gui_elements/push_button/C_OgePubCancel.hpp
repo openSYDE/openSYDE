@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUSHBUTTONCANCEL_H
-#define C_OGEPUSHBUTTONCANCEL_H
+#ifndef C_OGEPUSHBUTTONCANCEL_HPP
+#define C_OGEPUSHBUTTONCANCEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

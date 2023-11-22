@@ -74,7 +74,8 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    mu32_CoManagerNodeIndexOfCoDevice(0U),
    mu8_CoManagerNodeIndexIntfNumber(0U),
    mq_IndexValid(false),
-   mc_UndoManager(NULL)
+   mc_UndoManager(NULL),
+   mq_SkipLoadUserSettings(false)
 {
    mpc_Ui->setupUi(this);
 
@@ -540,11 +541,11 @@ void C_SdBueComIfDescriptionWidget::PartialReload(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SelectMessageSearch(const uint32_t ou32_NodeIndex,
                                                         const uint32_t ou32_DataPoolIndex,
-                                                        const uint32_t ou32_ListIndex,
-                                                        const uint32_t ou32_MessageIndex) const
+                                                        const uint32_t ou32_ListIndex, const uint32_t ou32_MessageIndex)
 {
    C_OscCanMessageIdentificationIndices c_MessageId;
 
+   mq_SkipLoadUserSettings = true;
    // fills all information except the message index
    m_PrepareMessageId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, c_MessageId);
 
@@ -553,12 +554,12 @@ void C_SdBueComIfDescriptionWidget::SelectMessageSearch(const uint32_t ou32_Node
       // In case of node mode the interface must be adapted
       this->mpc_Ui->pc_CbInterface->setCurrentIndex(c_MessageId.u32_InterfaceIndex);
    }
-
    //Update protocol (might change)
    this->SetProtocol(c_MessageId.e_ComProtocol);
 
    c_MessageId.u32_MessageIndex = ou32_MessageIndex;
    this->m_SelectMessage(c_MessageId);
+   mq_SkipLoadUserSettings = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -600,7 +601,6 @@ void C_SdBueComIfDescriptionWidget::SelectSignalSearch(const uint32_t ou32_NodeI
                   // In case of node mode the interface must be adapted
                   this->mpc_Ui->pc_CbInterface->setCurrentIndex(c_MessageId.u32_InterfaceIndex);
                }
-
                //Update protocol (might change)
                this->SetProtocol(c_MessageId.e_ComProtocol);
 
@@ -1296,15 +1296,20 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
       if (pc_Bus != NULL)
       {
          const C_UsCommunication c_UserSettingsBus = C_UsHandler::h_GetInstance()->GetProjSdBus(pc_Bus->c_Name.c_str());
-         c_UserSettingsBus.GetLastSelectedMessage(e_SelectedProtocol, q_MessageSelected, c_SelectedMessageName,
-                                                  q_SignalSelected, c_SelectedSignalName);
-         //Reinit necessary (in some cases)
-         this->mc_MessageSyncManager.Init(this->mu32_BusIndex, e_SelectedProtocol);
+         if (!mq_SkipLoadUserSettings)
+         {
+            c_UserSettingsBus.GetLastSelectedMessage(e_SelectedProtocol, q_MessageSelected, c_SelectedMessageName,
+                                                     q_SignalSelected, c_SelectedSignalName);
+            //Reinit necessary (in some cases)
+            this->mc_MessageSyncManager.Init(this->mu32_BusIndex, e_SelectedProtocol);
+         }
          this->mpc_Ui->pc_MsgSigTableWidget->LoadUserSettings(c_UserSettingsBus.GetMessageOverviewColumnWidth(),
                                                               c_UserSettingsBus.GetSignalOverviewColumnWidth());
       }
-
-      this->SetProtocol(e_SelectedProtocol);
+      if (!mq_SkipLoadUserSettings)
+      {
+         this->SetProtocol(e_SelectedProtocol);
+      }
    }
    else
    {
@@ -1318,10 +1323,12 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
          const C_UsNode c_UserSettingsNode = C_UsHandler::h_GetInstance()->GetProjSdNode(
             pc_Node->c_Properties.c_Name.c_str());
          uint32_t u32_SelectedInterface = c_UserSettingsNode.GetSelectedInterface();
-
-         // Protocol
-         e_SelectedProtocol = c_UserSettingsNode.GetSelectedProtocol();
-         this->SetProtocol(e_SelectedProtocol);
+         if (!mq_SkipLoadUserSettings)
+         {
+            // Protocol
+            e_SelectedProtocol = c_UserSettingsNode.GetSelectedProtocol();
+            this->SetProtocol(e_SelectedProtocol);
+         }
 
          // Interface
          if (u32_SelectedInterface >= static_cast<uint32_t>(this->mpc_Ui->pc_CbInterface->count()))
@@ -1346,10 +1353,12 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
                const C_UsNodeDatapool c_UserSettingsDataPool = c_UserSettingsNode.GetDatapool(
                   pc_DataPool->c_Name.c_str());
                const C_UsCommunication c_UserSettingsList = c_UserSettingsDataPool.GetCommList(pc_List->c_Name.c_str());
-
+               if (!mq_SkipLoadUserSettings)
+               {
+                  c_UserSettingsList.GetLastSelectedMessage(e_Tmp, q_MessageSelected, c_SelectedMessageName,
+                                                            q_SignalSelected, c_SelectedSignalName);
+               }
                //Get
-               c_UserSettingsList.GetLastSelectedMessage(e_Tmp, q_MessageSelected, c_SelectedMessageName,
-                                                         q_SignalSelected, c_SelectedSignalName);
                this->mpc_Ui->pc_MsgSigTableWidget->LoadUserSettings(c_UserSettingsList.GetMessageOverviewColumnWidth(),
                                                                     c_UserSettingsList.GetSignalOverviewColumnWidth());
             }
@@ -1357,15 +1366,20 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
       }
       else
       {
-         this->SetProtocol(e_SelectedProtocol);
+         if (!mq_SkipLoadUserSettings)
+         {
+            this->SetProtocol(e_SelectedProtocol);
+         }
       }
    }
-
    //Set
-   this->mpc_Ui->pc_NodeSelectorWidget->SetProtocol(e_SelectedProtocol);
-   this->mpc_Ui->pc_MessageSelectorWidget->SetProtocolType(e_SelectedProtocol);
-   this->mpc_Ui->pc_MessageSelectorWidget->UpdateButtonText();
-   this->mpc_Ui->pc_MsgSigEditWidget->SetComProtocol(e_SelectedProtocol);
+   if (!mq_SkipLoadUserSettings)
+   {
+      this->mpc_Ui->pc_NodeSelectorWidget->SetProtocol(e_SelectedProtocol);
+      this->mpc_Ui->pc_MessageSelectorWidget->SetProtocolType(e_SelectedProtocol);
+      this->mpc_Ui->pc_MessageSelectorWidget->UpdateButtonText();
+      this->mpc_Ui->pc_MsgSigEditWidget->SetComProtocol(e_SelectedProtocol);
+   }
    if ((q_MessageSelected == true) || (q_SignalSelected == true))
    {
       C_OscCanMessageIdentificationIndices c_MessageId;
@@ -1440,7 +1454,6 @@ int32_t C_SdBueComIfDescriptionWidget::mh_GetIndexOfProtocol(const C_OscCanProto
       tgl_assert(false);
       break;
    }
-
    return s32_Index;
 }
 

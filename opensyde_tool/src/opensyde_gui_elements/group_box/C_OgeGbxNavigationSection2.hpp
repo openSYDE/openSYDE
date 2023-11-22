@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXNAVIGATIONSECTION2_H
-#define C_OGEGBXNAVIGATIONSECTION2_H
+#ifndef C_OGEGBXNAVIGATIONSECTION2_HPP
+#define C_OGEGBXNAVIGATIONSECTION2_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

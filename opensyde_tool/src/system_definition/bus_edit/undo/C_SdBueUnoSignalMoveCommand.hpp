@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEUNOSIGNALMOVECOMMAND_H
-#define C_SDBUEUNOSIGNALMOVECOMMAND_H
+#ifndef C_SDBUEUNOSIGNALMOVECOMMAND_HPP
+#define C_SDBUEUNOSIGNALMOVECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdBueUnoSignalAddDeleteBaseCommand.hpp"

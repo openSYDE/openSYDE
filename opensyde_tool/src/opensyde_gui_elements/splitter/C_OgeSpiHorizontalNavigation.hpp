@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPIHORIZONTALNAVIGATION_H
-#define C_OGESPIHORIZONTALNAVIGATION_H
+#ifndef C_OGESPIHORIZONTALNAVIGATION_HPP
+#define C_OGESPIHORIZONTALNAVIGATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeSpiBase.hpp"

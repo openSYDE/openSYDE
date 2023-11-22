@@ -22,7 +22,7 @@
 #include "C_PuiSvHandler.hpp"
 #include "C_UsHandler.hpp"
 #include "C_GtGetText.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_OscParamSetHandler.hpp"
 
@@ -94,6 +94,8 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
            this, &C_SyvUpInformationWidget::m_HideBigUpdateSummary);
    connect(this->mpc_Ui->pc_WidgetUpdateSummarySmall, &C_SyvUpSummaryWidgetSmall::SigHideSmallSummaryWidget,
            this, &C_SyvUpInformationWidget::m_HideSmallUpdateSummary);
+   connect(this, &C_SyvUpInformationWidget::SigInvalidView, this->mpc_Ui->pc_WidgetUpdatePackage,
+           &C_SyvUpPacWidget::DisableUpdatePackage);
 } //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -377,7 +379,7 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
                if ((u32_NodeIndex < orc_IsFileBased.size()) && (orc_IsFileBased[u32_NodeIndex] == false))
                {
                   //Do the address based byte count stuff
-                  C_OsyHexFile c_HexFile;
+                  C_OscHexFile c_HexFile;
                   const uint32_t u32_Result = c_HexFile.LoadFromFile(rc_File.c_str());
                   if (u32_Result == stw::hex_file::NO_ERR)
                   {

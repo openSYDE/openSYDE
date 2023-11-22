@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSYSTEMBUSFILERH
-#define C_OSCSYSTEMBUSFILERH
+#ifndef C_OSCSYSTEMBUSFILER_HPP
+#define C_OSCSYSTEMBUSFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

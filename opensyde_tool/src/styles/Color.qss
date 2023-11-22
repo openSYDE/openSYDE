@@ -19,7 +19,6 @@ stw--opensyde_gui--C_SyvDaItPaTreeView,
 stw--opensyde_gui--C_SyvDaItPaWidgetNew,
 stw--opensyde_gui_elements--C_OgeTebLabel,
 stw--opensyde_gui--C_SdBueCoAddSignalsView,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView,
 stw--opensyde_gui_elements--C_OgeGbxNavigationSectionSelected,
 stw--opensyde_gui_elements--C_OgePubNavigation[Active="false"],
 stw--opensyde_gui_elements--C_OgeGbxNavigationTab,
@@ -195,7 +194,8 @@ stw--opensyde_gui--C_SdBueCoAddSignalsDialog,
 stw--opensyde_gui--C_SdNdeCoDeviceUpdateEdsDialog,
 stw--opensyde_gui--C_SdBueJ1939PgPropertiesDialog,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogDialog,
-stw--opensyde_gui--C_SdNdeDpImportRamViewReport
+stw--opensyde_gui--C_SdNdeDpImportRamViewReport,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView
 {
 background-color: transparent;
 }
@@ -456,7 +456,8 @@ stw--opensyde_gui--C_SdNdeHalcConfigImportView,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView::item,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item,
-stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="1"]
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="1"],
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView
 {
 color: rgb(19, 19, 45);
 }
@@ -684,9 +685,9 @@ stw--opensyde_gui--C_SdNdeHalcChannelTreeView::item:selected,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw--opensyde_gui_elements--C_OgeRabProperties[CheckedColor="4"]:checked,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView::section,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView::item::selected,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView::item
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item::selected,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item
 {
 color: rgb(57, 57, 109);
 }
@@ -982,8 +983,8 @@ stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView::section
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section
 {
 border-color: rgb(155, 155, 170);
 }
@@ -1085,8 +1086,7 @@ stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground:checked[CheckedBac
 stw--opensyde_gui_elements--C_OgePubHalcPanel:enabled:hover:pressed,
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement:hover:pressed[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"],
-stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView::item::selected
+stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"]
 {
      background-color: rgb(206, 206, 217);
 }
@@ -1311,8 +1311,11 @@ stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:disabled,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:!checked,
 stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Hovered="11"]:hover,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView::section,
-stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Background="11"]
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Background="11"],
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:disabled,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:enabled:!checked
 {
 background-color: rgb(237, 237, 242);
 }
@@ -1535,7 +1538,9 @@ stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:enabled:indeterminate,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:checked,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:indeterminate,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:checked,
-stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:indeterminate
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:indeterminate,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:checked,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:indeterminate
 {
 background-color: rgb(203, 235, 193);
 }

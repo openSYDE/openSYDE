@@ -1781,22 +1781,20 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeInd
    \param[in]  oq_IsString          Flag if new type is string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_NodeIndex,
-                                                            const uint32_t ou32_DataPoolIndex,
-                                                            const uint32_t ou32_ListIndex,
-                                                            const uint32_t ou32_ElementIndex,
-                                                            const C_OscNodeDataPoolContent::E_Type oe_Type,
-                                                            const bool oq_IsArray, const uint32_t ou32_ArraySize,
-                                                            const bool oq_IsString)
+void C_PuiSvData::OnSyncElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                  const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                  const C_OscNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray,
+                                                  const uint32_t ou32_ArraySize, const bool oq_IsString)
 {
    bool q_Changed = false;
 
    for (uint32_t u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
    {
       C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[u32_ItDashboard];
-      if (rc_Dashboard.OnSyncNodeDataPoolListElementArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                                                                 ou32_ElementIndex, oe_Type, oq_IsArray,
-                                                                 ou32_ArraySize, oq_IsString) == true)
+      if (rc_Dashboard.OnSyncElementTypeOrArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex,
+                                                       ou32_ListIndex,
+                                                       ou32_ElementIndex, oe_Type, oq_IsArray,
+                                                       ou32_ArraySize, oq_IsString) == true)
       {
          q_Changed = true;
       }
@@ -1834,6 +1832,30 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_
             this->mc_ReadRailAssignments.insert(c_TmpId, c_NewConfig);
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  orc_MinElement       New min element
+   \param[in]  orc_MaxElement       New max element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::OnSyncElementRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                            const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                            const C_OscNodeDataPoolContent & orc_MinElement,
+                                            const C_OscNodeDataPoolContent & orc_MaxElement)
+{
+   for (uint32_t u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
+   {
+      C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[u32_ItDashboard];
+      rc_Dashboard.OnSyncElementRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                             ou32_ElementIndex, orc_MinElement, orc_MaxElement);
    }
 }
 
@@ -2832,6 +2854,18 @@ void C_PuiSvData::HandleCompatibilityChart(void)
    for (const C_PuiSvDashboard & rc_Dashboard : c_NewDashboards)
    {
       this->mc_Dashboards.push_back(rc_Dashboard);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fix dashboard write content type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::FixDashboardWriteContentType()
+{
+   for (C_PuiSvDashboard & rc_Dashboard : this->mc_Dashboards)
+   {
+      rc_Dashboard.FixDashboardWriteContentType();
    }
 }
 

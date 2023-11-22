@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDMANUNOTOPOLOGYMANAGER_H
-#define C_SDMANUNOTOPOLOGYMANAGER_H
+#ifndef C_SDMANUNOTOPOLOGYMANAGER_HPP
+#define C_SDMANUNOTOPOLOGYMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

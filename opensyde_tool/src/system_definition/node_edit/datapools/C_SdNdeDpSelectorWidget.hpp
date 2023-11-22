@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPSELECTORWIDGET_H
-#define C_SDNDEDPSELECTORWIDGET_H
+#ifndef C_SDNDEDPSELECTORWIDGET_HPP
+#define C_SDNDEDPSELECTORWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -112,4 +112,4 @@ private:
 }
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
-#endif // C_SDNDEDPSELECTORWIDGET_H
+#endif // C_SDNDEDPSELECTORWIDGET_HPP

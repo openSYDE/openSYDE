@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGECBXWHITE_H
-#define C_CAMOGECBXWHITE_H
+#ifndef C_CAMOGECBXWHITE_HPP
+#define C_CAMOGECBXWHITE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeCbxToolTipBase.hpp"

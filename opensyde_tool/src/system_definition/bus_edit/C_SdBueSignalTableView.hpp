@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUESIGNALTABLEVIEW_H
-#define C_SDBUESIGNALTABLEVIEW_H
+#ifndef C_SDBUESIGNALTABLEVIEW_HPP
+#define C_SDBUESIGNALTABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSortFilterProxyModel>

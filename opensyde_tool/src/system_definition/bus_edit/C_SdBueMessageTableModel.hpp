@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGETABLEMODEL_H
-#define C_SDBUEMESSAGETABLEMODEL_H
+#ifndef C_SDBUEMESSAGETABLEMODEL_HPP
+#define C_SDBUEMESSAGETABLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractTableModel>

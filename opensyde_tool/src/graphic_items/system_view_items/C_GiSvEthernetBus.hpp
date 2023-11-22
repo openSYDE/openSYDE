@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVETHERNETBUS_H
-#define C_GISVETHERNETBUS_H
+#ifndef C_GISVETHERNETBUS_HPP
+#define C_GISVETHERNETBUS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiLiEthernetBus.hpp"

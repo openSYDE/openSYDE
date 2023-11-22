@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCDEVICEMANAGERH
-#define C_OSCDEVICEMANAGERH
+#ifndef C_OSCDEVICEMANAGER_HPP
+#define C_OSCDEVICEMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

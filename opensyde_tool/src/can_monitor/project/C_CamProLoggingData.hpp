@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMPROLOGGINGDATA_H
-#define C_CAMPROLOGGINGDATA_H
+#ifndef C_CAMPROLOGGINGDATA_HPP
+#define C_CAMPROLOGGINGDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

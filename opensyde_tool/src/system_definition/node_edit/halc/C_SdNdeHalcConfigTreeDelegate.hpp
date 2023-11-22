@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCCONFIGTREEDELEGATE_H
-#define C_SDNDEHALCCONFIGTREEDELEGATE_H
+#ifndef C_SDNDEHALCCONFIGTREEDELEGATE_HPP
+#define C_SDNDEHALCCONFIGTREEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblDelegate.hpp"

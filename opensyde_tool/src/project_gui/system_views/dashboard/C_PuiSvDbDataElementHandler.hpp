@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBDATAELEMENTHANDLER_H
-#define C_PUISVDBDATAELEMENTHANDLER_H
+#ifndef C_PUISVDBDATAELEMENTHANDLER_HPP
+#define C_PUISVDBDATAELEMENTHANDLER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVector>
@@ -66,6 +66,7 @@ public:
                                              C_PuiSvDbDataElementDisplayFormatterConfig & orc_FormatterConfig)
    const;
    bool IsDataElementRegistered(const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId) const;
+   bool IsReadItem() const;
 
    void InsertNewValueIntoQueue(const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId,
                                 const C_PuiSvDbDataElementContent & orc_NewValue);
@@ -81,7 +82,8 @@ protected:
    virtual void m_OnDataElementRegistered(const uint32_t ou32_WidgetDataPoolElementIndex);
 
    virtual int32_t m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex, QString & orc_ScaledValue,
-                                  float64_t * const opf64_UnscaledValueAsFloat);
+                                  float64_t * const opf64_UnscaledValueAsFloat,
+                                  float64_t * const opf64_ScaledValueAsFloat);
    virtual int32_t m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex,
                                   std::vector<QString> & orc_ScaledValues, std::vector<float64_t> & orc_UnscaledValues);
 
@@ -129,7 +131,8 @@ private:
       }
 
       QString GetSingleValueContentFormatted(const C_PuiSvDbDataElementContent & orc_Value, const uint32_t ou32_Index,
-                                             float64_t * const opf64_UnscaledValueAsFloat) const;
+                                             float64_t * const opf64_UnscaledValueAsFloat,
+                                             float64_t * const opf64_ScaledValueAsFloat = NULL) const;
       std::vector<QString> GetValuesContentFormatted(const C_PuiSvDbDataElementContent & orc_Value,
                                                      std::vector<float64_t> & orc_UnscaledValueAsFloat) const;
 

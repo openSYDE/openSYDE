@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBMESSAGEOK_H
-#define C_OGEPUBMESSAGEOK_H
+#ifndef C_OGEPUBMESSAGEOK_HPP
+#define C_OGEPUBMESSAGEOK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPushButton>

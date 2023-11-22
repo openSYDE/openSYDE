@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCCHANNELTREEMODEL_H
-#define C_SDNDEHALCCHANNELTREEMODEL_H
+#ifndef C_SDNDEHALCCHANNELTREEMODEL_HPP
+#define C_SDNDEHALCCHANNELTREEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreModel.hpp"

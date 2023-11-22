@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDACHAPLOTHANDLERWIDGET_H
-#define C_SYVDACHAPLOTHANDLERWIDGET_H
+#ifndef C_SYVDACHAPLOTHANDLERWIDGET_HPP
+#define C_SYVDACHAPLOTHANDLERWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

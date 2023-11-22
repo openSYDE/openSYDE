@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPSELECTORITEMUSAGEWIDGET_H
-#define C_SDNDEDPSELECTORITEMUSAGEWIDGET_H
+#ifndef C_SDNDEDPSELECTORITEMUSAGEWIDGET_HPP
+#define C_SDNDEDPSELECTORITEMUSAGEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

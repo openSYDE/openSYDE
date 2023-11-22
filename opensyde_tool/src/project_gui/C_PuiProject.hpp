@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIPROJECT_H
-#define C_PUIPROJECT_H
+#ifndef C_PUIPROJECT_HPP
+#define C_PUIPROJECT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

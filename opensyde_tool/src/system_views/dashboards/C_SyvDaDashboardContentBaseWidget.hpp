@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDCONTENTBASEWIDGET_H
-#define C_SYVDADASHBOARDCONTENTBASEWIDGET_H
+#ifndef C_SYVDADASHBOARDCONTENTBASEWIDGET_HPP
+#define C_SYVDADASHBOARDCONTENTBASEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -59,7 +59,8 @@ Q_SIGNALS:
    void SigTriggerUpdateTransmissionConfiguration(void);
    void SigDataPoolWrite(const uint32_t ou32_NodeIndex, const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                          const uint16_t ou16_ElementIndex);
-   void SigDataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index);
+   void SigDataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index,
+                        stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
    void SigNvmReadList(const stw::opensyde_core::C_OscNodeDataPoolListId & orc_Id);
 
 private:

@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVLASTKNOWNHALELEMENTID_H
-#define C_PUISVLASTKNOWNHALELEMENTID_H
+#ifndef C_PUISVLASTKNOWNHALELEMENTID_HPP
+#define C_PUISVLASTKNOWNHALELEMENTID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

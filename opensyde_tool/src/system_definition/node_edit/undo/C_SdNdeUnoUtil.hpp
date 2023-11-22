@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEUNOUTIL_H
-#define C_SDNDEUNOUTIL_H
+#ifndef C_SDNDEUNOUTIL_HPP
+#define C_SDNDEUNOUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

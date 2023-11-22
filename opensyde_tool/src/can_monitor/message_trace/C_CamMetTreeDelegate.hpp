@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREEDELEGATE_H
-#define C_CAMMETTREEDELEGATE_H
+#ifndef C_CAMMETTREEDELEGATE_HPP
+#define C_CAMMETTREEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>

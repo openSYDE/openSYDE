@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBTOGGLE_H
-#define C_OGEPUBTOGGLE_H
+#ifndef C_OGEPUBTOGGLE_HPP
+#define C_OGEPUBTOGGLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPushButton>

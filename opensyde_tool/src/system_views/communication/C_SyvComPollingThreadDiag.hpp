@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVCOMPOLLINGTHREADH
-#define C_SYVCOMPOLLINGTHREADH
+#ifndef C_SYVCOMPOLLINGTHREA_HPP
+#define C_SYVCOMPOLLINGTHREA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QThread>
@@ -48,6 +48,9 @@ private:
    };
 
    void m_SetRunParams(const E_Service oe_Service, stw::opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer,
+                       const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
+                       stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
+   void m_SetRunParams(const E_Service oe_Service, stw::opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer,
                        const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                        const uint16_t ou16_ElementIndex);
    void m_SetRunParams(const E_Service oe_Service, stw::opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer,
@@ -63,6 +66,7 @@ private:
    uint8_t mu8_DataPoolIndex;
    uint16_t mu16_ListIndex;
    uint16_t mu16_ElementIndex;
+   stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * mpc_DashboardWidget;
    const stw::opensyde_core::C_OscNode * mpc_ParamNodeValues;
    std::vector<stw::opensyde_core::C_OscNodeDataPoolListId>  mc_ListIds;
    // Output
@@ -81,7 +85,8 @@ public:
    ~C_SyvComPollingThreadDiag(void) override;
 
    int32_t StartDataPoolRead(stw::opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
-                             const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex);
+                             const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
+                             C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
    int32_t StartDataPoolWrite(stw::opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
                               const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex);
    int32_t StartNvmRead(stw::opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,

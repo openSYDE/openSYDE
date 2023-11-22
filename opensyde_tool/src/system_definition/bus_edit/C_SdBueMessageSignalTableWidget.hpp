@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGESIGNALTABLEWIDGET_H
-#define C_SDBUEMESSAGESIGNALTABLEWIDGET_H
+#ifndef C_SDBUEMESSAGESIGNALTABLEWIDGET_HPP
+#define C_SDBUEMESSAGESIGNALTABLEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -72,4 +72,4 @@ private:
 }
 }
 
-#endif // C_SDBUEMESSAGESIGNALTABLEWIDGET_H
+#endif // C_SDBUEMESSAGESIGNALTABLEWIDGET_HPP

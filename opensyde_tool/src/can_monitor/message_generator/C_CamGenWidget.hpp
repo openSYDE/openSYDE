@@ -9,8 +9,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENWIDGET_H
-#define C_CAMGENWIDGET_H
+#ifndef C_CAMGENWIDGET_HPP
+#define C_CAMGENWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -58,6 +58,7 @@ Q_SIGNALS:
    void SigRegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active);
    void SigRemoveAllCyclicMessages(void);
    void SigSendMessage(const uint32_t ou32_MessageIndex, const uint32_t ou32_TimeToSend);
+   void SigAutoProtocolSupport(const uint32_t ou32_MessageIndex, const bool oq_Active);
 
 private:
    Ui::C_CamGenWidget * mpc_Ui;

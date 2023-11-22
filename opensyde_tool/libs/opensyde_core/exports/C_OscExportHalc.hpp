@@ -6,8 +6,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCEXPORTHALC_H
-#define C_OSCEXPORTHALC_H
+#ifndef C_OSCEXPORTHALC_HPP
+#define C_OSCEXPORTHALC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

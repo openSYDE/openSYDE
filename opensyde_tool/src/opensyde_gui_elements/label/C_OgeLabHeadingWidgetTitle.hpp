@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABHEADINGWIDGETTITLE_H
-#define C_OGELABHEADINGWIDGETTITLE_H
+#ifndef C_OGELABHEADINGWIDGETTITLE_HPP
+#define C_OGELABHEADINGWIDGETTITLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

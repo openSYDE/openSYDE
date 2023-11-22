@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXTABLEHALC_H
-#define C_OGESPXTABLEHALC_H
+#ifndef C_OGESPXTABLEHALC_HPP
+#define C_OGESPXTABLEHALC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiSpinBoxGroup.hpp"

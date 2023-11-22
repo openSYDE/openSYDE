@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGELABSTATUSBAR_H
-#define C_CAMOGELABSTATUSBAR_H
+#ifndef C_CAMOGELABSTATUSBAR_HPP
+#define C_CAMOGELABSTATUSBAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabToolTipBase.hpp"

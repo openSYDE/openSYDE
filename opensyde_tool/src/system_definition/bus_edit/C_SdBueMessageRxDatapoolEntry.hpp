@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGERXDATAPOOLENTRY_H
-#define C_SDBUEMESSAGERXDATAPOOLENTRY_H
+#ifndef C_SDBUEMESSAGERXDATAPOOLENTRY_HPP
+#define C_SDBUEMESSAGERXDATAPOOLENTRY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

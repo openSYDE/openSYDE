@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCMAGICIANGENERATOR_H
-#define C_OSCHALCMAGICIANGENERATOR_H
+#ifndef C_OSCHALCMAGICIANGENERATOR_HPP
+#define C_OSCHALCMAGICIANGENERATOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscNode.hpp"

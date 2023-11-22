@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSFILTERTABLEVIEW_H
-#define C_CAMMOSFILTERTABLEVIEW_H
+#ifndef C_CAMMOSFILTERTABLEVIEW_HPP
+#define C_CAMMOSFILTERTABLEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblViewToolTipBase.hpp"

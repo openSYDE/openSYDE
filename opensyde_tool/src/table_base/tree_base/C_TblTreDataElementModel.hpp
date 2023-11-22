@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEDATAELEMENTTREEMODEL_H
-#define C_SYVDAPEDATAELEMENTTREEMODEL_H
+#ifndef C_SYVDAPEDATAELEMENTTREEMODEL_HPP
+#define C_SYVDAPEDATAELEMENTTREEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMap>

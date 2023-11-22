@@ -9,8 +9,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETABLEWIDGETCOMIF_H
-#define C_OGETABLEWIDGETCOMIF_H
+#ifndef C_OGETABLEWIDGETCOMIF_HPP
+#define C_OGETABLEWIDGETCOMIF_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXTOOLTIPBASE_H
-#define C_OGEGBXTOOLTIPBASE_H
+#ifndef C_OGEGBXTOOLTIPBASE_HPP
+#define C_OGEGBXTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

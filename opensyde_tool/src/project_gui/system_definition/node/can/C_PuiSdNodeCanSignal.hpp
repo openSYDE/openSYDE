@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDNODECANSIGNAL_H
-#define C_PUISDNODECANSIGNAL_H
+#ifndef C_PUISDNODECANSIGNAL_HPP
+#define C_PUISDNODECANSIGNAL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

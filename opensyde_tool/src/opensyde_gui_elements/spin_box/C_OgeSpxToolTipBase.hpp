@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXTOOLTIPBASE_H
-#define C_OGESPXTOOLTIPBASE_H
+#ifndef C_OGESPXTOOLTIPBASE_HPP
+#define C_OGESPXTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSpinBox>

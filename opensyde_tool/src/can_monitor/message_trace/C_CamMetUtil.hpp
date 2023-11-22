@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETUTIL_H
-#define C_CAMMETUTIL_H
+#ifndef C_CAMMETUTIL_HPP
+#define C_CAMMETUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREELOGGERDATAGREYOUTINFORMATION_H
-#define C_CAMMETTREELOGGERDATAGREYOUTINFORMATION_H
+#ifndef C_CAMMETTREELOGGERDATAGREYOUTINFORMATION_HPP
+#define C_CAMMETTREELOGGERDATAGREYOUTINFORMATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISDIMAGEGROUP_H
-#define C_GISDIMAGEGROUP_H
+#ifndef C_GISDIMAGEGROUP_HPP
+#define C_GISDIMAGEGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiBiImageGroup.hpp"

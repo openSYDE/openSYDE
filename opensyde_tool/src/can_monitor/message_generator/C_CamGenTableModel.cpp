@@ -24,11 +24,14 @@
 #include "C_CamProHandler.hpp"
 #include "C_CamGenTableModel.hpp"
 #include "C_CamProClipBoardHelper.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_OscCanProtocol.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
 using namespace stw::errors;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -88,6 +91,40 @@ void C_CamGenTableModel::UpdateMessageData(const uint32_t ou32_MessageIndex)
 
    Q_EMIT (this->dataChanged(this->index(ou32_MessageIndex, s32_Col),
                              this->index(ou32_MessageIndex, s32_Col), c_Roles));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update Auto protocol column data
+
+   \param[in]  ou32_MessageIndex    Message index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableModel::UpdateAutoProtocolCellData(const uint32_t ou32_MessageIndex)
+{
+   QVector<int32_t> c_Roles;
+   const int32_t s32_Col = C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eAUTO_SUPPORT);
+
+   c_Roles.push_back(static_cast<int32_t>(Qt::DisplayRole));
+
+   Q_EMIT (this->dataChanged(this->index(ou32_MessageIndex, s32_Col),
+                             this->index(ou32_MessageIndex, s32_Col), c_Roles));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Request trigger of model function for updating message AutoProtocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableModel::TriggerMessageReload()
+{
+   const int32_t s32_Col = C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eAUTO_SUPPORT);
+   const int32_t s32_RowCount = this->rowCount();
+   const QModelIndex c_TopLeft = this->index(0, s32_Col);
+   const QModelIndex c_BottomRight = this->index(s32_RowCount - 1, s32_Col);
+
+   QVector<int32_t> c_Roles;
+   c_Roles.push_back(static_cast<int32_t>(Qt::DisplayRole));
+
+   Q_EMIT this->dataChanged(c_TopLeft, c_BottomRight, c_Roles);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,6 +195,9 @@ QVariant C_CamGenTableModel::headerData(const int32_t os32_Section, const Qt::Or
          case eKEY:
             c_Header = C_GtGetText::h_GetText("Key");
             break;
+         case eAUTO_SUPPORT:
+            c_Header = C_GtGetText::h_GetText("Auto Protocol");
+            break;
          default:
             tgl_assert(false);
             break;
@@ -199,6 +239,9 @@ QVariant C_CamGenTableModel::headerData(const int32_t os32_Section, const Qt::Or
             break;
          case eKEY:
             c_Retval = C_GtGetText::h_GetText("Key");
+            break;
+         case eAUTO_SUPPORT:
+            c_Retval = C_GtGetText::h_GetText("Auto ECeS/ECoS Protocol Support");
             break;
          default:
             tgl_assert(false);
@@ -244,6 +287,12 @@ QVariant C_CamGenTableModel::headerData(const int32_t os32_Section, const Qt::Or
          case eKEY:
             c_Header = C_GtGetText::h_GetText("Configure key for triggering transmission of message.");
             break;
+         case eAUTO_SUPPORT:
+            c_Header = C_GtGetText::h_GetText("ECeS: When sending automatic calculation of the CRC and incrementing of "
+                                              "the block counter is applied.\n"
+                                              "ECoS: When sending the inverted second frame will be sent automatically "
+                                              "immediately after the first frame gets sent.");
+            break;
          default:
             tgl_assert(false);
             break;
@@ -274,7 +323,7 @@ int32_t C_CamGenTableModel::columnCount(const QModelIndex & orc_Parent) const
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      s32_Retval = 10;
+      s32_Retval = 11;
    }
    return s32_Retval;
 }
@@ -383,6 +432,14 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const int32_t o
                   c_Retval = pc_Message->GetExtended();
                }
                break;
+            case eAUTO_SUPPORT:
+               //Different handling for booleans
+               if (os32_Role == ms32_USER_ROLE_SORT)
+               {
+                  //For sorting!
+                  c_Retval = pc_Message->q_SetAutoSupportMode;
+               }
+               break;
             default:
                tgl_assert(false);
                break;
@@ -420,16 +477,24 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const int32_t o
          {
             if (e_Col == eDATA)
             {
-               QString c_Tmp;
-               for (uint16_t u16_It = 0U; u16_It < pc_Message->u16_Dlc; ++u16_It)
+               if ((pc_Message->q_SetAutoSupportMode != true) ||
+                   (C_CamGenTableModel::m_GetCurrentMessageProtocolType(u32_Index) != C_OscCanProtocol::eECES))
                {
-                  if (c_Tmp.isEmpty() == false)
+                  QString c_Tmp;
+                  for (uint16_t u16_It = 0U; u16_It < pc_Message->u16_Dlc; ++u16_It)
                   {
-                     c_Tmp += " ";
+                     if (c_Tmp.isEmpty() == false)
+                     {
+                        c_Tmp += " ";
+                     }
+                     c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
                   }
-                  c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
+                  c_Retval = c_Tmp;
                }
-               c_Retval = c_Tmp;
+               else
+               {
+                  c_Retval = UpdateDataForAutoProtocol(orc_Index);
+               }
             }
          }
          else if (os32_Role == ms32_USER_ROLE_MARKER_TRANSPARENCY)
@@ -588,6 +653,9 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const int32_t o
             case eRTR:
                c_Retval = mh_GetBoolAsCheckStateVariant(pc_Message->GetRtr());
                break;
+            case eAUTO_SUPPORT:
+               c_Retval = mh_GetBoolAsCheckStateVariant(pc_Message->q_SetAutoSupportMode);
+               break;
             default:
                tgl_assert(false);
                break;
@@ -678,6 +746,8 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
             case eXTD:
                //Different handling for booleans
                break;
+            case eAUTO_SUPPORT:
+               break;
             default:
                tgl_assert(false);
                break;
@@ -742,6 +812,10 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                   e_Selector = C_CamProMessageData::eGBODS_EXTENDED;
                   q_Continue = true;
                   break;
+               case eAUTO_SUPPORT:
+                  e_Selector = C_CamProMessageData::eGBODS_AUTO_SUPPORT;
+                  q_Continue = true;
+                  break;
                default:
                   tgl_assert(false);
                   break;
@@ -775,6 +849,12 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                      {
                         Q_EMIT (this->SigRegisterCyclicMessage(u32_Index, q_Val));
                      }
+                  }
+                  if (e_Col == eAUTO_SUPPORT)
+                  {
+                     this->UpdateMessageData(u32_Index);
+                     this->UpdateAutoProtocolCellData(u32_Index);
+                     Q_EMIT (this->SigAutoProtocolSupport(u32_Index, q_Val));
                   }
                   q_Retval = true;
                   //Signal check change
@@ -853,6 +933,15 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
       case eDATA:
          c_Retval = c_Retval | Qt::ItemIsEnabled;
          break;
+      case eAUTO_SUPPORT:
+         if ((C_CamGenTableModel::m_GetCurrentMessageProtocolType(static_cast<uint32_t>(orc_Index.row())) ==
+              C_OscCanProtocol::eECES) ||
+             (C_CamGenTableModel::m_GetCurrentMessageProtocolType(static_cast<uint32_t>(orc_Index.row())) ==
+              C_OscCanProtocol::eCAN_OPEN_SAFETY))
+         {
+            c_Retval = c_Retval | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
+         }
+         break;
       default:
          tgl_assert(false);
          break;
@@ -921,9 +1010,12 @@ C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const int32_t o
       e_Retval = eCYCLIC_TIME;
       break;
    case 8:
-      e_Retval = eKEY;
+      e_Retval = eAUTO_SUPPORT;
       break;
    case 9:
+      e_Retval = eKEY;
+      break;
+   case 10:
       e_Retval = eMANUAL_TRIGGER;
       break;
    default:
@@ -973,11 +1065,14 @@ int32_t C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns o
    case eCYCLIC_TIME:
       s32_Retval = 7;
       break;
-   case eKEY:
+   case eAUTO_SUPPORT:
       s32_Retval = 8;
       break;
-   case eMANUAL_TRIGGER:
+   case eKEY:
       s32_Retval = 9;
+      break;
+   case eMANUAL_TRIGGER:
+      s32_Retval = 10;
       break;
    default:
       tgl_assert(false);
@@ -1003,6 +1098,45 @@ std::vector<uint32_t> C_CamGenTableModel::AddSpecificNewItems(const std::vector<
    c_Retval = m_AddNewMessages(m_GetLastSelectedIndex(orc_SelectedIndex), orc_Messages);
    Q_EMIT (this->SigItemCountChanged(this->m_GetSizeItems()));
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update data feild for ECeS Messages when Auto Protocol is selected
+
+   \param[in]       orc_Index     Index at which the changed to be done
+
+   \return
+   QString String data of message data field
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_CamGenTableModel::UpdateDataForAutoProtocol(const QModelIndex & orc_Index) const
+{
+   QString c_Tmp;
+
+   if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+   {
+      const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+      const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(u32_Index);
+
+      for (uint16_t u16_It = 0U; u16_It < pc_Message->u16_Dlc; ++u16_It)
+      {
+         if (c_Tmp.isEmpty() == false)
+         {
+            c_Tmp += " ";
+         }
+         if (((pc_Message->q_SetAutoSupportMode == true) &&
+              (C_CamGenTableModel::m_GetCurrentMessageProtocolType(u32_Index) == C_OscCanProtocol::eECES)) &&
+             ((u16_It == 6) || (u16_It == 7)))
+         {
+            c_Tmp += "XX";
+         }
+         else
+         {
+            c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
+         }
+      }
+   }
+   return c_Tmp;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1193,4 +1327,43 @@ void C_CamGenTableModel::m_SpecialXtdFlagSetHandling(const int32_t os32_Row, con
                                 this->index(os32_Row, s32_Col),
                                 QVector<int32_t>() << os32_Role));
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  getting message protocol type
+
+   \param[in]  ou32_MessageIndex    Message index
+
+   \return
+   return type of protocol for current message
+
+   \retval   eLAYER2,           Data pool communication protocol OSI layer 2
+   \retval   eCAN_OPEN_SAFETY,  Data pool communication protocol CAN open safety (safety protocol)
+   \retval   eECES,             Data pool communication protocol ECeS (safety protocol)
+   \retval   eJ1939,            Data pool communication protocol J1939
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscCanProtocol::E_Type C_CamGenTableModel::m_GetCurrentMessageProtocolType(const uint32_t ou32_MessageIndex) const
+{
+   const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(
+      ou32_MessageIndex);
+
+   C_OscCanProtocol::E_Type e_ProtocolType = C_OscCanProtocol::eCAN_OPEN;
+   if (pc_Message != NULL)
+   {
+      if (C_CamDbHandler::h_GetInstance()->FindOsyMessage(pc_Message->c_DataBaseFilePath.c_str(),
+                                                          pc_Message->c_Name.c_str()) == C_NO_ERR)
+      {
+         if (C_CamDbHandler::h_GetInstance()->GetOscMessage(pc_Message->c_DataBaseFilePath.c_str(),
+                                                            pc_Message->c_Name.c_str(),
+                                                            pc_Message->q_ContainsValidHash,
+                                                            pc_Message->u32_Hash,
+                                                            &e_ProtocolType) == NULL)
+         {
+            // Db engine is not ready yet to get the current message protocol
+            // It is totally fine to be failed at this point, as still the DB file is in loading process
+         }
+      }
+   }
+   return e_ProtocolType;
 }

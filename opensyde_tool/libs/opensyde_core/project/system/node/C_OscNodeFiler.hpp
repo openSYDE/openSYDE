@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODEFILERV3_H
-#define C_OSCNODEFILERV3_H
+#ifndef C_OSCNODEFILERV3_HPP
+#define C_OSCNODEFILERV3_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscNode.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEDARKSCROLLAREA_H
-#define C_OGEDARKSCROLLAREA_H
+#ifndef C_OGEDARKSCROLLAREA_HPP
+#define C_OGEDARKSCROLLAREA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QScrollArea>

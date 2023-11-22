@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGESELECTORTREEDELEGATE_H
-#define C_SDBUEMESSAGESELECTORTREEDELEGATE_H
+#ifndef C_SDBUEMESSAGESELECTORTREEDELEGATE_HPP
+#define C_SDBUEMESSAGESELECTORTREEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>

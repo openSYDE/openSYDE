@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELETOOLTIPBASE_H
-#define C_OGELETOOLTIPBASE_H
+#ifndef C_OGELETOOLTIPBASE_HPP
+#define C_OGELETOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeToolTipBase.hpp"

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPLISTTABLEERRORMANAGER_H
-#define C_SDNDEDPLISTTABLEERRORMANAGER_H
+#ifndef C_SDNDEDPLISTTABLEERRORMANAGER_HPP
+#define C_SDNDEDPLISTTABLEERRORMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

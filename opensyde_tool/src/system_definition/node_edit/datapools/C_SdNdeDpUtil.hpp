@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPUTIL_H
-#define C_SDNDEDPUTIL_H
+#ifndef C_SDNDEDPUTIL_HPP
+#define C_SDNDEDPUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

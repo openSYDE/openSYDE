@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEUNOMESSAGEADDDELETEBASECOMMAND_H
-#define C_SDBUEUNOMESSAGEADDDELETEBASECOMMAND_H
+#ifndef C_SDBUEUNOMESSAGEADDDELETEBASECOMMAND_HPP
+#define C_SDBUEUNOMESSAGEADDDELETEBASECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdBueUnoMessageBaseCommand.hpp"
@@ -52,6 +52,9 @@ protected:
 private:
    void m_Store(void);
    void m_Remove(void);
+   static void mh_UpdateSignalsToProtocol(stw::opensyde_core::C_OscCanMessage & orc_Message,
+                                          std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_Signals,
+                                          const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

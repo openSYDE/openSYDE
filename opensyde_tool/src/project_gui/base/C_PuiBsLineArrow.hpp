@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSLINEARROW_H
-#define C_PUIBSLINEARROW_H
+#ifndef C_PUIBSLINEARROW_HPP
+#define C_PUIBSLINEARROW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QColor>

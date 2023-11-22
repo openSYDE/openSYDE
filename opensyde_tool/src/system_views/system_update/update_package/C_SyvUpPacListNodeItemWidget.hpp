@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACLISTNODEITEMWIDGET_H
-#define C_SYVUPPACLISTNODEITEMWIDGET_H
+#ifndef C_SYVUPPACLISTNODEITEMWIDGET_HPP
+#define C_SYVUPPACLISTNODEITEMWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDateTime>

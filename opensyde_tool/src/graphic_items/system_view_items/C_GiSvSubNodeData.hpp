@@ -5,12 +5,12 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVSUBNODEDATA_H
-#define C_GISVSUBNODEDATA_H
+#ifndef C_GISVSUBNODEDATA_HPP
+#define C_GISVSUBNODEDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 #include "C_SyvUtil.hpp"
 #include "C_SyvUpDeviceInfo.hpp"
 #include "C_OscViewNodeUpdate.hpp"

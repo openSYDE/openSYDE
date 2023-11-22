@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXTRANSPARENTDASHBOARD_H
-#define C_OGEGBXTRANSPARENTDASHBOARD_H
+#ifndef C_OGEGBXTRANSPARENTDASHBOARD_HPP
+#define C_OGEGBXTRANSPARENTDASHBOARD_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

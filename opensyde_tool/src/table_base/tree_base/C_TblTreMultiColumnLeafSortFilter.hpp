@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLTREMULTICOLUMNLEAFSORTFILTER_H
-#define C_TBLTREMULTICOLUMNLEAFSORTFILTER_H
+#ifndef C_TBLTREMULTICOLUMNLEAFSORTFILTER_HPP
+#define C_TBLTREMULTICOLUMNLEAFSORTFILTER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreDataElementSortFilter.hpp"

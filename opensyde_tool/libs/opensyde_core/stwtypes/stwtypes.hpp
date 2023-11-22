@@ -21,8 +21,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef STWTYPESHPP
-#define STWTYPESHPP
+#ifndef STWTYPES_HPP
+#define STWTYPES_HPP
 
 #ifndef __cplusplus
 //use stwtypes.h for C sources

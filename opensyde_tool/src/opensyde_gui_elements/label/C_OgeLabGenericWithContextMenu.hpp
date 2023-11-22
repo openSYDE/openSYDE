@@ -5,8 +5,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABGENERICWITHCONTEXTMENU_H
-#define C_OGELABGENERICWITHCONTEXTMENU_H
+#ifndef C_OGELABGENERICWITHCONTEXTMENU_HPP
+#define C_OGELABGENERICWITHCONTEXTMENU_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabContextMenuBase.hpp"

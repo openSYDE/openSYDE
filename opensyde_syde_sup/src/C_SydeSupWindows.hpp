@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYDESUPWINDOWSH
-#define C_SYDESUPWINDOWSH
+#ifndef C_SYDESUPWINDOWS_HPP
+#define C_SYDESUPWINDOWS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

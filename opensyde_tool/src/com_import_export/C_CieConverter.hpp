@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIECONVERTERH
-#define C_CIECONVERTERH
+#ifndef C_CIECONVERTE_HPP
+#define C_CIECONVERTE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

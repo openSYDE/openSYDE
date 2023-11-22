@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISDARROW_H
-#define C_GISDARROW_H
+#ifndef C_GISDARROW_HPP
+#define C_GISDARROW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiBiArrow.hpp"

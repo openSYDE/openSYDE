@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMDBOSYLISTID_H
-#define C_CAMDBOSYLISTID_H
+#ifndef C_CAMDBOSYLISTID_HPP
+#define C_CAMDBOSYLISTID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscNodeDataPoolListId.hpp"

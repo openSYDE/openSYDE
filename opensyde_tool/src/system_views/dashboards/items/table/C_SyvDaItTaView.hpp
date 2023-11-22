@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITTAVIEW_H
-#define C_SYVDAITTAVIEW_H
+#ifndef C_SYVDAITTAVIEW_HPP
+#define C_SYVDAITTAVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblViewScroll.hpp"

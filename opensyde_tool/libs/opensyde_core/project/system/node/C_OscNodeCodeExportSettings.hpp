@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODECODEEXPORTSETTINGS_H
-#define C_OSCNODECODEEXPORTSETTINGS_H
+#ifndef C_OSCNODECODEEXPORTSETTINGS_HPP
+#define C_OSCNODECODEEXPORTSETTINGS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

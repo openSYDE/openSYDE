@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEDTOOLTIPCONTENT_H
-#define C_OGETEDTOOLTIPCONTENT_H
+#ifndef C_OGETEDTOOLTIPCONTENT_HPP
+#define C_OGETEDTOOLTIPCONTENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTextEdit>

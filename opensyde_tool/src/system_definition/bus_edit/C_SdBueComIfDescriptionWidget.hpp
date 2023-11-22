@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUECOMIFDESCRIPTIONWIDGET_H
-#define C_SDBUECOMIFDESCRIPTIONWIDGET_H
+#ifndef C_SDBUECOMIFDESCRIPTIONWIDGET_HPP
+#define C_SDBUECOMIFDESCRIPTIONWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -53,7 +53,7 @@ public:
    void SetProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol) const;
    void PartialReload(void);
    void SelectMessageSearch(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
-                            const uint32_t ou32_ListIndex, const uint32_t ou32_MessageIndex) const;
+                            const uint32_t ou32_ListIndex, const uint32_t ou32_MessageIndex);
 
    void SelectSignalSearch(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                            const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex) const;
@@ -181,6 +181,7 @@ private:
    bool mq_IndexValid;
    stw::opensyde_gui_logic::C_SdBueUnoManager mc_UndoManager;
    stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager mc_MessageSyncManager;
+   bool mq_SkipLoadUserSettings;
 };
 }
 }

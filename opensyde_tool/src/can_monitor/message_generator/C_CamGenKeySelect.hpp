@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENKEYSELECT_H
-#define C_CAMGENKEYSELECT_H
+#ifndef C_CAMGENKEYSELECT_HPP
+#define C_CAMGENKEYSELECT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

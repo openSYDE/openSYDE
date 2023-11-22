@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDHANDLERBUSLOGIC_H
-#define C_PUISDHANDLERBUSLOGIC_H
+#ifndef C_PUISDHANDLERBUSLOGIC_HPP
+#define C_PUISDHANDLERBUSLOGIC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSdHandlerHalc.hpp"

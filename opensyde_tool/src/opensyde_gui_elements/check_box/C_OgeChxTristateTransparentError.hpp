@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXTRISTATETRANSPARENTERROR_H
-#define C_OGECHXTRISTATETRANSPARENTERROR_H
+#ifndef C_OGECHXTRISTATETRANSPARENTERROR_HPP
+#define C_OGECHXTRISTATETRANSPARENTERROR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

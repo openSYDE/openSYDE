@@ -27,7 +27,7 @@
 #include "C_SyvUpPacListNodeItemDatablockWidget.hpp"
 #include "C_SyvUpPacListNodeItemParamSetWidget.hpp"
 #include "C_OgeWiCustomMessage.hpp"
-#include "C_OsyHexFile.hpp"
+#include "C_OscHexFile.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -125,7 +125,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::AdaptFile(const QString & orc_File,
          }
          else if (this->mq_FileBased == false)
          {
-            C_OsyHexFile * const pc_HexFile = new C_OsyHexFile();
+            C_OscHexFile * const pc_HexFile = new C_OscHexFile();
             if (pc_HexFile->LoadFromFile(c_AbsoluteFilePath.toStdString().c_str()) == stw::hex_file::NO_ERR)
             {
                stw::diag_lib::C_XFLECUInformation c_FileApplicationInfo;

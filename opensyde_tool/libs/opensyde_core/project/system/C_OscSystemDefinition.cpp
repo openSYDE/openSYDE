@@ -430,17 +430,13 @@ int32_t C_OscSystemDefinition::GetNextFreeBusId(uint8_t & oru8_BusId) const
          q_Continue = false;
       }
    }
+   //Revert last ++
+   --oru8_BusId;
    //Check result
    if (q_Continue == true)
    {
       s32_Retval = C_NOACT;
    }
-   else
-   {
-      //Revert last ++
-      --oru8_BusId;
-   }
-
    return s32_Retval;
 }
 
@@ -622,7 +618,8 @@ const
          bool q_DataPoolNameConflict;
          bool q_DataPoolNameInvalid;
          bool q_DataPoolListError;
-         bool q_DataPoolListOrElementLengthError;
+         bool q_DataPoolTooFewListsOrElementsError;
+         bool q_DataPoolTooManyListsOrElementsError;
          bool q_ResultError = false;
          static std::map<std::vector<uint32_t>, bool> hc_PreviousCommChecks;
          static std::map<uint32_t, bool> hc_PreviousCommonChecks;
@@ -652,8 +649,10 @@ const
                   c_Hashes.push_back(u32_ProtocolHash);
 
                   //check basic: list and element count:
-                  rc_CheckedNode.CheckErrorDataPoolNumListsAndElements(u32_Counter, q_DataPoolListOrElementLengthError);
-                  if (q_DataPoolListOrElementLengthError == true)
+                  rc_CheckedNode.CheckErrorDataPoolNumListsAndElements(u32_Counter,
+                                                                       q_DataPoolTooFewListsOrElementsError,
+                                                                       q_DataPoolTooManyListsOrElementsError);
+                  if ((q_DataPoolTooFewListsOrElementsError == true) || (q_DataPoolTooManyListsOrElementsError == true))
                   {
                      q_ResultError = true;
                      q_AlreadyAdded = true;
@@ -739,10 +738,12 @@ const
                if (c_It == hc_PreviousCommonChecks.end())
                {
                   rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, &q_DataPoolNameInvalid,
-                                                    &q_DataPoolListError, &q_DataPoolListOrElementLengthError, NULL);
+                                                    &q_DataPoolListError, &q_DataPoolTooFewListsOrElementsError,
+                                                    &q_DataPoolTooManyListsOrElementsError, NULL);
 
                   if (((q_DataPoolNameConflict == true) || (q_DataPoolNameInvalid == true)) ||
-                      (q_DataPoolListError == true) || (q_DataPoolListOrElementLengthError == true))
+                      (q_DataPoolListError == true) || (q_DataPoolTooFewListsOrElementsError == true) ||
+                      (q_DataPoolTooManyListsOrElementsError == true))
                   {
                      q_ResultError = true;
                      if (opc_InvalidDataPoolIndices != NULL)
@@ -763,7 +764,7 @@ const
                else
                {
                   //ALWAYS do datapool name conflict check
-                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL, NULL);
+                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL, NULL, NULL);
 
                   if (q_DataPoolNameConflict == true)
                   {

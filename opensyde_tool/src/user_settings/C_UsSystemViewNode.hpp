@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USSYSTEMVIEWNODE_H
-#define C_USSYSTEMVIEWNODE_H
+#ifndef C_USSYSTEMVIEWNODE_HPP
+#define C_USSYSTEMVIEWNODE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVector>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISDTEXTELEMENT_H
-#define C_GISDTEXTELEMENT_H
+#ifndef C_GISDTEXTELEMENT_HPP
+#define C_GISDTEXTELEMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiBiTextElement.hpp"

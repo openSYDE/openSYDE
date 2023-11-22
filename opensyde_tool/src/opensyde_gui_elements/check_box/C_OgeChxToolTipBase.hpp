@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXTOOLTIPBASE_H
-#define C_OGECHXTOOLTIPBASE_H
+#ifndef C_OGECHXTOOLTIPBASE_HPP
+#define C_OGECHXTOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QCheckBox>

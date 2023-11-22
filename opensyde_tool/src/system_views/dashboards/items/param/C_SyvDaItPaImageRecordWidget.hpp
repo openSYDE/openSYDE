@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITPAIMAGERECORDWIDGET_H
-#define C_SYVDAITPAIMAGERECORDWIDGET_H
+#ifndef C_SYVDAITPAIMAGERECORDWIDGET_HPP
+#define C_SYVDAITPAIMAGERECORDWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

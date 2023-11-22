@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMAINWINDOW_H
-#define C_CAMMAINWINDOW_H
+#ifndef C_CAMMAINWINDOW_HPP
+#define C_CAMMAINWINDOW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMainWindow>
@@ -81,6 +81,7 @@ private:
    void m_PauseLogging(void);
    void m_ContinueLogging(void);
    void m_StopLogging(void);
+   void m_ClearData(void);
 
    int32_t m_InitCan(int32_t & ors32_Bitrate);
    void m_CloseCan(void);
@@ -117,6 +118,7 @@ private:
    void m_CheckForLastDatabaseLoaded(const QString & orc_DatabasePath);
    void m_DisplayCheckMessagesDialog(const QString & orc_DatabasePath, const std::vector<uint32_t> & orc_Indices);
    void m_AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+   void m_UpdateAutoSupportProtocol(const uint32_t ou32_MessageIndex, const bool oq_Active);
 
 Q_SIGNALS:
    void SigEmitAddFilterToChildWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);

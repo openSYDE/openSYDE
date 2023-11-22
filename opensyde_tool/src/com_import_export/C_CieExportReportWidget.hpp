@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEEXPORTREPORTWIDGET_H
-#define C_CIEEXPORTREPORTWIDGET_H
+#ifndef C_CIEEXPORTREPORTWIDGET_HPP
+#define C_CIEEXPORTREPORTWIDGET_HPP
 
 #include <QWidget>
 #include "stwtypes.hpp"

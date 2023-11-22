@@ -1041,18 +1041,21 @@ void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
          pc_Item->ConnectionActiveChanged(oq_Active);
       }
    }
-   //if (oq_Active == true)
-   //{
-   //Temporary reset for agritechnica
-   //IMPORTANT: this function was const
-   //   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   //   if (pc_View != NULL)
-   //   {
-   //      this->mq_LastKnownDarkMode = !pc_View->GetDarkModeActive();
-   //      this->UpdateShowValues();
-   //      this->SetDarkModeActive(pc_View->GetDarkModeActive());
-   //   }
-   //}
+
+   if (oq_Active == true)
+   {
+      // In case of an activated connection a second call is necessary
+      // All widgets must handled ConnectionActiveChanged before calling this function to avoid race conditions
+      // between initial read and write configurations of the write widgets
+      for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
+      {
+         C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
+         if (pc_Item != NULL)
+         {
+            pc_Item->ConnectionActiveStarted();
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

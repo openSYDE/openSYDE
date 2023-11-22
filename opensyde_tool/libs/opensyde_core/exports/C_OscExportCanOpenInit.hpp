@@ -8,8 +8,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCEXPORTCANOPENINIT_H
-#define C_OSCEXPORTCANOPENINIT_H
+#ifndef C_OSCEXPORTCANOPENINIT_HPP
+#define C_OSCEXPORTCANOPENINIT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclStringList.hpp"

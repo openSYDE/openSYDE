@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDCEXISTINGNODEDROPAREAWIDGET_H
-#define C_SYVDCEXISTINGNODEDROPAREAWIDGET_H
+#ifndef C_SYVDCEXISTINGNODEDROPAREAWIDGET_HPP
+#define C_SYVDCEXISTINGNODEDROPAREAWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

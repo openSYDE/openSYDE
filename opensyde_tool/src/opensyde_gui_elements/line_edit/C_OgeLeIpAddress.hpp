@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELEIPADDRESS_H
-#define C_OGELEIPADDRESS_H
+#ifndef C_OGELEIPADDRESS_HPP
+#define C_OGELEIPADDRESS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeToolTipBase.hpp"

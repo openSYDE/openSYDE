@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVCOMMESSAGEMONITOR_H
-#define C_SYVCOMMESSAGEMONITOR_H
+#ifndef C_SYVCOMMESSAGEMONITOR_HPP
+#define C_SYVCOMMESSAGEMONITOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
@@ -85,6 +85,9 @@ public:
    void UpdateBusLoad(const uint8_t ou8_BusLoad) override;
    void UpdateTxCounter(const uint32_t ou32_TxCount) override;
    void UpdateTxErrors(const uint32_t ou32_TxErrors) override;
+
+   // ECeS message handling
+   void ResetEcesMessages(void) override;
 
    uint8_t GetBusLoad(void) const;
    uint32_t GetTxCount(void) const;

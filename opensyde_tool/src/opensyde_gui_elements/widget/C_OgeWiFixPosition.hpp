@@ -6,8 +6,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIFIXPOSITION_H
-#define C_OGEWIFIXPOSITION_H
+#ifndef C_OGEWIFIXPOSITION_HPP
+#define C_OGEWIFIXPOSITION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

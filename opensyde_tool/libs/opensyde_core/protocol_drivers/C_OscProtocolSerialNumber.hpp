@@ -8,8 +8,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPROTOCOLSERIALNUMBER_H
-#define C_OSCPROTOCOLSERIALNUMBER_H
+#ifndef C_OSCPROTOCOLSERIALNUMBER_HPP
+#define C_OSCPROTOCOLSERIALNUMBER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILILINEGROUP_H
-#define C_GILILINEGROUP_H
+#ifndef C_GILILINEGROUP_HPP
+#define C_GILILINEGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItemGroup>
@@ -146,4 +146,4 @@ private:
 }
 } //end of namespace
 
-#endif // C_LINEGRAPHICSITEMGROUP_H
+#endif // C_LINEGRAPHICSITEMGROUP_HPP

@@ -139,7 +139,7 @@ void C_SyvUpPacHexFileView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 void C_SyvUpPacHexFileView::m_LoadInfo(void) const
 {
    QString c_Text = "<html><body>";
-   C_OsyHexFile c_HexFile;
+   C_OscHexFile c_HexFile;
    uint32_t u32_Result;
 
    u32_Result = c_HexFile.LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str());
@@ -242,7 +242,7 @@ QString C_SyvUpPacHexFileView::mh_GetMd5Hex(const QString & orc_Path)
    \param[in,out] orc_Content Text to append to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
+void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OscHexFile & orc_HexFile, QString & orc_Content)
 {
    const uint32_t u32_Bytes = orc_HexFile.ByteCount();
    uint32_t u32_Crc;
@@ -277,7 +277,7 @@ void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QS
    \param[in,out] orc_Content Text to append to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
+void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OscHexFile & orc_HexFile, QString & orc_Content)
 {
    C_SclDynamicArray<stw::diag_lib::C_XFLECUInformation> c_InfoBlocks;
    orc_HexFile.GetECUInformationBlocks(c_InfoBlocks, 0UL, false, false, false);

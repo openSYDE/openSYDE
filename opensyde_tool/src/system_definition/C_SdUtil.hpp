@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDUTIL_H
-#define C_SDUTIL_H
+#ifndef C_SDUTIL_HPP
+#define C_SDUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -76,7 +76,7 @@ public:
                                                                            const int32_t & ors32_SpecialInterface);
    static void h_AdaptMessageToProtocolType(stw::opensyde_core::C_OscCanMessage & orc_Message,
                                             stw::opensyde_gui_logic::C_PuiSdNodeCanMessage * const opc_UiMessage,
-                                            std::vector<opensyde_core::C_OscNodeDataPoolListElement> & orc_SignalListElements, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos);
+                                            std::vector<opensyde_core::C_OscNodeDataPoolListElement> & orc_SignalListElements, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos, const bool oq_IncludeSignalUpdate = true);
    static void h_AdaptSignalToProtocolType(stw::opensyde_core::C_OscCanSignal & orc_Signal,
                                            opensyde_core::C_OscNodeDataPoolListElement & orc_SignalListElement,
                                            const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type,

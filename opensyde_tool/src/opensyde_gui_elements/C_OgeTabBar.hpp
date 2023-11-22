@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETABBAR_H
-#define C_OGETABBAR_H
+#ifndef C_OGETABBAR_HPP
+#define C_OGETABBAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTabBar>

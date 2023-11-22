@@ -11,8 +11,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPROTOCOLDRIVEROSYTPCANHPP
-#define C_OSCPROTOCOLDRIVEROSYTPCANHPP
+#ifndef C_OSCPROTOCOLDRIVEROSYTPCAN_HPP
+#define C_OSCPROTOCOLDRIVEROSYTPCAN_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

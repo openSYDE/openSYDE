@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPLISTEDITWIDGET_H
-#define C_SDNDEDPLISTEDITWIDGET_H
+#ifndef C_SDNDEDPLISTEDITWIDGET_HPP
+#define C_SDNDEDPLISTEDITWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

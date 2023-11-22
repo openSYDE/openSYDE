@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVSEDLLCONFIGURATIONDIALOG_H
-#define C_SYVSEDLLCONFIGURATIONDIALOG_H
+#ifndef C_SYVSEDLLCONFIGURATIONDIALOG_HPP
+#define C_SYVSEDLLCONFIGURATIONDIALOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

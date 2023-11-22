@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAUNOMANAGER_H
-#define C_SYVDAUNOMANAGER_H
+#ifndef C_SYVDAUNOMANAGER_HPP
+#define C_SYVDAUNOMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

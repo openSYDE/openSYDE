@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDATABLEBASE_H
-#define C_GISVDATABLEBASE_H
+#ifndef C_GISVDATABLEBASE_HPP
+#define C_GISVDATABLEBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvDaItTaView.hpp"

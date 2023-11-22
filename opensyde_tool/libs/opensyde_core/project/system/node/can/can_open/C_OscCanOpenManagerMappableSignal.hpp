@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANOPENMANAGERMAPPABLESIGNAL_H
-#define C_OSCCANOPENMANAGERMAPPABLESIGNAL_H
+#ifndef C_OSCCANOPENMANAGERMAPPABLESIGNAL_HPP
+#define C_OSCCANOPENMANAGERMAPPABLESIGNAL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscCanSignal.hpp"

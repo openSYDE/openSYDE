@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETSETTINGSPOPUP_H
-#define C_CAMMETSETTINGSPOPUP_H
+#ifndef C_CAMMETSETTINGSPOPUP_HPP
+#define C_CAMMETSETTINGSPOPUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

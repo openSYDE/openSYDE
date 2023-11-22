@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEDBASE_H
-#define C_OGETEDBASE_H
+#ifndef C_OGETEDBASE_HPP
+#define C_OGETEDBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTextEdit>

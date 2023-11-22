@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDBLISTDELEGATE_H
-#define C_SDNDEDBLISTDELEGATE_H
+#ifndef C_SDNDEDBLISTDELEGATE_HPP
+#define C_SDNDEDBLISTDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>

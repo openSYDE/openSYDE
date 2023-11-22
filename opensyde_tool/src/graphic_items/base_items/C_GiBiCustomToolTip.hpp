@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIBICUSTOMTOOLTIP_H
-#define C_GIBICUSTOMTOOLTIP_H
+#ifndef C_GIBICUSTOMTOOLTIP_HPP
+#define C_GIBICUSTOMTOOLTIP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

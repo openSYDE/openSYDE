@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXDASHBOARD_H
-#define C_OGECHXDASHBOARD_H
+#ifndef C_OGECHXDASHBOARD_HPP
+#define C_OGECHXDASHBOARD_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPushButton>

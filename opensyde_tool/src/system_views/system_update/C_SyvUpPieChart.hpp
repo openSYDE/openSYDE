@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPIECHART_H
-#define C_SYVUPPIECHART_H
+#ifndef C_SYVUPPIECHART_HPP
+#define C_SYVUPPIECHART_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

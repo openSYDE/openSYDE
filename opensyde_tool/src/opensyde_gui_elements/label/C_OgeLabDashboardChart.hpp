@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABDASHBOARDCHART_H
-#define C_OGELABDASHBOARDCHART_H
+#ifndef C_OGELABDASHBOARDCHART_HPP
+#define C_OGELABDASHBOARDCHART_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

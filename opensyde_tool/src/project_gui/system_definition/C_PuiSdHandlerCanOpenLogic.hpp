@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDHANDLERCANOPENLOGIC_H
-#define C_PUISDHANDLERCANOPENLOGIC_H
+#ifndef C_PUISDHANDLERCANOPENLOGIC_HPP
+#define C_PUISDHANDLERCANOPENLOGIC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSdHandlerBusLogic.hpp"

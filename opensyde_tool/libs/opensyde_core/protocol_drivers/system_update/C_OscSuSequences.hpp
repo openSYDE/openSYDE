@@ -11,13 +11,14 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSUSEQUENCESH
-#define C_OSCSUSEQUENCESH
+#ifndef C_OSCSUSEQUENCES_HPP
+#define C_OSCSUSEQUENCES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
 #include "C_SclString.hpp"
 #include "C_OscSystemDefinition.hpp"
+#include "C_OscComFlashloaderInformation.hpp"
 #include "C_OscComSequencesBase.hpp"
 #include "C_OscSuSequencesNodeStates.hpp"
 #include "C_OscViewNodeUpdate.hpp"
@@ -44,7 +45,7 @@ public:
       stw::scl::C_SclString c_DeviceName;                                   ///< name of device
       std::vector<C_OscProtocolDriverOsy::C_FlashBlockInfo> c_Applications; ///< list of applications present on the
                                                                             // device
-      C_OscComDriverFlash::C_FlashloaderInformation c_MoreInformation;      ///< collection of additional information
+      C_OscComFlashloaderInformation c_MoreInformation;                     ///< collection of additional information
    };
 
    ///basic information about status of one STW Flashloader device

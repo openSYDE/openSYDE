@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBBASECOPYPASTEMANAGER_H
-#define C_SEBBASECOPYPASTEMANAGER_H
+#ifndef C_SEBBASECOPYPASTEMANAGER_HPP
+#define C_SEBBASECOPYPASTEMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPointF>

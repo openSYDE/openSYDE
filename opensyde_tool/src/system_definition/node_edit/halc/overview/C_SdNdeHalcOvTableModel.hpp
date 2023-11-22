@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCOVTABLEMODEL_H
-#define C_SDNDEHALCOVTABLEMODEL_H
+#ifndef C_SDNDEHALCOVTABLEMODEL_HPP
+#define C_SDNDEHALCOVTABLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractTableModel>

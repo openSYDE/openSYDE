@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWICUSTOMMESSAGE_H
-#define C_OGEWICUSTOMMESSAGE_H
+#ifndef C_OGEWICUSTOMMESSAGE_HPP
+#define C_OGEWICUSTOMMESSAGE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDialog>
@@ -115,4 +115,4 @@ private:
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 } //end of namespace
-#endif // C_OGEWICUSTOMMESSAGE_H
+#endif // C_OGEWICUSTOMMESSAGE_HPP

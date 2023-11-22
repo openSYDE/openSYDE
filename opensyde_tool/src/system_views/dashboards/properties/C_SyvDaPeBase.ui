@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>680</width>
-    <height>1037</height>
+    <height>1055</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -594,12 +594,15 @@
        <number>13</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0">
         <property name="spacing">
          <number>0</number>
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,1">
@@ -695,6 +698,9 @@
          <layout class="QVBoxLayout" name="pc_VerticalLayoutDesign_2">
           <property name="spacing">
            <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
           </property>
           <item>
            <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxDataElementChangeable">
@@ -1127,9 +1133,6 @@
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,0,0,0,0,0,0,0,1">
-            <property name="spacing">
-             <number>6</number>
-            </property>
             <item>
              <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelFactor">
               <property name="text">
@@ -1379,6 +1382,257 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxInitialValue">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>20</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_27">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelDashboardConnectHandling">
+                 <property name="text">
+                  <string>Dashboard Connect</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_15">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>13</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_39" stretch="0">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_7">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>1</height>
+                  </size>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_32" stretch="0,0,0,0,1">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetDefaultConstraint</enum>
+             </property>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelInitialValueMode">
+               <property name="text">
+                <string>Initial</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxInitialValueMode">
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_23">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QWidget" name="pc_WidgetConstValue" native="true">
+               <layout class="QHBoxLayout" name="horizontalLayout_28">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelInitialValue">
+                  <property name="text">
+                   <string>Value</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="stw::opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_SpinBoxInitialValue" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>200</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="stw::opensyde_gui_elements::C_OgeChxTristateTransparentToggle" name="pc_ToggleInitialValue">
+                  <property name="minimumSize">
+                   <size>
+                    <width>66</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>66</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Toggle</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_26">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="0,1">
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgeChxProperties" name="pc_CheckBoxDashboardConnectWrite">
+               <property name="text">
+                <string>Auto write</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_21">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>1</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -1503,11 +1757,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.hpp</header>
@@ -1519,25 +1768,9 @@
    <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
-   <extends>QComboBox</extends>
-   <header>C_OgeCbxText.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeChxProperties</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxProperties.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.hpp</header>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
@@ -1551,14 +1784,40 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubConfigure</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubConfigure.hpp</header>
+   <header>C_OgePubCancel.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
+   <extends>QComboBox</extends>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeProperties.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeChxTristateTransparentToggle</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxTristateTransparentToggle.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgePubConfigure</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubConfigure.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeChxProperties</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxProperties.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgePubOpen</class>
@@ -1601,6 +1860,12 @@
    <class>stw::opensyde_gui_elements::C_OgeSpxFactorProperties</class>
    <extends>QDoubleSpinBox</extends>
    <header>C_OgeSpxFactorProperties.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiSpinBoxGroupProperties.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

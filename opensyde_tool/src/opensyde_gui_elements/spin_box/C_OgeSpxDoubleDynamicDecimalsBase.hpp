@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXDOUBLEDYNAMICDECIMALSBASE_H
-#define C_OGESPXDOUBLEDYNAMICDECIMALSBASE_H
+#ifndef C_OGESPXDOUBLEDYNAMICDECIMALSBASE_HPP
+#define C_OGESPXDOUBLEDYNAMICDECIMALSBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDoubleSpinBox>

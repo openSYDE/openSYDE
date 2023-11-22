@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAPEUPDATEMODECONFIGURATION_H
-#define C_SYVDAPEUPDATEMODECONFIGURATION_H
+#ifndef C_SYVDAPEUPDATEMODECONFIGURATION_HPP
+#define C_SYVDAPEUPDATEMODECONFIGURATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

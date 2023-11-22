@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEBUSEDITPROPERTIESWIDGET_H
-#define C_SDBUEBUSEDITPROPERTIESWIDGET_H
+#ifndef C_SDBUEBUSEDITPROPERTIESWIDGET_HPP
+#define C_SDBUEBUSEDITPROPERTIESWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

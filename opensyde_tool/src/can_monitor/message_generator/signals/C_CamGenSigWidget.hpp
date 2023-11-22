@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECAMGENSIGWIDGET_H
-#define C_OGECAMGENSIGWIDGET_H
+#ifndef C_OGECAMGENSIGWIDGET_HPP
+#define C_OGECAMGENSIGWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiOnlyBackground.hpp"
@@ -45,6 +45,7 @@ public:
    void TriggerSignalReload(void);
    void UpdateMessageDlc(const uint32_t ou32_MessageIndex) const;
    void UpdateSelection(const uint32_t ou32_NumSelectedItems, const uint32_t ou32_Row);
+   void UpdateAutoProtocolSupport(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

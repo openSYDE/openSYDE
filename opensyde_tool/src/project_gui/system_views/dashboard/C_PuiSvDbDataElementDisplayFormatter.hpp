@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBDATAELEMENTDISPLAYFORMATTER_H
-#define C_PUISVDBDATAELEMENTDISPLAYFORMATTER_H
+#ifndef C_PUISVDBDATAELEMENTDISPLAYFORMATTER_HPP
+#define C_PUISVDBDATAELEMENTDISPLAYFORMATTER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

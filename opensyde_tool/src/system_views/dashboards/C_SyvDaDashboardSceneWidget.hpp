@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDSCENEWIDGET_H
-#define C_SYVDADASHBOARDSCENEWIDGET_H
+#ifndef C_SYVDADASHBOARDSCENEWIDGET_HPP
+#define C_SYVDADASHBOARDSCENEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTimer>

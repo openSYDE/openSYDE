@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLVIEWSCROLL_H
-#define C_TBLVIEWSCROLL_H
+#ifndef C_TBLVIEWSCROLL_HPP
+#define C_TBLVIEWSCROLL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

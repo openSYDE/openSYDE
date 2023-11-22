@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILITEMPORARYLINE_H
-#define C_GILITEMPORARYLINE_H
+#ifndef C_GILITEMPORARYLINE_HPP
+#define C_GILITEMPORARYLINE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

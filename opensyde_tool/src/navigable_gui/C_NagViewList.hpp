@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGVIEWLIST_H
-#define C_NAGVIEWLIST_H
+#ifndef C_NAGVIEWLIST_HPP
+#define C_NAGVIEWLIST_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

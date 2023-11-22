@@ -8,11 +8,11 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBSLIDER_H
-#define C_PUISVDBSLIDER_H
+#ifndef C_PUISVDBSLIDER_HPP
+#define C_PUISVDBSLIDER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_PuiSvDbWidgetBase.hpp"
+#include "C_PuiSvDbWriteWidgetBase.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -24,7 +24,7 @@ namespace opensyde_gui_logic
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvDbSlider :
-   public C_PuiSvDbWidgetBase
+   public C_PuiSvDbWriteWidgetBase
 {
 public:
    enum E_Type

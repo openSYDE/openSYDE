@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIGCHANNEL_H
-#define C_OSCHALCCONFIGCHANNEL_H
+#ifndef C_OSCHALCCONFIGCHANNEL_HPP
+#define C_OSCHALCCONFIGCHANNEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

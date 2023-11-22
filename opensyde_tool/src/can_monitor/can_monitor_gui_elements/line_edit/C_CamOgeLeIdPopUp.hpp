@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGELEIDPOPUP_H
-#define C_CAMOGELEIDPOPUP_H
+#ifndef C_CAMOGELEIDPOPUP_HPP
+#define C_CAMOGELEIDPOPUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblEditLineEditBase.hpp"

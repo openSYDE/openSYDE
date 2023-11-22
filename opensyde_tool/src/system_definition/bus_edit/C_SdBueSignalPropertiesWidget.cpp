@@ -243,7 +243,7 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
                                         "\nUnsigned: Unsigned Integer"
                                         "\nIEEE Float: 32 Bit IEEE Float"
                                         "\nIEEE Double: 64 Bit IEEE Double");
-   this->mpc_Ui->pc_LabelValueType->SetToolTipInformation(C_GtGetText::h_GetText("Type"), c_InfoText);
+   this->mpc_Ui->pc_LabelType->SetToolTipInformation(C_GtGetText::h_GetText("Type"), c_InfoText);
 
    //Length
    c_InfoText =  C_GtGetText::h_GetText("Signal length in bits.");

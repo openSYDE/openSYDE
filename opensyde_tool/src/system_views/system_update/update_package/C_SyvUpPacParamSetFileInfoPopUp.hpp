@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACPARAMSETFILEINFOPOPUP_H
-#define C_SYVUPPACPARAMSETFILEINFOPOPUP_H
+#ifndef C_SYVUPPACPARAMSETFILEINFOPOPUP_HPP
+#define C_SYVUPPACPARAMSETFILEINFOPOPUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

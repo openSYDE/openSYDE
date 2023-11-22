@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETAWSELECTOR_H
-#define C_OGETAWSELECTOR_H
+#ifndef C_OGETAWSELECTOR_HPP
+#define C_OGETAWSELECTOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

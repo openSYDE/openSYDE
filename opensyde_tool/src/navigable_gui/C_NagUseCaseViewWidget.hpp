@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_NAGUSECASEVIEWWIDGET_H
-#define C_NAGUSECASEVIEWWIDGET_H
+#ifndef C_NAGUSECASEVIEWWIDGET_HPP
+#define C_NAGUSECASEVIEWWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

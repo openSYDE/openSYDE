@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLEDITLINEEDITBASE_H
-#define C_TBLEDITLINEEDITBASE_H
+#ifndef C_TBLEDITLINEEDITBASE_HPP
+#define C_TBLEDITLINEEDITBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVariant>

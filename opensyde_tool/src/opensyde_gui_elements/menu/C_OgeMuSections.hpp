@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEMUSECTIONS_H
-#define C_OGEMUSECTIONS_H
+#ifndef C_OGEMUSECTIONS_HPP
+#define C_OGEMUSECTIONS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMenu>

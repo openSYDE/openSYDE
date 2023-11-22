@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGELEFILEPATH_H
-#define C_CAMOGELEFILEPATH_H
+#ifndef C_CAMOGELEFILEPATH_HPP
+#define C_CAMOGELEFILEPATH_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeFilePathBase.hpp"

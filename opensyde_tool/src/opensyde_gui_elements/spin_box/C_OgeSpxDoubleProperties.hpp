@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXDOUBLEPROPERTIES_H
-#define C_OGESPXDOUBLEPROPERTIES_H
+#ifndef C_OGESPXDOUBLEPROPERTIES_HPP
+#define C_OGESPXDOUBLEPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

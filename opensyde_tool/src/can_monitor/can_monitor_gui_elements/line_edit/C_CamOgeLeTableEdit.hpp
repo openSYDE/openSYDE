@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMLETABLEEDIT_H
-#define C_CAMLETABLEEDIT_H
+#ifndef C_CAMLETABLEEDIT_HPP
+#define C_CAMLETABLEEDIT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblEditLineEditBase.hpp"

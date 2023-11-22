@@ -908,12 +908,13 @@ void C_GiSvSubNodeData::m_CheckThirdParty(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvSubNodeData::m_InitPackageData(const C_OscNode & orc_Node, const C_OscViewNodeUpdate & orc_UpdateInformation)
 {
-   if (orc_Node.c_Applications.size() ==
-       orc_UpdateInformation.GetPaths(C_OscViewNodeUpdate::eFTP_DATA_BLOCK).size())
+   const std::vector<C_OscNodeApplication> c_HexApps = orc_Node.GetHexApplications();
+
+   if (c_HexApps.size() == orc_UpdateInformation.GetPaths(C_OscViewNodeUpdate::eFTP_DATA_BLOCK).size())
    {
-      if (orc_Node.c_Applications.size() > 0UL)
+      if (c_HexApps.size() > 0UL)
       {
-         //Register any datablocks found
+         //Register any HEX datablocks found (parameter set Data Blocks are handled together with PSI files)
          this->mq_AnyDatablockFound = true;
       }
       tgl_assert(orc_Node.u32_SubDeviceIndex < orc_Node.pc_DeviceDefinition->c_SubDevices.size());
@@ -926,7 +927,7 @@ void C_GiSvSubNodeData::m_InitPackageData(const C_OscNode & orc_Node, const C_Os
          std::vector<QString> c_FinalApplicationPaths;
          const std::vector<C_SclString> & rc_ApplicationPaths = orc_UpdateInformation.GetPaths(
             C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
-         c_FinalApplicationPaths.reserve(orc_Node.c_Applications.size());
+         c_FinalApplicationPaths.reserve(rc_ApplicationPaths.size());
 
          for (u32_ItApplication = 0U; u32_ItApplication < orc_Node.c_Applications.size();
               ++u32_ItApplication)
@@ -976,7 +977,7 @@ void C_GiSvSubNodeData::m_InitPackageDataForApplicationsFromFiles(const std::vec
    {
       const stw::scl::C_SclString c_Path = orc_FinalFilePaths[u32_ItFile].toStdString().c_str();
       // c_Path is already absolute and placeholder variables got resolved!
-      C_OsyHexFile c_HexFile;
+      C_OscHexFile c_HexFile;
       uint32_t u32_Result;
 
       u32_Result = c_HexFile.LoadFromFile(c_Path.c_str());

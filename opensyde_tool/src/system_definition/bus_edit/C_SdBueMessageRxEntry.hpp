@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGERXENTRY_H
-#define C_SDBUEMESSAGERXENTRY_H
+#ifndef C_SDBUEMESSAGERXENTRY_HPP
+#define C_SDBUEMESSAGERXENTRY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QIcon>

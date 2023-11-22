@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEWISPINBOXGROUPTABLE_H
-#define C_CAMOGEWISPINBOXGROUPTABLE_H
+#ifndef C_CAMOGEWISPINBOXGROUPTABLE_HPP
+#define C_CAMOGEWISPINBOXGROUPTABLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiSpinBoxGroup.hpp"

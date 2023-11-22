@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIARROWCURSORBUTTON_H
-#define C_GILIARROWCURSORBUTTON_H
+#ifndef C_GILIARROWCURSORBUTTON_HPP
+#define C_GILIARROWCURSORBUTTON_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

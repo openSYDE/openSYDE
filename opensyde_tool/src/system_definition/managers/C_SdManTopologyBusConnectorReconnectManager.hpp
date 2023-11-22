@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDMANTOPOLOGYBUSCONNECTORRECONNECTMANAGER_H
-#define C_SDMANTOPOLOGYBUSCONNECTORRECONNECTMANAGER_H
+#ifndef C_SDMANTOPOLOGYBUSCONNECTORRECONNECTMANAGER_HPP
+#define C_SDMANTOPOLOGYBUSCONNECTORRECONNECTMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

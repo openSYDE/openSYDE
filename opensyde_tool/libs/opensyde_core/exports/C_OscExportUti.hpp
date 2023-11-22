@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCEXPORTUTI_H
-#define C_OSCEXPORTUTI_H
+#ifndef C_OSCEXPORTUTI_HPP
+#define C_OSCEXPORTUTI_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclStringList.hpp"

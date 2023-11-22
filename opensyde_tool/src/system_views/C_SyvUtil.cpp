@@ -432,7 +432,7 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32_t ou32_ViewIndex,
 QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32_t ou32_ViewIndex,
                                                    const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                                                    const bool oq_ReadItem,
-                                                   const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode)
+                                                   const C_PuiSvDbWriteWidgetBase::E_WriteMode oe_WriteMode)
 {
    QString c_Retval;
    QString c_DashboardDescription;
@@ -453,7 +453,7 @@ QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32_t ou32_ViewIndex
    }
    else
    {
-      if (oe_WriteMode == C_PuiSvDbWidgetBase::eWM_MANUAL)
+      if (oe_WriteMode == C_PuiSvDbWriteWidgetBase::eWM_MANUAL)
       {
          c_DashboardDescription += C_GtGetText::h_GetText("On Trigger");
       }

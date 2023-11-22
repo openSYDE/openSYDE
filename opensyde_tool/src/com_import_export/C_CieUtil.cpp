@@ -297,11 +297,12 @@ int32_t C_CieUtil::h_ExportFile(const stw::opensyde_gui_logic::C_CieConverter::C
    * Eliminate spaces
    * Cut after 31 characters
 
-   \param[in,out]  orc_Name      Old/New name
-   \param[in,out]  orc_Comment   Comment
+   \param[in,out]  orc_Name                        Old/New name
+   \param[in,out]  orc_Comment                     Comment
+   \param[in]      oq_AlwaysAppendNameInComment    Always append name in comment
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieUtil::h_AdaptName(C_SclString & orc_Name, C_SclString & orc_Comment)
+void C_CieUtil::h_AdaptName(C_SclString & orc_Name, C_SclString & orc_Comment, const bool oq_AlwaysAppendNameInComment)
 {
    C_SclString c_NewName = orc_Name;
 
@@ -314,7 +315,7 @@ void C_CieUtil::h_AdaptName(C_SclString & orc_Name, C_SclString & orc_Comment)
       c_NewName.Delete(ms32_C_ITEM_MAX_CHAR_COUNT + 1, c_NewName.Length());
    }
 
-   if (orc_Name == c_NewName)
+   if ((orc_Name == c_NewName) && (oq_AlwaysAppendNameInComment == false))
    {
       //No change
    }
@@ -337,15 +338,17 @@ void C_CieUtil::h_AdaptName(C_SclString & orc_Name, C_SclString & orc_Comment)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adapt import messages
 
-   \param[in,out]  orc_ImportDataAssignment  Import data assignment
-   \param[in]      oe_ProtocolType           Protocol type
+   \param[in,out]  orc_ImportDataAssignment        Import data assignment
+   \param[in]      oe_ProtocolType                 Protocol type
+   \param[in]      oq_AlwaysAppendNameInComment    Always append name in comment
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieUtil::h_AdaptImportMessages(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment,
-                                      const C_OscCanProtocol::E_Type oe_ProtocolType)
+                                      const C_OscCanProtocol::E_Type oe_ProtocolType,
+                                      const bool oq_AlwaysAppendNameInComment)
 {
    mh_AdaptMessagesToProtocolType(orc_ImportDataAssignment, oe_ProtocolType);
-   mh_AdaptMessageNames(orc_ImportDataAssignment);
+   mh_AdaptMessageNames(orc_ImportDataAssignment, oq_AlwaysAppendNameInComment);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -431,29 +434,21 @@ int32_t C_CieUtil::h_GetDeviceInfo(const uint32_t ou32_DeviceNodeIndex, const ui
          const C_OscNodeComInterfaceSettings & rc_CurInterface =
             pc_Node->c_Properties.c_ComInterfaces[ou32_DeviceNodeInterfaceIndex];
          stw::scl::C_SclString c_ParsingError;
-         std::vector<C_OscCanMessage> c_OscRxMessageData;
-         std::vector<C_OscNodeDataPoolListElement> c_OscRxSignalData;
-         std::vector<uint8_t> c_RxSignalDefaultMinMaxValuesUsed;
-         std::vector<C_OscCanMessage> c_OscTxMessageData;
-         std::vector<C_OscNodeDataPoolListElement> c_OscTxSignalData;
-         std::vector<uint8_t> c_TxSignalDefaultMinMaxValuesUsed;
+         C_OscEdsDcfImportMessageGroup c_OscRxMessageData;
+         C_OscEdsDcfImportMessageGroup c_OscTxMessageData;
          std::vector<std::vector<stw::scl::C_SclString> > c_ImportMessagesPerMessage;
-         std::vector<C_OscCanMessage> c_InvalidOscRxMessageData;
-         std::vector<C_OscNodeDataPoolListElement> c_InvalidOscRxSignalData;
-         std::vector<uint8_t> c_InvalidRxSignalDefaultMinMaxValuesUsed;
-         std::vector<C_OscCanMessage> c_InvalidOscTxMessageData;
-         std::vector<C_OscNodeDataPoolListElement> c_InvalidOscTxSignalData;
-         std::vector<uint8_t> c_InvalidTxSignalDefaultMinMaxValuesUsed;
+         C_OscEdsDcfImportMessageGroup c_InvalidOscRxMessageData;
+         C_OscEdsDcfImportMessageGroup c_InvalidOscTxMessageData;
          std::vector<std::vector<stw::scl::C_SclString> > c_InvalidImportMessagesPerMessage;
          s32_Retval = C_OscImportEdsDcf::h_Import(
             C_PuiUtil::h_GetAbsolutePathFromProject(
                orc_EdsPath).toStdString().c_str(),
             rc_CurInterface.u8_NodeId,
-            c_OscRxMessageData, c_OscRxSignalData, c_RxSignalDefaultMinMaxValuesUsed,
-            c_OscTxMessageData, c_OscTxSignalData, c_TxSignalDefaultMinMaxValuesUsed,
-            c_ImportMessagesPerMessage, c_ParsingError, true,
-            c_InvalidOscRxMessageData, c_InvalidOscRxSignalData, c_InvalidRxSignalDefaultMinMaxValuesUsed,
-            c_InvalidOscTxMessageData, c_InvalidOscTxSignalData, c_InvalidTxSignalDefaultMinMaxValuesUsed,
+            c_OscRxMessageData,
+            c_OscTxMessageData,
+            c_ImportMessagesPerMessage, c_ParsingError, C_OscCanProtocol::eCAN_OPEN,
+            c_InvalidOscRxMessageData,
+            c_InvalidOscTxMessageData,
             c_InvalidImportMessagesPerMessage);
          orc_ParsingError = c_ParsingError.c_str();
          if (s32_Retval == C_NO_ERR)
@@ -472,20 +467,13 @@ int32_t C_CieUtil::h_GetDeviceInfo(const uint32_t ou32_DeviceNodeIndex, const ui
 
             orc_NodeAssignment.c_ImportData =
                C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEdsFileImport(c_OscRxMessageData,
-                                                                               c_OscRxSignalData,
-                                                                               c_RxSignalDefaultMinMaxValuesUsed,
                                                                                c_OscTxMessageData,
-                                                                               c_OscTxSignalData,
-                                                                               c_TxSignalDefaultMinMaxValuesUsed,
                                                                                c_ImportMessagesPerMessage);
             orc_InvalidNodeAssignment.c_ImportData =
-               C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEdsFileImport(c_InvalidOscRxMessageData,
-                                                                               c_InvalidOscRxSignalData,
-                                                                               c_InvalidRxSignalDefaultMinMaxValuesUsed,
-                                                                               c_InvalidOscTxMessageData,
-                                                                               c_InvalidOscTxSignalData,
-                                                                               c_InvalidTxSignalDefaultMinMaxValuesUsed,
-                                                                               c_InvalidImportMessagesPerMessage);
+               C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEdsFileImport(
+                  c_InvalidOscRxMessageData,
+                  c_InvalidOscTxMessageData,
+                  c_InvalidImportMessagesPerMessage);
             if (C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(ou32_DeviceNodeIndex,
                                                                                 ou32_DeviceNodeInterfaceIndex,
                                                                                 u8_InterfaceId) == C_NO_ERR)
@@ -833,27 +821,19 @@ int32_t C_CieUtil::mh_ImportDcfEdsFile(const uint32_t ou32_BusIndex, const C_Osc
             const C_OscNodeComInterfaceSettings & rc_CurInterface =
                pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceIndex];
             C_SclString c_ParsingError;
-            std::vector<C_OscCanMessage> c_OscRxMessageData;
-            std::vector<C_OscNodeDataPoolListElement> c_OscRxSignalData;
-            std::vector<uint8_t> c_RxSignalDefaultMinMaxValuesUsed;
-            std::vector<C_OscCanMessage> c_OscTxMessageData;
-            std::vector<C_OscNodeDataPoolListElement> c_OscTxSignalData;
-            std::vector<uint8_t> c_TxSignalDefaultMinMaxValuesUsed;
+            C_OscEdsDcfImportMessageGroup c_OscRxMessageData;
+            C_OscEdsDcfImportMessageGroup c_OscTxMessageData;
             std::vector<std::vector<C_SclString> > c_ImportMessagesPerMessage;
-            std::vector<C_OscCanMessage> c_InvalidOscRxMessageData;
-            std::vector<C_OscNodeDataPoolListElement> c_InvalidOscRxSignalData;
-            std::vector<uint8_t> c_InvalidRxSignalDefaultMinMaxValuesUsed;
-            std::vector<C_OscCanMessage> c_InvalidOscTxMessageData;
-            std::vector<C_OscNodeDataPoolListElement> c_InvalidOscTxSignalData;
-            std::vector<uint8_t> c_InvalidTxSignalDefaultMinMaxValuesUsed;
+            C_OscEdsDcfImportMessageGroup c_InvalidOscRxMessageData;
+            C_OscEdsDcfImportMessageGroup c_InvalidOscTxMessageData;
             std::vector<std::vector<C_SclString> > c_InvalidImportMessagesPerMessage;
             const int32_t s32_ImportResult = C_OscImportEdsDcf::h_Import(
                orc_FullFilePath.toStdString().c_str(), rc_CurInterface.u8_NodeId,
-               c_OscRxMessageData, c_OscRxSignalData, c_RxSignalDefaultMinMaxValuesUsed,
-               c_OscTxMessageData, c_OscTxSignalData, c_TxSignalDefaultMinMaxValuesUsed,
-               c_ImportMessagesPerMessage, c_ParsingError, false,
-               c_InvalidOscRxMessageData, c_InvalidOscRxSignalData, c_InvalidRxSignalDefaultMinMaxValuesUsed,
-               c_InvalidOscTxMessageData, c_InvalidOscTxSignalData, c_InvalidTxSignalDefaultMinMaxValuesUsed,
+               c_OscRxMessageData,
+               c_OscTxMessageData,
+               c_ImportMessagesPerMessage, c_ParsingError, oe_ProtocolType,
+               c_InvalidOscRxMessageData,
+               c_InvalidOscTxMessageData,
                c_InvalidImportMessagesPerMessage);
             if (s32_ImportResult == C_NO_ERR)
             {
@@ -862,11 +842,7 @@ int32_t C_CieUtil::mh_ImportDcfEdsFile(const uint32_t ou32_BusIndex, const C_Osc
                c_NodeAssignment.u32_OsyInterfaceIndex = u32_InterfaceIndex;
                c_NodeAssignment.c_ImportData =
                   C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEdsFileImport(c_OscRxMessageData,
-                                                                                  c_OscRxSignalData,
-                                                                                  c_RxSignalDefaultMinMaxValuesUsed,
                                                                                   c_OscTxMessageData,
-                                                                                  c_OscTxSignalData,
-                                                                                  c_TxSignalDefaultMinMaxValuesUsed,
                                                                                   c_ImportMessagesPerMessage);
                if ((c_NodeAssignment.c_ImportData.c_Core.c_OscRxMessageData.size() > 0UL) ||
                    (c_NodeAssignment.c_ImportData.c_Core.c_OscTxMessageData.size() > 0UL))
@@ -969,10 +945,12 @@ int32_t C_CieUtil::mh_ImportDcfEdsFile(const uint32_t ou32_BusIndex, const C_Osc
    * Eliminate spaces
    * Cut after 31 characters
 
-   \param[in,out]  orc_ImportDataAssignment  Import data assignment
+   \param[in,out]  orc_ImportDataAssignment        Import data assignment
+   \param[in]      oq_AlwaysAppendNameInComment    Always append name in comment
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieUtil::mh_AdaptMessageNames(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment)
+void C_CieUtil::mh_AdaptMessageNames(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment,
+                                     const bool oq_AlwaysAppendNameInComment)
 {
    //Each imported node
    for (uint32_t u32_ItNodes = 0; u32_ItNodes < orc_ImportDataAssignment.size(); u32_ItNodes++)
@@ -984,23 +962,23 @@ void C_CieUtil::mh_AdaptMessageNames(std::vector<C_CieImportDataAssignment> & or
       for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OscRxMessageData.size(); ++u32_Count)
       {
          C_OscCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OscRxMessageData[u32_Count];
-         C_CieUtil::h_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment);
+         C_CieUtil::h_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment, oq_AlwaysAppendNameInComment);
       }
       for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OscTxMessageData.size(); ++u32_Count)
       {
          C_OscCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OscTxMessageData[u32_Count];
-         C_CieUtil::h_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment);
+         C_CieUtil::h_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment, oq_AlwaysAppendNameInComment);
       }
       //Each signal
       for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OscRxSignalData.size(); ++u32_Count)
       {
          C_OscNodeDataPoolListElement & rc_CurSignal = rc_CurData.c_ImportData.c_Core.c_OscRxSignalData[u32_Count];
-         C_CieUtil::h_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment);
+         C_CieUtil::h_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment, oq_AlwaysAppendNameInComment);
       }
       for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OscTxSignalData.size(); ++u32_Count)
       {
          C_OscNodeDataPoolListElement & rc_CurSignal = rc_CurData.c_ImportData.c_Core.c_OscTxSignalData[u32_Count];
-         C_CieUtil::h_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment);
+         C_CieUtil::h_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment, oq_AlwaysAppendNameInComment);
       }
    }
 }

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEIMPORTREPORTWIDGET_H
-#define C_CIEIMPORTREPORTWIDGET_H
+#ifndef C_CIEIMPORTREPORTWIDGET_HPP
+#define C_CIEIMPORTREPORTWIDGET_HPP
 
 #include <QWidget>
 #include "stwtypes.hpp"
@@ -110,6 +110,7 @@ private:
                                      const stw::opensyde_core::C_OscCanMessage & orc_CurMessage,
                                      const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscAllSignalData, const
                                      QString & orc_InfoMessages, const uint32_t ou32_NodeIndex, const bool oq_IsTx, const uint32_t ou32_MessageIndex, const QString & orc_Suffix, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType, const stw::scl::C_SclString * const opc_NodeNameReplacement, const bool oq_ReplaceMessageNames);
+   static bool mh_IsEdsOrDcfImport(const QString & orc_Suffix);
 
    //Avoid call
    C_CieImportReportWidget(const C_CieImportReportWidget &);

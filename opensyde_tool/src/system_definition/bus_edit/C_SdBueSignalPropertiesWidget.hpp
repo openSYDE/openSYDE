@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUESIGNALPROPERTIESWIDGET_H
-#define C_SDBUESIGNALPROPERTIESWIDGET_H
+#ifndef C_SDBUESIGNALPROPERTIESWIDGET_HPP
+#define C_SDBUESIGNALPROPERTIESWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -174,4 +174,4 @@ Q_SIGNALS:
 }
 }
 
-#endif // C_SDBUESIGNALPROPERTIESWIDGET_H
+#endif // C_SDBUESIGNALPROPERTIESWIDGET_HPP

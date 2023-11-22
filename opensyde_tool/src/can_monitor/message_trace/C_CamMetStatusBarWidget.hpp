@@ -9,8 +9,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETSTATUSBARWIDGET_H
-#define C_CAMMETSTATUSBARWIDGET_H
+#ifndef C_CAMMETSTATUSBARWIDGET_HPP
+#define C_CAMMETSTATUSBARWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

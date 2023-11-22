@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMLVEMPTYITEM_H
-#define C_SDBUEMLVEMPTYITEM_H
+#ifndef C_SDBUEMLVEMPTYITEM_HPP
+#define C_SDBUEMLVEMPTYITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

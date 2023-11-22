@@ -890,7 +890,16 @@ void C_SyvDaDashboardsWidget::m_DataPoolWrite(const uint32_t ou32_NodeIndex, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OscNodeDataPoolListElementId & orc_Index)
+/*! \brief   Read a Datapool element from server
+
+   \param[in]       orc_Index             Detailed input parameter description
+   \param[in]       opc_DashboardWidget   Optional pointer to dashboard widget data element
+                                             Valid pointer: read value only for this widget with this Datapool element
+                                             NULL pointer:  read value for all widgets with this Datapool element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OscNodeDataPoolListElementId & orc_Index,
+                                             stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget)
 {
    if (this->mpc_ComDriver != NULL)
    {
@@ -898,12 +907,13 @@ void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OscNodeDataPoolListElementI
          this->mpc_ComDriver->PollDataPoolRead(orc_Index.u32_NodeIndex,
                                                static_cast<uint8_t>(orc_Index.u32_DataPoolIndex),
                                                static_cast<uint16_t>(orc_Index.u32_ListIndex),
-                                               static_cast<uint16_t>(orc_Index.u32_ElementIndex));
+                                               static_cast<uint16_t>(orc_Index.u32_ElementIndex),
+                                               opc_DashboardWidget);
       //Error handling
       if (s32_Return == C_BUSY)
       {
-         const C_OscNodeDataPoolListElementId c_Id(orc_Index);
-         this->mc_MissedReadOperations.insert(c_Id);
+         const C_MissedReadOperation c_MissedOperation(orc_Index, opc_DashboardWidget);
+         this->mc_MissedReadOperations.insert(c_MissedOperation);
       }
    }
 }
@@ -956,33 +966,36 @@ void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const int32_t os32
       }
       else
       {
-         if (this->mc_MissedReadOperations.size() > 0)
+         if (this->mc_MissedWriteOperations.size() > 0)
          {
-            const C_OscNodeDataPoolListElementId c_Id = *this->mc_MissedReadOperations.begin();
+            const C_OscNodeDataPoolListElementId c_Id = *this->mc_MissedWriteOperations.begin();
             const int32_t s32_Return =
-               this->mpc_ComDriver->PollDataPoolRead(c_Id.u32_NodeIndex, static_cast<uint8_t>(c_Id.u32_DataPoolIndex),
-                                                     static_cast<uint16_t>(c_Id.u32_ListIndex),
-                                                     static_cast<uint16_t>(c_Id.u32_ElementIndex));
+               this->mpc_ComDriver->PollDataPoolWrite(c_Id.u32_NodeIndex,
+                                                      static_cast<uint8_t>(c_Id.u32_DataPoolIndex),
+                                                      static_cast<uint16_t>(c_Id.u32_ListIndex),
+                                                      static_cast<uint16_t>(c_Id.u32_ElementIndex));
             //Error handling
             if (s32_Return != C_BUSY)
             {
-               this->mc_MissedReadOperations.erase(this->mc_MissedReadOperations.begin());
+               this->mc_MissedWriteOperations.erase(this->mc_MissedWriteOperations.begin());
             }
          }
          else
          {
-            if (this->mc_MissedWriteOperations.size() > 0)
+            if (this->mc_MissedReadOperations.size() > 0)
             {
-               const C_OscNodeDataPoolListElementId c_Id = *this->mc_MissedWriteOperations.begin();
+               const C_MissedReadOperation c_MissedOperation = *this->mc_MissedReadOperations.begin();
+               const C_OscNodeDataPoolListElementId & rc_Id = c_MissedOperation.c_ElementId;
                const int32_t s32_Return =
-                  this->mpc_ComDriver->PollDataPoolWrite(c_Id.u32_NodeIndex,
-                                                         static_cast<uint8_t>(c_Id.u32_DataPoolIndex),
-                                                         static_cast<uint16_t>(c_Id.u32_ListIndex),
-                                                         static_cast<uint16_t>(c_Id.u32_ElementIndex));
+                  this->mpc_ComDriver->PollDataPoolRead(rc_Id.u32_NodeIndex,
+                                                        static_cast<uint8_t>(rc_Id.u32_DataPoolIndex),
+                                                        static_cast<uint16_t>(rc_Id.u32_ListIndex),
+                                                        static_cast<uint16_t>(rc_Id.u32_ElementIndex),
+                                                        c_MissedOperation.pc_DashboardWidget);
                //Error handling
                if (s32_Return != C_BUSY)
                {
-                  this->mc_MissedWriteOperations.erase(this->mc_MissedWriteOperations.begin());
+                  this->mc_MissedReadOperations.erase(this->mc_MissedReadOperations.begin());
                }
             }
          }
@@ -1198,4 +1211,44 @@ void C_SyvDaDashboardsWidget::m_AdaptSpaceHolderWidgetColor(void) const
    {
       this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(0);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current smaller than orc_Cmp
+
+   Warning: Due to array comparison no comparison function may be combined.
+
+   \param[in]  orc_Cmp  Compared instance
+
+   \return
+   Current smaller than orc_Cmp
+   Else false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaDashboardsWidget::C_MissedReadOperation::operator <(const C_MissedReadOperation & orc_Cmp) const
+{
+   bool q_Return;
+
+   if (this->c_ElementId < orc_Cmp.c_ElementId)
+   {
+      q_Return = true;
+   }
+   else if (this->c_ElementId == orc_Cmp.c_ElementId)
+   {
+      //lint -e{946}  Operator necessary for std::set, no further interpretation
+      if (this->pc_DashboardWidget < orc_Cmp.pc_DashboardWidget)
+      {
+         q_Return = true;
+      }
+      else
+      {
+         q_Return = false;
+      }
+   }
+   else
+   {
+      q_Return = false;
+   }
+
+   return q_Return;
 }

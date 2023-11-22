@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABDESCRIPTIONMESSAGE_H
-#define C_OGELABDESCRIPTIONMESSAGE_H
+#ifndef C_OGELABDESCRIPTIONMESSAGE_HPP
+#define C_OGELABDESCRIPTIONMESSAGE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabContextMenuBase.hpp"

@@ -74,15 +74,15 @@ C_SdBueJ1939AddMessagesFromCatalogDialog::C_SdBueJ1939AddMessagesFromCatalogDial
    this->mrc_ParentDialog.SetWidget(this);
 
    m_SetupContextMenu();
-   m_UpdateSelection(0);
    m_UpdateUi();
+   m_UpdateSelection(0);
 
    // Combobox settings
    this->mpc_Ui->pc_ComboBoxMessageMode->addItem(C_GtGetText::h_GetText("Show all messages"));
    this->mpc_Ui->pc_ComboBoxMessageMode->addItem(C_GtGetText::h_GetText("Show only J1939 specific messages"));
    this->mpc_Ui->pc_ComboBoxMessageMode->setCurrentIndex(0);
 
-   this->mpc_Ui->pc_TabelView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+   this->mpc_Ui->pc_TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
    this->mpc_Ui->pc_TextBrowserStatusMessage->SetLinkOnly();
 
@@ -107,9 +107,9 @@ C_SdBueJ1939AddMessagesFromCatalogDialog::C_SdBueJ1939AddMessagesFromCatalogDial
    connect(this->mpc_Ui->pc_ComboBoxMessageMode,
            static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnModeChanged);
-   connect(this->mpc_Ui->pc_TabelView, &C_SdBueJ1939AddMessagesFromCatalogTableView::SigSelectionChanged, this,
+   connect(this->mpc_Ui->pc_TreeView, &C_SdBueJ1939AddMessagesFromCatalogTreeView::SigSelectionChanged, this,
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateSelection);
-   connect(this->mpc_Ui->pc_TabelView, &C_SdBueJ1939AddMessagesFromCatalogTableView::SigAccept, this,
+   connect(this->mpc_Ui->pc_TreeView, &C_SdBueJ1939AddMessagesFromCatalogTreeView::SigAccept, this,
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_AddClicked);
    connect(this->mpc_Ui->pc_LineEditMessageFilter, &QLineEdit::textChanged, this,
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnSearch);
@@ -214,7 +214,7 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::keyPressEvent(QKeyEvent * const o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueJ1939AddMessagesFromCatalogDialog::m_AddClicked(void)
 {
-   this->mc_MessagesImportedFromCatalog = this->mpc_Ui->pc_TabelView->GetSelectedMessages();
+   this->mc_MessagesImportedFromCatalog = this->mpc_Ui->pc_TreeView->GetSelectedMessages();
    if (this->mc_MessagesImportedFromCatalog.size() == 0)
    {
       this->m_ShowNoMessagesSelectedPopup();
@@ -262,13 +262,14 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnModeChanged()
       {
          std::vector<stw::opensyde_gui_logic::C_CieConverter::C_CieNodeMessage> c_FilteredMessages;
          this->m_FilterJ1939SpecificMessages(c_FilteredMessages);
-         this->mpc_Ui->pc_TabelView->UpdateData(c_FilteredMessages);
+         this->mpc_Ui->pc_TreeView->UpdateData(c_FilteredMessages);
       }
       // All messages
       else
       {
-         this->mpc_Ui->pc_TabelView->UpdateData(this->mc_MessagesImportedFromCatalog);
+         this->mpc_Ui->pc_TreeView->UpdateData(this->mc_MessagesImportedFromCatalog);
       }
+      this->m_UpdateSelection(0);
    }
 
    m_UpdateUi();
@@ -398,7 +399,7 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_LoadCatalog()
       if ((c_CieCommDef.c_Nodes.size() > 0UL) || (c_CieCommDef.c_UnmappedMessages.size() > 0UL))
       {
          // Process the messages
-         this->mpc_Ui->pc_TabelView->UpdateData(this->mc_MessagesImportedFromCatalog);
+         this->mpc_Ui->pc_TreeView->UpdateData(this->mc_MessagesImportedFromCatalog);
       }
    }
    else
@@ -407,7 +408,7 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_LoadCatalog()
 
       //Update table
       this->mc_MessagesImportedFromCatalog.clear();
-      this->mpc_Ui->pc_TabelView->UpdateData(this->mc_MessagesImportedFromCatalog);
+      this->mpc_Ui->pc_TreeView->UpdateData(this->mc_MessagesImportedFromCatalog);
    }
 
    m_UpdateUi();
@@ -450,21 +451,19 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_SetStatus() const
 void C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateUi() const
 {
    //  Messages exist
-   if (this->mpc_Ui->pc_TabelView->IsEmpty() == false)
+   if (this->mpc_Ui->pc_TreeView->IsEmpty() == false)
    {
-      this->mpc_Ui->pc_TabelView->setVisible(true);
+      this->mpc_Ui->pc_TreeView->setVisible(true);
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
       this->mpc_Ui->pc_LabelNoMessages->setVisible(false);
    }
    // no messages
    else
    {
-      this->mpc_Ui->pc_TabelView->setVisible(false);
+      this->mpc_Ui->pc_TreeView->setVisible(false);
       this->mpc_Ui->pc_LabelSelection->setVisible(false);
       this->mpc_Ui->pc_LabelNoMessages->setVisible(true);
    }
-
-   this->mpc_Ui->pc_LabelSelection->setText(C_GtGetText::h_GetText("No selected message"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -473,20 +472,20 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateUi() const
    \param[in]  os32_SelectionCount   Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateSelection(const int32_t os32_SelectionCount) const
+void C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateSelection(const uint32_t ou32_SelectionCount) const
 {
-   if (this->mpc_Ui->pc_TabelView->IsEmpty() == true)
+   if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
    {
       this->mpc_Ui->pc_LabelSelection->setVisible(false);
    }
    else
    {
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
-      if (os32_SelectionCount > 0)
+      if (ou32_SelectionCount > 0)
       {
          this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                           "%1 selected message(s)")).
-                                                  arg(os32_SelectionCount));
+                                                  arg(ou32_SelectionCount));
       }
       else
       {
@@ -504,10 +503,14 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateSelection(const int32_t o
 void C_SdBueJ1939AddMessagesFromCatalogDialog::m_ShowCatalogImportError()
 {
    C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-   QString c_LogMessage("For detailed information see ");
+   const QString c_LogMessage = C_GtGetText::h_GetText("For detailed information see ") +
+                                C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                                 C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
 
-   c_LogMessage += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
-                                    C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+   //Update log file
+   C_OscLoggingHandler::h_Flush();
+
+   // Show message
    c_Message.SetHeading(C_GtGetText::h_GetText("Catalog Import Error"));
    c_Message.SetDescription(C_GtGetText::h_GetText("DBC file cannot be read. Check your file and retry."));
    c_Message.SetDetails(c_LogMessage);
@@ -664,8 +667,20 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_ExtractMessagesFromDbc(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnSearch(const QString & orc_Text) const
 {
-   this->mpc_Ui->pc_TabelView->Search(orc_Text);
+   this->mpc_Ui->pc_TreeView->Search(orc_Text);
+
    m_UpdateUi();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select all messages in the table
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueJ1939AddMessagesFromCatalogDialog::m_SelectAllMessages()
+{
+   // Message selection varies depending on existence of the filter text
+   this->mpc_Ui->pc_TreeView->SelectAllMessages(this->mpc_Ui->pc_LineEditMessageFilter->text().isEmpty());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -677,10 +692,12 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_SetupContextMenu(void)
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
 
    // select all action
-   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select all"),
-                                    this->mpc_Ui->pc_TabelView,
-                                    &C_SdBueJ1939AddMessagesFromCatalogTableView::selectAll,
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select all visible"),
+                                    this, &C_SdBueJ1939AddMessagesFromCatalogDialog::m_SelectAllMessages,
                                     static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Unselect all"),
+                                    this->mpc_Ui->pc_TreeView,
+                                    &C_SdBueJ1939AddMessagesFromCatalogTreeView::UnSelectAllMessages);
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(this, &C_SdBueJ1939AddMessagesFromCatalogDialog::customContextMenuRequested, this,
@@ -698,7 +715,7 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnCustomContextMenuRequested(co
    const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
 
    // check if position is on tree view
-   if (this->mpc_Ui->pc_TabelView->geometry().contains(orc_Pos))
+   if (this->mpc_Ui->pc_TreeView->geometry().contains(orc_Pos))
    {
       this->mpc_ContextMenu->popup(c_PosGlobal);
    }

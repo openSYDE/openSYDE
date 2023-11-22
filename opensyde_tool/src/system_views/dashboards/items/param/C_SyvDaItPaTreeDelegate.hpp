@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITPATREEDELEGATE_H
-#define C_SYVDAITPATREEDELEGATE_H
+#ifndef C_SYVDAITPATREEDELEGATE_HPP
+#define C_SYVDAITPATREEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBSVGICONWITHTEXT_H
-#define C_OGEPUBSVGICONWITHTEXT_H
+#ifndef C_OGEPUBSVGICONWITHTEXT_HPP
+#define C_OGEPUBSVGICONWITHTEXT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubSvgIconWithTextBase.hpp"

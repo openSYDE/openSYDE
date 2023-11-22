@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCTARGETSUPPORTPACKAGEFILER_H
-#define C_OSCTARGETSUPPORTPACKAGEFILER_H
+#ifndef C_OSCTARGETSUPPORTPACKAGEFILER_HPP
+#define C_OSCTARGETSUPPORTPACKAGEFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

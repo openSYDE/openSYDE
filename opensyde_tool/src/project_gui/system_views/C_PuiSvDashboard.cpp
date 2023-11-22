@@ -1688,13 +1688,11 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32_t ou32_No
    False No elements were invalidated
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_NodeIndex,
-                                                                 const uint32_t ou32_DataPoolIndex,
-                                                                 const uint32_t ou32_ListIndex,
-                                                                 const uint32_t ou32_ElementIndex,
-                                                                 const C_OscNodeDataPoolContent::E_Type oe_Type,
-                                                                 const bool oq_IsArray, const uint32_t ou32_ArraySize,
-                                                                 const bool oq_IsString)
+bool C_PuiSvDashboard::OnSyncElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                       const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                       const C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                       const bool oq_IsArray, const uint32_t ou32_ArraySize,
+                                                       const bool oq_IsString)
 {
    bool q_Retval = false;
 
@@ -1767,6 +1765,8 @@ bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32_t 
          }
       }
    }
+   m_SyncWriteElementsOnElementTypeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex,
+                                           oe_Type);
    //Probably not necessary
    m_SyncCleanUpParams();
 
@@ -1805,6 +1805,39 @@ bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32_t 
       }
    }
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  orc_MinElement       New min element
+   \param[in]  orc_MaxElement       New max element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncElementRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                 const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                 const C_OscNodeDataPoolContent & orc_MinElement,
+                                                 const C_OscNodeDataPoolContent & orc_MaxElement)
+{
+   for (C_PuiSvDbSlider & rc_Element : this->mc_Sliders)
+   {
+      C_PuiSvDashboard::mh_SyncContentToRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                     ou32_ElementIndex, orc_MinElement, orc_MaxElement, rc_Element);
+   }
+   for (C_PuiSvDbSpinBox & rc_Element : this->mc_SpinBoxes)
+   {
+      C_PuiSvDashboard::mh_SyncContentToRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                     ou32_ElementIndex, orc_MinElement, orc_MaxElement, rc_Element);
+   }
+   for (C_PuiSvDbToggle & rc_Element : this->mc_Toggles)
+   {
+      C_PuiSvDashboard::mh_SyncContentToRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                     ou32_ElementIndex, orc_MinElement, orc_MaxElement, rc_Element);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3120,6 +3153,26 @@ void C_PuiSvDashboard::HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fix dashboard write content type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::FixDashboardWriteContentType()
+{
+   for (C_PuiSvDbSlider & rc_Element : this->mc_Sliders)
+   {
+      C_PuiSvDashboard::mh_FixDashboardWriteContentType(rc_Element);
+   }
+   for (C_PuiSvDbSpinBox & rc_Element : this->mc_SpinBoxes)
+   {
+      C_PuiSvDashboard::mh_FixDashboardWriteContentType(rc_Element);
+   }
+   for (C_PuiSvDbToggle & rc_Element : this->mc_Toggles)
+   {
+      C_PuiSvDashboard::mh_FixDashboardWriteContentType(rc_Element);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget type
 
    \param[in]  opc_Box  Basic widget item
@@ -3394,6 +3447,151 @@ void C_PuiSvDashboard::m_SyncCleanUpParams(void)
          {
             //Iterate to next item
             ++c_ItDataPoolElements;
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fix dashboard write content type
+
+   \param[in,out]  orc_Element   Element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::mh_FixDashboardWriteContentType(C_PuiSvDbWriteWidgetBase & orc_Element)
+{
+   if (orc_Element.c_DataPoolElementsConfig.size() > 0UL)
+   {
+      const C_PuiSvDbNodeDataElementConfig & rc_CurElement = orc_Element.c_DataPoolElementsConfig[0UL];
+      //Assuming only one element selectable
+      tgl_assert(orc_Element.c_DataPoolElementsConfig.size() == 1UL);
+      if (rc_CurElement.c_ElementId.GetIsValid())
+      {
+         const C_OscNodeDataPoolListElement * const pc_DpElement =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurElement.c_ElementId);
+         tgl_assert(pc_DpElement != NULL);
+         if (pc_DpElement != NULL)
+         {
+            //Only overwrite if mismatch!
+            if ((orc_Element.c_InitialValue.GetType() != pc_DpElement->GetType()) ||
+                (orc_Element.c_InitialValue.GetArray() != pc_DpElement->GetArray()))
+            {
+               C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_Unused;
+               orc_Element.c_InitialValue = pc_DpElement->c_MinValue;
+               tgl_assert(C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_DpElement->c_MinValue,
+                                                                                pc_DpElement->c_MaxValue,
+                                                                                orc_Element.c_InitialValue, e_Unused,
+                                                                                C_OscNodeDataPoolContentUtil::eTO_ZERO) ==
+                          C_NO_ERR);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sync write elements on node data pool list element type changed
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Type              Type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::m_SyncWriteElementsOnElementTypeChanged(const uint32_t ou32_NodeIndex,
+                                                               const uint32_t ou32_DataPoolIndex,
+                                                               const uint32_t ou32_ListIndex,
+                                                               const uint32_t ou32_ElementIndex,
+                                                               const C_OscNodeDataPoolContent::E_Type oe_Type)
+{
+   for (C_PuiSvDbSlider & rc_Element : this->mc_Sliders)
+   {
+      C_PuiSvDashboard::mh_SyncContentTypeToTypeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                        ou32_ElementIndex, oe_Type, rc_Element);
+   }
+   for (C_PuiSvDbSpinBox & rc_Element : this->mc_SpinBoxes)
+   {
+      C_PuiSvDashboard::mh_SyncContentTypeToTypeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                        ou32_ElementIndex, oe_Type, rc_Element);
+   }
+   for (C_PuiSvDbToggle & rc_Element : this->mc_Toggles)
+   {
+      C_PuiSvDashboard::mh_SyncContentTypeToTypeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                        ou32_ElementIndex, oe_Type, rc_Element);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sync content type to type changed
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
+   \param[in]      oe_Type             Type
+   \param[in,out]  orc_Element         Element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::mh_SyncContentTypeToTypeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                       const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                       const C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                       C_PuiSvDbWriteWidgetBase & orc_Element)
+{
+   if (orc_Element.c_DataPoolElementsConfig.size() > 0UL)
+   {
+      const C_PuiSvDbNodeDataElementConfig & rc_CurElement = orc_Element.c_DataPoolElementsConfig[0UL];
+      //Assuming only one element selectable
+      tgl_assert(orc_Element.c_DataPoolElementsConfig.size() == 1UL);
+      if (rc_CurElement.c_ElementId.GetIsValid())
+      {
+         if (rc_CurElement.c_ElementId.CheckSameDataElement(C_OscNodeDataPoolListElementId(ou32_NodeIndex,
+                                                                                           ou32_DataPoolIndex,
+                                                                                           ou32_ListIndex,
+                                                                                           ou32_ElementIndex)))
+         {
+            orc_Element.c_InitialValue.SetType(oe_Type);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sync content to range changed
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
+   \param[in]      orc_MinElement      Min element
+   \param[in]      orc_MaxElement      Max element
+   \param[in,out]  orc_Element         Element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::mh_SyncContentToRangeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                    const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                    const C_OscNodeDataPoolContent & orc_MinElement,
+                                                    const C_OscNodeDataPoolContent & orc_MaxElement,
+                                                    C_PuiSvDbWriteWidgetBase & orc_Element)
+{
+   if (orc_Element.c_DataPoolElementsConfig.size() > 0UL)
+   {
+      const C_PuiSvDbNodeDataElementConfig & rc_CurElement = orc_Element.c_DataPoolElementsConfig[0UL];
+      //Assuming only one element selectable
+      tgl_assert(orc_Element.c_DataPoolElementsConfig.size() == 1UL);
+      if (rc_CurElement.c_ElementId.GetIsValid())
+      {
+         if (rc_CurElement.c_ElementId.CheckSameDataElement(C_OscNodeDataPoolListElementId(ou32_NodeIndex,
+                                                                                           ou32_DataPoolIndex,
+                                                                                           ou32_ListIndex,
+                                                                                           ou32_ElementIndex)))
+         {
+            C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_Unused;
+            tgl_assert(C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_MinElement,
+                                                                             orc_MaxElement,
+                                                                             orc_Element.c_InitialValue, e_Unused,
+                                                                             C_OscNodeDataPoolContentUtil::eLEAVE_VALUE) ==
+                       C_NO_ERR);
          }
       }
    }

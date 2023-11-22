@@ -5,8 +5,8 @@
    \copyright   Copyright 2023 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEBLABEL_H
-#define C_OGETEBLABEL_H
+#ifndef C_OGETEBLABEL_HPP
+#define C_OGETEBLABEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTebContextMenuBase.hpp"

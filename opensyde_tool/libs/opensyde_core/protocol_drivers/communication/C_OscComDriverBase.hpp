@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCOMDRIVERBASE_H
-#define C_OSCCOMDRIVERBASE_H
+#ifndef C_OSCCOMDRIVERBASE_HPP
+#define C_OSCCOMDRIVERBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -20,6 +20,7 @@
 #include "stw_can.hpp"
 #include "C_CanDispatcher.hpp"
 #include "C_OscComMessageLogger.hpp"
+#include "C_OscComAutoSupport.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -61,14 +62,21 @@ public:
 
    virtual void DistributeMessages(void);
    virtual void SendCanMessageQueued(const stw::can::T_STWCAN_Msg_TX & orc_Msg);
-   int32_t SendCanMessageDirect(const stw::can::T_STWCAN_Msg_TX & orc_Msg);
+   int32_t SendCanMessageDirect(stw::can::T_STWCAN_Msg_TX & orc_Msg);
 
-   virtual void SendCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg);
-   virtual void AddCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg);
-   virtual void RemoveCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg);
+   virtual void SendCanMessage(C_OscComDriverBaseCanMessage & orc_MsgCfg, const bool oq_SetAutoSupportMode,
+                               const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
+   virtual void AddCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg, const bool oq_SetAutoSupportMode,
+                                    const C_OscCanProtocol::E_Type oe_ProtocolType);
+   virtual void RemoveCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg,
+                                       const bool oq_SetAutoSupportMode,
+                                       const C_OscCanProtocol::E_Type oe_ProtocolType);
    virtual void RemoveAllCyclicCanMessages(void);
 
    virtual void PrepareForDestruction(void);
+   virtual void ClearData(void);
+   virtual void UpdateAutoSupportProtocol(const int32_t os32_CanId, const bool oq_SetAutoSupportMode,
+                                          const C_OscCanProtocol::E_Type oe_ProtocolType);
 
 protected:
    virtual void m_HandleCanMessage(const stw::can::T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx);
@@ -101,6 +109,8 @@ private:
 
    uint32_t mu32_CanTxCounter;
    uint32_t mu32_CanTxErrors;
+
+   C_OscComAutoSupport * mpc_AutoSupportProtocol;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

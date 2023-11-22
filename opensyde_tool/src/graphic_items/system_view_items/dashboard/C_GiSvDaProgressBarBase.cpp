@@ -208,7 +208,7 @@ void C_GiSvDaProgressBarBase::UpdateShowValue(void)
    QString c_ScaledValue;
 
    if ((this->mpc_ProgressBarWidget != NULL) &&
-       (this->m_GetLastValue(0, c_ScaledValue, &f64_UnscaledValue) == C_NO_ERR))
+       (this->m_GetLastValue(0, c_ScaledValue, &f64_UnscaledValue, NULL) == C_NO_ERR))
    {
       const float64_t f64_Progress =
          ((f64_UnscaledValue - this->mf64_UnscaledMin) / (this->mf64_UnscaledMax - this->mf64_UnscaledMin)) * 2000000.0;
@@ -285,7 +285,6 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
          pc_PropertiesWidget->SetType(pc_Box->e_Type);
          pc_PropertiesWidget->SetAlignment(pc_Box->e_Alignment);
          pc_PropertiesWidget->SetShowMinMax(pc_Box->q_ShowMinMax);
-         pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);
 
          if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
@@ -306,7 +305,6 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
             {
                c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
             }
-            c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
             //Force update
             this->mq_InitialStyleCall = true;

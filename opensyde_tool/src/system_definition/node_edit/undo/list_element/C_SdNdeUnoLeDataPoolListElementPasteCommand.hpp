@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEUNOLEDATAPOOLLISTELEMENTPASTECOMMAND_H
-#define C_SDNDEUNOLEDATAPOOLLISTELEMENTPASTECOMMAND_H
+#ifndef C_SDNDEUNOLEDATAPOOLLISTELEMENTPASTECOMMAND_HPP
+#define C_SDNDEUNOLEDATAPOOLLISTELEMENTPASTECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

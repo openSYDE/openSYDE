@@ -239,6 +239,11 @@ void C_OscComMessageLoggerFileAsc::AddMessageToFile(const C_OscComMessageLoggerD
          }
          c_LogEntry += "\n";
       }
+      if (orc_MessageData.c_Status != "")
+      {
+         c_LogEntry += "   //Status  " + orc_MessageData.c_Status;
+         c_LogEntry += "\n";
+      }
 
       this->mc_File.write(c_LogEntry.c_str(), c_LogEntry.Length());
    }

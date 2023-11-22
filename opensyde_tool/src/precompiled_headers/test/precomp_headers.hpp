@@ -14,8 +14,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef  PRECOMP_HEADERS_TEST_H
-#define  PRECOMP_HEADERS_TEST_H
+#ifndef  PRECOMP_HEADERS_TEST_HPP
+#define  PRECOMP_HEADERS_TEST_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

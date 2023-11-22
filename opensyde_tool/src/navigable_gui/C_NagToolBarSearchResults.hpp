@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGTOOLBARSEARCHRESULTS_H
-#define C_NAGTOOLBARSEARCHRESULTS_H
+#ifndef C_NAGTOOLBARSEARCHRESULTS_HPP
+#define C_NAGTOOLBARSEARCHRESULTS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -71,4 +71,4 @@ private:
 }
 } //end of namespace
 
-#endif // C_NAGTOOLTIP_H
+#endif // C_NAGTOOLTIP_HPP

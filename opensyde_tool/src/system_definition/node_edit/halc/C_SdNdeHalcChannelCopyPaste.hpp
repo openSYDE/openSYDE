@@ -6,8 +6,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEHALCCHANNELCOPYPASTE_H
-#define C_SDNDEHALCCHANNELCOPYPASTE_H
+#ifndef C_SDNDEHALCCHANNELCOPYPASTE_HPP
+#define C_SDNDEHALCCHANNELCOPYPASTE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

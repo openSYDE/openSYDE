@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELENAVIGATION_H
-#define C_OGELENAVIGATION_H
+#ifndef C_OGELENAVIGATION_HPP
+#define C_OGELENAVIGATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeContextMenuBase.hpp"

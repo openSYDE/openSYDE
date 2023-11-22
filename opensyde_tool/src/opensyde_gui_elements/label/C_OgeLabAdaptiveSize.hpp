@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABADAPTIVESIZE_H
-#define C_OGELABADAPTIVESIZE_H
+#ifndef C_OGELABADAPTIVESIZE_HPP
+#define C_OGELABADAPTIVESIZE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

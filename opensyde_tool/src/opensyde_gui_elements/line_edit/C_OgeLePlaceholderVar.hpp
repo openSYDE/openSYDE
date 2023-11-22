@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELEPLACEHOLDERVAR_H
-#define C_OGELEPLACEHOLDERVAR_H
+#ifndef C_OGELEPLACEHOLDERVAR_HPP
+#define C_OGELEPLACEHOLDERVAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeToolTipBase.hpp"

@@ -205,6 +205,27 @@ void C_GiSvDaSliderBase::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaSliderBase::UpdateShowValue(void)
+{
+   // Poll only when something is expected
+   if (this->mq_ManualReadStarted == true)
+   {
+      QString c_Value;
+      float64_t f64_UnscaledValue;
+      if (this->m_GetLastValue(0UL, c_Value, &f64_UnscaledValue, NULL) == C_NO_ERR)
+      {
+         this->m_SetUnscaledValueToSliderWidget(f64_UnscaledValue);
+         this->mq_ManualReadStarted = false;
+      }
+   }
+
+   // For write widget calling base class is not necessary
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active   Flag if connection is active or not active now
@@ -214,7 +235,20 @@ void C_GiSvDaSliderBase::ConnectionActiveChanged(const bool oq_Active)
 {
    if (oq_Active == true)
    {
-      this->m_UpdateStaticValues();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
+      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
+
+      if ((pc_Box != NULL) &&
+          (pc_Box->e_InitialValueMode == C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE))
+      {
+         // Special case: Defined constant value as start value is set
+         // Update before calling base class implementation
+         float64_t f64_UnscaledValue;
+         tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Box->c_InitialValue, f64_UnscaledValue,
+                                                              0UL) == C_NO_ERR);
+         this->m_SetUnscaledValueToSliderWidget(f64_UnscaledValue);
+      }
+
       if (this->m_IsOnChange() == true)
       {
          connect(this->mpc_SliderWidget, &C_SyvDaItDashboardSliderWidget::SigOnChange, this,
@@ -317,11 +351,13 @@ bool C_GiSvDaSliderBase::CallProperties(void)
          pc_Dialog->SetTheme(pc_Box->e_DisplayStyle);
 
          //Resize
-         c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithDisplayFormatter());
+         c_New->SetSize(C_SyvDaPeBase::h_GetSliderPopupSizeWithDashboardConnect());
 
          pc_PropertiesWidget->SetType(pc_Box->e_Type);
          pc_PropertiesWidget->SetShowMinMax(pc_Box->q_ShowMinMax);
          pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);
+         pc_Dialog->SetAutoWriteOnConnect(pc_Box->q_AutoWriteOnConnect);
+         pc_Dialog->SetDashboardConnectInitialValue(pc_Box->e_InitialValueMode, pc_Box->c_InitialValue, false);
 
          if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
@@ -342,11 +378,16 @@ bool C_GiSvDaSliderBase::CallProperties(void)
                c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
             }
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
+            c_Box.q_AutoWriteOnConnect = pc_Dialog->GetAutoWriteOnConnect();
+            c_Box.e_InitialValueMode = pc_Dialog->GetDashboardConnectInitialValueMode();
+            c_Box.c_InitialValue = pc_Dialog->GetDashboardConnectInitialValue();
 
             //Force update
             this->mq_InitialStyleCall = true;
             //Apply
             this->me_WriteMode = pc_Dialog->GetWriteMode();
+            this->me_WriteInitialValueMode = c_Box.e_InitialValueMode;
+            this->mq_AutoWriteOnConnect = c_Box.q_AutoWriteOnConnect;
 
             this->ClearDataPoolElements();
             if (c_Tmp.c_ElementId.GetIsValid())
@@ -574,11 +615,29 @@ bool C_GiSvDaSliderBase::m_IsOnChange(void) const
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
-         if (pc_Box->e_ElementWriteMode == C_PuiSvDbWidgetBase::eWM_ON_CHANGE)
+         if (pc_Box->e_ElementWriteMode == C_PuiSvDbWriteWidgetBase::eWM_ON_CHANGE)
          {
             q_Retval = true;
          }
       }
    }
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set unscaled value to slider widget
+
+   \param[in]  of64_NewValue  New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaSliderBase::m_SetUnscaledValueToSliderWidget(const float64_t of64_NewValue) const
+{
+   if (this->mpc_SliderWidget != NULL)
+   {
+      //Scale value to slider range
+      const float64_t f64_SliderValue = ((of64_NewValue - this->mf64_UnscaledMinValue) /
+                                         this->mf64_SliderFactor) +
+                                        static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue());
+      this->mpc_SliderWidget->SetValue(static_cast<int32_t>(f64_SliderValue));
+   }
 }

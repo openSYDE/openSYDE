@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPACSECTIONNODEFILESWIDGET_H
-#define C_SYVUPPACSECTIONNODEFILESWIDGET_H
+#ifndef C_SYVUPPACSECTIONNODEFILESWIDGET_HPP
+#define C_SYVUPPACSECTIONNODEFILESWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvUpPacSectionNodeWidget.hpp"

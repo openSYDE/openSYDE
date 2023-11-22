@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEDASHBOARDPROGRESSBAR_H
-#define C_OGEDASHBOARDPROGRESSBAR_H
+#ifndef C_OGEDASHBOARDPROGRESSBAR_HPP
+#define C_OGEDASHBOARDPROGRESSBAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QProgressBar>

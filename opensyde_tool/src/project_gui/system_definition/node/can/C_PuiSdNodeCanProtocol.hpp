@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDNODECANPROTOCOL_H
-#define C_PUISDNODECANPROTOCOL_H
+#ifndef C_PUISDNODECANPROTOCOL_HPP
+#define C_PUISDNODECANPROTOCOL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

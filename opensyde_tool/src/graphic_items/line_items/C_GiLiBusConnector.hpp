@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIBUSCONNECTOR_H
-#define C_GILIBUSCONNECTOR_H
+#ifndef C_GILIBUSCONNECTOR_HPP
+#define C_GILIBUSCONNECTOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

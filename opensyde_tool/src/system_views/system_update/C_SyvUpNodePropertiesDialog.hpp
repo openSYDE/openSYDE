@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPNODEPROPERTIESDIALOG_H
-#define C_SYVUPNODEPROPERTIESDIALOG_H
+#ifndef C_SYVUPNODEPROPERTIESDIALOG_HPP
+#define C_SYVUPNODEPROPERTIESDIALOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -73,13 +73,11 @@ private:
                                             const stw::opensyde_core::C_OscNode & orc_Node,
                                             const bool oq_IsMultiDevice);
    static void mh_GetApplicationDataForNode(const C_GiSvSubNodeData & orc_NodeInfo,
-                                            const stw::opensyde_core::C_OscNode & orc_Node,
-                                            const uint32_t ou32_ApplicationIndex, QString & orc_ApplicationName,
-                                            QString & orc_ApplicationStateIcon, QString & orc_ApplicationState,
-                                            QString & orc_DeviceValidStatus, QString & orc_FileProjectName,
-                                            QString & orc_DeviceProjectName, QString & orc_FileVersion,
-                                            QString & orc_DeviceFileVersion, QString & orc_FileBuildDate,
-                                            QString & orc_DeviceBuildDate);
+                                            const uint32_t ou32_ApplicationIndex, QString & orc_ApplicationStateIcon,
+                                            QString & orc_ApplicationState, QString & orc_DeviceValidStatus,
+                                            QString & orc_FileProjectName, QString & orc_DeviceProjectName,
+                                            QString & orc_FileVersion, QString & orc_DeviceFileVersion,
+                                            QString & orc_FileBuildDate, QString & orc_DeviceBuildDate);
    static void mh_ExtractStwDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
                                               const QString & orc_FileProjectName, QString & orc_DeviceProjectName,
                                               const QString & orc_FileVersion, QString & orc_DeviceFileVersion,

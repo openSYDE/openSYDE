@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDSEARCHTREEWIDGET_H
-#define C_SDSEARCHTREEWIDGET_H
+#ifndef C_SDSEARCHTREEWIDGET_HPP
+#define C_SDSEARCHTREEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

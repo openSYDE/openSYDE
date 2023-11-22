@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETRANSPARENTSCROLLAREA_H
-#define C_OGETRANSPARENTSCROLLAREA_H
+#ifndef C_OGETRANSPARENTSCROLLAREA_HPP
+#define C_OGETRANSPARENTSCROLLAREA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

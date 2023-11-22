@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBBASECONTEXTMENUMANAGER_H
-#define C_SEBBASECONTEXTMENUMANAGER_H
+#ifndef C_SEBBASECONTEXTMENUMANAGER_HPP
+#define C_SEBBASECONTEXTMENUMANAGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>

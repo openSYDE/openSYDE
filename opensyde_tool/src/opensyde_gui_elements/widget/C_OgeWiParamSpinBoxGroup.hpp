@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIPARAMSPINBOXGROUP_H
-#define C_OGEWIPARAMSPINBOXGROUP_H
+#ifndef C_OGEWIPARAMSPINBOXGROUP_HPP
+#define C_OGEWIPARAMSPINBOXGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiSpinBoxGroup.hpp"

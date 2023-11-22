@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODECOMINTERFACESETTINGS_H
-#define C_OSCNODECOMINTERFACESETTINGS_H
+#ifndef C_OSCNODECOMINTERFACESETTINGS_HPP
+#define C_OSCNODECOMINTERFACESETTINGS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

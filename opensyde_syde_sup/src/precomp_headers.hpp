@@ -6,8 +6,8 @@
    Contains a list of header files to be pre-compiled.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef PRECOMP_HEADERS_H
-#define PRECOMP_HEADERS_H
+#ifndef PRECOMP_HEADERS_HPP
+#define PRECOMP_HEADERS_HPP
 
 //lint -esym(766,"precomp_headers.h")   effectively not used in lint "builds"; but that's exactly what we want
 #ifndef _lint //speed up linting: don't include all of the headers for each linted .cpp file

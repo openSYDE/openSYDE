@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEUNOMESSAGEBASECOMMAND_H
-#define C_SDBUEUNOMESSAGEBASECOMMAND_H
+#ifndef C_SDBUEUNOMESSAGEBASECOMMAND_HPP
+#define C_SDBUEUNOMESSAGEBASECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -44,6 +44,7 @@ protected:
    stw::opensyde_gui::C_SdBueMessageSelectorTreeWidget * const mpc_MessageTreeWidget;
 
    bool m_CheckMessagesSortedAscending(void) const;
+   bool m_CheckMessagesSortedAscendingWithDirection(const bool oq_IsTx) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

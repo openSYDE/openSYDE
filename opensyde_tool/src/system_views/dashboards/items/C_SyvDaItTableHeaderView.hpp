@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITTABLEHEADERVIEW_H
-#define C_SYVDAITTABLEHEADERVIEW_H
+#ifndef C_SYVDAITTABLEHEADERVIEW_HPP
+#define C_SYVDAITTABLEHEADERVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDpListTableHeaderView.hpp"

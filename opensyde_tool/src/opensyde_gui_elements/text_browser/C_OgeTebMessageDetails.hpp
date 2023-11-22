@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEBMESSAGEDETAILS_H
-#define C_OGETEBMESSAGEDETAILS_H
+#ifndef C_OGETEBMESSAGEDETAILS_HPP
+#define C_OGETEBMESSAGEDETAILS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTebContextMenuBase.hpp"

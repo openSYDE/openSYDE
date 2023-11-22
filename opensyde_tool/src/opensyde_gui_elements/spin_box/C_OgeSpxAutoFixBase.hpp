@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXAUTOFIXBASE_H
-#define C_OGESPXAUTOFIXBASE_H
+#ifndef C_OGESPXAUTOFIXBASE_HPP
+#define C_OGESPXAUTOFIXBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVariant>

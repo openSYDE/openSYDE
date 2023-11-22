@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMGENSIGTABLEMODEL_H
-#define C_CAMGENSIGTABLEMODEL_H
+#ifndef C_CAMGENSIGTABLEMODEL_HPP
+#define C_CAMGENSIGTABLEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractTableModel>

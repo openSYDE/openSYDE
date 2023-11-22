@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBNODEDATAPOOLLISTELEMENTID_H
-#define C_PUISVDBNODEDATAPOOLLISTELEMENTID_H
+#ifndef C_PUISVDBNODEDATAPOOLLISTELEMENTID_HPP
+#define C_PUISVDBNODEDATAPOOLLISTELEMENTID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

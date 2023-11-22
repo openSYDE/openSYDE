@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCEXPORTCOMMUNICATIONSTACKH
-#define C_OSCEXPORTCOMMUNICATIONSTACKH
+#ifndef C_OSCEXPORTCOMMUNICATIONSTACK_HPP
+#define C_OSCEXPORTCOMMUNICATIONSTACK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

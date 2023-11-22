@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPSERVICEPROJSETTINGSMODEL_H
-#define C_POPSERVICEPROJSETTINGSMODEL_H
+#ifndef C_POPSERVICEPROJSETTINGSMODEL_HPP
+#define C_POPSERVICEPROJSETTINGSMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

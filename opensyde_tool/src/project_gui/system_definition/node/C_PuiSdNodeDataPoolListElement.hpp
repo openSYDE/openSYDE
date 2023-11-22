@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDNODEDATAPOOLLISTELEMENT_H
-#define C_PUISDNODEDATAPOOLLISTELEMENT_H
+#ifndef C_PUISDNODEDATAPOOLLISTELEMENT_HPP
+#define C_PUISDNODEDATAPOOLLISTELEMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

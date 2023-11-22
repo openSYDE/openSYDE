@@ -202,7 +202,7 @@ void C_GiSvDaLabelBase::UpdateShowValue(void)
    if (this->mpc_LabelWidget != NULL)
    {
       QString c_Value;
-      if (this->m_GetLastValue(0UL, c_Value, NULL) == C_NO_ERR)
+      if (this->m_GetLastValue(0UL, c_Value, NULL, NULL) == C_NO_ERR)
       {
          this->mpc_LabelWidget->SetValue(c_Value);
       }

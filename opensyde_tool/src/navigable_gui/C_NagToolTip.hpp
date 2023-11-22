@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGTOOLTIP_H
-#define C_NAGTOOLTIP_H
+#ifndef C_NAGTOOLTIP_HPP
+#define C_NAGTOOLTIP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -69,4 +69,4 @@ private:
 }
 } //end of namespace
 
-#endif // C_NAGTOOLTIP_H
+#endif // C_NAGTOOLTIP_HPP

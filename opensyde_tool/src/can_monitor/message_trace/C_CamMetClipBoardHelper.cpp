@@ -70,12 +70,13 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
    const int32_t s32_WIDTH_DIR = 12;
    const int32_t s32_WIDTH_DLC = 12;
    const int32_t s32_WIDTH_DATA = 34;
+   const int32_t s32_WIDTH_COUNTER = 20;
    QString c_Text;
    uint32_t u32_CounterMessage;
 
    //Build header
    C_CamMetClipBoardHelper::mh_AddHeader(c_Text, s32_WIDTH_INITIAL, s32_WIDTH_TIME, s32_WIDTH_ID, s32_WIDTH_NAME,
-                                         s32_WIDTH_DIR, s32_WIDTH_DLC, s32_WIDTH_DATA);
+                                         s32_WIDTH_DIR, s32_WIDTH_DLC, s32_WIDTH_DATA, s32_WIDTH_COUNTER);
 
    for (u32_CounterMessage = 0U; u32_CounterMessage < orc_MessageData.size(); ++u32_CounterMessage)
    {
@@ -87,7 +88,7 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
                                                 oq_DisplayAsHex, oq_DisplayTimestampRelative,
                                                 oq_DisplayTimestampAbsoluteTimeOfDay, s32_WIDTH_INITIAL, s32_WIDTH_TIME,
                                                 s32_WIDTH_ID, s32_WIDTH_NAME, s32_WIDTH_DIR, s32_WIDTH_DLC,
-                                                s32_WIDTH_DATA,
+                                                s32_WIDTH_DATA, s32_WIDTH_COUNTER,
                                                 orc_MessageData[u32_CounterMessage].c_ExpandedIndices);
       }
    }
@@ -99,19 +100,21 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
 /*! \brief  Add header
 
    \param[in,out]  orc_Text            Text
-   \param[in]      os32_WidthInitial    Width initial section
-   \param[in]      os32_WidthTime       Width time section
-   \param[in]      os32_WidthId         Width ID section
-   \param[in]      os32_WidthName       Width name section
-   \param[in]      os32_WidthDir        Width direction section
-   \param[in]      os32_WidthDlc        Width DLC section
-   \param[in]      os32_WidthData       Width data section
+   \param[in]      os32_WidthInitial   Width initial section
+   \param[in]      os32_WidthTime      Width time section
+   \param[in]      os32_WidthId        Width ID section
+   \param[in]      os32_WidthName      Width name section
+   \param[in]      os32_WidthDir       Width direction section
+   \param[in]      os32_WidthDlc       Width DLC section
+   \param[in]      os32_WidthData      Width data section
+   \param[in]      os32_WidthCounter   Width counter section
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetClipBoardHelper::mh_AddHeader(QString & orc_Text, const int32_t os32_WidthInitial,
                                            const int32_t os32_WidthTime, const int32_t os32_WidthId,
                                            const int32_t os32_WidthName, const int32_t os32_WidthDir,
-                                           const int32_t os32_WidthDlc, const int32_t os32_WidthData)
+                                           const int32_t os32_WidthDlc, const int32_t os32_WidthData,
+                                           const int32_t os32_WidthCounter)
 {
    int32_t s32_TextLength;
 
@@ -142,7 +145,11 @@ void C_CamMetClipBoardHelper::mh_AddHeader(QString & orc_Text, const int32_t os3
    orc_Text += C_GtGetText::h_GetText("Data");
    orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthData, ' ');
 
+   s32_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("Counter");
+   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthCounter, ' ');
+
+   orc_Text += C_GtGetText::h_GetText("Status");
    orc_Text += "\n";
 }
 
@@ -158,13 +165,14 @@ void C_CamMetClipBoardHelper::mh_AddHeader(QString & orc_Text, const int32_t os3
                                                          oq_DisplayTimestampRelative is true
                                                          true: Timestamp with time of day
                                                          false: Timestamp beginning at start of measurement
-   \param[in]      os32_WidthInitial                      Width initial section
-   \param[in]      os32_WidthTime                         Width time section
-   \param[in]      os32_WidthId                           Width ID section
-   \param[in]      os32_WidthName                         Width name section
-   \param[in]      os32_WidthDir                          Width direction section
-   \param[in]      os32_WidthDlc                          Width DLC section
-   \param[in]      os32_WidthData                         Width data section
+   \param[in]      os32_WidthInitial                     Width initial section
+   \param[in]      os32_WidthTime                        Width time section
+   \param[in]      os32_WidthId                          Width ID section
+   \param[in]      os32_WidthName                        Width name section
+   \param[in]      os32_WidthDir                         Width direction section
+   \param[in]      os32_WidthDlc                         Width DLC section
+   \param[in]      os32_WidthData                        Width data section
+   \param[in]      os32_WidthCounter                     Width counter section
    \param[in]      orc_ExpandedIndices                   Expanded indices
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +183,7 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
                                             const int32_t os32_WidthInitial, const int32_t os32_WidthTime,
                                             const int32_t os32_WidthId, const int32_t os32_WidthName,
                                             const int32_t os32_WidthDir, const int32_t os32_WidthDlc,
-                                            const int32_t os32_WidthData,
+                                            const int32_t os32_WidthData, const int32_t os32_WidthCounter,
                                             const std::vector<int32_t> & orc_ExpandedIndices)
 {
    QString c_Line;
@@ -270,8 +278,8 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
          if (orc_MessageData.c_ProtocolTextHex != "")
          {
             c_Line += orc_MessageData.c_ProtocolTextHex.c_str();
-            //Always add at least one space
-            c_Line += " ";
+            //Always add at least three spaces for separation
+            c_Line += "   ";
          }
          else
          {
@@ -283,8 +291,8 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
          if (orc_MessageData.c_ProtocolTextDec != "")
          {
             c_Line += orc_MessageData.c_ProtocolTextDec.c_str();
-            //Always add at least one space
-            c_Line += " ";
+            //Always add at least three spaces for separation
+            c_Line += "   ";
          }
          else
          {
@@ -295,7 +303,18 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
    c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthData, ' ');
 
    // Counter
-   c_Line += orc_MessageData.c_Counter.c_str() + static_cast<QString>("\n");
+   s32_LineLength = c_Line.length();
+   c_Line += orc_MessageData.c_Counter.c_str();
+
+   if (orc_MessageData.c_Status != "")
+   {
+      c_Line += "   "; //Always add at least three spaces for separation
+      // only add blanks if there is a status to append in next step
+      c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthCounter, ' ');
+   }
+
+   // Status
+   c_Line += orc_MessageData.c_Status.c_str() + static_cast<QString>("\n");
 
    if (oq_IsExtended == true)
    {

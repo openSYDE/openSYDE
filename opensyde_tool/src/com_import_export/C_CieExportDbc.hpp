@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEEXPORTDBC_H
-#define C_CIEEXPORTDBC_H
+#ifndef C_CIEEXPORTDBC_HPP
+#define C_CIEEXPORTDBC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

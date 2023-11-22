@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPSAVEASDIALOGWIDGET_H
-#define C_POPSAVEASDIALOGWIDGET_H
+#ifndef C_POPSAVEASDIALOGWIDGET_HPP
+#define C_POPSAVEASDIALOGWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

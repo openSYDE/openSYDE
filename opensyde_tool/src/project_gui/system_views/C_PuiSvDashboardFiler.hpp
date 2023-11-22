@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDASHBOARDFILER_H
-#define C_PUISVDASHBOARDFILER_H
+#ifndef C_PUISVDASHBOARDFILER_HPP
+#define C_PUISVDASHBOARDFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -64,6 +64,8 @@ private:
                                  stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadWidgetBase(C_PuiSvDbWidgetBase & orc_Widget,
                                     stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadWriteWidgetBase(C_PuiSvDbWriteWidgetBase & orc_WriteWidget,
+                                         stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadDataElementConfig(C_PuiSvDbNodeDataElementConfig & orc_Config,
                                            stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadDataScalingConfig(C_PuiSvDbDataElementScaling & orc_Config,
@@ -108,6 +110,8 @@ private:
                               stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveWidgetBase(const C_PuiSvDbWidgetBase & orc_Widget,
                                  stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveWriteWidgetBase(const C_PuiSvDbWriteWidgetBase & orc_WriteWidget,
+                                      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveDataElementConfig(const C_PuiSvDbNodeDataElementConfig & orc_Config,
                                         stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveDataScalingConfig(const C_PuiSvDbDataElementScaling & orc_Config,
@@ -128,7 +132,8 @@ private:
    static QString mh_TabChartZoomModeToString(const C_PuiSvDbTabChart::E_SettingZoomMode oe_ZoomMode);
    static QString mh_TabChartVerticalAxisModeToString(
       const C_PuiSvDbTabChart::E_SettingVerticalAxisMode oe_VerticalAxisMode);
-   static QString mh_WriteModeToString(const C_PuiSvDbWidgetBase::E_WriteMode oe_Mode);
+   static QString mh_WriteModeToString(const C_PuiSvDbWriteWidgetBase::E_WriteMode oe_Mode);
+   static QString mh_InitialValueModeTypeToString(const C_PuiSvDbWriteWidgetBase::E_InitialValueModeType oe_Mode);
    static QString mh_SourceTypeToString(const C_PuiSvDbNodeDataPoolListElementId::E_Type oe_Type);
 
    static int32_t mh_StringToDisplayStyle(const QString & orc_String, C_PuiSvDbWidgetBase::E_Style & ore_Style);
@@ -146,7 +151,9 @@ private:
                                                      C_PuiSvDbTabChart::E_SettingZoomMode & ore_ZoomMode);
    static int32_t mh_StringToTabChartSettingVerticalAxisMode(const QString & orc_String,
                                                              C_PuiSvDbTabChart::E_SettingVerticalAxisMode & ore_VerticalAxisMode);
-   static int32_t mh_StringToWriteMode(const QString & orc_String, C_PuiSvDbWidgetBase::E_WriteMode & ore_Mode);
+   static int32_t mh_StringToWriteMode(const QString & orc_String, C_PuiSvDbWriteWidgetBase::E_WriteMode & ore_Mode);
+   static int32_t mh_StringToInitialValueModeType(const QString & orc_String,
+                                                  C_PuiSvDbWriteWidgetBase::E_InitialValueModeType & ore_Mode);
    static int32_t mh_StringToSourceType(const QString & orc_String,
                                         C_PuiSvDbNodeDataPoolListElementId::E_Type & ore_Type);
 };

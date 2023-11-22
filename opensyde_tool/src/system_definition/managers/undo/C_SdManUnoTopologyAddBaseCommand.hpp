@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDMANUNOTOPOLOGYADDBASECOMMAND_H
-#define C_SDMANUNOTOPOLOGYADDBASECOMMAND_H
+#ifndef C_SDMANUNOTOPOLOGYADDBASECOMMAND_HPP
+#define C_SDMANUNOTOPOLOGYADDBASECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

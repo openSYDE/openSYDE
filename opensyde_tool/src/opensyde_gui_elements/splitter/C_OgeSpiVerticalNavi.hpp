@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPIVERTICALNAVI_H
-#define C_OGESPIVERTICALNAVI_H
+#ifndef C_OGESPIVERTICALNAVI_HPP
+#define C_OGESPIVERTICALNAVI_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

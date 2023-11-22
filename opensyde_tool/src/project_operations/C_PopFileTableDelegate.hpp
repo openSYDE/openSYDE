@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPFILETABLEDELEGATE_H
-#define C_POPFILETABLEDELEGATE_H
+#ifndef C_POPFILETABLEDELEGATE_HPP
+#define C_POPFILETABLEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>

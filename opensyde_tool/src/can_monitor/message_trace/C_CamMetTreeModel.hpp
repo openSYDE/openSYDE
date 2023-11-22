@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREEMODEL_H
-#define C_CAMMETTREEMODEL_H
+#ifndef C_CAMMETTREEMODEL_HPP
+#define C_CAMMETTREEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -43,7 +43,8 @@ public:
       eCAN_DIR,
       eCAN_DLC,
       eCAN_DATA,
-      eCAN_COUNTER
+      eCAN_COUNTER,
+      eCAN_STATUS,
    };
 
    C_CamMetTreeModel(QObject * const opc_Parent = NULL);
@@ -179,6 +180,8 @@ private:
    static bool mh_IsMessageMultiplexed(const C_CamMetTreeLoggerData & orc_Data);
    static void mh_SortMultiplexedSignals(
       std::vector<stw::opensyde_core::C_OscComMessageLoggerDataSignal> & orc_Signals);
+
+   bool m_IsStatusValid(const C_CamMetTreeLoggerData & orc_CurrentMessage) const;
 
    class C_LoggerDataComparatorForMultiplexer
    {

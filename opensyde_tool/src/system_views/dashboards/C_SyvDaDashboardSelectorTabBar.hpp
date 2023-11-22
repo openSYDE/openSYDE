@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDSELECTORTABBAR_H
-#define C_SYVDADASHBOARDSELECTORTABBAR_H
+#ifndef C_SYVDADASHBOARDSELECTORTABBAR_HPP
+#define C_SYVDADASHBOARDSELECTORTABBAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTabBar>

@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBSVGICONWITHTEXTBASE_H
-#define C_OGEPUBSVGICONWITHTEXTBASE_H
+#ifndef C_OGEPUBSVGICONWITHTEXTBASE_HPP
+#define C_OGEPUBSVGICONWITHTEXTBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

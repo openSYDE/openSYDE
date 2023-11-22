@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPFILESIZEINFORMATION_H
-#define C_SYVUPFILESIZEINFORMATION_H
+#ifndef C_SYVUPFILESIZEINFORMATION_HPP
+#define C_SYVUPFILESIZEINFORMATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANDISPATCHEROSYROUTER_H
-#define C_OSCCANDISPATCHEROSYROUTER_H
+#ifndef C_OSCCANDISPATCHEROSYROUTER_HPP
+#define C_OSCCANDISPATCHEROSYROUTER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>

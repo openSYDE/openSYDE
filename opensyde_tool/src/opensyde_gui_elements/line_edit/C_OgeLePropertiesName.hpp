@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELEPROPERTIESNAME_H
-#define C_OGELEPROPERTIESNAME_H
+#ifndef C_OGELEPROPERTIESNAME_HPP
+#define C_OGELEPROPERTIESNAME_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLeToolTipBase.hpp"

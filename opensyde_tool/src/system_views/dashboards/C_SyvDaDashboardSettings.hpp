@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDSETTINGS_H
-#define C_SYVDADASHBOARDSETTINGS_H
+#ifndef C_SYVDADASHBOARDSETTINGS_HPP
+#define C_SYVDADASHBOARDSETTINGS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

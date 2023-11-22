@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USSYSTEMVIEW_H
-#define C_USSYSTEMVIEW_H
+#ifndef C_USSYSTEMVIEW_HPP
+#define C_USSYSTEMVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

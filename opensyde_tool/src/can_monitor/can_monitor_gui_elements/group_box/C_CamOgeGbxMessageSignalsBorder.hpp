@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEGBXMESSAGESIGNALSBORDER_H
-#define C_CAMOGEGBXMESSAGESIGNALSBORDER_H
+#ifndef C_CAMOGEGBXMESSAGESIGNALSBORDER_HPP
+#define C_CAMOGEGBXMESSAGESIGNALSBORDER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGroupBox>

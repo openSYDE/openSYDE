@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDADASHBOARDSWIDGET_H
-#define C_SYVDADASHBOARDSWIDGET_H
+#ifndef C_SYVDADASHBOARDSWIDGET_HPP
+#define C_SYVDADASHBOARDSWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -94,7 +94,8 @@ private:
 
    void m_DataPoolWrite(const uint32_t ou32_NodeIndex, const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                         const uint16_t ou16_ElementIndex);
-   void m_DataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index);
+   void m_DataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index,
+                       opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
    void m_NvmReadList(const stw::opensyde_core::C_OscNodeDataPoolListId & orc_Index);
    void m_HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc);
    void m_ConnectStepFinished(void);
@@ -113,6 +114,25 @@ private:
       eCS_DISCONNECTING
    };
 
+   class C_MissedReadOperation
+   {
+   public:
+      C_MissedReadOperation(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index,
+                            stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget) :
+         c_ElementId(orc_Index),
+         pc_DashboardWidget(opc_DashboardWidget)
+      {
+      }
+      virtual ~C_MissedReadOperation()
+      {
+      }
+
+      virtual bool operator <(const C_MissedReadOperation & orc_Cmp) const;
+
+      stw::opensyde_core::C_OscNodeDataPoolListElementId c_ElementId;
+      stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const pc_DashboardWidget;
+   };
+
    Ui::C_SyvDaDashboardsWidget * mpc_Ui;
    stw::opensyde_gui_logic::C_SyvComDriverDiag * mpc_ComDriver;
    stw::opensyde_gui_logic::C_SyvComDriverDiagConnect * const mpc_ConnectionThread;
@@ -126,7 +146,7 @@ private:
    bool mq_DarkModeActive;
    bool mq_ConnectActive;
    std::set<stw::opensyde_core::C_OscNodeDataPoolListId> mc_MissedReadNvmOperations;
-   std::set<stw::opensyde_core::C_OscNodeDataPoolListElementId> mc_MissedReadOperations;
+   std::set<C_MissedReadOperation> mc_MissedReadOperations;
    std::set<stw::opensyde_core::C_OscNodeDataPoolListElementId> mc_MissedWriteOperations;
    E_ConnectState me_ConnectState;
    int32_t ms32_InitToolboxCounter;

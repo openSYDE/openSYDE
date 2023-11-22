@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITPATREEMODEL_H
-#define C_SYVDAITPATREEMODEL_H
+#ifndef C_SYVDAITPATREEMODEL_HPP
+#define C_SYVDAITPATREEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreItem.hpp"

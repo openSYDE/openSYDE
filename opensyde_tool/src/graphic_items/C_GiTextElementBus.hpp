@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GITEXTELEMENTBUS_H
-#define C_GITEXTELEMENTBUS_H
+#ifndef C_GITEXTELEMENTBUS_HPP
+#define C_GITEXTELEMENTBUS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPixmap>

@@ -6,8 +6,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDACHAPLOT_H
-#define C_SYVDACHAPLOT_H
+#ifndef C_SYVDACHAPLOT_HPP
+#define C_SYVDACHAPLOT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "qcustomplot.h"

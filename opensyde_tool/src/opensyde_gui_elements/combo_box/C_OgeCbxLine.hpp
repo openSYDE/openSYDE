@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECBXLINE_H
-#define C_OGECBXLINE_H
+#ifndef C_OGECBXLINE_HPP
+#define C_OGECBXLINE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

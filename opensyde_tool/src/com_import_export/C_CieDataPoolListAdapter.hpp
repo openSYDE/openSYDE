@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEDATAPOOLLISTADAPTER_H
-#define C_CIEDATAPOOLLISTADAPTER_H
+#ifndef C_CIEDATAPOOLLISTADAPTER_HPP
+#define C_CIEDATAPOOLLISTADAPTER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -21,6 +21,7 @@
 #include "C_CieConverter.hpp"
 #include "C_PuiSdNodeDataPoolListElement.hpp"
 #include "C_SclStringList.hpp"
+#include "C_OscEdsDcfImportMessageGroup.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -40,12 +41,8 @@ public:
    static C_CieDataPoolListStructure h_GetStructureFromDbcFileImport(
       const stw::opensyde_gui_logic::C_CieConverter::C_CieNode & orc_CieNode);
    static C_CieDataPoolListStructure h_GetStructureFromDcfAndEdsFileImport(
-      const std::vector<stw::opensyde_core::C_OscCanMessage> & orc_OscRxMessageData,
-      const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscRxSignalData,
-      const std::vector<uint8_t> & orc_RxSignalDefaultMinMaxValuesUsed,
-      const std::vector<stw::opensyde_core::C_OscCanMessage> & orc_OscTxMessageData,
-      const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscTxSignalData,
-      const std::vector<uint8_t> & orc_TxSignalDefaultMinMaxValuesUsed,
+      const stw::opensyde_core::C_OscEdsDcfImportMessageGroup & orc_OscRxMessageData,
+      const stw::opensyde_core::C_OscEdsDcfImportMessageGroup & orc_OscTxMessageData,
       const std::vector<std::vector<stw::scl::C_SclString> > & orc_InfoMessagesPerMessage);
    static void h_AssignNode(const stw::opensyde_core::C_OscCanInterfaceId & orc_Id,
                             std::vector<stw::opensyde_core::C_OscCanMessage> & orc_OscMessageData);

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEDELIDED_H
-#define C_OGETEDELIDED_H
+#ifndef C_OGETEDELIDED_HPP
+#define C_OGETEDELIDED_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTedContextMenuBase.hpp"

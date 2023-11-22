@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGVIEWITEM_H
-#define C_NAGVIEWITEM_H
+#ifndef C_NAGVIEWITEM_HPP
+#define C_NAGVIEWITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QIcon>

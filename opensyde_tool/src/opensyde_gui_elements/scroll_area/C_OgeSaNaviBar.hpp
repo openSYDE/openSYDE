@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESANAVIBAR_H
-#define C_OGESANAVIBAR_H
+#ifndef C_OGESANAVIBAR_HPP
+#define C_OGESANAVIBAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QScrollArea>

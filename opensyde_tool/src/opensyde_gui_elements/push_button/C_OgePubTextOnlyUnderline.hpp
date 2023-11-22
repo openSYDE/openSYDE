@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBTEXTONLYUNDERLINE_H
-#define C_OGEPUBTEXTONLYUNDERLINE_H
+#ifndef C_OGEPUBTEXTONLYUNDERLINE_HPP
+#define C_OGEPUBTEXTONLYUNDERLINE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

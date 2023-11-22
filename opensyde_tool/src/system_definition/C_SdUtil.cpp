@@ -895,17 +895,18 @@ std::vector<std::vector<uint8_t> > C_SdUtil::h_GetAllUsedIpAddressesForBus(const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt message to protocol restrictions
 
-   \param[in,out]  orc_Message            Message to adapt
-   \param[in,out]  opc_UiMessage          Optional Ui Message to adapt
-   \param[in,out]  orc_SignalListElements Datapool list elements for signals
-   \param[in]      oe_Type                Protocol type
-   \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
+   \param[in,out]  orc_Message               Message to adapt
+   \param[in,out]  opc_UiMessage             Optional Ui Message to adapt
+   \param[in,out]  orc_SignalListElements    Datapool list elements for signals
+   \param[in]      oe_Type                   Protocol type
+   \param[in,out]  opc_AdaptationInfos       Optional report about adaptations
+   \param[in]      oq_IncludeSignalUpdate    Flag to control signal update
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_PuiSdNodeCanMessage * const opc_UiMessage,
                                             std::vector<C_OscNodeDataPoolListElement> & orc_SignalListElements,
                                             const C_OscCanProtocol::E_Type oe_Type,
-                                            QStringList * const opc_AdaptationInfos)
+                                            QStringList * const opc_AdaptationInfos, const bool oq_IncludeSignalUpdate)
 {
    QStringList c_Info;
 
@@ -1003,16 +1004,19 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
          break;
       }
 
-      //Adapt signals
-      for (std::vector<C_OscCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
-           c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
+      if (oq_IncludeSignalUpdate)
       {
-         tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size());
-         if (c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size())
+         //Adapt signals
+         for (std::vector<C_OscCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
+              c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
          {
-            h_AdaptSignalToProtocolType(*c_SignalIt,
-                                        orc_SignalListElements[c_SignalIt->u32_ComDataElementIndex],
-                                        oe_Type, &c_Info);
+            tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size());
+            if (c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size())
+            {
+               h_AdaptSignalToProtocolType(*c_SignalIt,
+                                           orc_SignalListElements[c_SignalIt->u32_ComDataElementIndex],
+                                           oe_Type, &c_Info);
+            }
          }
       }
       c_Info.removeDuplicates();

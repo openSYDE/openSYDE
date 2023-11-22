@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPLISTDATASETMODEL_H
-#define C_SDNDEDPLISTDATASETMODEL_H
+#ifndef C_SDNDEDPLISTDATASETMODEL_HPP
+#define C_SDNDEDPLISTDATASETMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

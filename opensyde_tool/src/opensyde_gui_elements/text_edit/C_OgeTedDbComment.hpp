@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETEDDBCOMMENT_H
-#define C_OGETEDDBCOMMENT_H
+#ifndef C_OGETEDDBCOMMENT_HPP
+#define C_OGETEDDBCOMMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTextEdit>

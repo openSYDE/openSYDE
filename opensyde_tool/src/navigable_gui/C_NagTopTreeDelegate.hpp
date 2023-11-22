@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGTOPTREEDELEGATE_H
-#define C_NAGTOPTREEDELEGATE_H
+#ifndef C_NAGTOPTREEDELEGATE_HPP
+#define C_NAGTOPTREEDELEGATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>

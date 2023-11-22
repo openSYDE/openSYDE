@@ -182,7 +182,7 @@ void C_GiSvDaPieChartBase::UpdateShowValue(void)
    float64_t f64_UnscaledValue;
    QString c_ScaledValue;
 
-   if (this->m_GetLastValue(0UL, c_ScaledValue, &f64_UnscaledValue) == C_NO_ERR)
+   if (this->m_GetLastValue(0UL, c_ScaledValue, &f64_UnscaledValue, NULL) == C_NO_ERR)
    {
       const float64_t f64_Progress =
          ((f64_UnscaledValue - this->mf64_UnscaledMin) / (this->mf64_UnscaledMax - this->mf64_UnscaledMin)) *

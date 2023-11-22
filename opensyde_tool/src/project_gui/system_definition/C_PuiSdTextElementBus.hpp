@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISDTEXTELEMENTBUS_H
-#define C_PUISDTEXTELEMENTBUS_H
+#ifndef C_PUISDTEXTELEMENTBUS_HPP
+#define C_PUISDTEXTELEMENTBUS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

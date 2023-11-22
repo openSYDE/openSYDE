@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_SDNDEDPEDITWIDGET_H
-#define C_SDNDEDPEDITWIDGET_H
+#ifndef C_SDNDEDPEDITWIDGET_HPP
+#define C_SDNDEDPEDITWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

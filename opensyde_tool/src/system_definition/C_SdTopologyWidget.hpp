@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_SDTOPOLOGYWIDGET_H
-#define C_SDTOPOLOGYWIDGET_H
+#ifndef C_SDTOPOLOGYWIDGET_HPP
+#define C_SDTOPOLOGYWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -89,4 +89,4 @@ protected:
 }
 } //end of namespace
 
-#endif // C_SYSDEFTOPOLOGYWIDGET_H
+#endif // C_SYSDEFTOPOLOGYWIDGET_HPP

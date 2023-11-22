@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CIEIMPORTDBCH
-#define C_CIEIMPORTDBCH
+#ifndef C_CIEIMPORTDB_HPP
+#define C_CIEIMPORTDB_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

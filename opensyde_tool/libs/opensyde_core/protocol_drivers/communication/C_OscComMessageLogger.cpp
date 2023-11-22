@@ -41,6 +41,10 @@ using namespace stw::cmon_protocol;
 const uint64_t C_OscComMessageLogger::mhu64_MAX_TIMESTAMP_DAY_OF_TIME =
    ((((24ULL * 60ULL) * 60ULL) * 1000ULL) * 1000ULL);
 
+const stw::scl::C_SclString C_OscComMessageLogger::mhc_ECES_MESSAGE_COUNTER = "ECeS_Message_Counter";
+const stw::scl::C_SclString C_OscComMessageLogger::mhc_ECES_CHECKSUM = "ECeS_Checksum";
+const uint32_t C_OscComMessageLogger::mhu32_ECES_MAX_MESSAGE_COUNTER = 255;
+
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -100,7 +104,8 @@ C_OscComMessageLogger::C_OscComMessageLogger(void) :
    mu64_FirstTimeStampStart(0U),
    mu64_FirstTimeStampDayOfTime(0U),
    mu64_LastTimeStamp(0U),
-   mu32_FilteredMessages(0U)
+   mu32_FilteredMessages(0U),
+   mpc_AutoSupportProtocol(new C_OscComAutoSupport())
 {
    // Resize the vector for all potential CAN standard ids
    this->mc_MsgCounterStandardId.resize(0x800U, 0U);
@@ -124,6 +129,9 @@ C_OscComMessageLogger::~C_OscComMessageLogger(void)
    }
    mpc_OsySysDefMessage = NULL;
    mpc_OsySysDefDataPoolList = NULL;
+
+   delete this->mpc_AutoSupportProtocol;
+   this->mpc_AutoSupportProtocol = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -160,6 +168,7 @@ void C_OscComMessageLogger::Pause(void)
 void C_OscComMessageLogger::Stop(void)
 {
    this->m_ResetCounter();
+   this->m_ResetEcesMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -662,7 +671,20 @@ int32_t C_OscComMessageLogger::HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
             q_OpenSydeInterpretationFound = this->m_InterpretSysDef(this->mc_HandledCanMessage);
          }
 
-         if (q_OpenSydeInterpretationFound == false)
+         if (q_OpenSydeInterpretationFound == true)
+         {
+            // Check for ECoS message
+            if (this->m_CheckIfEcosMessage(orc_Msg) == true)
+            {
+               this->m_SaveEcosMessage();
+            }
+            // Check and handle for ECeS message
+            else
+            {
+               this->m_CheckAndHandleEcesMessage();
+            }
+         }
+         else
          {
             // No message in openSYDE system definitions found, check and let interpret other
             if (this->m_CheckInterpretation(this->mc_HandledCanMessage) == false)
@@ -673,6 +695,12 @@ int32_t C_OscComMessageLogger::HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
                {
                   // Only necessary if a protocol was found in the hex variant
                   this->mc_HandledCanMessage.c_ProtocolTextDec = this->m_GetProtocolStringDec(orc_Msg).c_str();
+               }
+
+               // Message not found in any other place. Check and process for ECoS inverted message
+               else
+               {
+                  this->m_HandleEcosInvertedMessage();
                }
             }
          }
@@ -1359,6 +1387,7 @@ void C_OscComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
    this->mc_HandledCanMessage.c_ProtocolTextDec = "";
    this->mc_HandledCanMessage.c_Signals.clear();
    this->mc_HandledCanMessage.q_CanDlcError = false;
+   this->mc_HandledCanMessage.c_Status = "";
 
    // Save the L2 message. Needed for the interpretation partly
    this->mc_HandledCanMessage.c_CanMsg = orc_Msg;
@@ -1601,16 +1630,15 @@ void C_OscComMessageLogger::mh_AddSpecialEcesSignals(C_OscNode & orc_Node,
    c_MessageCounterSig.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
    c_MessageCounterSig.u16_ComBitLength = 8;
    c_MessageCounterSig.u16_ComBitStart = 48;
-   c_MessageCounterElement.c_Name = "ECeS_Message_Counter";
+   c_MessageCounterElement.c_Name = mhc_ECES_MESSAGE_COUNTER;
    c_MessageCounterElement.c_Comment =
       "Automatically generated signal to represent message counter signal of the ECeS Message.";
 
    c_ChecksumSig.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
    c_ChecksumSig.u16_ComBitLength = 8;
    c_ChecksumSig.u16_ComBitStart = 56;
-   c_ChecksumElement.c_Name = "ECeS_Checksum";
-   c_ChecksumElement.c_Comment =
-      "Automatically generated signal to represent CRC checksum signal of the ECeS Message.";
+   c_ChecksumElement.c_Name = mhc_ECES_CHECKSUM;
+   c_ChecksumElement.c_Comment = "Automatically generated signal to represent CRC checksum signal of the ECeS Message.";
 
    // insert signals
    int32_t s32_Result;
@@ -1622,4 +1650,293 @@ void C_OscComMessageLogger::mh_AddSpecialEcesSignals(C_OscNode & orc_Node,
                                       orc_Id.q_MessageIsTx, orc_Id.u32_MessageIndex, ou32_SignalIndex + 1,
                                       c_ChecksumSig, c_ChecksumElement);
    tgl_assert(s32_Result == C_NO_ERR);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if received message has protocol ECeS and process it accordingly
+
+      Special signals ("ECeS_Message_Counter" and "ECeS_Checksum") indicate that it is an ECeS message
+      Validate both their values and update message status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComMessageLogger::m_CheckAndHandleEcesMessage()
+{
+   // Look for special signals that indicate an ECeS message
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_HandledCanMessage.c_Signals.size(); ++u32_Counter)
+   {
+      C_OscComMessageLoggerDataSignal & rc_Signal = this->mc_HandledCanMessage.c_Signals[u32_Counter];
+
+      // Look for special signal "ECeS_Message_Counter" in the message received
+      if (rc_Signal.c_Name.AnsiCompareIc(mhc_ECES_MESSAGE_COUNTER) == 0)
+      {
+         // Search for the unique ECeS message (based on CAN Id) in the saved ECeS messages
+         const std::map<uint32_t,  C_SclString>::iterator c_Iterator = this->mc_EcesMessages.find(
+            this->mpc_OsySysDefMessage->u32_CanId);
+
+         this->mc_HandledCanMessage.c_Status = "Counter OK. ";
+         C_SclString c_DifferenceValue = "";
+
+         // Validate message counter with previous message with same CAN Id
+         if (c_Iterator != this->mc_EcesMessages.end())
+         {
+            // compare the message counter values (ideally the counter of the received message should be +1)
+            int32_t s32_CounterDiff = rc_Signal.c_Value.ToInt() - c_Iterator->second.ToInt();
+
+            // When max value of counter is reached, ensure that the increment is valid
+            // E.g if max value = 255, next counter value = 0. Hence s32_CounterDiff = -255.
+            // In order that the counting continues further, set the difference to 1
+            if (std::abs(s32_CounterDiff) == static_cast<int32_t>(mhu32_ECES_MAX_MESSAGE_COUNTER))
+            {
+               s32_CounterDiff = 1;
+            }
+
+            // if message counter is incorrect
+            if (s32_CounterDiff != 1)
+            {
+               this->mc_HandledCanMessage.c_Status = "Counter Invalid. ";
+            }
+
+            c_DifferenceValue = C_SclString::IntToStr(s32_CounterDiff);
+
+            // Insert a "+" sign for positive difference value
+            if (s32_CounterDiff >= 1)
+            {
+               c_DifferenceValue = c_DifferenceValue.Insert("+", 0);
+            }
+            this->mc_HandledCanMessage.c_Status += "Diff: " + c_DifferenceValue +
+                                                   "; Prev. Counter = " + c_Iterator->second + ". ";
+
+            // remove the old message
+            this->mc_EcesMessages.erase(this->mpc_OsySysDefMessage->u32_CanId);
+         }
+
+         this->mc_EcesMessages.insert(std::pair<uint32_t, C_SclString>(this->mpc_OsySysDefMessage->u32_CanId,
+                                                                       rc_Signal.c_Value));
+      }
+
+      // Look for special signal "ECeS_Checksum" in the message received
+      else if (rc_Signal.c_Name.AnsiCompareIc(mhc_ECES_CHECKSUM) == 0)
+      {
+         const uint8_t u8_OrigCrcValue = static_cast<uint8_t>(this->mc_HandledCanMessage.c_CanMsg.au8_Data[7]);
+         const uint8_t u8_CalculatedCrcValue = C_OscComAutoSupport::h_GetCyclicRedundancyCheckCalculation(6,
+                                                                                                          this->mc_HandledCanMessage.c_CanMsg.au8_Data);
+         // Validate checksum
+         if (u8_OrigCrcValue == u8_CalculatedCrcValue)
+         {
+            this->mc_HandledCanMessage.c_Status += "CRC OK.";
+         }
+         else
+         {
+            this->mc_HandledCanMessage.c_Status += "CRC Invalid.";
+         }
+      }
+      // added to remove static warning
+      else
+      {
+         // do nothing
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset ECeS messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComMessageLogger::m_ResetEcesMessages()
+{
+   this->mc_EcesMessages.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save the last seen ECoS message received
+
+      When a new ECoS message is received, the old one is overwritten
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComMessageLogger::m_SaveEcosMessage()
+{
+   const T_STWCAN_Msg_RX & rc_Msg =  this->mc_HandledCanMessage.c_CanMsg;
+
+   std::vector<uint8_t> c_MessageData;
+
+   // Insert message data into vector
+   c_MessageData.insert(c_MessageData.end(), &rc_Msg.au8_Data[0], &rc_Msg.au8_Data[rc_Msg.u8_DLC]);
+
+   // mc_EcosMessage details saved: CAN Id, message name, message data
+   this->mc_EcosMessage.u32_CanId = rc_Msg.u32_ID;
+   this->mc_EcosMessage.c_MessageName = this->mc_HandledCanMessage.c_Name;
+   this->mc_EcosMessage.c_MessageData = c_MessageData;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the received message has protocol ECoS
+
+   Searches in all loaded databases and finds if received message has protocol ECoS
+
+   \param[in]       orc_Msg    CAN message received
+
+   \return
+   true if it is an ECoS message
+   false otherwise
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscComMessageLogger::m_CheckIfEcosMessage(const stw::can::T_STWCAN_Msg_RX & orc_Msg)
+{
+   bool q_Return = false;
+
+   std::map<stw::scl::C_SclString, C_OscComMessageLoggerOsySysDefConfig>::const_iterator c_ItSysDef;
+
+   for (c_ItSysDef = this->mc_OsySysDefs.begin(); c_ItSysDef != this->mc_OsySysDefs.end(); ++c_ItSysDef)
+   {
+      // Check if the database is active
+      if (this->mc_DatabaseActiveFlags[c_ItSysDef->first] == true)
+      {
+         const C_OscSystemDefinition & rc_OsySysDef = c_ItSysDef->second.c_OsySysDef;
+         uint32_t u32_NodeCounter;
+
+         // Search all nodes which are connected to to the CAN bus
+         for (u32_NodeCounter = 0U; u32_NodeCounter < rc_OsySysDef.c_Nodes.size(); ++u32_NodeCounter)
+         {
+            const C_OscNode & rc_Node = rc_OsySysDef.c_Nodes[u32_NodeCounter];
+            uint32_t u32_IntfCounter;
+            bool q_IntfFound = false;
+
+            // Search an interface which is connected to the bus
+            for (u32_IntfCounter = 0U; u32_IntfCounter < rc_Node.c_Properties.c_ComInterfaces.size(); ++u32_IntfCounter)
+            {
+               if ((rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].GetBusConnected() == true) &&
+                   (rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].u32_BusIndex ==
+                    c_ItSysDef->second.u32_BusIndex))
+               {
+                  // Com Interface found
+                  q_IntfFound = true;
+                  break;
+               }
+            }
+            if (q_IntfFound == true)
+            {
+               // Check all messages of the node for this interface on this bus
+               uint32_t u32_ProtCounter;
+
+               for (u32_ProtCounter = 0U; u32_ProtCounter < rc_Node.c_ComProtocols.size(); ++u32_ProtCounter)
+               {
+                  const C_OscCanProtocol & rc_CanProt = rc_Node.c_ComProtocols[u32_ProtCounter];
+
+                  // Search for ECoS messages only
+                  if (rc_CanProt.e_Type == C_OscCanProtocol::eCAN_OPEN_SAFETY)
+                  {
+                     tgl_assert(u32_IntfCounter < rc_CanProt.c_ComMessages.size());
+                     if (u32_IntfCounter < rc_CanProt.c_ComMessages.size())
+                     {
+                        // Search TX messages
+                        const std::vector<C_OscCanMessage> & rc_CanMsgContainerTx =
+                           rc_CanProt.c_ComMessages[u32_IntfCounter].c_TxMessages;
+                        bool q_SearchAlsoInRxMessages = true; // flag to improve performance
+                        uint32_t u32_CanMsgCounter;
+
+                        for (u32_CanMsgCounter = 0U; u32_CanMsgCounter < rc_CanMsgContainerTx.size();
+                             ++u32_CanMsgCounter)
+                        {
+                           const C_OscCanMessage & rc_OscMsg = rc_CanMsgContainerTx[u32_CanMsgCounter];
+
+                           // if CAN ID and extended bit match
+                           if ((orc_Msg.u32_ID == rc_OscMsg.u32_CanId) &&
+                               ((orc_Msg.u8_XTD == 1U) == rc_OscMsg.q_IsExtended))
+                           {
+                              // Found message, no need to search in Rx messages
+                              q_SearchAlsoInRxMessages = false;
+                              q_Return = true;
+                              break;
+                           }
+                        }
+
+                        // Search RX messages
+                        if (q_SearchAlsoInRxMessages == true)
+                        {
+                           const std::vector<C_OscCanMessage> & rc_CanMsgContainerRx =
+                              rc_CanProt.c_ComMessages[u32_IntfCounter].c_RxMessages;
+                           uint32_t u32_CanMsgCounterRx;
+
+                           for (u32_CanMsgCounterRx = 0U; u32_CanMsgCounterRx <
+                                rc_CanMsgContainerRx.size();
+                                ++u32_CanMsgCounterRx)
+                           {
+                              const C_OscCanMessage & rc_OscMsg =
+                                 rc_CanMsgContainerRx[u32_CanMsgCounterRx];
+
+                              // No check of dlc here, it will be checked for each signal
+                              if ((orc_Msg.u32_ID == rc_OscMsg.u32_CanId) &&
+                                  ((orc_Msg.u8_XTD == 1U) == rc_OscMsg.q_IsExtended))
+                              {
+                                 q_Return = true;
+                                 break;
+                              }
+                           } // end for Rx
+                        }    // end if q_SearchAlsoInRxMessages
+                     } // end if messages for protocol exist
+                  }    // end if protocol is eCAN_OPEN_SAFETY
+               } // end for c_ComProtocols
+            }    // end if Com interface found
+         } // end for c_Nodes
+      }    // end if database is active
+   } // end for mc_OsySysDefs
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Resets ECeS messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComMessageLogger::ResetEcesMessages(void)
+{
+   this->m_ResetEcesMessages();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle ECoS inverted frame
+
+  Process the message sent after an ECoS message (contains inverted data).
+  The inverted frame has:
+      - Name field empty
+      _ CAN Id +1 to ECoS message CAN Id
+      - Data inverted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComMessageLogger::m_HandleEcosInvertedMessage()
+{
+   // Check if an ECoS message has been previously received.
+   // If yes, verify CAN Id, data size and if inverted data exists
+   if (this->mc_EcosMessage.c_MessageData.size() > 0)
+   {
+      uint8_t au8_InvertedData[8U];
+      std::vector<uint8_t> c_InvertedData;
+      this->mc_HandledCanMessage.c_Status = "";
+
+      const uint8_t u8_DataSize = static_cast<uint8_t>(this->mc_EcosMessage.c_MessageData.size());
+
+      // Compare CAN ID and DLC (data length code) of received messsage to that of last received ECoS message.
+      if (((this->mc_HandledCanMessage.c_CanMsg.u32_ID - 1) == (this->mc_EcosMessage.u32_CanId)) &&
+          (this->mc_HandledCanMessage.c_CanMsg.u8_DLC == u8_DataSize))
+      {
+         // Set message name
+         this->mc_HandledCanMessage.c_Name = (this->mc_EcosMessage.c_MessageName) + " (Inverted Frame)";
+
+         // Invert message data of the received CAN message
+         C_OscComAutoSupport::h_InvertCanMessage(this->mc_HandledCanMessage.c_CanMsg.au8_Data,
+                                                 au8_InvertedData);
+
+         c_InvertedData.insert(c_InvertedData.end(), &au8_InvertedData[0],
+                               &au8_InvertedData[this->mc_HandledCanMessage.c_CanMsg.u8_DLC]);
+
+         // Compare data
+         if (c_InvertedData == this->mc_EcosMessage.c_MessageData)
+         {
+            this->mc_HandledCanMessage.c_Status = "Inverted data OK";
+         }
+         else
+         {
+            this->mc_HandledCanMessage.c_Status = "Incorrect inverted data";
+         }
+      }
+   }
 }

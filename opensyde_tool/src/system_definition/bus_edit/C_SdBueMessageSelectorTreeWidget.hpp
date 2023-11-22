@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUEMESSAGESELECTORTREEWIDGET_H
-#define C_SDBUEMESSAGESELECTORTREEWIDGET_H
+#ifndef C_SDBUEMESSAGESELECTORTREEWIDGET_HPP
+#define C_SDBUEMESSAGESELECTORTREEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QItemSelection>

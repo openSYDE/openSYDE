@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGTOPTREEMODEL_H
-#define C_NAGTOPTREEMODEL_H
+#ifndef C_NAGTOPTREEMODEL_HPP
+#define C_NAGTOPTREEMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreModel.hpp"

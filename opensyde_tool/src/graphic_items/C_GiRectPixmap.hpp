@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIRECTPIXMAP_H
-#define C_GIRECTPIXMAP_H
+#ifndef C_GIRECTPIXMAP_HPP
+#define C_GIRECTPIXMAP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsRectItem>

@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVCOMDATADEALER_H
-#define C_SYVCOMDATADEALER_H
+#ifndef C_SYVCOMDATADEALER_HPP
+#define C_SYVCOMDATADEALER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMap>
@@ -43,6 +43,9 @@ public:
 
    void RegisterWidget(C_PuiSvDbDataElementHandler * const opc_Widget);
 
+   int32_t DataPoolReadWithWidget(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                  const uint16_t ou16_ElementIndex,
+                                  C_PuiSvDbDataElementHandler * const opc_DashboardWidget, uint8_t * const opu8_NrCode);
    int32_t DataPoolRead(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                         const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode) override;
    int32_t NvmRead(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
@@ -51,6 +54,9 @@ public:
                        uint8_t * const opu8_NrCode) override;
 
 protected:
+   void m_OnReadDataPoolEventReceivedForWidget(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                               const uint16_t ou16_ElementIndex,
+                                               C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
    void m_OnReadDataPoolEventReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
                                       const uint16_t ou16_ElementIndex) override;
    void m_OnReadDataPoolEventErrorReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,

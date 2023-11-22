@@ -9,8 +9,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSDATABASEWIDGET_H
-#define C_CAMMOSDATABASEWIDGET_H
+#ifndef C_CAMMOSDATABASEWIDGET_HPP
+#define C_CAMMOSDATABASEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTimer>

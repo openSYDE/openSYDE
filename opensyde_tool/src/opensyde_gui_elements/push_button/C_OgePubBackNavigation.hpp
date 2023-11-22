@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBBACKNAVIGATION_H
-#define C_OGEPUBBACKNAVIGATION_H
+#ifndef C_OGEPUBBACKNAVIGATION_HPP
+#define C_OGEPUBBACKNAVIGATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubSvgIconWithTextBase.hpp"

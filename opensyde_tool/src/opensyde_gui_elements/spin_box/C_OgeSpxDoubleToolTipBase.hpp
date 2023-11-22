@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESPXDOUBLETOOLTIPBASE_H
-#define C_OGESPXDOUBLETOOLTIPBASE_H
+#ifndef C_OGESPXDOUBLETOOLTIPBASE_HPP
+#define C_OGESPXDOUBLETOOLTIPBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

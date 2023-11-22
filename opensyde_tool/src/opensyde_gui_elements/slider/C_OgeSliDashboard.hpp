@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGESLIDASHBOARD_H
-#define C_OGESLIDASHBOARD_H
+#ifndef C_OGESLIDASHBOARD_HPP
+#define C_OGESLIDASHBOARD_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSvgRenderer>

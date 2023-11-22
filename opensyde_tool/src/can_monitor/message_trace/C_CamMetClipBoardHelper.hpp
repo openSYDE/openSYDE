@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETCLIPBOARDHELPER_H
-#define C_CAMMETCLIPBOARDHELPER_H
+#ifndef C_CAMMETCLIPBOARDHELPER_HPP
+#define C_CAMMETCLIPBOARDHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -51,13 +51,14 @@ public:
 private:
    static void mh_AddHeader(QString & orc_Text, const int32_t os32_WidthInitial, const int32_t os32_WidthTime,
                             const int32_t os32_WidthId, const int32_t os32_WidthName, const int32_t os32_WidthDir,
-                            const int32_t os32_WidthDlc, const int32_t os32_WidthData);
+                            const int32_t os32_WidthDlc, const int32_t os32_WidthData, const int32_t os32_WidthCounter);
    static void mh_AddMessage(QString & orc_Text, const stw::opensyde_core::C_OscComMessageLoggerData & orc_MessageData,
                              const bool oq_IsExtended, const bool oq_DisplayAsHex,
                              const bool oq_DisplayTimestampRelative, const bool oq_DisplayTimestampAbsoluteTimeOfDay,
                              const int32_t os32_WidthInitial, const int32_t os32_WidthTime, const int32_t os32_WidthId,
                              const int32_t os32_WidthName, const int32_t os32_WidthDir, const int32_t os32_WidthDlc,
-                             const int32_t os32_WidthData, const std::vector<int32_t> & orc_ExpandedIndices);
+                             const int32_t os32_WidthData, const int32_t os32_WidthCounter,
+                             const std::vector<int32_t> & orc_ExpandedIndices);
    static void mh_AddCanSignals(const int32_t os32_LineWidthInitial, const bool oq_DisplayAsHex,
                                 const std::vector<stw::opensyde_core::C_OscComMessageLoggerDataSignal> & orc_Signals,
                                 const std::vector<int32_t> & orc_ExpandedSignalIndices, QString & orc_CompleteString);

@@ -4513,13 +4513,22 @@ int32_t C_PuiSdHandlerNodeLogic::SetDataPoolListElement(const uint32_t & oru32_N
                     (rc_OscDataElement.GetArraySize() !=
                      c_NewValuesContent.GetArraySize())))
                {
-                  Q_EMIT this->SigSyncNodeDataPoolListElementChanged(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                     oru32_DataPoolListIndex,
-                                                                     oru32_DataPoolListElementIndex,
-                                                                     c_NewValuesContent.GetType(),
-                                                                     c_NewValuesContent.GetArray(),
-                                                                     c_NewValuesContent.GetArraySize(),
-                                                                     orc_UiContent.q_InterpretAsString);
+                  Q_EMIT this->SigSyncNodeDataPoolListElementTypeChanged(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                         oru32_DataPoolListIndex,
+                                                                         oru32_DataPoolListElementIndex,
+                                                                         c_NewValuesContent.GetType(),
+                                                                         c_NewValuesContent.GetArray(),
+                                                                         c_NewValuesContent.GetArraySize(),
+                                                                         orc_UiContent.q_InterpretAsString);
+               }
+               if ((rc_OscDataElement.c_MinValue != orc_OscContent.c_MinValue) ||
+                   (rc_OscDataElement.c_MaxValue != orc_OscContent.c_MaxValue))
+               {
+                  Q_EMIT (this->SigSyncNodeDataPoolListElementRangeChanged(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                           oru32_DataPoolListIndex,
+                                                                           oru32_DataPoolListElementIndex,
+                                                                           orc_OscContent.c_MinValue,
+                                                                           orc_OscContent.c_MaxValue));
                }
                if (rc_OscDataElement.e_Access != c_NewValuesContent.e_Access)
                {

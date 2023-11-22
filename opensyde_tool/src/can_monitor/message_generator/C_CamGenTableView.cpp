@@ -107,6 +107,8 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    connect(this, &C_CamGenTableView::SigLinkClicked, this, &C_CamGenTableView::m_HandleLinkClicked);
    connect(&this->mc_Model, &C_CamGenTableModel::SigItemCheck, this, &C_CamGenTableView::m_HandleCheckChange);
    connect(&this->mc_Model, &C_CamGenTableModel::SigReport, this, &C_CamGenTableView::m_Report);
+   connect(&this->mc_Model, &C_CamGenTableModel::SigAutoProtocolSupport, this,
+           &C_CamGenTableView::SigAutoProtocolSupport);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -273,6 +275,7 @@ void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<int32_t> & orc_
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eCYCLIC_TIME), 94);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eKEY), 60);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eMANUAL_TRIGGER), 120);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eAUTO_SUPPORT), 110);
    }
 }
 
@@ -431,6 +434,15 @@ bool C_CamGenTableView::CheckAndHandleKey(const QString & orc_Input)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Request trigger of model function for updating message AutoProtocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableView::TriggerMessageReload()
+{
+   this->mc_Model.TriggerMessageReload();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overwritten keypress event slot
 
    Here: add new actions
@@ -517,6 +529,7 @@ void C_CamGenTableView::keyPressEvent(QKeyEvent * const opc_Event)
             case C_CamGenTableModel::eCYCLIC_TRIGGER:
             case C_CamGenTableModel::eKEY:
             case C_CamGenTableModel::eMANUAL_TRIGGER:
+            case C_CamGenTableModel::eAUTO_SUPPORT:
             default:
                q_Ignore = true;
                break;
@@ -921,6 +934,7 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
       c_NewMessage.c_Name = orc_NewItems[u32_ItNewItem][1UL].toStdString().c_str();
       c_NewMessage.SetMessageBoolValue(C_CamProMessageData::eGBODS_RTR, false);
       c_NewMessage.SetMessageBoolValue(C_CamProMessageData::eGBODS_DO_CYCLIC, false);
+      c_NewMessage.SetMessageBoolValue(C_CamProMessageData::eGBODS_AUTO_SUPPORT, false);
 
       if (c_FileInfo.suffix().compare("dbc", Qt::CaseInsensitive) == 0)
       {

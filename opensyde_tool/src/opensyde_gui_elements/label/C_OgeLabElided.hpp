@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABELIDED_H
-#define C_OGELABELIDED_H
+#ifndef C_OGELABELIDED_HPP
+#define C_OGELABELIDED_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeLabGenericNoPaddingNoMargins.hpp"

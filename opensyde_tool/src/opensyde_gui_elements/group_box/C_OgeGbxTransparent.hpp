@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXTRANSPARENT_H
-#define C_OGEGBXTRANSPARENT_H
+#ifndef C_OGEGBXTRANSPARENT_HPP
+#define C_OGEGBXTRANSPARENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeGbxToolTipBase.hpp"

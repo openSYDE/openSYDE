@@ -45,7 +45,8 @@ C_CamProMessageData::C_CamProMessageData(void) :
    q_IsExtended(false),
    q_IsRtr(false),
    u16_Dlc(0U),
-   u32_Id(0UL)
+   u32_Id(0UL),
+   q_SetAutoSupportMode(false)
 {
    //Start with 8 Bytes, initialize with zero
    c_Bytes.resize(8U, 0U);
@@ -72,6 +73,8 @@ void C_CamProMessageData::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->u16_Dlc, sizeof(this->u16_Dlc), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->c_Bytes[0UL], c_Bytes.size(), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_DoCyclicTrigger, sizeof(this->q_DoCyclicTrigger), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_SetAutoSupportMode, sizeof(this->q_SetAutoSupportMode),
+                                       oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->u32_CyclicTriggerTime, sizeof(this->u32_CyclicTriggerTime),
                                        oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(this->c_Key.c_str(), this->c_Key.Length(), oru32_HashValue);
@@ -204,6 +207,9 @@ void C_CamProMessageData::SetMessageBoolValue(const C_CamProMessageData::E_Gener
       break;
    case eGBODS_DO_CYCLIC:
       this->q_DoCyclicTrigger = oq_Value;
+      break;
+   case eGBODS_AUTO_SUPPORT:
+      this->q_SetAutoSupportMode = oq_Value;
       break;
    default:
       break;

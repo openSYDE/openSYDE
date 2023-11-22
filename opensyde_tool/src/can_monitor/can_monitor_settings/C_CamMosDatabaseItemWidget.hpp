@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMOSDATABASEITEMWIDGET_H
-#define C_CAMMOSDATABASEITEMWIDGET_H
+#ifndef C_CAMMOSDATABASEITEMWIDGET_HPP
+#define C_CAMMOSDATABASEITEMWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDateTime>

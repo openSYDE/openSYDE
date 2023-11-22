@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILIBUSSTYLESETUPWIDGET_H
-#define C_GILIBUSSTYLESETUPWIDGET_H
+#ifndef C_GILIBUSSTYLESETUPWIDGET_HPP
+#define C_GILIBUSSTYLESETUPWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

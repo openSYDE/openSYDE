@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GILICUSTOMFUNCTIONS_H
-#define C_GILICUSTOMFUNCTIONS_H
+#ifndef C_GILICUSTOMFUNCTIONS_HPP
+#define C_GILICUSTOMFUNCTIONS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVariant>

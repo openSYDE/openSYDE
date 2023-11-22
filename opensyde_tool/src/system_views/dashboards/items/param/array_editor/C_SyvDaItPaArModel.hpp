@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITPAARMODEL_H
-#define C_SYVDAITPAARMODEL_H
+#ifndef C_SYVDAITPAARMODEL_HPP
+#define C_SYVDAITPAARMODEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

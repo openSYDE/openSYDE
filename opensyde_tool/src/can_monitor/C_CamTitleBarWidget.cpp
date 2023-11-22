@@ -226,8 +226,7 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
       switch (e_Output)
       {
       case C_OgeWiCustomMessage::eYES:
-         q_Continue = true;
-         SaveConfig();
+         q_Continue = SaveConfig();
          break;
       case C_OgeWiCustomMessage::eNO:
          q_Continue = true;
@@ -244,29 +243,40 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle save configuration action
+ *
+ *  \return
+   True  Save project
+   False Didn't save project
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamTitleBarWidget::SaveConfig(void)
+bool C_CamTitleBarWidget::SaveConfig(void)
 {
+   bool q_SaveProject = false;
    const QString c_FilePath = C_CamProHandler::h_GetInstance()->GetCurrentFilePath();
 
    //Check if save as necessary
    if (c_FilePath.isEmpty())
    {
-      SaveAsConfig();
+      q_SaveProject = SaveAsConfig();
    }
    else
    {
-      m_DoSaveToFileAction(c_FilePath);
+      q_SaveProject = m_DoSaveToFileAction(c_FilePath);
    }
+   return q_SaveProject;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle save configuration as action
+ *
+ *   *  \return
+   True  Save project
+   False Didn't save project
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamTitleBarWidget::SaveAsConfig(void)
+bool C_CamTitleBarWidget::SaveAsConfig(void)
 {
+   bool q_SaveProject = false;
    QString c_PreviousDir = C_CamProHandler::h_GetInstance()->GetCurrentProjDir();
    QString c_FileName;
 
@@ -286,7 +296,9 @@ void C_CamTitleBarWidget::SaveAsConfig(void)
 
       // update GUI
       Q_EMIT (this->SigSavedAsNew());
+      q_SaveProject = true;
    }
+   return q_SaveProject;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -402,9 +414,13 @@ void C_CamTitleBarWidget::m_NewConfig(void)
 /*! \brief  Handle save to file action with valid file path
 
    \param[in]  orc_File    Selected file path
+
+ *  \return
+   True  Save project
+   False Didn't save project
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
+bool C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
 {
    int32_t s32_Return;
 
@@ -431,6 +447,7 @@ void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
 
    // update recent projects menu
    this->UpdateRecentProjectsAndWindowTitle();
+   return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -449,18 +466,15 @@ void C_CamTitleBarWidget::m_OnOpenProjectClicked(void)
       {
          c_PreviousDir = C_Uti::h_GetExePath();
       }
-
       const QString c_FullFilePath =
          C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Select openSYDE CAN Monitor Project File"),
                                         c_PreviousDir, C_CamTitleBarWidget::mhc_FILTER, "*.syde_cam");
-
       if (c_FullFilePath != "")
       {
          // Let all modules save their specific user settings before saving to file
          Q_EMIT (this->SigPrepareForSave());
          // save user settings to not lose project dependent user settings
          C_UsHandler::h_GetInstance()->Save();
-
          // load configuration
          this->LoadConfig(c_FullFilePath);
       }

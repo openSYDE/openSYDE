@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPPROGRESSLOG_H
-#define C_SYVUPPROGRESSLOG_H
+#ifndef C_SYVUPPROGRESSLOG_HPP
+#define C_SYVUPPROGRESSLOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

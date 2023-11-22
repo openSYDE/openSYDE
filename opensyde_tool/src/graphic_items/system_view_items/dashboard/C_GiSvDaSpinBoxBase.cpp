@@ -189,6 +189,30 @@ void C_GiSvDaSpinBoxBase::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaSpinBoxBase::UpdateShowValue(void)
+{
+   if (this->mpc_SpinBoxWidget != NULL)
+   {
+      // Poll only when something is expected
+      if (this->mq_ManualReadStarted == true)
+      {
+         QString c_Value;
+         float64_t f64_ScaledValue;
+         if (this->m_GetLastValue(0UL, c_Value, NULL, &f64_ScaledValue) == C_NO_ERR)
+         {
+            this->mpc_SpinBoxWidget->SetValue(f64_ScaledValue);
+            this->mq_ManualReadStarted = false;
+         }
+      }
+   }
+
+   // For write widget calling base class is not necessary
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active   Flag if connection is active or not active now
@@ -198,31 +222,47 @@ void C_GiSvDaSpinBoxBase::ConnectionActiveChanged(const bool oq_Active)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
-   if (oq_Active == true)
-   {
-      this->m_UpdateStaticValues();
-   }
-
-   C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
    if (pc_Dashboard != NULL)
    {
       const C_PuiSvDbSpinBox * const pc_Box = pc_Dashboard->GetSpinBox(static_cast<uint32_t>(this->ms32_Index));
-      if ((pc_Box != NULL) && (pc_Box->e_ElementWriteMode == C_PuiSvDbToggle::eWM_ON_CHANGE))
+      if (pc_Box != NULL)
       {
-         if (oq_Active == true)
+         if ((oq_Active == true) &&
+             (this->GetWidgetDataPoolElementCount() > 0U) &&
+             (pc_Box->e_InitialValueMode == C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE))
          {
-            if (this->mq_Connected == false)
-            {
-               this->mq_Connected = true;
-               connect(this->mpc_SpinBoxWidget, &C_OgeWiDashboardSpinBoxGroup::SigValueChanged, this,
-                       &C_GiSvDaSpinBoxBase::SendCurrentValue);
-            }
+            // Special case: Defined constant value as start value is set
+            // Update before calling base class implementation
+            // Scaling is here necessary
+            C_PuiSvDbDataElementScaling c_Scaling;
+            QVariant c_VariantValue;
+            tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
+            c_VariantValue = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Box->c_InitialValue,
+                                                                                   c_Scaling.f64_Factor,
+                                                                                   c_Scaling.f64_Offset,
+                                                                                   0UL);
+            this->mpc_SpinBoxWidget->SetValue(c_VariantValue);
          }
-         else
+
+         C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
+
+         if (pc_Box->e_ElementWriteMode == C_PuiSvDbToggle::eWM_ON_CHANGE)
          {
-            this->mq_Connected = false;
-            disconnect(this->mpc_SpinBoxWidget, &C_OgeWiDashboardSpinBoxGroup::SigValueChanged, this,
-                       &C_GiSvDaSpinBoxBase::SendCurrentValue);
+            if (oq_Active == true)
+            {
+               if (this->mq_Connected == false)
+               {
+                  this->mq_Connected = true;
+                  connect(this->mpc_SpinBoxWidget, &C_OgeWiDashboardSpinBoxGroup::SigValueChanged, this,
+                          &C_GiSvDaSpinBoxBase::SendCurrentValue);
+               }
+            }
+            else
+            {
+               this->mq_Connected = false;
+               disconnect(this->mpc_SpinBoxWidget, &C_OgeWiDashboardSpinBoxGroup::SigValueChanged, this,
+                          &C_GiSvDaSpinBoxBase::SendCurrentValue);
+            }
          }
       }
    }
@@ -313,11 +353,13 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
          pc_Dialog->SetTheme(pc_Box->e_DisplayStyle);
 
          //Resize
-         c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter());
+         c_New->SetSize(C_SyvDaPeBase::h_GetSpinBoxPopupSizeWithDashboardConnect());
 
          pc_PropertiesWidget->SetType(pc_Box->e_Type);
          pc_PropertiesWidget->SetShowUnit(pc_Box->q_ShowUnit);
          pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);
+         pc_Dialog->SetAutoWriteOnConnect(pc_Box->q_AutoWriteOnConnect);
+         pc_Dialog->SetDashboardConnectInitialValue(pc_Box->e_InitialValueMode, pc_Box->c_InitialValue, false);
 
          if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
@@ -337,9 +379,14 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
                c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
             }
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
+            c_Box.q_AutoWriteOnConnect = pc_Dialog->GetAutoWriteOnConnect();
+            c_Box.e_InitialValueMode = pc_Dialog->GetDashboardConnectInitialValueMode();
+            c_Box.c_InitialValue = pc_Dialog->GetDashboardConnectInitialValue();
 
             //Apply
             this->me_WriteMode = pc_Dialog->GetWriteMode();
+            this->me_WriteInitialValueMode = c_Box.e_InitialValueMode;
+            this->mq_AutoWriteOnConnect = c_Box.q_AutoWriteOnConnect;
             this->SetDisplayStyle(c_Box.e_DisplayStyle, this->mq_DarkMode);
             if (this->mpc_SpinBoxWidget != NULL)
             {
@@ -461,6 +508,9 @@ void C_GiSvDaSpinBoxBase::m_UpdateStaticValues(void)
             this->mpc_SpinBoxWidget->SetShowUnit(pc_Box->q_ShowUnit);
             this->mpc_SpinBoxWidget->SetUnit(c_Scaling.c_Unit);
             tgl_assert(C_SdNdeDpContentUtil::h_SimpleConvertToVariant(pc_Box->c_Value, c_VariantValue) == C_NO_ERR);
+
+            float64_t f64_Test;
+            pc_Box->c_Value.GetAnyValueAsFloat64(f64_Test, 0);
             this->mpc_SpinBoxWidget->SetValue(c_VariantValue);
          }
       }

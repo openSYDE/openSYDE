@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_TBLDELEGATEUTIL_H
-#define C_TBLDELEGATEUTIL_H
+#ifndef C_TBLDELEGATEUTIL_HPP
+#define C_TBLDELEGATEUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QRect>

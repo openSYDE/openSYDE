@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITDASHBOARDPROGRESSBARWIDGET_H
-#define C_SYVDAITDASHBOARDPROGRESSBARWIDGET_H
+#ifndef C_SYVDAITDASHBOARDPROGRESSBARWIDGET_HPP
+#define C_SYVDAITDASHBOARDPROGRESSBARWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

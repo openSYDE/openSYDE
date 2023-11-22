@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSDATAELEMENT_H
-#define C_PUIBSDATAELEMENT_H
+#ifndef C_PUIBSDATAELEMENT_HPP
+#define C_PUIBSDATAELEMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

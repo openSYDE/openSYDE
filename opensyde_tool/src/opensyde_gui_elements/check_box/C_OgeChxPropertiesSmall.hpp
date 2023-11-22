@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXPROPERTIESSMALL_H
-#define C_OGECHXPROPERTIESSMALL_H
+#ifndef C_OGECHXPROPERTIESSMALL_HPP
+#define C_OGECHXPROPERTIESSMALL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeChxProperties.hpp"

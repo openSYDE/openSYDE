@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXPROPERTIES_H
-#define C_OGECHXPROPERTIES_H
+#ifndef C_OGECHXPROPERTIES_HPP
+#define C_OGECHXPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeChxToolTipBase.hpp"

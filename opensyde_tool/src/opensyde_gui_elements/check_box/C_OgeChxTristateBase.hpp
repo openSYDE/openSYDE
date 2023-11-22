@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGECHXTRISTATEBASE_H
-#define C_OGECHXTRISTATEBASE_H
+#ifndef C_OGECHXTRISTATEBASE_HPP
+#define C_OGECHXTRISTATEBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

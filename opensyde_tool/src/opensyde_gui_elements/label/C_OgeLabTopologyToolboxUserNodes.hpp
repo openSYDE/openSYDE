@@ -8,8 +8,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABTOPOLOGYTOOLBOXUSERNODES_H
-#define C_OGELABTOPOLOGYTOOLBOXUSERNODES_H
+#ifndef C_OGELABTOPOLOGYTOOLBOXUSERNODES_HPP
+#define C_OGELABTOPOLOGYTOOLBOXUSERNODES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

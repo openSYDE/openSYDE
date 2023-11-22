@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGABOUTDIALOG_H
-#define C_NAGABOUTDIALOG_H
+#ifndef C_NAGABOUTDIALOG_HPP
+#define C_NAGABOUTDIALOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

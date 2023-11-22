@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITPATREEVIEW_H
-#define C_SYVDAITPATREEVIEW_H
+#ifndef C_SYVDAITPATREEVIEW_HPP
+#define C_SYVDAITPATREEVIEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbParam.hpp"

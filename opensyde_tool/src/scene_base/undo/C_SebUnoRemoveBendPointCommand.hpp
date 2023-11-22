@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOTOPREMOVEBENDPOINTCOMMAND_H
-#define C_SEBUNOTOPREMOVEBENDPOINTCOMMAND_H
+#ifndef C_SEBUNOTOPREMOVEBENDPOINTCOMMAND_HPP
+#define C_SEBUNOTOPREMOVEBENDPOINTCOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

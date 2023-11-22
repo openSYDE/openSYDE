@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIPROGRESSBOPPERLE_H
-#define C_OGEWIPROGRESSBOPPERLE_H
+#ifndef C_OGEWIPROGRESSBOPPERLE_HPP
+#define C_OGEWIPROGRESSBOPPERLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

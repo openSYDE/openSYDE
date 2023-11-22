@@ -1313,20 +1313,6 @@ int32_t C_PuiSvDashboardFiler::mh_LoadWidgetBase(C_PuiSvDbWidgetBase & orc_Widge
       {
          s32_Retval = C_CONFIG;
       }
-      if ((orc_XmlParser.SelectNodeChild("write-mode") == "write-mode") && (s32_Retval == C_NO_ERR))
-      {
-         if (C_PuiSvDashboardFiler::mh_StringToWriteMode(orc_XmlParser.GetNodeContent().c_str(),
-                                                         orc_Widget.e_ElementWriteMode) != C_NO_ERR)
-         {
-            s32_Retval = C_CONFIG;
-         }
-         //Return
-         tgl_assert(orc_XmlParser.SelectNodeParent() == "base");
-      }
-      else
-      {
-         s32_Retval = C_CONFIG;
-      }
       if ((orc_XmlParser.SelectNodeChild("display-style") == "display-style") && (s32_Retval == C_NO_ERR))
       {
          if (C_PuiSvDashboardFiler::mh_StringToDisplayStyle(orc_XmlParser.GetNodeContent().c_str(),
@@ -1341,12 +1327,99 @@ int32_t C_PuiSvDashboardFiler::mh_LoadWidgetBase(C_PuiSvDbWidgetBase & orc_Widge
       {
          s32_Retval = C_CONFIG;
       }
+      if (s32_Retval == C_NO_ERR)
+      {
+         C_PuiSvDbWriteWidgetBase * const pc_WriteBase = dynamic_cast<C_PuiSvDbWriteWidgetBase * const>(&orc_Widget);
+         if (pc_WriteBase != NULL)
+         {
+            s32_Retval = C_PuiSvDashboardFiler::mh_LoadWriteWidgetBase(*pc_WriteBase, orc_XmlParser);
+         }
+      }
       //Return
       orc_XmlParser.SelectNodeParent();
    }
    else
    {
       s32_Retval = C_CONFIG;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load write widget base
+
+   \param[in,out]  orc_WriteWidget  Write widget
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the base element
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSvDashboardFiler::mh_LoadWriteWidgetBase(C_PuiSvDbWriteWidgetBase & orc_WriteWidget,
+                                                      C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.SelectNodeChild("write-mode") == "write-mode")
+   {
+      if (C_PuiSvDashboardFiler::mh_StringToWriteMode(orc_XmlParser.GetNodeContent().c_str(),
+                                                      orc_WriteWidget.e_ElementWriteMode) != C_NO_ERR)
+      {
+         s32_Retval = C_CONFIG;
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "base");
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+
+   if (orc_XmlParser.SelectNodeChild("write") == "write")
+   {
+      if (orc_XmlParser.SelectNodeChild("connect-init-handling") == "connect-init-handling")
+      {
+         s32_Retval =
+            orc_XmlParser.GetAttributeBoolError("auto-write-on-connect", orc_WriteWidget.q_AutoWriteOnConnect);
+         if (orc_XmlParser.SelectNodeChild("mode") == "mode")
+         {
+            if (C_PuiSvDashboardFiler::mh_StringToInitialValueModeType(orc_XmlParser.GetNodeContent().c_str(),
+                                                                       orc_WriteWidget.e_InitialValueMode) != C_NO_ERR)
+            {
+               s32_Retval = C_CONFIG;
+            }
+            //Return
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "connect-init-handling");
+         }
+         else
+         {
+            s32_Retval = C_CONFIG;
+         }
+         if (orc_XmlParser.SelectNodeChild("value") == "value")
+         {
+            if (C_OscNodeDataPoolFiler::h_LoadDataPoolContentV1(orc_WriteWidget.c_InitialValue,
+                                                                orc_XmlParser) != C_NO_ERR)
+            {
+               s32_Retval = C_CONFIG;
+            }
+            //Return
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "connect-init-handling");
+         }
+         //Return
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "write");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "base");
+   }
+   else
+   {
+      //Use default values
    }
 
    return s32_Retval;
@@ -2135,12 +2208,46 @@ void C_PuiSvDashboardFiler::mh_SaveWidgetBase(const C_PuiSvDbWidgetBase & orc_Wi
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "base");
 
-   orc_XmlParser.CreateNodeChild("write-mode", C_PuiSvDashboardFiler::mh_WriteModeToString(
-                                    orc_Widget.e_ElementWriteMode).toStdString().c_str());
    orc_XmlParser.CreateNodeChild("display-style", C_PuiSvDashboardFiler::mh_DisplayStyleToString(
                                     orc_Widget.e_DisplayStyle).toStdString().c_str());
+
+   {
+      const C_PuiSvDbWriteWidgetBase * const pc_WriteWidget =
+         dynamic_cast<const C_PuiSvDbWriteWidgetBase * const>(&orc_Widget);
+      if (pc_WriteWidget != NULL)
+      {
+         C_PuiSvDashboardFiler::mh_SaveWriteWidgetBase(*pc_WriteWidget, orc_XmlParser);
+      }
+   }
    //Return
    orc_XmlParser.SelectNodeParent();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save write widget base
+
+   \param[in]      orc_WriteWidget  Write widget
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the base element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboardFiler::mh_SaveWriteWidgetBase(const C_PuiSvDbWriteWidgetBase & orc_WriteWidget,
+                                                   C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.CreateNodeChild("write-mode", C_PuiSvDashboardFiler::mh_WriteModeToString(
+                                    orc_WriteWidget.e_ElementWriteMode).toStdString().c_str());
+   orc_XmlParser.CreateAndSelectNodeChild("write");
+   orc_XmlParser.CreateAndSelectNodeChild("connect-init-handling");
+   orc_XmlParser.SetAttributeBool("auto-write-on-connect", orc_WriteWidget.q_AutoWriteOnConnect);
+   orc_XmlParser.CreateNodeChild("mode", C_PuiSvDashboardFiler::mh_InitialValueModeTypeToString(
+                                    orc_WriteWidget.e_InitialValueMode).toStdString().c_str());
+   orc_XmlParser.CreateAndSelectNodeChild("value");
+   C_OscNodeDataPoolFiler::h_SaveDataPoolContentV1(orc_WriteWidget.c_InitialValue, orc_XmlParser);
+   //Return
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "connect-init-handling");
+   //Return
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "write");
+   //Return
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "base");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2543,17 +2650,49 @@ QString C_PuiSvDashboardFiler::mh_TabChartVerticalAxisModeToString(
    Stringified write mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSvDashboardFiler::mh_WriteModeToString(const C_PuiSvDbWidgetBase::E_WriteMode oe_Mode)
+QString C_PuiSvDashboardFiler::mh_WriteModeToString(const C_PuiSvDbWriteWidgetBase::E_WriteMode oe_Mode)
 {
    QString c_Retval;
 
    switch (oe_Mode)
    {
-   case C_PuiSvDbWidgetBase::eWM_MANUAL:
+   case C_PuiSvDbWriteWidgetBase::eWM_MANUAL:
       c_Retval = "manual";
       break;
-   case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
+   case C_PuiSvDbWriteWidgetBase::eWM_ON_CHANGE:
       c_Retval = "on-change";
+      break;
+   default:
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform initial value mode to string
+
+   \param[in]  oe_Mode  Initial value mode
+
+   \return
+   Stringified initial value mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvDashboardFiler::mh_InitialValueModeTypeToString(
+   const C_PuiSvDbWriteWidgetBase::E_InitialValueModeType oe_Mode)
+{
+   QString c_Retval;
+
+   switch (oe_Mode)
+   {
+   case C_PuiSvDbWriteWidgetBase::eIVM_DISABLED:
+      c_Retval = "disabled";
+      break;
+   case C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE:
+      c_Retval = "set-constant-value";
+      break;
+   case C_PuiSvDbWriteWidgetBase::eIVM_READ_SERVER_VALUE:
+      c_Retval = "read-server-value";
       break;
    default:
       break;
@@ -3000,22 +3139,59 @@ int32_t C_PuiSvDashboardFiler::mh_StringToTabChartSettingVerticalAxisMode(const 
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvDashboardFiler::mh_StringToWriteMode(const QString & orc_String,
-                                                    C_PuiSvDbWidgetBase::E_WriteMode & ore_Mode)
+                                                    C_PuiSvDbWriteWidgetBase::E_WriteMode & ore_Mode)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String.compare("manual") == 0)
    {
-      ore_Mode = C_PuiSvDbWidgetBase::eWM_MANUAL;
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eWM_MANUAL;
    }
    else if (orc_String.compare("on-change") == 0)
    {
-      ore_Mode = C_PuiSvDbWidgetBase::eWM_ON_CHANGE;
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eWM_ON_CHANGE;
    }
    else
    {
       //Default
-      ore_Mode = C_PuiSvDbWidgetBase::eWM_MANUAL;
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eWM_MANUAL;
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform string to initial value mode
+
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Mode      Initial value mode
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSvDashboardFiler::mh_StringToInitialValueModeType(const QString & orc_String,
+                                                               C_PuiSvDbWriteWidgetBase::E_InitialValueModeType & ore_Mode)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_String.compare("disabled") == 0)
+   {
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eIVM_DISABLED;
+   }
+   else if (orc_String.compare("set-constant-value") == 0)
+   {
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eIVM_SET_CONSTANT_VALUE;
+   }
+   else if (orc_String.compare("read-server-value") == 0)
+   {
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eIVM_READ_SERVER_VALUE;
+   }
+   else
+   {
+      //Default
+      ore_Mode = C_PuiSvDbWriteWidgetBase::eIVM_DISABLED;
       s32_Retval = C_RANGE;
    }
    return s32_Retval;

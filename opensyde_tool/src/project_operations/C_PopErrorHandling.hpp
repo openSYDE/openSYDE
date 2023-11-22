@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_POPERRORHANDLING_H
-#define C_POPERRORHANDLING_H
+#ifndef C_POPERRORHANDLING_HPP
+#define C_POPERRORHANDLING_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

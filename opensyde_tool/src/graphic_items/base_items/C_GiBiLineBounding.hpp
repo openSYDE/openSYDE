@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GIBILINEBOUNDING_H
-#define C_GIBILINEBOUNDING_H
+#ifndef C_GIBILINEBOUNDING_HPP
+#define C_GIBILINEBOUNDING_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVector>

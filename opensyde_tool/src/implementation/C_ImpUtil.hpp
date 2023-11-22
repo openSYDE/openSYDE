@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_IMPUTIL_H
-#define C_IMPUTIL_H
+#ifndef C_IMPUTIL_HPP
+#define C_IMPUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <windows.h>

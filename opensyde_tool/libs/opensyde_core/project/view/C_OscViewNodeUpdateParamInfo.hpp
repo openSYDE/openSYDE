@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCVIEWNODEUPDATEPARAMINFO_H
-#define C_OSCVIEWNODEUPDATEPARAMINFO_H
+#ifndef C_OSCVIEWNODEUPDATEPARAMINFO_HPP
+#define C_OSCVIEWNODEUPDATEPARAMINFO_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

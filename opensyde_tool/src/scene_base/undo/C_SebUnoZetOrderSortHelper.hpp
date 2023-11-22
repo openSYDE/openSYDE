@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOZETORDERSORTHELPER_H
-#define C_SEBUNOZETORDERSORTHELPER_H
+#ifndef C_SEBUNOZETORDERSORTHELPER_HPP
+#define C_SEBUNOZETORDERSORTHELPER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItem>

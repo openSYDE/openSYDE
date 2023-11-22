@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVROROUTECALCULATION_H
-#define C_SYVROROUTECALCULATION_H
+#ifndef C_SYVROROUTECALCULATION_HPP
+#define C_SYVROROUTECALCULATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

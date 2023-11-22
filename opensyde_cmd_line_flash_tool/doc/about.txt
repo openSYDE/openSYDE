@@ -1,0 +1,59 @@
+---------------------------------------------------------------------
+File:      about.txt
+Content:   Information about this project
+---------------------------------------------------------------------
+
+Description:
+============
+osy_cmd_line_flash_tool is a console application for updating one device with one HEX file.
+It is a very simplified tool, compared to the other system based openSYDE tools. 
+For all other use cases we highly recommend using the openSYDE GUI tool or SYDEsup, 
+if you prefer using a command line tool.
+
+Features:
+* Setup CAN and connect to device
+* Read device information
+* Update device with one given HEX file
+* Configuration through command line parameters
+* Report progress to command line and exit with defined result codes
+
+Non-Features (that are all supported in openSYDE GUI and SYDEsup):
+* Only address based targets supported (no filebased support)
+* Only CAN bus supported (no Ethernet support)
+* Only local busses are supported (no routing)
+* Only openSYDE protocol support
+* Only HEX files support
+* No security support (public/private key authentication)
+* No device name check (HEX file device name vs. device name)
+* No check if update is necessary
+
+Platform:
+=========
+MS Windows (Win10 verified)
+
+Requires:
+=========
+* STW CAN DLL to access CAN bus
+* openSYDE device connected to CAN bus
+* HEX file you want to flash
+
+Getting started:
+================
+* Run with parameter -h to get a list of options
+* Here is an example call for flashing "myapplication.hex" to device with node ID 1 and bitrate 1 MBit/s:
+   osy_cmd_line_flash_tool.exe -i "C:\openSYDE\tool\STW_dlls\stwpeak2\stwpeak2.dll" -f "C:\Flashware\myapplication.hex" -n 1 -b 1000
+* The tool prints some information about current progress to command line
+* If something fails, check log file in ./Logs
+
+Error codes:
+============
+osy_cmd_line_flash_tool can exit with the following codes:
+   0     everything okay
+   1     Caller requested help via -h
+   10    Command line parsing error (e.g. no CAN DLL provided)
+   20    Initialization failed (e.g. CAN initialization error or node ID misconfigured)
+   30    Flashloader activation failed
+   40    Reading device information failed (e.g. not connected to device)
+   50    Error in update of device (e.g. could not read HEX file or could not communicate with server)
+   60    Error when resetting device
+Always check log file at ./Logs for details what happened!

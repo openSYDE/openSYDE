@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSBOXBASE_H
-#define C_PUIBSBOXBASE_H
+#ifndef C_PUIBSBOXBASE_HPP
+#define C_PUIBSBOXBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPointF>

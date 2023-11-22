@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABSVGONLY_H
-#define C_OGELABSVGONLY_H
+#ifndef C_OGELABSVGONLY_HPP
+#define C_OGELABSVGONLY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSvgRenderer>

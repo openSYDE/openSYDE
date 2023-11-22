@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USFILER_H
-#define C_USFILER_H
+#ifndef C_USFILER_HPP
+#define C_USFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

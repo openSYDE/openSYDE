@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBTOOLBOXUTIL_H
-#define C_SEBTOOLBOXUTIL_H
+#ifndef C_SEBTOOLBOXUTIL_HPP
+#define C_SEBTOOLBOXUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>

@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGEPUBPROJOP_H
-#define C_CAMOGEPUBPROJOP_H
+#ifndef C_CAMOGEPUBPROJOP_HPP
+#define C_CAMOGEPUBPROJOP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.hpp"

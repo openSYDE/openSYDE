@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISYTEXTELEMENTWIDGET_H
-#define C_GISYTEXTELEMENTWIDGET_H
+#ifndef C_GISYTEXTELEMENTWIDGET_HPP
+#define C_GISYTEXTELEMENTWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

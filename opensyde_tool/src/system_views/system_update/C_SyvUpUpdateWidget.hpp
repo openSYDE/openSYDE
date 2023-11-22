@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPUPDATEWIDGET_H
-#define C_SYVUPUPDATEWIDGET_H
+#ifndef C_SYVUPUPDATEWIDGET_HPP
+#define C_SYVUPUPDATEWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -62,6 +62,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
+   void SigInvalidView(void);
    void SigBlockDragAndDrop(const bool oq_Block);
    void SigNodeConnectStates(const std::vector<stw::opensyde_core::C_OscSuSequencesNodeConnectStates> & orc_NodeStates,
                              const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors);

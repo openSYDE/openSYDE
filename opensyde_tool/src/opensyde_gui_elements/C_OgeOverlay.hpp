@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEOVERLAY_H
-#define C_OGEOVERLAY_H
+#ifndef C_OGEOVERLAY_HPP
+#define C_OGEOVERLAY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

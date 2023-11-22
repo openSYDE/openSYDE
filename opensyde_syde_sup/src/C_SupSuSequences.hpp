@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SUPSUSEQUENCES_H
-#define C_SUPSUSEQUENCES_H
+#ifndef C_SUPSUSEQUENCES_HPP
+#define C_SUPSUSEQUENCES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscSuSequences.hpp"

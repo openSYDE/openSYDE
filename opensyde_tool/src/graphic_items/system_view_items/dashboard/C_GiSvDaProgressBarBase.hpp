@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_GISVDAPROGRESSBARBASE_H
-#define C_GISVDAPROGRESSBARBASE_H
+#ifndef C_GISVDAPROGRESSBARBASE_HPP
+#define C_GISVDAPROGRESSBARBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiSvDaRectBaseGroup.hpp"

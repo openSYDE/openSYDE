@@ -75,20 +75,20 @@ const QString C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED =
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex            Index of system view
-   \param[in]     oru32_DashboardIndex       Index of dashboard in system view
-   \param[in]     ors32_DataIndex            Index of data element in dashboard in system view
-   \param[in]     ore_Type                   Type for data storage
-   \param[in]     ou32_MaximumDataElements   Maximum number of shown data elements of the widget
-   \param[in]     oru64_Id                   Unique ID
-   \param[in]     of64_MinWidth              Minimum width of widget
-   \param[in]     of64_MinHeight             Minimum height of widget
-   \param[in]     of64_InitWidth             Initial width of widget
-   \param[in]     of64_InitHeight            Initial height of widget
-   \param[in]     oq_KeepAspectRatio         Flag if the rectangle should always keep its initial aspect ratio
-   \param[in]     oq_ReadItem                Flag if item is a read only item and needs the timeout mechanism
-   \param[in,out] opc_Parent                 Optional pointer to parent
-   \param[in]     orc_PosOffset              Optional offset for the position (values must be in 0.0 <= x < 1.0)
+   \param[in]      oru32_ViewIndex           Index of system view
+   \param[in]      oru32_DashboardIndex      Index of dashboard in system view
+   \param[in]      ors32_DataIndex           Index of data element in dashboard in system view
+   \param[in]      ore_Type                  Type for data storage
+   \param[in]      ou32_MaximumDataElements  Maximum number of shown data elements of the widget
+   \param[in]      oru64_Id                  Unique ID
+   \param[in]      of64_MinWidth             Minimum width of widget
+   \param[in]      of64_MinHeight            Minimum height of widget
+   \param[in]      of64_InitWidth            Initial width of widget
+   \param[in]      of64_InitHeight           Initial height of widget
+   \param[in]      oq_KeepAspectRatio        Flag if the rectangle should always keep its initial aspect ratio
+   \param[in]      oq_ReadItem               Flag if item is a read only item and needs the timeout mechanism
+   \param[in,out]  opc_Parent                Optional pointer to parent
+   \param[in]      orc_PosOffset             Optional offset for the position (values must be in 0.0 <= x < 1.0)
                                              Negative value deactivates the function
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,12 +105,15 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32_t & oru32_ViewIndex, c
    C_PuiSvDbDataElementHandler(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, ore_Type,
                                ou32_MaximumDataElements, oq_ReadItem),
    me_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
-   me_WriteMode(C_PuiSvDbWidgetBase::eWM_MANUAL),
+   mq_AutoWriteOnConnect(false),
+   me_WriteMode(C_PuiSvDbWriteWidgetBase::eWM_MANUAL),
+   me_WriteInitialValueMode(C_PuiSvDbWriteWidgetBase::eIVM_DISABLED),
    mq_DarkMode(false),
    mf64_WriteValue(0.0),
    mq_InitialStyleCall(true),
    mq_EditModeActive(false),
    mq_EditContentModeEnabled(false),
+   mq_ManualReadStarted(false),
    ms32_IconSize(24),
    mc_CurrentSize(of64_InitWidth, of64_InitHeight),
    mq_ProxyWidgetInteractionActive(false),
@@ -289,13 +292,19 @@ void C_GiSvDaRectBaseGroup::SetDefaultCursor(const QCursor & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load basic widget data
 
-   \param[in] orc_Data Basic widget data
+   \param[in]  orc_Data    Basic widget data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data)
 {
+   const C_PuiSvDbWriteWidgetBase * const pc_WriteData =
+      dynamic_cast<const C_PuiSvDbWriteWidgetBase * const>(&orc_Data);
+
    this->me_Style = orc_Data.e_DisplayStyle;
-   this->me_WriteMode = orc_Data.e_ElementWriteMode;
+   if (pc_WriteData != NULL)
+   {
+      this->m_LoadSvWriteData(*pc_WriteData);
+   }
 
    this->LoadBasicData(orc_Data);
    this->ApplySizeChange(orc_Data.c_UiPosition, QSizeF(orc_Data.f64_Width, orc_Data.f64_Height));
@@ -320,8 +329,13 @@ void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateSvBasicData(C_PuiSvDbWidgetBase & orc_Data, const bool oq_SkipDataElements) const
 {
+   C_PuiSvDbWriteWidgetBase * const pc_WriteData = dynamic_cast<C_PuiSvDbWriteWidgetBase * const>(&orc_Data);
+
    orc_Data.e_DisplayStyle = this->me_Style;
-   orc_Data.e_ElementWriteMode = this->me_WriteMode;
+   if (pc_WriteData != NULL)
+   {
+      this->m_UpdateSvWriteData(*pc_WriteData);
+   }
 
    this->UpdateBasicData(orc_Data);
    if (oq_SkipDataElements == false)
@@ -530,13 +544,18 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
 
          this->mc_LastTransparencyValue.clear();
          this->mc_LastTransparencyValue.resize(this->GetWidgetDataPoolElementCount(), -1);
-
-         this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ);
       }
       else
       {
-         this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE);
+         this->mpc_SendIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE);
+
+         if (this->mq_AutoWriteOnConnect == true)
+         {
+            this->SendCurrentValue();
+         }
       }
+
+      this->mpc_ReadIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ);
 
       this->mpc_ButtonGroup->setVisible(this->mq_ShowButton);
 
@@ -549,14 +568,12 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
 
       if (this->mq_ShowButton == true)
       {
-         if (this->mq_ReadItem == true)
+         if (this->mq_ReadItem != true)
          {
-            this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ_DISABLED);
+            this->mpc_SendIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED);
          }
-         else
-         {
-            this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED);
-         }
+
+         this->mpc_ReadIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ_DISABLED);
       }
       //Always disable error
       if (this->mpc_ConflictIcon != NULL)
@@ -565,6 +582,23 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
          //Clear error
          this->mc_CommmunicationErrors.clear();
          this->mc_InvalidDlcSignals.clear();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start of a connection after all widgets executed ConnectionActiveChanged(true)
+
+   Handling initial read of write widgets
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::ConnectionActiveStarted()
+{
+   if (this->mq_ReadItem == false)
+   {
+      if (this->me_WriteInitialValueMode == C_PuiSvDbWriteWidgetBase::eIVM_READ_SERVER_VALUE)
+      {
+         this->m_ManualRead();
       }
    }
 }
@@ -609,9 +643,9 @@ void C_GiSvDaRectBaseGroup::EditModeActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
 {
-   if ((this->mu32_NextManualActionIndex == 0) && (this->mpc_RefreshIcon != NULL))
+   if ((this->mu32_NextManualActionIndex == 0) && (this->mpc_SendIcon != NULL))
    {
-      m_ManualOperationStarted();
+      m_ManualOperationStarted(false);
    }
    if ((this->GetWidgetDataPoolElementCount() >  this->mu32_NextManualActionIndex) &&
        (this->mq_ReadItem == false))
@@ -1014,6 +1048,7 @@ const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::m_GetSvDashboard(void) const
    \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[out]    orc_ScaledValue                 String with result string
    \param[out]    opf64_UnscaledValueAsFloat      Optional float with unscaled value
+   \param[out]    opf64_ScaledValueAsFloat        Optional float with scaled value
 
    \return
    C_NO_ERR    Value read
@@ -1022,12 +1057,14 @@ const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::m_GetSvDashboard(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex, QString & orc_ScaledValue,
-                                              float64_t * const opf64_UnscaledValueAsFloat)
+                                              float64_t * const opf64_UnscaledValueAsFloat,
+                                              float64_t * const opf64_ScaledValueAsFloat)
 {
    C_PuiSvDbNodeDataPoolListElementId c_Id;
    const int32_t s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex,
                                                                           orc_ScaledValue,
-                                                                          opf64_UnscaledValueAsFloat);
+                                                                          opf64_UnscaledValueAsFloat,
+                                                                          opf64_ScaledValueAsFloat);
 
    //Remove error on valid new value
    if ((s32_Retval == C_NO_ERR) && (this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_Id) == C_NO_ERR))
@@ -1225,13 +1262,31 @@ void C_GiSvDaRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc
        (this->mpc_ButtonGroup->isVisible() == true))
    {
       const QPointF c_Pos = opc_Event->scenePos();
-      const QRectF c_Rect = this->mpc_ButtonGroup->sceneBoundingRect();
-
-      // is the cursor in the area of the label
-      if (c_Rect.contains(c_Pos) == true)
+      if (this->mpc_ReadIcon != NULL)
       {
-         m_HandleGenericButtonClick();
-         q_GenericButtonClicked = true;
+         const QRectF c_RectRead = this->mpc_ReadIcon->sceneBoundingRect();
+
+         // is the cursor in the area of the label
+         if (c_RectRead.contains(c_Pos) == true)
+         {
+            m_HandleReadButtonClick();
+            q_GenericButtonClicked = true;
+         }
+         else
+         {
+            if (this->mpc_SendIcon != NULL)
+            {
+               const QRectF c_RectSend = this->mpc_SendIcon->sceneBoundingRect();
+
+               // is the cursor in the area of the label
+               if (c_RectSend.contains(c_Pos) == true)
+               {
+                  // Write the actual value to the server
+                  this->SendCurrentValue();
+                  q_GenericButtonClicked = true;
+               }
+            }
+         }
       }
    }
 
@@ -1447,81 +1502,32 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
    C_GiBiRectBaseGroup::hoverMoveEvent(opc_Event);
 
    //Handle tool tips
-   if ((this->mpc_RefreshIcon->isVisible() == true) &&
-       (this->mpc_RefreshIcon->contains(this->mpc_RefreshIcon->mapFromScene(opc_Event->scenePos())) == true))
+   if ((this->mpc_ReadIcon->isVisible() == true) &&
+       (this->mpc_ReadIcon->contains(this->mpc_ReadIcon->mapFromScene(opc_Event->scenePos())) == true))
    {
-      QString c_ManualItems;
       QString c_Text;
-      if (this->mq_ReadItem == true)
+      c_Text = C_GtGetText::h_GetText("Trigger manual read for:\n");
+      c_Text += this->m_GetItemsForButtonToolTip();
+      if (this->mq_ConnectionActive == false)
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-         if (pc_View != NULL)
-         {
-            for (uint32_t u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
-            {
-               C_PuiSvDbNodeDataPoolListElementId c_Id;
-               if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
-               {
-                  C_PuiSvReadDataConfiguration c_Config;
-                  if (pc_View->GetReadRailAssignment(c_Id, c_Config) == C_NO_ERR)
-                  {
-                     if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
-                     {
-                        const C_OscNodeDataPoolListElement * const pc_Element =
-                           C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
-                        if (pc_Element != NULL)
-                        {
-                           //Add name
-                           if (c_Id.GetUseArrayElementIndex())
-                           {
-                              c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                                 c_Id.GetArrayElementIndex());
-                           }
-                           else
-                           {
-                              c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
-                           }
-                           c_ManualItems += "\n";
-                        }
-                     }
-                  }
-               }
-            }
-         }
-         c_Text = C_GtGetText::h_GetText("Trigger manual read for:\n");
+         c_Text += C_GtGetText::h_GetText("\nOnly available while connected.");
       }
-      else
+      //Check if redisplay necessary
+      if (c_Text.compare(this->GetCurrentToolTipContent()) != 0)
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-         if (pc_View != NULL)
-         {
-            for (uint32_t u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
-            {
-               C_PuiSvDbNodeDataPoolListElementId c_Id;
-               if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
-               {
-                  const C_OscNodeDataPoolListElement * const pc_Element =
-                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
-                  if (pc_Element != NULL)
-                  {
-                     //Add name
-                     if (c_Id.GetUseArrayElementIndex())
-                     {
-                        c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                           c_Id.GetArrayElementIndex());
-                     }
-                     else
-                     {
-                        c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
-                     }
-                     c_ManualItems += "\n";
-                  }
-               }
-            }
-         }
-         c_Text = C_GtGetText::h_GetText("Trigger manual write for:\n");
+         Q_EMIT this->SigHideToolTip();
       }
-      c_Text += c_ManualItems;
+      this->SetDefaultToolTipHeading("");
+      this->SetDefaultToolTipContent(c_Text);
+      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+   }
+   else if ((this->mpc_SendIcon != NULL) && (this->mpc_SendIcon->isVisible() == true) &&
+            (this->mpc_SendIcon->contains(this->mpc_SendIcon->mapFromScene(opc_Event->scenePos())) == true))
+   {
+      QString c_Text;
+      c_Text = C_GtGetText::h_GetText("Trigger manual write for:\n");
+      c_Text += this->m_GetItemsForButtonToolTip();
+
       if (this->mq_ConnectionActive == false)
       {
          c_Text += C_GtGetText::h_GetText("\nOnly available while connected.");
@@ -1670,7 +1676,7 @@ void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
                          (m_CheckHasAnyRequiredBusesConnected() == false) ||
                          (m_CheckHasAnyRequiredNodesValidDashboardRouting() == false);
 
-      if (((((this->me_WriteMode == C_PuiSvDbWidgetBase::eWM_MANUAL) && (this->mq_ReadItem == false)) ||
+      if (((((this->me_WriteMode == C_PuiSvDbWriteWidgetBase::eWM_MANUAL) && (this->mq_ReadItem == false)) ||
             (q_ManualReadElement == true)) &&
            (q_InvalidElement == false)) && (this->m_AllowRefreshButton() == true))
       {
@@ -1688,14 +1694,11 @@ void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
       this->mq_ShowButton = false;
    }
 
-   if (this->mq_ReadItem == true)
+   if (this->mq_ReadItem == false)
    {
-      this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ_DISABLED);
+      this->mpc_SendIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED);
    }
-   else
-   {
-      this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED);
-   }
+   this->mpc_ReadIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ_DISABLED);
    if (this->mpc_ButtonGroup != NULL)
    {
       this->mpc_ButtonGroup->setVisible(this->mq_ShowButton);
@@ -1837,39 +1840,52 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
 void C_GiSvDaRectBaseGroup::m_InitButton(void)
 {
    QRectF c_Rect;
-   QString c_Path;
    QGraphicsRectItem * pc_RectItem;
    //Offset to have icon inside widget
    const float64_t f64_PosHorizontal =
       (this->GetVisibleBoundingRect().width() - (static_cast<float64_t>(this->ms32_IconSize) * 1.8125));
-   const float64_t f64_POS_Y = 0.0;
+   const float64_t f64_POS_Y_ICON_1 = 0.0;
+   const float64_t f64_POS_Y_ICON_2 = static_cast<float64_t>(this->ms32_IconSize);
+   const float64_t f64_POS_WRITE_ICON = f64_POS_Y_ICON_1;
+   const float64_t f64_POS_READ_ICON = this->mq_ReadItem ? f64_POS_Y_ICON_1 : f64_POS_Y_ICON_2;
+   float64_t f64_Width = static_cast<float64_t>(this->ms32_IconSize);
 
    // create 'button' with points
    mpc_ButtonGroup = new QGraphicsItemGroup();
    this->mpc_ButtonGroup->setCursor(Qt::ArrowCursor);
 
-   if (this->mq_ReadItem == true)
+   if (this->mq_ReadItem == false)
    {
-      c_Path = C_GiSvDaRectBaseGroup::mhc_ICON_READ_DISABLED;
+      // create the write icon
+      mpc_SendIcon =
+         new C_GiSvgGraphicsItem(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED,
+                                 static_cast<float64_t>(this->ms32_IconSize),
+                                 static_cast<float64_t>(this->ms32_IconSize));
+
+      this->mpc_SendIcon->moveBy(f64_PosHorizontal - this->mpc_SendIcon->pos().x(),
+                                 f64_POS_WRITE_ICON - this->mpc_SendIcon->pos().y());
+      this->mpc_ButtonGroup->addToGroup(this->mpc_SendIcon);
+      f64_Width += static_cast<float64_t>(this->ms32_IconSize);
    }
    else
    {
-      c_Path = C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED;
+      mpc_SendIcon = NULL;
    }
-   // create the refresh icon
-   mpc_RefreshIcon = new C_GiSvgGraphicsItem(c_Path, static_cast<float64_t>(this->ms32_IconSize),
-                                             static_cast<float64_t>(this->ms32_IconSize));
 
-   this->mpc_RefreshIcon->moveBy(f64_PosHorizontal - this->mpc_RefreshIcon->pos().x(),
-                                 f64_POS_Y - this->mpc_RefreshIcon->pos().y());
-
-   this->mpc_ButtonGroup->addToGroup(this->mpc_RefreshIcon);
+   // create the read icon
+   mpc_ReadIcon =
+      new C_GiSvgGraphicsItem(C_GiSvDaRectBaseGroup::mhc_ICON_READ_DISABLED,
+                              static_cast<float64_t>(this->ms32_IconSize),
+                              static_cast<float64_t>(this->ms32_IconSize));
+   this->mpc_ReadIcon->moveBy(f64_PosHorizontal - this->mpc_ReadIcon->pos().x(),
+                              f64_POS_READ_ICON - this->mpc_ReadIcon->pos().y());
+   this->mpc_ButtonGroup->addToGroup(this->mpc_ReadIcon);
 
    //Increase bounding rect
    c_Rect = this->mpc_ButtonGroup->boundingRect();
    c_Rect.setX(f64_PosHorizontal);
-   c_Rect.setY(f64_POS_Y);
-   c_Rect.setWidth(static_cast<float64_t>(this->ms32_IconSize));
+   c_Rect.setY(f64_POS_Y_ICON_1);
+   c_Rect.setWidth(f64_Width);
    c_Rect.setHeight(static_cast<float64_t>(this->ms32_IconSize));
    pc_RectItem = new QGraphicsRectItem(c_Rect);
    pc_RectItem->setPen(static_cast<QPen>(Qt::NoPen));
@@ -1886,11 +1902,11 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ManualRead(void)
 {
-   if ((this->mu32_NextManualActionIndex == 0) && (this->mpc_RefreshIcon != NULL))
+   if ((this->mu32_NextManualActionIndex == 0) && (this->mpc_ReadIcon != NULL))
    {
-      this->m_ManualOperationStarted();
+      this->m_ManualOperationStarted(true);
    }
-   if ((this->GetWidgetDataPoolElementCount() > this->mu32_NextManualActionIndex) && (this->mq_ReadItem == true))
+   if ((this->GetWidgetDataPoolElementCount() > this->mu32_NextManualActionIndex))
    {
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
 
@@ -1900,7 +1916,10 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
       {
          //Always iterate to next element!
          ++this->mu32_NextManualActionIndex;
-         if (this->m_CheckIsOnTrigger(c_ElementId))
+
+         // Write element or read item configured for manual trigger
+         if ((this->mq_ReadItem == false) ||
+             this->m_CheckIsOnTrigger(c_ElementId))
          {
             if ((c_ElementId.GetIsValid() == true) &&
                 (this->m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true) &&
@@ -1909,7 +1928,8 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
                //-1 because we already prepared for the next element!
                if (this->m_CheckElementAlreadyRead(this->mu32_NextManualActionIndex - 1UL, c_ElementId) == false)
                {
-                  Q_EMIT (this->SigDataPoolRead(c_ElementId));
+                  this->mq_ManualReadStarted = true;
+                  Q_EMIT (this->SigDataPoolRead(c_ElementId, ((this->mq_ReadItem == false) ? this : NULL)));
                }
                else
                {
@@ -1943,30 +1963,21 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Handle any click to the generic button
+/*! \brief  Handle any click to the read button
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::m_HandleGenericButtonClick(void)
+void C_GiSvDaRectBaseGroup::m_HandleReadButtonClick(void)
 {
    this->mq_AbortTriggered = false;
-   //Read the read element and write the value of the write element
-   if (this->mq_ReadItem == false)
+   //Only for read items this may be abort
+   if (this->mu32_NextManualActionIndex > 0UL)
    {
-      // Write the actual value to the server
-      this->SendCurrentValue();
+      //Register abort
+      this->mq_AbortTriggered = true;
    }
    else
    {
-      //Only for read items this may be abort
-      if (this->mu32_NextManualActionIndex > 0UL)
-      {
-         //Register abort
-         this->mq_AbortTriggered = true;
-      }
-      else
-      {
-         this->m_ManualRead();
-      }
+      this->m_ManualRead();
    }
 }
 
@@ -2024,19 +2035,27 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   First step of manual operation
+
+   \param[in]  oq_IsRead   Flag if read button
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::m_ManualOperationStarted(void)
+void C_GiSvDaRectBaseGroup::m_ManualOperationStarted(const bool oq_IsRead)
 {
-   if ((this->mpc_RefreshIcon != NULL) && (this->GetWidgetDataPoolElementCount() > 1))
+   if (this->GetWidgetDataPoolElementCount() > 1)
    {
-      if (this->mq_ReadItem == true)
+      if (oq_IsRead)
       {
-         this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ_ABORT);
+         if (this->mpc_ReadIcon != NULL)
+         {
+            this->mpc_ReadIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ_ABORT);
+         }
       }
       else
       {
-         this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_ABORT);
+         if (this->mpc_SendIcon != NULL)
+         {
+            this->mpc_SendIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_ABORT);
+         }
       }
    }
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -2046,20 +2065,99 @@ void C_GiSvDaRectBaseGroup::m_ManualOperationStarted(void)
 /*! \brief   Final step of manual operation
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::m_ManualOperationFinished(void)
+void C_GiSvDaRectBaseGroup::m_ManualOperationFinished()
 {
    //Reset current state
    this->mu32_NextManualActionIndex = 0;
-   if ((this->mpc_RefreshIcon != NULL) && (this->GetWidgetDataPoolElementCount() > 1))
+   if  (this->GetWidgetDataPoolElementCount() > 1)
    {
-      if (this->mq_ReadItem == true)
+      if (this->mpc_ReadIcon != NULL)
       {
-         this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ);
+         this->mpc_ReadIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_READ);
       }
-      else
+      if (this->mpc_SendIcon != NULL)
       {
-         this->mpc_RefreshIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE);
+         this->mpc_SendIcon->SetSvg(C_GiSvDaRectBaseGroup::mhc_ICON_WRITE);
       }
    }
    QApplication::restoreOverrideCursor();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load basic write data
+
+   \param[in]  orc_Data    Data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::m_LoadSvWriteData(const C_PuiSvDbWriteWidgetBase & orc_Data)
+{
+   this->mq_AutoWriteOnConnect = orc_Data.q_AutoWriteOnConnect;
+   this->me_WriteMode = orc_Data.e_ElementWriteMode;
+   this->me_WriteInitialValueMode = orc_Data.e_InitialValueMode;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update basic write data
+
+   \param[in,out]  orc_Data   Data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::m_UpdateSvWriteData(C_PuiSvDbWriteWidgetBase & orc_Data) const
+{
+   orc_Data.e_ElementWriteMode = this->me_WriteMode;
+   orc_Data.e_InitialValueMode = this->me_WriteInitialValueMode;
+   orc_Data.q_AutoWriteOnConnect = this->mq_AutoWriteOnConnect;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get items for button tool tip
+
+   \return
+   Items for button tool tip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_GiSvDaRectBaseGroup::m_GetItemsForButtonToolTip(void) const
+{
+   QString c_Retval = "";
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      for (uint32_t u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+      {
+         C_PuiSvDbNodeDataPoolListElementId c_Id;
+         if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
+         {
+            bool q_Continue = false;
+            C_PuiSvReadDataConfiguration c_Config;
+            if (pc_View->GetReadRailAssignment(c_Id, c_Config) == C_NO_ERR)
+            {
+               if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+               {
+                  q_Continue = true;
+               }
+            }
+            if ((q_Continue) || (this->mq_ReadItem == false))
+            {
+               const C_OscNodeDataPoolListElement * const pc_Element =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
+               if (pc_Element != NULL)
+               {
+                  //Add name
+                  if (c_Id.GetUseArrayElementIndex())
+                  {
+                     c_Retval += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                        c_Id.GetArrayElementIndex());
+                  }
+                  else
+                  {
+                     c_Retval += static_cast<QString>(pc_Element->c_Name.c_str());
+                  }
+                  c_Retval += "\n";
+               }
+            }
+         }
+      }
+   }
+   return c_Retval;
 }

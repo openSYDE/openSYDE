@@ -1844,11 +1844,15 @@ int32_t C_PuiSdHandlerBusLogic::SetCanSignal(const C_OscCanMessageIdentification
       //Signal changed signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
       {
-         Q_EMIT (this->SigSyncNodeDataPoolListElementChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                             c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
-                                                             orc_OscSignalCommon.GetType(),
-                                                             orc_OscSignalCommon.GetArray(),
-                                                             orc_OscSignalCommon.GetArraySize(), false));
+         Q_EMIT (this->SigSyncNodeDataPoolListElementTypeChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                                 c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
+                                                                 orc_OscSignalCommon.GetType(),
+                                                                 orc_OscSignalCommon.GetArray(),
+                                                                 orc_OscSignalCommon.GetArraySize(), false));
+         Q_EMIT (this->SigSyncNodeDataPoolListElementRangeChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                                  c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
+                                                                  orc_OscSignalCommon.c_MinValue,
+                                                                  orc_OscSignalCommon.c_MaxValue));
       }
       //Ui data pool part
       if (pc_Protocol != NULL)

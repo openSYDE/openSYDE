@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBTOOLBAR_H
-#define C_OGEPUBTOOLBAR_H
+#ifndef C_OGEPUBTOOLBAR_HPP
+#define C_OGEPUBTOOLBAR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

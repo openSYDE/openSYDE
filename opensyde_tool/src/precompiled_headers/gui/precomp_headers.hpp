@@ -14,8 +14,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef  PRECOMP_HEADERS_GUI_H
-#define  PRECOMP_HEADERS_GUI_H
+#ifndef  PRECOMP_HEADERS_GUI_HPP
+#define  PRECOMP_HEADERS_GUI_HPP
 
 //lint -esym(766,"precomp_headers.hpp")   effectively not used in lint "builds"; but that's exactly what we want
 #ifndef _lint //speed up linting: don't include all of the headers for each linted .cpp file

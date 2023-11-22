@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVDBPIECHART_H
-#define C_PUISVDBPIECHART_H
+#ifndef C_PUISVDBPIECHART_HPP
+#define C_PUISVDBPIECHART_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbWidgetBase.hpp"

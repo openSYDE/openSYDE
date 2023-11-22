@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEFRASEPARATOR_H
-#define C_OGEFRASEPARATOR_H
+#ifndef C_OGEFRASEPARATOR_HPP
+#define C_OGEFRASEPARATOR_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

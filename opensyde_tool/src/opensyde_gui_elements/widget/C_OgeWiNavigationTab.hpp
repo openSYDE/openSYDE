@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWINAVIGATIONTAB_H
-#define C_OGEWINAVIGATIONTAB_H
+#ifndef C_OGEWINAVIGATIONTAB_HPP
+#define C_OGEWINAVIGATIONTAB_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPushButton>

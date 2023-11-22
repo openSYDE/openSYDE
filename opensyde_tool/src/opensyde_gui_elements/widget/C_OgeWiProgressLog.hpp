@@ -6,8 +6,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEWIPROGRESSLOG_H
-#define C_OGEWIPROGRESSLOG_H
+#ifndef C_OGEWIPROGRESSLOG_HPP
+#define C_OGEWIPROGRESSLOG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

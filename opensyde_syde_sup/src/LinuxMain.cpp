@@ -35,7 +35,7 @@ using namespace stw::errors;
 /*! \brief   main
 
    \param[in]   os32_Argc    number of command line arguments
-   \param[in]   oapcn_Argv   command line arguments
+   \param[in]   oppcn_Argv   command line arguments
 
    \return
    C_SydeSup::e_Result::eOK                        success

@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVDAITPAWIDGETNEW_H
-#define C_SYVDAITPAWIDGETNEW_H
+#ifndef C_SYVDAITPAWIDGETNEW_HPP
+#define C_SYVDAITPAWIDGETNEW_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>

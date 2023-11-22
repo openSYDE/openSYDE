@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETAWALTERNATIVE_H
-#define C_OGETAWALTERNATIVE_H
+#ifndef C_OGETAWALTERNATIVE_HPP
+#define C_OGETAWALTERNATIVE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

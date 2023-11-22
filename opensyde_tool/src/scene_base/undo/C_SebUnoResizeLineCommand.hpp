@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBUNOTOPRESIZELINECOMMAND_H
-#define C_SEBUNOTOPRESIZELINECOMMAND_H
+#ifndef C_SEBUNOTOPRESIZELINECOMMAND_HPP
+#define C_SEBUNOTOPRESIZELINECOMMAND_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

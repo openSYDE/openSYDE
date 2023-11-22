@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SYVUPINFORMATIONWIDGET_H
-#define C_SYVUPINFORMATIONWIDGET_H
+#ifndef C_SYVUPINFORMATIONWIDGET_HPP
+#define C_SYVUPINFORMATIONWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -79,6 +79,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigUpdatePackageState(const int32_t os32_State) const;
+   void SigInvalidView(void);
 
 protected:
    void showEvent(QShowEvent * const opc_Event) override;

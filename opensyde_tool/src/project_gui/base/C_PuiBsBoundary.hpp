@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUIBSBOUNDARY_H
-#define C_PUIBSBOUNDARY_H
+#ifndef C_PUIBSBOUNDARY_HPP
+#define C_PUIBSBOUNDARY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QColor>

@@ -6,8 +6,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGETREEVIEWCHECKABLE_H
-#define C_OGETREEVIEWCHECKABLE_H
+#ifndef C_OGETREEVIEWCHECKABLE_HPP
+#define C_OGETREEVIEWCHECKABLE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

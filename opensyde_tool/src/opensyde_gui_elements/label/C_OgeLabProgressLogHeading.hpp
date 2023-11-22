@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGELABPROGRESSLOGHEADING_H
-#define C_OGELABPROGRESSLOGHEADING_H
+#ifndef C_OGELABPROGRESSLOGHEADING_HPP
+#define C_OGELABPROGRESSLOGHEADING_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QLabel>

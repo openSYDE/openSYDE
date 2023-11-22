@@ -12,8 +12,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCZIPFILEH
-#define C_OSCZIPFILEH
+#ifndef C_OSCZIPFILE_HPP
+#define C_OSCZIPFILE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <set>

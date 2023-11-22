@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_USSYSTEMVIEWDASHBOARD_H
-#define C_USSYSTEMVIEWDASHBOARD_H
+#ifndef C_USSYSTEMVIEWDASHBOARD_HPP
+#define C_USSYSTEMVIEWDASHBOARD_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSize>

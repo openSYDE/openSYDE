@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEFRAFRAME_H
-#define C_OGEFRAFRAME_H
+#ifndef C_OGEFRAFRAME_HPP
+#define C_OGEFRAFRAME_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

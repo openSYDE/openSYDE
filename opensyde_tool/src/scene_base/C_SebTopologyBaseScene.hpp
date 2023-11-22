@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SEBTOPOLOGYBASESCENE_H
-#define C_SEBTOPOLOGYBASESCENE_H
+#ifndef C_SEBTOPOLOGYBASESCENE_HPP
+#define C_SEBTOPOLOGYBASESCENE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVector>

@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANOPENMANAGERINFO_H
-#define C_OSCCANOPENMANAGERINFO_H
+#ifndef C_OSCCANOPENMANAGERINFO_HPP
+#define C_OSCCANOPENMANAGERINFO_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>

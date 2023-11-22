@@ -7,8 +7,8 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef C_SDHANDLERWIDGET_H
-#define C_SDHANDLERWIDGET_H
+#ifndef C_SDHANDLERWIDGET_HPP
+#define C_SDHANDLERWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

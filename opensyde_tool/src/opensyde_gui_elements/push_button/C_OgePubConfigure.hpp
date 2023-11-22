@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEPUBCONFIGURE_H
-#define C_OGEPUBCONFIGURE_H
+#ifndef C_OGEPUBCONFIGURE_HPP
+#define C_OGEPUBCONFIGURE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

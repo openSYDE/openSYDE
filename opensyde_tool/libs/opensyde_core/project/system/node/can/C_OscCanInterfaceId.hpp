@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANINTERFACEID_H
-#define C_OSCCANINTERFACEID_H
+#ifndef C_OSCCANINTERFACEID_HPP
+#define C_OSCCANINTERFACEID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

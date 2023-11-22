@@ -1500,6 +1500,7 @@ void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32_t ou32_NodeIndex
          }
 
          Q_EMIT this->SigMessageRxChanged();
+         Q_EMIT this->SigRecheckError();
       }
       else
       {

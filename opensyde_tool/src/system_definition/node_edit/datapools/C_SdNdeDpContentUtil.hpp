@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDNDEDPCONTENTUTIL_H
-#define C_SDNDEDPCONTENTUTIL_H
+#ifndef C_SDNDEDPCONTENTUTIL_HPP
+#define C_SDNDEDPCONTENTUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVariant>
