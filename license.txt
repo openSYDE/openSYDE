@@ -22,6 +22,7 @@ openSYDE CAN Monitor  GPL V3                    opensyde_tool\src
 openSYDE Core         GPL V3 or proprietary     opensyde_tool\libs\opensyde_core                   
 SYDE Coder C          GPL V3 or proprietary     opensyde_syde_coder_c                              
 SYDEsup               GPL V3 or proprietary     opensyde_syde_sup                                  
+cmd_line_flash_tool   GPL V3 or proprietary     opensyde_cmd_line_flash_tool                       
 Qt 5.15.2             LGPL 3                    <no sources provided> (*)                                http://doc.qt.io/qt-5/licensing.html
 gettext               LPGL 2.1                  libraries\gettext-0.19.7                                 https://www.gnu.org/software/gettext/
 QCustomPlot           GPL 3                     libraries\qcustomplot-2.0.1                              https://www.qcustomplot.com/index.php/introduction
