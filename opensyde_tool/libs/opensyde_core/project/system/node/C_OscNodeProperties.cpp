@@ -265,3 +265,61 @@ void C_OscNodeProperties::CreateComInterfaces(const C_OscDeviceDefinition & orc_
       }
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all CAN interfaces that are stored in c_ComInterfaces
+
+   \return
+   std::vector<C_OscNodeComInterfaceSettings>
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OscNodeComInterfaceSettings> C_OscNodeProperties::GetCanInterfaces() const
+{
+   const C_OscSystemBus::E_Type e_CAN = C_OscSystemBus::eCAN;
+
+   std::vector<C_OscNodeComInterfaceSettings> c_CanInterfaces = m_GetInterfaces(e_CAN);
+
+   return c_CanInterfaces;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all Ethernet interfaces that are stored in c_ComInterfaces
+
+   \return
+   std::vector<C_OscNodeComInterfaceSettings>
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OscNodeComInterfaceSettings> C_OscNodeProperties::GetEthernetInterfaces() const
+{
+   const C_OscSystemBus::E_Type e_ETHERNET = C_OscSystemBus::eETHERNET;
+
+   std::vector<C_OscNodeComInterfaceSettings> c_EthernetInterfaces = m_GetInterfaces(e_ETHERNET);
+
+   return c_EthernetInterfaces;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get the interfaces according to the argument
+
+   \param[in]  ore_Type           Type of the interface that is searched
+
+   \return
+   std::vector<C_OscNodeComInterfaceSettings>
+*///----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OscNodeComInterfaceSettings> C_OscNodeProperties::m_GetInterfaces(const C_OscSystemBus::E_Type oe_Type)
+const
+{
+   const uint32_t u32_ComInterfacesSize = static_cast<uint32_t>(c_ComInterfaces.size());
+
+   std::vector<C_OscNodeComInterfaceSettings> c_Interfaces;
+
+   for (uint32_t u32_ComInterfacesIndex = 0; u32_ComInterfacesIndex < u32_ComInterfacesSize; ++u32_ComInterfacesIndex)
+   {
+      const C_OscNodeComInterfaceSettings c_OscNodeComInterfaceSettings = c_ComInterfaces[u32_ComInterfacesIndex];
+      if (c_OscNodeComInterfaceSettings.e_InterfaceType == oe_Type)
+      {
+         c_Interfaces.push_back(c_OscNodeComInterfaceSettings);
+      }
+   }
+   return c_Interfaces;
+}

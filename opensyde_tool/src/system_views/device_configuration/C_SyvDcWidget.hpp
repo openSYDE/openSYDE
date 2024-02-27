@@ -149,7 +149,7 @@ private:
    void m_AssignmentConnect(const uint32_t ou32_NodeIndex,
                             const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber,
                             const std::map<uint8_t,
-                                           stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+                                           stw::opensyde_core::C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
    const;
    void m_AssignmentDisconnect(const uint32_t ou32_NodeIndex,
                                const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber) const;
@@ -165,7 +165,7 @@ private:
 
    void m_HandleMissingDevices(
       const std::vector<stw::opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_AllDeviceInfos,
-      const std::vector<stw::opensyde_gui_logic::C_SyvDcDeviceInformation> & orc_FoundDeviceInfos,
+      const std::vector<stw::opensyde_core::C_OscDcDeviceInformation> & orc_FoundDeviceInfos,
       QString & orc_ReportText) const;
 
    bool m_AreAllInterfacesToConfigure(void) const;
@@ -189,7 +189,7 @@ private:
    uint64_t mu64_BitRate;
    bool mq_DisconnectNecessary;
    stw::opensyde_core::C_OscSystemBus::E_Type me_BusType;
-   std::vector<stw::opensyde_gui_logic::C_SyvDcDeviceInformation> mc_FoundDevices;
+   std::vector<stw::opensyde_core::C_OscDcDeviceInformation> mc_FoundDevices;
    bool mq_SecurityFeatureUsed;
 
    QTimer mc_Timer;

@@ -89,6 +89,8 @@ C_SyvDaChaWidget::C_SyvDaChaWidget(const uint32_t ou32_ViewIndex, const uint32_t
            this, &C_SyvDaChaWidget::m_ManualReadTriggered);
    connect(this->mpc_Ui->pc_ChartWidget, &C_SyvDaChaPlotHandlerWidget::SigManualReadAbortTriggered,
            this, &C_SyvDaChaWidget::m_ManualReadAbortTriggered);
+   connect(this->mpc_Ui->pc_ChartWidget, &C_SyvDaChaPlotHandlerWidget::SigGetCurrentDashboardTabName,
+           this, &C_SyvDaChaWidget::SigGetCurrentDashboardTabName);
 
    //Custom context menu
    this->m_SetupContextMenu();
@@ -422,6 +424,17 @@ void C_SyvDaChaWidget::SetErrorForInvalidDlc(const C_OscNodeDataPoolListElementI
 {
    this->mc_InvalidDlcSignals.insert(orc_ElementId, ou8_Dlc);
    m_UpdateErrorIcon();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets current dashboard tab name
+
+ *     \param[in]  orc_CurrentDashboardTabName   current chart tab name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaWidget::SetCurrentDashboardName(const QString & orc_CurrentDashboardTabName)
+{
+   this->mpc_Ui->pc_ChartWidget->SetCurrentDashboardTabName(orc_CurrentDashboardTabName);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

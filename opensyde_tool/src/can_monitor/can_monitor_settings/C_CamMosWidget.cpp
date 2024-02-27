@@ -43,11 +43,11 @@ using namespace stw::opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
-   C_OgeWiOnlyBackground(opc_Parent),
+   C_CamOgeWiSettingsBase(opc_Parent),
    mpc_Ui(new Ui::C_CamMosWidget),
    mpc_PopupDatabase(new C_CamMosSectionPopup()),
    mpc_PopupDllConfig(new C_CamMosSectionPopup()),
@@ -61,41 +61,16 @@ C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_WiTitle->SetTitle(C_GtGetText::h_GetText("Settings"));
    this->mpc_Ui->pc_WiTitle->SetIconType(C_CamOgeWiSectionHeader::E_ButtonType::eLEFTRIGHT);
 
-   this->mpc_Ui->pc_PbDatabase->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_PbDllConfig->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_PbFilter->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_PbLogging->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_PbDatabase->setIcon(QIcon("://images/IconDatabase.svg"));
-   this->mpc_Ui->pc_PbDllConfig->setIcon(QIcon("://images/IconConfig.svg"));
-   this->mpc_Ui->pc_PbFilter->setIcon(QIcon("://images/IconFilter.svg"));
-   this->mpc_Ui->pc_PbLogging->setIcon(QIcon("://images/IconLogging.svg"));
+   this->m_InitSettingsSection(this->mpc_PopupDatabase, this->mpc_Ui->pc_PbDatabase, opc_Parent,
+                               "://images/IconDatabase.svg");
+   this->m_InitSettingsSection(this->mpc_PopupFilter, this->mpc_Ui->pc_PbFilter, opc_Parent,
+                               "://images/IconFilter.svg");
+   this->m_InitSettingsSection(this->mpc_PopupLogging, this->mpc_Ui->pc_PbLogging, opc_Parent,
+                               "://images/IconLogging.svg");
+   this->m_InitSettingsSection(this->mpc_PopupDllConfig, this->mpc_Ui->pc_PbDllConfig, opc_Parent,
+                               "://images/IconConfig.svg");
    this->mpc_Ui->pc_WiCollapsed->SetBackgroundColor(1);
    this->mpc_Ui->pc_WiExpanded->SetBackgroundColor(1);
-
-   // set parents here
-   // opc_Parent is a layout and would try to integrate the popup, so we better use its parent.
-   this->mpc_PopupDatabase->setParent(opc_Parent->parentWidget());
-   this->mpc_PopupDllConfig->setParent(opc_Parent->parentWidget());
-   this->mpc_PopupFilter->setParent(opc_Parent->parentWidget());
-   this->mpc_PopupLogging->setParent(opc_Parent->parentWidget());
-
-   // hide popups on start
-   this->mpc_PopupDatabase->setVisible(false);
-   this->mpc_PopupDllConfig->setVisible(false);
-   this->mpc_PopupFilter->setVisible(false);
-   this->mpc_PopupLogging->setVisible(false);
-
-   // button checked = popup open
-   this->mpc_Ui->pc_PbDatabase->setCheckable(true);
-   this->mpc_Ui->pc_PbDllConfig->setCheckable(true);
-   this->mpc_Ui->pc_PbFilter->setCheckable(true);
-   this->mpc_Ui->pc_PbLogging->setCheckable(true);
-
-   // connect buttons to section popups
-   connect(this->mpc_Ui->pc_PbDatabase, &C_CamOgePubSettingsAdd::toggled, this, &C_CamMosWidget::m_ShowPopupDatabase);
-   connect(this->mpc_Ui->pc_PbDllConfig, &C_CamOgePubSettingsAdd::toggled, this, &C_CamMosWidget::m_ShowPopupDllConfig);
-   connect(this->mpc_Ui->pc_PbFilter, &C_CamOgePubSettingsAdd::toggled, this, &C_CamMosWidget::m_ShowPopupFilter);
-   connect(this->mpc_Ui->pc_PbLogging, &C_CamOgePubSettingsAdd::toggled, this, &C_CamMosWidget::m_ShowPopupLogging);
 
    // connect hide signal of widgets
    connect(this->mpc_Ui->pc_WiDatabase, &C_CamMosDatabaseWidget::SigHide, this, &C_CamMosWidget::m_HidePopupDatabase);
@@ -324,50 +299,10 @@ void C_CamMosWidget::CanFilterMsgDropped()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten move event.
-
-   Here: Handle popup move.
-
-   \param[in,out]    opc_Event   Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::moveEvent(QMoveEvent * const opc_Event)
-{
-   QPoint c_Point;
-
-   if (this->mpc_PopupDatabase->isVisible() == true)
-   {
-      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbDatabase);
-      this->mpc_PopupDatabase->DoMove(c_Point);
-   }
-   else if (this->mpc_PopupDllConfig->isVisible() == true)
-   {
-      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbDllConfig);
-      this->mpc_PopupDllConfig->DoMove(c_Point);
-   }
-   else if (this->mpc_PopupFilter->isVisible() == true)
-   {
-      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbFilter);
-      this->mpc_PopupFilter->DoMove(c_Point);
-   }
-   else if (this->mpc_PopupLogging->isVisible() == true)
-   {
-      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbLogging);
-      this->mpc_PopupLogging->DoMove(c_Point);
-   }
-   else
-   {
-      // do nothing
-   }
-
-   C_OgeWiOnlyBackground::moveEvent(opc_Event);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle expand or collapse settings for subsections.
 
-   \param[in]     oq_Expand        true: expand settings subsections
-                                   false: collapse settings subsections
+   \param[in]  oq_Expand   true: expand settings subsections
+                           false: collapse settings subsections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::m_OnExpandSettings(const bool oq_Expand)
@@ -469,125 +404,6 @@ void C_CamMosWidget::m_HidePopupFilter(void) const
 void C_CamMosWidget::m_HidePopupLogging(void) const
 {
    this->mpc_Ui->pc_PbLogging->setChecked(false);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show database popup.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::m_ShowPopupDatabase(const bool oq_Checked)
-{
-   if (oq_Checked == true)
-   {
-      this->m_ShowPopup(this->mpc_PopupDatabase, this->mpc_Ui->pc_PbDatabase);
-
-      // hide all other popups
-      this->mpc_Ui->pc_PbDllConfig->setChecked(false);
-      this->mpc_Ui->pc_PbFilter->setChecked(false);
-      this->mpc_Ui->pc_PbLogging->setChecked(false);
-   }
-   else
-   {
-      this->mpc_PopupDatabase->setVisible(false);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show CAN DLL configuration popup.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::m_ShowPopupDllConfig(const bool oq_Checked)
-{
-   if (oq_Checked == true)
-   {
-      this->m_ShowPopup(this->mpc_PopupDllConfig, this->mpc_Ui->pc_PbDllConfig);
-
-      // hide all other popups
-      this->mpc_Ui->pc_PbDatabase->setChecked(false);
-      this->mpc_Ui->pc_PbFilter->setChecked(false);
-      this->mpc_Ui->pc_PbLogging->setChecked(false);
-   }
-   else
-   {
-      this->mpc_PopupDllConfig->setVisible(false);
-   }
-}
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show filter popup.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::m_ShowPopupFilter(const bool oq_Checked)
-{
-   if (oq_Checked == true)
-   {
-      this->m_ShowPopup(this->mpc_PopupFilter, this->mpc_Ui->pc_PbFilter);
-
-      // hide all other popups
-      this->mpc_Ui->pc_PbDatabase->setChecked(false);
-      this->mpc_Ui->pc_PbDllConfig->setChecked(false);
-      this->mpc_Ui->pc_PbLogging->setChecked(false);
-   }
-   else
-   {
-      this->mpc_PopupFilter->setVisible(false);
-   }
-}
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show logging popup.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::m_ShowPopupLogging(const bool oq_Checked)
-{
-   if (oq_Checked == true)
-   {
-      this->m_ShowPopup(this->mpc_PopupLogging, this->mpc_Ui->pc_PbLogging);
-
-      // hide all other popups
-      this->mpc_Ui->pc_PbDatabase->setChecked(false);
-      this->mpc_Ui->pc_PbDllConfig->setChecked(false);
-      this->mpc_Ui->pc_PbFilter->setChecked(false);
-   }
-   else
-   {
-      this->mpc_PopupLogging->setVisible(false);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show an popup
-
-   \param[in]       opc_Popup    Specific popup widget
-   \param[in]       opc_Button   Specific button as start point
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::m_ShowPopup(C_CamMosSectionPopup * const opc_Popup,
-                                 const C_CamOgePubSettingsAdd * const opc_Button) const
-{
-   const QPoint c_Point = this->m_GetPopupMovePoint(opc_Button);
-
-   opc_Popup->Show(c_Point);
-   //lint -e{429}  no memory leak because opc_Popup points to instances which are freed in destructor
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the point for the DoMove function of C_CamMosSectionPopup
-
-   \param[in]       opc_Button   Specific button as start point
-
-   \return
-   Point for DoMove function on parent of splitter widget
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QPoint C_CamMosWidget::m_GetPopupMovePoint(const C_CamOgePubSettingsAdd * const opc_Button) const
-{
-   // Position of button in C_CamMosWidget widget
-   const QPoint c_Settings = opc_Button->mapToParent(opc_Button->rect().topLeft());
-   // Position on splitter level
-   const QPoint c_Splitter = this->mapToParent(c_Settings);
-   // Position on parent of splitter
-   const QPoint c_TopWidget = this->parentWidget()->mapToParent(c_Splitter);
-
-   return c_TopWidget;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

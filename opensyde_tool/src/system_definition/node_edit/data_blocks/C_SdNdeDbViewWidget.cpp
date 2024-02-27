@@ -221,12 +221,21 @@ void C_SdNdeDbViewWidget::UpdateApplications(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new project action
+
+   \retval   true   Cancel
+   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::AddFromTsp(void)
+bool C_SdNdeDbViewWidget::AddFromTsp(void)
 {
+   bool q_Cancel = false;
+   const QString c_LAST_KNOWN_TSP_PATH = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTspPath();
+
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_SdNdeDbAddNewProject * const pc_Dialog = new C_SdNdeDbAddNewProject(this->mu32_NodeIndex, *c_New);
+
+   pc_Dialog->SetTspPath(c_LAST_KNOWN_TSP_PATH);
+
    C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
 
    //Help
@@ -238,7 +247,6 @@ void C_SdNdeDbViewWidget::AddFromTsp(void)
    c_New->SetSize(c_SIZE);
 
    //init
-   pc_Dialog->SetTspPath(C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTspPath());
 
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
@@ -288,7 +296,15 @@ void C_SdNdeDbViewWidget::AddFromTsp(void)
       }
 
       c_Message.SetDescription(c_Description);
-      c_Message.Execute();
+      const C_OgeWiCustomMessage::E_Outputs e_Output = c_Message.Execute();
+      if (e_Output != C_OgeWiCustomMessage::eOK)
+      {
+         q_Cancel = true;
+      }
+   }
+   else
+   {
+      q_Cancel = true;
    }
 
    if (c_New != NULL)
@@ -297,6 +313,7 @@ void C_SdNdeDbViewWidget::AddFromTsp(void)
       c_New->HideOverlay();
       c_New->deleteLater();
    }
+   return q_Cancel;
 } //lint !e593  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -366,10 +366,12 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
 {
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
 
-   new C_NagAboutDialog(*c_New, "openSYDE CAN Monitor", ":/images/CAN_Monitor_logo.png", 20);
+   new C_NagAboutDialog(*c_New, "openSYDE CAN Monitor", ":/images/CAN_Monitor_logo.png", 20,
+                        C_GtGetText::h_GetText("Vector::DBC Module by Tobias Lorenz;Bison;Flex")); //Default +
+                                                                                                   //Vector DBC
 
    //Resize
-   const QSize c_SIZE(650, 538);
+   const QSize c_SIZE(650, 500);
    c_New->SetSize(c_SIZE);
 
    c_New->exec();

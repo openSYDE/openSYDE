@@ -1,0 +1,21 @@
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui--C_SyvDcConnectedNodeList
+{
+outline: none;
+}
+
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui--C_SyvDcConnectedNodeList
+{
+border-style: none;
+}
+
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui--C_SyvDcConnectedNodeList::item
+{
+border-style: none;
+border-width: 0px;
+border-radius: 0px;
+}

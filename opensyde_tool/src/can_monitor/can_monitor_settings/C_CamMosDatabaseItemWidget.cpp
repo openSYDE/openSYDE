@@ -27,6 +27,7 @@
 #include "C_CamProHandler.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_CamUti.hpp"
+#include "C_CamUtiGeneric.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -677,7 +678,8 @@ void C_CamMosDatabaseItemWidget::m_OnBrowse()
       if (q_Continue)
       {
          const QString c_DatabaseName =
-            C_CamUti::h_AskUserToSaveRelativePath(this, c_Name, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+            C_CamUtiGeneric::h_AskUserToSaveRelativePath(this, c_Name,
+                                                         C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
          // if path contains invalid characters this returned empty
          if (c_DatabaseName.isEmpty() == false)

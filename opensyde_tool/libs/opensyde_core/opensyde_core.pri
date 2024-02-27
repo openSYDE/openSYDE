@@ -440,6 +440,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_common)
 
    INCLUDEPATH += $${PWD}/protocol_drivers \
                   $${PWD}/protocol_drivers/communication \
+                  $${PWD}/protocol_drivers/device_config \
                   $${PWD}/kefex_diaglib/dl_pool \
                   $${PWD}/kefex_diaglib/hexfile \
                   $${PWD}/kefex_diaglib/dl_kefex \
@@ -469,7 +470,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_common)
               $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.cpp \
               $${PWD}/protocol_drivers/C_OscUpdateUtil.cpp \
               $${PWD}/protocol_drivers/C_OscHexFile.cpp \
-              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.cpp
+              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.cpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcDeviceInformation.cpp
 
    HEADERS += $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.hpp \
               $${PWD}/kefex_diaglib/hexfile/C_HexFile.hpp \
@@ -495,7 +497,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_common)
               $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.hpp \
               $${PWD}/protocol_drivers/C_OscUpdateUtil.hpp \
               $${PWD}/protocol_drivers/C_OscHexFile.hpp \
-              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.hpp
+              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.hpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcDeviceInformation.hpp
 }
 
 # optional: protocol drivers basic(openSYDE, STW Flashloader, KEFEX, Data Dealer)
@@ -506,10 +509,13 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_basic) 
    message("opensyde_core_skip_protocol_drivers_basic not detected ... dragging in package")
 
    INCLUDEPATH += $${PWD}/protocol_drivers/basic_update \
+                  $${PWD}/protocol_drivers/device_config
 
    SOURCES += $${PWD}/protocol_drivers/basic_update/C_OscBuSequences.cpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcBasicSequences.cpp
 
    HEADERS += $${PWD}/protocol_drivers/basic_update/C_OscBuSequences.hpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcBasicSequences.hpp
 }
 
 # optional: protocol drivers system(openSYDE, STW Flashloader, KEFEX, Data Dealer)

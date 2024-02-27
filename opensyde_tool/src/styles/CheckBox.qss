@@ -14,6 +14,12 @@ margin-top: 3px;
 margin-right: 0px;
 }
 
+/*Set min-width equal to width (C_OgeChxPropertiesSmall::indicator)*/
+stw--opensyde_gui_elements--C_OgeChxPropertiesSmall
+{
+min-width: 22px;
+}
+
 stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator
 {
 width: 24px;

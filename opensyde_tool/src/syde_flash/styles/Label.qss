@@ -1,0 +1,34 @@
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_OgeLabPopUpTitle
+{
+padding-left:20px;
+padding-top:15px;
+padding-right:0px;
+padding-bottom:15px;
+}
+
+stw--opensyde_gui_elements--C_OgeLabPopUpSubTitle
+{
+padding-left:0px;
+padding-top:15px;
+padding-right:0px;
+padding-bottom:15px;
+}
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_OgeMuSections QLabel
+{
+padding: 5px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_OgeLabGenericBubble
+{
+margin-top: 1px;
+padding-left: 2px;
+padding-top: 0px;
+padding-right: 1px;
+padding-bottom: 0px;
+border-radius: 2px;
+}
+
+/* --------------------------------------------------------------------- */

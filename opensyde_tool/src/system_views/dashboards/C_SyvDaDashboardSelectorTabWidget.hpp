@@ -144,6 +144,7 @@ private:
    C_SyvDaDashboardScreenshot * mpc_ScreenshotDashboardTab;
    void m_PerformScreenshot(const bool oq_IsControlButtonPressed);
    void m_SetCurrentTabNameForScreenshotFile(void);
+   void m_GetCurrentDashboardTabName(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

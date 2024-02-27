@@ -96,6 +96,7 @@ C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Scene, &C_SdTopologyScene::SigBusDeleted, this, &C_SdTopologyWidget::SigBusDeleted);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigNodeChanged, this, &C_SdTopologyWidget::SigNodeChanged);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigBusChanged, this, &C_SdTopologyWidget::SigBusChanged);
+   connect(this->mpc_Scene, &C_SdTopologyScene::SigOpenTsp, this, &C_SdTopologyWidget::SigOpenTsp);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigErrorChange, this,
            &C_SdTopologyWidget::SigErrorChange);
 

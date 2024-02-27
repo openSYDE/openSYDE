@@ -1603,6 +1603,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_Connect(const C_SyvDaDashboardWidget *
               &C_SyvDaDashboardSelectorTabWidget::SigDataPoolRead);
       connect(opc_Widget, &C_SyvDaDashboardWidget::SigNvmReadList, this,
               &C_SyvDaDashboardSelectorTabWidget::SigNvmReadList);
+      connect(opc_Widget, &C_SyvDaDashboardWidget::SigGetCurrentDashboardTabName, this,
+              &C_SyvDaDashboardSelectorTabWidget::m_GetCurrentDashboardTabName);
    }
 }
 
@@ -1626,6 +1628,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_Disconnect(const C_SyvDaDashboardWidge
                  &C_SyvDaDashboardSelectorTabWidget::SigDataPoolRead);
       disconnect(opc_Widget, &C_SyvDaDashboardWidget::SigNvmReadList, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigNvmReadList);
+      disconnect(opc_Widget, &C_SyvDaDashboardWidget::SigGetCurrentDashboardTabName, this,
+                 &C_SyvDaDashboardSelectorTabWidget::m_GetCurrentDashboardTabName);
    }
 }
 
@@ -1690,6 +1694,31 @@ void C_SyvDaDashboardSelectorTabWidget::m_SetCurrentTabNameForScreenshotFile()
                C_OscUtils::h_NiceifyStringForFileName(pc_Dashboard->GetName().toStdString()).c_str();
             mpc_ScreenshotDashboardTab->setParent(this->currentWidget());
             mpc_ScreenshotDashboardTab->setAccessibleName(c_DashboardName.c_str());
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set current chart tab name for saving .csv file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardSelectorTabWidget::m_GetCurrentDashboardTabName(void) const
+{
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      C_SyvDaDashboardWidget * const pc_Widget =
+         dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(this->currentIndex()));
+      if (pc_Widget != NULL)
+      {
+         const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(pc_Widget->GetDashboardIndex());
+         if (pc_Dashboard != NULL)
+         {
+            const C_SclString c_DashboardName =
+               C_OscUtils::h_NiceifyStringForFileName(pc_Dashboard->GetName().toStdString()).c_str();
+            pc_Widget->SetCurrentDashboardTabName(c_DashboardName.c_str());
          }
       }
    }

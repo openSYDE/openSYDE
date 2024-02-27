@@ -20,7 +20,6 @@
 #include "C_SdBueComIfDescriptionWidget.hpp"
 #include "C_SdNdeNodePropertiesTabContentWidget.hpp"
 #include "C_SdNdeCoWidget.hpp"
-
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
@@ -52,7 +51,8 @@ public:
    void SetFlag(const uint32_t ou32_Flag) const;
    void OpenDetail(const int32_t os32_MainIndex, const int32_t os32_ListIndex, const int32_t os32_ElementIndex,
                    const int32_t os32_Flag);
-   void AddFromTsp(void);
+   bool AddFromTsp(void);
+
    int32_t GetTabIndex(void) const;
 
    static const int32_t hs32_TAB_INDEX_PROPERTIES;

@@ -287,6 +287,20 @@ void C_SyvDaDashboardSceneWidget::SetFocus(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets current dashboard tab name
+
+ *     \param[in]  orc_CurrentDashboardTabName   current chart tab name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
+void C_SyvDaDashboardSceneWidget::SetCurrentDashboardName(const QString & orc_CurrentDashboardTabName)
+{
+   Q_UNUSED(orc_CurrentDashboardTabName) //Base class have  as pure virtual function which we don't need here in this
+                                         // child class expecting for future use (but so far using in
+                                         // "C_SyvDaChaWidget")
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Event
 
    \param[in,out]  opc_Event  Event

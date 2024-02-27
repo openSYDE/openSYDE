@@ -28,8 +28,6 @@ class C_CamUti
 {
 public:
    static QString h_GetAbsPathFromProj(const QString & orc_Path);
-   static QString h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
-                                              const QString & orc_AbsoluteReferenceDir);
    static QString h_ResolvePlaceholderVariables(const QString & orc_Path);
    static QString h_GetResolvedAbsolutePathFromProj(const QString & orc_Path);
    static QString h_GetResolvedAbsolutePathFromExe(const QString & orc_Path);

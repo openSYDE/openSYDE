@@ -15,7 +15,7 @@
 #include <QWidget>
 #include <QListWidgetItem>
 #include "stwtypes.hpp"
-#include "C_SyvDcSequences.hpp"
+#include "C_OscDcDeviceInformation.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -38,9 +38,9 @@ class C_SyvDcConnectedNodeWidget :
 
 public:
    explicit C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
-                                       const stw::opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info,
+                                       const stw::opensyde_core::C_OscDcDeviceInformation & orc_Info,
                                        const std::map<uint8_t,
-                                                      stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
+                                                      stw::opensyde_core::C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                        QWidget * const opc_Parent = NULL);
    ~C_SyvDcConnectedNodeWidget(void) noexcept override;
 
@@ -49,8 +49,10 @@ public:
    uint8_t GetManufacturerFormat(void) const;
    QString GetDeviceName(void) const;
    bool GetDeviceNameValid(void) const;
-   std::map<uint8_t, stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> GetSubNodeIdsToOldNodeIds(void) const;
+   std::map<uint8_t, stw::opensyde_core::C_OscDcDeviceOldComConfig> GetSubNodeIdsToOldNodeIds(void) const;
    bool CompareSerialNumber(const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber) const;
+   void SetWidth(const int32_t os32_WidgetWidth);
+   uint8_t GetNodeId(void) const;
 
 protected:
    void paintEvent(QPaintEvent * const opc_Event) override;
@@ -58,10 +60,15 @@ protected:
 private:
    Ui::C_SyvDcConnectedNodeWidget * mpc_Ui;
    QListWidgetItem * mpc_ListWidgetItem;
-   const stw::opensyde_gui_logic::C_SyvDcDeviceInformation mc_Info;
-   const std::map<uint8_t, stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> mc_SubNodeIdsToOldNodeIds;
+   const stw::opensyde_core::C_OscDcDeviceInformation mc_Info;
+   const std::map<uint8_t, stw::opensyde_core::C_OscDcDeviceOldComConfig> mc_SubNodeIdsToOldNodeIds;
+
+   static const int32_t mhs32_HEIGHT;
+   static const int32_t mhs32_WIDTH;
+   static const int32_t mhs32_SCROLLBAR_WIDTH;
 
    void m_Init(void);
+
    //Avoid call
    C_SyvDcConnectedNodeWidget(const C_SyvDcConnectedNodeWidget &);
    C_SyvDcConnectedNodeWidget & operator =(const C_SyvDcConnectedNodeWidget &) &;

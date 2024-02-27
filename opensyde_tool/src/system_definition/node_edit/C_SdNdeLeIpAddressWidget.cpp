@@ -372,11 +372,13 @@ void C_SdNdeLeIpAddressWidget::SetError(const bool oq_Error) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeLeIpAddressWidget::m_MoveNextLineEdit(const uint32_t ou32_Pos)
 {
-   if ((ou32_Pos + 1) < mhs32_IPV4SIZE)
+   const uint32_t u32_NextPos = ou32_Pos + 1;
+
+   if (u32_NextPos < mhs32_IPV4SIZE)
    {
-      this->mapc_LineEdit[ou32_Pos + 1]->setFocus();
-      this->mapc_LineEdit[ou32_Pos + 1]->setCursorPosition(0);
-      this->mapc_LineEdit[ou32_Pos + 1]->selectAll();
+      this->mapc_LineEdit[u32_NextPos]->setFocus();
+      this->mapc_LineEdit[u32_NextPos]->setCursorPosition(0);
+      this->mapc_LineEdit[u32_NextPos]->selectAll();
    }
 }
 

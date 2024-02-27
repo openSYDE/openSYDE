@@ -304,7 +304,7 @@ void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
-   c_Popup->SetSize(QSize(412, 620));
+   c_Popup->SetSize(QSize(462, 670));
 
    if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {

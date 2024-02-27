@@ -431,11 +431,15 @@ else()
 
    set(OPENSYDE_CORE_PROTOCOL_DRIVERS_BASIC_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/basic_update/C_OscBuSequences.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/device_config/C_OscDcBasicSequences.cpp
+
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/basic_update/C_OscBuSequences.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/device_config/C_OscDcBasicSequences.hpp
    )
 
    set(OPENSYDE_CORE_PROTOCOL_DRIVERS_BASIC_INCLUDE_DIRECTORIES
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/basic_update
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/device_config
    )
 endif()
 
@@ -487,7 +491,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer
       ${CMAKE_CURRENT_SOURCE_DIR}/security
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/basic_update
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update
@@ -525,6 +528,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolDriverOsyTpIp.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscUpdateUtil.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComFlashloaderInformation.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/device_config/C_OscDcDeviceInformation.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_pool/CDLReportEvents.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXComm.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.cpp
@@ -555,6 +559,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolDriverOsyTpIp.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscUpdateUtil.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComFlashloaderInformation.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/device_config/C_OscDcDeviceInformation.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_pool/CDLReportEvents.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXComm.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.hpp
@@ -567,6 +572,7 @@ else()
        ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher
        ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers
        ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
+       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/device_config
        ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_stwflash
        ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/hexfile
        ${CMAKE_CURRENT_SOURCE_DIR}/ip_dispatcher/dispatcher

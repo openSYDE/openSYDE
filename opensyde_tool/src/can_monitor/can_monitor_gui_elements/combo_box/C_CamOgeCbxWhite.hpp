@@ -30,7 +30,7 @@ class C_CamOgeCbxWhite :
 
 public:
    explicit C_CamOgeCbxWhite(QWidget * const opc_Parent = NULL);
-   virtual ~C_CamOgeCbxWhite(void);
+   ~C_CamOgeCbxWhite(void) override;
 
 private:
    //Avoid call

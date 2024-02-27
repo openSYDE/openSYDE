@@ -44,7 +44,7 @@ public:
    };
 
    explicit C_SdBueJ1939AddMessagesFromCatalogDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent);
-   ~C_SdBueJ1939AddMessagesFromCatalogDialog(void) noexcept override;
+   ~C_SdBueJ1939AddMessagesFromCatalogDialog(void)  override;
 
    void InitStaticNames(void) const;
    std::vector<stw::opensyde_gui_logic::C_CieConverter::C_CieNodeMessage> GetMessagesImportedFromCatalog(void) const;

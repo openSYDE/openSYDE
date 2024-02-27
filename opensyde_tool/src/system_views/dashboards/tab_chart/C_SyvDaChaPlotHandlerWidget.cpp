@@ -21,6 +21,7 @@
 #include "stwerrors.hpp"
 #include "TglUtils.hpp"
 #include "TglTime.hpp"
+#include "TglFile.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_OscUtils.hpp"
@@ -30,6 +31,11 @@
 #include "C_PuiSvDbNodeDataElementConfig.hpp"
 #include "C_OscNodeDataPoolContentUtil.hpp"
 #include "C_SdNdeDpContentUtil.hpp"
+#include "C_PuiProject.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_SclString.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -37,6 +43,8 @@ using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint8_t C_SyvDaChaPlotHandlerWidget::mhu8_COUNT_COLORS = 47U;
@@ -132,7 +140,8 @@ C_SyvDaChaPlotHandlerWidget::C_SyvDaChaPlotHandlerWidget(QWidget * const opc_Par
    mpc_SecondCursor(NULL),
    mf64_MeasuredTimeFirstCursor(0.0),
    mf64_MeasuredTimeSecondCursor(0.0),
-   mq_IsSecondCursorClicked(false)
+   mq_IsSecondCursorClicked(false),
+   mc_Out(&mc_File)
 {
    const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
 
@@ -259,6 +268,8 @@ C_SyvDaChaPlotHandlerWidget::C_SyvDaChaPlotHandlerWidget(QWidget * const opc_Par
            this, &C_SyvDaChaPlotHandlerWidget::m_CursorItemClicked);
    connect(this->mpc_Ui->pc_Plot, &C_SyvDaChaPlot::SigCursorItemReleased,
            this, &C_SyvDaChaPlotHandlerWidget::m_CursorItemReleased);
+   connect(this->mpc_Ui->pc_PushButtonExtractData, &QPushButton::clicked,
+           this, &C_SyvDaChaPlotHandlerWidget::m_SetSaveLocationToCsv);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -300,6 +311,7 @@ void C_SyvDaChaPlotHandlerWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonFitX->setText("");
    this->mpc_Ui->pc_PushButtonCursor->setText("");
    this->mpc_Ui->pc_PushButtonOptions->setText("");
+   this->mpc_Ui->pc_PushButtonExtractData->setText("");
 
    // set tool tip information
    this->mpc_Ui->pc_PushButtonPause->SetToolTipInformation(C_GtGetText::h_GetText("Play/Pause"),
@@ -323,6 +335,8 @@ void C_SyvDaChaPlotHandlerWidget::InitStaticNames(void) const
                                                             C_GtGetText::h_GetText("Select Cursor"));
    this->mpc_Ui->pc_PushButtonOptions->SetToolTipInformation(C_GtGetText::h_GetText("Select"),
                                                              C_GtGetText::h_GetText("Select Other Options"));
+   this->mpc_Ui->pc_PushButtonExtractData->SetToolTipInformation(C_GtGetText::h_GetText("Extract Data"),
+                                                                 C_GtGetText::h_GetText("Extract chart data to .csv"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -514,6 +528,7 @@ C_PuiSvDbTabChart & C_SyvDaChaPlotHandlerWidget::GetData(void)
    this->m_SaveState(this->mc_Data.q_IsPaused, this->mc_Data.s32_SplitterLeftWidth,
                      this->mc_Data.q_AreSamplePointsShown, this->mc_Data.c_VisibleScreen);
 
+   //lint -e{1536} it is intended to expose a private member to avoid copies of rather big data structures
    return this->mc_Data;
 }
 
@@ -1102,7 +1117,6 @@ void C_SyvDaChaPlotHandlerWidget::AddGraphContent(const C_PuiSvDbNodeDataPoolLis
 
                   pc_Graph->addData(f64_Timestamp, f64_Value);
                }
-
                // Show the last formatted value in the selector widget
                this->mpc_Ui->pc_ChartSelectorWidget->UpdateDataSerieValue(u32_ConfigCounter, orc_FormattedLastValue);
             }
@@ -1289,6 +1303,17 @@ void C_SyvDaChaPlotHandlerWidget::ManualReadFinished(void)
 {
    this->mpc_Ui->pc_PushButtonManualRead->setVisible(this->mq_ManualOperationPossible);
    this->mpc_Ui->pc_PushButtonManualAbort->setVisible(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set current chart tab name
+
+   \param[in]  orc_CurrentDashboardTabName
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaPlotHandlerWidget::SetCurrentDashboardTabName(const QString & orc_CurrentDashboardTabName)
+{
+   this->mc_CurrentDashboardTabName = orc_CurrentDashboardTabName;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1678,6 +1703,9 @@ void C_SyvDaChaPlotHandlerWidget::m_SetButtonIcons(const bool oq_DarkMode)
       this->mpc_Ui->pc_PushButtonFitX->SetSvg(
          "://images/system_views/dashboards/tab_chart/IconFitXDark.svg",
          "://images/system_views/dashboards/tab_chart/IconFitXDisabled.svg");
+      this->mpc_Ui->pc_PushButtonExtractData->SetSvg(
+         "://images/system_views/dashboards/tab_chart/IconExportCSVDark.svg",
+         "://images/system_views/dashboards/tab_chart/IconExportCSVDisabled.svg");
 
       switch (me_SettingCursorMode)
       {
@@ -1749,6 +1777,9 @@ void C_SyvDaChaPlotHandlerWidget::m_SetButtonIcons(const bool oq_DarkMode)
       this->mpc_Ui->pc_PushButtonFitX->SetSvg(
          "://images/system_views/dashboards/tab_chart/IconFitX.svg",
          "://images/system_views/dashboards/tab_chart/IconFitXDisabled.svg");
+      this->mpc_Ui->pc_PushButtonExtractData->SetSvg(
+         "://images/system_views/dashboards/tab_chart/IconExportCSV.svg",
+         "://images/system_views/dashboards/tab_chart/IconExportCSVDisabled.svg");
 
       switch (me_SettingCursorMode)
       {
@@ -3289,4 +3320,123 @@ void C_SyvDaChaPlotHandlerWidget::m_SaveState(bool & orq_IsPaused, int32_t & ors
    {
       ors32_SplitterLeftWidth = 300;
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Importing Chart data as .CSV file and saving it in a prefered local location
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaPlotHandlerWidget::m_ExtractDataToCsv(void)
+{
+   if (mc_File.open(QIODevice::ReadWrite  | QIODevice::Truncate))
+   {
+      mc_File.resize(0); //Truncate the file
+      QString c_DataElements;
+      const uint32_t u32_DataElementSize = this->mc_Data.c_DataPoolElementsConfig.size();
+      const auto pc_Plot = this->mpc_Ui->pc_Plot;
+      const auto pc_ChartSelectorWidget = this->mpc_Ui->pc_ChartSelectorWidget;
+      int32_t s32_MaxDataElement = 0;
+      if (u32_DataElementSize > 0)
+      {
+         s32_MaxDataElement = pc_Plot->graph(0)->dataCount();
+      }
+
+      for (uint32_t u32_DataElementCounter = 0U; u32_DataElementCounter < u32_DataElementSize; ++u32_DataElementCounter)
+      {
+         const QCPGraph * const pc_Graph = pc_Plot->graph(u32_DataElementCounter);
+         if (pc_Graph->visible())
+         {
+            if (pc_Graph->dataCount() > s32_MaxDataElement)
+            {
+               s32_MaxDataElement = pc_Graph->dataCount();
+            }
+            //Creating here headings for all data elements and units
+            c_DataElements += "Timestamp (ms);" + pc_ChartSelectorWidget->GetDataElementName(
+               u32_DataElementCounter) + " (" +
+                              pc_ChartSelectorWidget->GetDataElementUnit(u32_DataElementCounter) + ")";
+            if (u32_DataElementCounter < (u32_DataElementSize - 1))
+            {
+               c_DataElements += ";";
+            }
+         }
+      }
+
+      //Writing created data elements and units headings to .csv file
+      mc_Out << c_DataElements + "\n";
+
+      for (int32_t s32_GraphDataCounter = 0U; s32_GraphDataCounter < s32_MaxDataElement;
+           ++s32_GraphDataCounter)
+      {
+         for (uint32_t u32_DataElementCounter = 0U; u32_DataElementCounter < u32_DataElementSize;
+              ++u32_DataElementCounter)
+         {
+            const QCPGraph * const pc_Graph = pc_Plot->graph(u32_DataElementCounter);
+            if (pc_Graph->visible())
+            {
+               if (s32_GraphDataCounter < pc_Graph->dataCount())
+               {
+                  mc_Out << pc_Graph->data()->at(s32_GraphDataCounter)->key << ";" << pc_Graph->data()->at(
+                     s32_GraphDataCounter)->mainValue();
+               }
+               else
+               {
+                  mc_Out << ";";
+               }
+               if (u32_DataElementCounter < (u32_DataElementSize - 1))
+               {
+                  mc_Out << ";";
+               }
+            }
+         }
+         mc_Out << "\n";
+      }
+
+      mc_File.close();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set the location to save chart data export csv file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaPlotHandlerWidget::m_SetSaveLocationToCsv(void)
+{
+   Q_EMIT (this->SigGetCurrentDashboardTabName());
+   QString c_Folder = C_UsHandler::h_GetInstance()->GetLastKnownCsvExportPath();
+
+   if (c_Folder.isEmpty())
+   {
+      c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
+   }
+
+   const QString c_DefaultFilename = m_SaveCsvAs() + ".csv";
+
+   const QString c_FilterName = C_GtGetText::h_GetText("CSV (*.csv)");
+   const QString c_ExtractCsvFilePath = C_OgeWiUtil::h_GetSaveFileName(
+      this, C_GtGetText::h_GetText("Save Export data as CSV"), c_Folder, c_FilterName, c_DefaultFilename,
+      QFileDialog::DontConfirmOverwrite); // overwrite is handled later
+
+   if (!c_ExtractCsvFilePath.isEmpty())
+   {
+      mc_File.setFileName(c_ExtractCsvFilePath);
+      C_UsHandler::h_GetInstance()->SetLastKnownCsvExportPath(c_ExtractCsvFilePath);
+      this->m_ExtractDataToCsv();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Gives string value for saving CSV with name of format yyyy_MM_dd__HH_mm_ss_zzz_ProjectName_
+ *  DashboardName
+
+   \return
+   return c_SaveCsvAs, the name of the csv to be saved as
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SyvDaChaPlotHandlerWidget::m_SaveCsvAs(void) const
+{
+   const QDateTime c_DateTime = QDateTime::currentDateTime();
+   const QString c_SaveCsvAs = c_DateTime.toString("yyyy_MM_dd__HH_mm_ss_zzz") + "__" +
+                               C_PuiProject::h_GetInstance()->GetName() + "__" + this->mc_CurrentDashboardTabName;
+
+   return c_SaveCsvAs;
 }

@@ -16,6 +16,7 @@
 #include "C_OgePopUpDialog.hpp"
 #include "C_OscNodeApplication.hpp"
 #include "C_OscTargetSupportPackage.hpp"
+#include "C_OscNode.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui

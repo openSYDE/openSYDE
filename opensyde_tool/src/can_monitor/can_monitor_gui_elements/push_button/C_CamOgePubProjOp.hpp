@@ -31,14 +31,15 @@ class C_CamOgePubProjOp :
 public:
    explicit C_CamOgePubProjOp(QWidget * const opc_Parent = NULL);
 
-   void SetSvg(const QString & orc_Path);
+   void SetSvg(const QString & orc_Path, const QString orc_PathDisable = "");
    void SetIconOnly(const bool oq_IconOnly);
 
 protected:
-   virtual void paintEvent(QPaintEvent * const opc_PaintEvent);
+   void paintEvent(QPaintEvent * const opc_PaintEvent) override;
 
 private:
-   QString mc_SvgIcon;
+   QString mc_SvgIconEnable;
+   QString mc_SvgIconDisable;
    bool mq_IconOnly;
 };
 

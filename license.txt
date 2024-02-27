@@ -18,7 +18,8 @@ The following components were used resp. are provided as source code:
 Component             License                   Folder                                                   Details
 ==========================================================================================================================================
 openSYDE GUI          GPL V3                    opensyde_tool\src                                  
-openSYDE CAN Monitor  GPL V3                    opensyde_tool\src                                  
+openSYDE CAN Monitor  GPL V3                    opensyde_tool\src               
+SYDEflash             GPL V3                    opensyde_tool\src                   
 openSYDE Core         GPL V3 or proprietary     opensyde_tool\libs\opensyde_core                   
 SYDE Coder C          GPL V3 or proprietary     opensyde_syde_coder_c                              
 SYDEsup               GPL V3 or proprietary     opensyde_syde_sup                                  

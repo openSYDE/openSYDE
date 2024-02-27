@@ -1,0 +1,93 @@
+/* --------------------------------------------------------------------- */
+QPushButton
+{
+/* suppress dotted rectangle: */
+outline: none;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgePubSettingsAdd,
+stw--opensyde_gui_elements--C_OgePubConfigure
+{
+border-style: none;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgePubSettingsAdd
+{
+padding: 1px;
+padding-left: 5px;
+padding-right: 5px;
+text-align: center;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_OgePubProjAction
+{
+border-style: solid;
+border-radius: 0px;
+border-width: 1px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_OgePubCancel,
+stw--opensyde_gui_elements--C_OgePubDialog,
+stw--opensyde_gui_elements--C_OgePubMessageCancel,
+stw--opensyde_gui_elements--C_OgePubMessageOk
+{
+border-style: solid;
+border-radius: 2px;
+border-width: 1px;
+text-align: center;
+min-height: 30px;
+max-height: 30px;
+padding-left: 15px;
+padding-right: 15px;
+}
+
+stw--opensyde_gui_elements--C_OgePubCancel:focus,
+stw--opensyde_gui_elements--C_OgePubDialog:focus,
+stw--opensyde_gui_elements--C_OgePubMessageOk:focus,
+stw--opensyde_gui_elements--C_OgePubMessageCancel:focus
+{
+text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgePubDarkBrowse
+{
+border-style: solid;
+border-width: 1px;
+border-left-width: 0px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_FlaOgePubPathVariables
+{
+border-style: solid;
+border-width: 1px;
+border-left-width: 0px;
+border-right-width: 0px;
+}
+
+stw--opensyde_gui_elements--C_FlaOgePubPathVariables::menu-indicator
+{
+width: 0px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgePubProjOp,
+stw--opensyde_gui_elements--C_CamOgePubAbout
+{
+border-style: solid;
+border-width: 1px;
+height: 28px;
+padding-left: 10px;
+padding-right: 10px;
+}
+
+stw--opensyde_gui_elements--C_CamOgePubProjOp
+{
+padding-left: 50px;
+}
+/* --------------------------------------------------------------------- */

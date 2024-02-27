@@ -60,6 +60,7 @@ public:
    void HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) const;
 
    void SetFocus(void) const;
+   void SetCurrentDashboardTabName(const QString & orc_CurrentDashboardTabName) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -73,6 +74,7 @@ Q_SIGNALS:
    void SigDataPoolRead(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Index,
                         stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DashboardWidget);
    void SigNvmReadList(const stw::opensyde_core::C_OscNodeDataPoolListId & orc_Id);
+   void SigGetCurrentDashboardTabName(void);
 
 private:
    //Avoid call

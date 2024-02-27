@@ -30,7 +30,7 @@ class C_SdNdeDpSelectorAddListWidget :
 
 public:
    explicit C_SdNdeDpSelectorAddListWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeDpSelectorAddListWidget(void);
+   ~C_SdNdeDpSelectorAddListWidget(void) override;
 
 private:
    //Avoid call

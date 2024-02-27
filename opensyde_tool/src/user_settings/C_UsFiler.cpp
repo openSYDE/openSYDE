@@ -872,6 +872,9 @@ void C_UsFiler::mh_SaveCommon(const C_UsHandler & orc_UserSettings, C_SclIniFile
 
    // Performance measurement
    orc_Ini.WriteBool("Common", "PerformanceMeasurementActive", orc_UserSettings.GetPerformanceActive());
+
+   // TSP shortcut
+   orc_Ini.WriteBool("Common", "TSPShortcutActive", orc_UserSettings.GetTspShortcutActive());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1102,6 +1105,10 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       // J1939 Catalog Path
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_j1939_catalog_path",
                           orc_UserSettings.GetLastKnownJ1939CatalogPath().toStdString().c_str());
+
+      // CSV Export Path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_csv_export_path",
+                          orc_UserSettings.GetLastKnownCsvExportPath().toStdString().c_str());
 
       // Last tab index in system definition
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value",
@@ -1934,6 +1941,9 @@ void C_UsFiler::mh_LoadCommon(C_UsHandler & orc_UserSettings, C_SclIniFile & orc
 
    // Performance measurement
    orc_UserSettings.SetPerformanceActive(orc_Ini.ReadBool("Common", "PerformanceMeasurementActive", false));
+
+   // Enable|Disable TSP shortcut
+   orc_UserSettings.SetTspShortcutActive(orc_Ini.ReadBool("Common", "TSPShortcutActive", true));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2211,6 +2221,11 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       orc_UserSettings.SetLastKnownJ1939CatalogPath(orc_Ini.ReadString(
                                                        orc_ActiveProject.toStdString().c_str(),
                                                        "ProjSd_last_known_j1939_catalog_path", "").c_str());
+
+      // Chart data as CSV Export
+      orc_UserSettings.SetLastKnownCsvExportPath(orc_Ini.ReadString(
+                                                    orc_ActiveProject.toStdString().c_str(),
+                                                    "ProjSd_last_known_csv_export_path", "").c_str());
 
       // Last tab index in system definition
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);

@@ -295,17 +295,24 @@ void C_SdNdeNodeEditWidget::OpenDetail(const int32_t os32_MainIndex, const int32
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTsp()
+
+   \retval   true   Cancel
+   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::AddFromTsp(void)
+bool C_SdNdeNodeEditWidget::AddFromTsp(void)
 {
+   bool q_Cancel = false;
+   const bool q_ADAPT_CURSOR = true; //to set Cursor to WaitCursor
+
    //Widget necessary
-   m_CreatePropertiesTab(true);
+   m_CreatePropertiesTab(q_ADAPT_CURSOR);
    tgl_assert(this->mpc_PropertiesWidget != NULL);
    if (this->mpc_PropertiesWidget != NULL)
    {
-      this->mpc_PropertiesWidget->AddFromTsp();
+      q_Cancel = this->mpc_PropertiesWidget->AddFromTsp();
    }
+   return q_Cancel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -702,11 +709,8 @@ void C_SdNdeNodeEditWidget::m_CreatePropertiesTab(const bool oq_AdaptCursor)
       {
          this->mpc_PropertiesWidget->LoadUserSettings();
       }
-      if (oq_AdaptCursor)
-      {
-         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
-      }
    }
+   C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

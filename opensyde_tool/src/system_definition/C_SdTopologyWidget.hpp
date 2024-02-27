@@ -62,6 +62,7 @@ Q_SIGNALS:
    void SigBusDeleted(const uint32_t ou32_Index);
    void SigNodeChanged(const uint32_t ou32_Index);
    void SigBusChanged(const uint32_t ou32_Index);
+   bool SigOpenTsp();
    void SigErrorChange(void);
 
 private:

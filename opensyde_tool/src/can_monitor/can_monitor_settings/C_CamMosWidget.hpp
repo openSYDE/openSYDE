@@ -13,7 +13,7 @@
 #define C_CAMMOSWIDGET_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OgeWiOnlyBackground.hpp"
+#include "C_CamOgeWiSettingsBase.hpp"
 #include "C_CamProFilterData.hpp"
 #include "C_CamMosSectionPopup.hpp"
 #include "C_CamOgePubSettingsAdd.hpp"
@@ -34,7 +34,7 @@ namespace opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamMosWidget :
-   public stw::opensyde_gui_elements::C_OgeWiOnlyBackground
+   public stw::opensyde_gui_elements::C_CamOgeWiSettingsBase
 {
    Q_OBJECT
 
@@ -82,9 +82,6 @@ Q_SIGNALS:
    void SigEmitAddFilterToChildWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
    void SigSendCanMsgDroppedToParentWidget(void);
 
-protected:
-   void moveEvent(QMoveEvent * const opc_Event) override;
-
 private:
    Ui::C_CamMosWidget * mpc_Ui;
 
@@ -98,13 +95,6 @@ private:
    void m_HidePopupDllConfig(void) const;
    void m_HidePopupFilter(void) const;
    void m_HidePopupLogging(void) const;
-   void m_ShowPopupDatabase(const bool oq_Checked);
-   void m_ShowPopupDllConfig(const bool oq_Checked);
-   void m_ShowPopupFilter(const bool oq_Checked);
-   void m_ShowPopupLogging(const bool oq_Checked);
-   void m_ShowPopup(stw::opensyde_gui::C_CamMosSectionPopup * const opc_Popup,
-                    const stw::opensyde_gui_elements::C_CamOgePubSettingsAdd * const opc_Button) const;
-   QPoint m_GetPopupMovePoint(const stw::opensyde_gui_elements::C_CamOgePubSettingsAdd * const opc_Button) const;
    stw::opensyde_gui_logic::C_UsHandler::E_SettingsSubSection m_GetPopOpenIdentity(void) const;
 
    //Avoid call

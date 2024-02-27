@@ -34,7 +34,7 @@ public:
    void SetSvg(const QString & orc_Path);
 
 protected:
-   virtual void paintEvent(QPaintEvent * const opc_PaintEvent);
+   void paintEvent(QPaintEvent * const opc_PaintEvent) override;
 
 private:
    QString mc_SvgIcon;

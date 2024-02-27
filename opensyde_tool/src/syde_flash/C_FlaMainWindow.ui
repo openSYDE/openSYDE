@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_FlaMainWindow</class>
+ <widget class="QMainWindow" name="C_FlaMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1034</width>
+    <height>714</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_FlaMainWindow</string>
+  </property>
+  <widget class="QWidget" name="pc_CentralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="stw::opensyde_gui_elements::C_OgeSaMain" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>1032</width>
+         <height>712</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="stw::opensyde_gui::C_FlaTitleBarWidget" name="pc_TitleBarWidget" native="true"/>
+        </item>
+        <item>
+         <widget class="QWidget" name="pc_ShowWidget" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="stw::opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterSettings">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="childrenCollapsible">
+              <bool>false</bool>
+             </property>
+             <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_PropertiesAndUpdateWidget" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="stw::opensyde_gui::C_FlaPropWidget" name="pc_GeneralPropertiesWidget" native="true"/>
+               </item>
+               <item>
+                <widget class="stw::opensyde_gui::C_FlaUpProperties" name="pc_UpdateWidget" native="true"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="stw::opensyde_gui::C_FlaSetWidget" name="pc_SettingsWidget" native="true"/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+       <zorder>pc_ShowWidget</zorder>
+       <zorder>pc_TitleBarWidget</zorder>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_CamOgeSpi</class>
+   <extends>QSplitter</extends>
+   <header>C_CamOgeSpi.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeSaMain</class>
+   <extends>QScrollArea</extends>
+   <header>C_OgeSaMain.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaTitleBarWidget</class>
+   <extends>QWidget</extends>
+   <header>C_FlaTitleBarWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaSetWidget</class>
+   <extends>QWidget</extends>
+   <header>C_FlaSetWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaUpProperties</class>
+   <extends>QWidget</extends>
+   <header>C_FlaUpProperties.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaPropWidget</class>
+   <extends>QWidget</extends>
+   <header>C_FlaPropWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

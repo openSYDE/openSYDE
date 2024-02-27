@@ -113,7 +113,7 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_FillMessageInfo()
       C_OscCanUtil::h_GetJ1939PgInfoFromCanId(rc_Message.c_CanMessage.u32_CanId, c_PgInfo);
       c_MessageData.c_J1939Pgn = C_OscCanUtil::h_GetVisiblePgn(c_PgInfo.u32_Pgn);
 
-      // Add message contents to tree
+      // Add message details to the tree
       C_TblTreeModelCheckableItem * const pc_MessageItem = new C_TblTreeModelCheckableItem();
       pc_MessageItem->c_Name = c_MessageData.c_J1939Pgn.toString();
       pc_MessageItem->u32_Index = u32_MessageIndex; // Message index in the vector
@@ -125,7 +125,7 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_FillMessageInfo()
       pc_MessageItem->q_Selectable = true;
       pc_MessageItem->q_Enabled = true;
 
-      // Add signals if any
+      // Add signal details to the tree
       const uint32_t u32_SignalCount = rc_Message.c_CanMessage.c_Signals.size();
       if (u32_SignalCount > 0)
       {
@@ -140,7 +140,7 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_FillMessageInfo()
 
             C_TblTreeModelCheckableItem * const pc_SignalItem = new C_TblTreeModelCheckableItem();
             pc_SignalItem->c_Name = QString::number(c_SignalData.u32_Spn);
-            pc_SignalItem->u32_Index = u32_SignalIndex;
+            pc_SignalItem->u32_Index = u32_SignalIndex; // Signal index in the vector
             pc_SignalItem->c_Icon = QIcon(":/images/system_definition/IconSignal.svg");
 
             pc_SignalItem->q_Enabled = true;
@@ -214,7 +214,7 @@ QVariant C_SdBueJ1939AddMessagesFromCatalogTreeModel::headerData(const int32_t o
       }
       else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
-         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignTop);
       }
       else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
@@ -285,12 +285,16 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_DecodeIndex(const QModelInde
       if (pc_TreeItem != NULL)
       {
          const QModelIndex c_ParentModelIndex = orc_ModelIndex.parent();
+         // if the current index has a valid parent, that means it belongs to a child item (signal)
          if (c_ParentModelIndex.isValid())
          {
             //lint -e{9079} Result of Qt interface restrictions, set by index function
             const C_TblTreItem * const pc_ParentTreeItem =
                static_cast<const C_TblTreItem *>(c_ParentModelIndex.internalPointer());
             tgl_assert(pc_ParentTreeItem != NULL);
+
+            // the tree item field ("u32_Index") contains the vector index (vector that stores all messages and
+            // signals)
             if (pc_ParentTreeItem != NULL)
             {
                oru32_MessageIndex = pc_ParentTreeItem->u32_Index;
@@ -298,6 +302,7 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_DecodeIndex(const QModelInde
             oru32_SignalIndex = pc_TreeItem->u32_Index;
             orq_IsSignal = true;
          }
+         // parent is not valid, that means current index belongs to a parent item (message)
          else
          {
             oru32_MessageIndex = orc_ModelIndex.row();
@@ -349,8 +354,10 @@ QVariant C_SdBueJ1939AddMessagesFromCatalogTreeModel::data(const QModelIndex & o
                {
                   switch (e_Col)
                   {
+                  // Note: CAN Id data is commented out to exclude it's contents from the sort filter results.
+                  // (Sort Proxy model has role set as Qt::DisplayRole). Kept for future use
                   case eCAN_ID:
-                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_CanId;
+                     //                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_CanId;
                      break;
                   case eNAME:
                      c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Name.c_str();
@@ -359,7 +366,7 @@ QVariant C_SdBueJ1939AddMessagesFromCatalogTreeModel::data(const QModelIndex & o
                      c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Comment.c_str();
                      break;
                   case ePGN_SPN:
-                  // PGN / SPN handled by tree item name
+                  // PGN / SPN contained in tree item field "c_Name" (column 0)
                   default:
                      break;
                   }
@@ -377,17 +384,12 @@ QVariant C_SdBueJ1939AddMessagesFromCatalogTreeModel::data(const QModelIndex & o
                   case eCAN_ID:
                   // not applicable for signals
                   case ePGN_SPN:
-                  // PGN / SPN handled by tree item name
+                  // PGN / SPN contained in tree item field "c_Name"(column 0)
                   default:
                      break;
                   }
                }
             }
-         }
-
-         else
-         {
-            //Unknown
          }
       }
    }
@@ -555,32 +557,6 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::SelectAllParentItems()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Select only the filtered messages
-
-   \param[in]       orc_FilteredItems     Filtered messages
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueJ1939AddMessagesFromCatalogTreeModel::SelectFilteredParentItems(const QStringList & orc_FilteredItems)
-{
-   if (this->mpc_InvisibleRootItem != NULL)
-   {
-      std::vector<C_TblTreSimpleItem *> c_InvisibleRootChildren = this->mpc_InvisibleRootItem->c_Children;
-      for (uint32_t u32_MessageItem = 0;
-           u32_MessageItem < c_InvisibleRootChildren.size(); u32_MessageItem++)
-      {
-         C_TblTreeModelCheckableItem * const pc_MessageItem =
-            dynamic_cast<C_TblTreeModelCheckableItem *>(c_InvisibleRootChildren.at(u32_MessageItem));
-
-         // Search the filtered message PGN in the entire list of messages and enable its checkbox
-         if (orc_FilteredItems.contains(pc_MessageItem->c_Name))
-         {
-            pc_MessageItem->e_CheckState = Qt::Checked;
-         }
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Unselect all the parent items
  *
       Unselect all messages
@@ -597,6 +573,36 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::UnselectAllParentItems()
          C_TblTreeModelCheckableItem * const pc_MessageItem =
             dynamic_cast<C_TblTreeModelCheckableItem *>(c_InvisibleRootChildren.at(u32_MessageItem));
          pc_MessageItem->e_CheckState = Qt::Unchecked;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select only the filtered messages
+
+   \param[in]       orc_FilteredItems     Indexes of  filtered messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueJ1939AddMessagesFromCatalogTreeModel::SelectFilteredParentItems(const QModelIndexList & orc_FilteredItems)
+{
+   if (this->mpc_InvisibleRootItem != NULL)
+   {
+      std::vector<C_TblTreSimpleItem *> c_InvisibleRootChildren = this->mpc_InvisibleRootItem->c_Children;
+      for (uint32_t u32_MessageItem = 0;
+           u32_MessageItem < c_InvisibleRootChildren.size(); u32_MessageItem++)
+      {
+         C_TblTreeModelCheckableItem * const pc_MessageItem =
+            dynamic_cast<C_TblTreeModelCheckableItem *>(c_InvisibleRootChildren.at(u32_MessageItem));
+
+         // the tree item field ("u32_Index") contains the vector index which is same the "row" of the filtered item
+         for (uint32_t u32_ItemIndex = 0; u32_ItemIndex < static_cast<uint32_t>(orc_FilteredItems.size());
+              u32_ItemIndex++)
+         {
+            if (static_cast<uint32_t>(orc_FilteredItems[u32_ItemIndex].row()) == pc_MessageItem->u32_Index)
+            {
+               pc_MessageItem->e_CheckState = Qt::Checked;
+            }
+         }
       }
    }
 }

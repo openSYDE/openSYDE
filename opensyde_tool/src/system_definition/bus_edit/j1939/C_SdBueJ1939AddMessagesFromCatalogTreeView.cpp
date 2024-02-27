@@ -18,6 +18,7 @@
 #include "precomp_headers.hpp"
 #include "stwtypes.hpp"
 #include "C_SdBueJ1939AddMessagesFromCatalogTreeView.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -90,7 +91,7 @@ C_SdBueJ1939AddMessagesFromCatalogTreeView::C_SdBueJ1939AddMessagesFromCatalogTr
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   //   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::DisplayRole));
+   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::DisplayRole));
    this->C_SdBueJ1939AddMessagesFromCatalogTreeView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -100,24 +101,28 @@ C_SdBueJ1939AddMessagesFromCatalogTreeView::C_SdBueJ1939AddMessagesFromCatalogTr
 
    m_InitColumns();
 
-   // Hide CAN Id column (could be useful in future)
+   // Hide CAN Id column (In case CAN Id is used in future)
    this->setColumnHidden(C_SdBueJ1939AddMessagesFromCatalogTreeModel::h_EnumToColumn(
                             C_SdBueJ1939AddMessagesFromCatalogTreeModel::eCAN_ID), true);
+
+   // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
+   this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+   this->verticalScrollBar()->hide();
+   this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+   this->horizontalScrollBar()->hide();
 
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 
    this->setSortingEnabled(true);
-   this->setDragEnabled(false);
-
-   this->setTabKeyNavigation(false);
-
-   //Hover event
-   this->setMouseTracking(true);
 
    connect(this, &QTreeView::clicked, this,
            &C_SdBueJ1939AddMessagesFromCatalogTreeView::m_OnItemChecked);
+   connect(this->verticalScrollBar(), &QScrollBar::rangeChanged, this,
+           &C_SdBueJ1939AddMessagesFromCatalogTreeView::m_ShowHideVerticalScrollBar);
+   connect(this->horizontalScrollBar(), &QScrollBar::rangeChanged, this,
+           &C_SdBueJ1939AddMessagesFromCatalogTreeView::m_ShowHideHorizontalScrollBar);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,43 +152,47 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeView::UpdateData(
                       Qt::AscendingOrder);
 
    this->mc_Model.UpdateData(orc_MessagesImported);
+
+   // Resize the "Comment" column (Since it may have longer text)
+   this->resizeColumnToContents(C_SdBueJ1939AddMessagesFromCatalogTreeModel::h_EnumToColumn(
+                                   C_SdBueJ1939AddMessagesFromCatalogTreeModel::eCOMMENT));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Select all messages
  *
-   \param[in]  oq_IsFilterTextEmpty      Indicates whether the filter is applied or not i.e if the filter field
-                                         contains some text or is empty.
-*/
+  */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueJ1939AddMessagesFromCatalogTreeView::SelectAllMessages(const bool oq_IsFilterTextEmpty)
+void C_SdBueJ1939AddMessagesFromCatalogTreeView::SelectAllMessages()
 {
-   // Filter text empty, hence select all the messages.
-   if (oq_IsFilterTextEmpty == true)
+   const uint32_t u32_FilteredRowCount =  static_cast<uint32_t>(this->mc_SortProxyModel.rowCount());
+   const uint32_t u32_TotalRowCount = static_cast<uint32_t>(this->mc_Model.rowCount());
+
+   // No filtered messages exist, therefore all the messages to be selected.
+   if (u32_FilteredRowCount == u32_TotalRowCount)
    {
       // data gives PGN of filtered messages. Fetch these messages and select them.
       this->mc_Model.SelectAllParentItems();
    }
-   // Filter contains some text, hence select only the corresponding filtered messages.
+   // Filtered messages exist, hence select only these (that are visible).
    else
    {
-      const uint32_t u32_RowCount =  static_cast<uint32_t>(this->mc_SortProxyModel.rowCount());
-
-      QVariant c_Data;
-      QStringList c_FilteredMessages;
-
-      // Save the PGNs of filtered messages
-      for (uint32_t u32_RowIndex = 0; u32_RowIndex < u32_RowCount; u32_RowIndex++)
+      if ((u32_FilteredRowCount != 0) && (u32_FilteredRowCount < u32_TotalRowCount))
       {
-         // The mc_SortProxyModel index represents that of the visible (filtered) items.
-         // Pick the index of the first column containing PGN.
-         const QModelIndex c_SortFilterIndex = this->mc_SortProxyModel.index(u32_RowIndex, 0);
-         c_Data = this->mc_SortProxyModel.data(c_SortFilterIndex);
-         c_FilteredMessages.append(c_Data.toString());
-      }
+         QModelIndexList c_IndexList;
 
-      // Using the list of saved PGNs, select only those messages that have been filtered and are visible
-      this->mc_Model.SelectFilteredParentItems(c_FilteredMessages);
+         // Save the indexes of the filtered messages
+         for (uint32_t u32_RowIndex = 0; u32_RowIndex < u32_FilteredRowCount; u32_RowIndex++)
+         {
+            // Map the sort index to the actual index. The tree item at the actual index contains the message vector
+            // index.
+            const QModelIndex c_SortFilterIndex = this->mc_SortProxyModel.index(u32_RowIndex, 2);
+            c_IndexList.append(this->mc_SortProxyModel.mapToSource(c_SortFilterIndex));
+         }
+
+         // Select only those messages that have been filtered and are visible
+         this->mc_Model.SelectFilteredParentItems(c_IndexList);
+      }
    }
 
    Q_EMIT (this->SigSelectionChanged(this->mc_Model.GetCheckedItemCount()));
@@ -220,6 +229,48 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeView::m_InitColumns()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief  Show hide vertical scroll bar
+
+   \param[in]  os32_Min  Minimum range
+   \param[in]  os32_Max  Maximum range
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueJ1939AddMessagesFromCatalogTreeView::m_ShowHideVerticalScrollBar(const int32_t os32_Min,
+                                                                             const int32_t os32_Max) const
+{
+   // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
+   if ((os32_Min == 0) && (os32_Max == 0))
+   {
+      this->verticalScrollBar()->hide();
+   }
+   else
+   {
+      this->verticalScrollBar()->show();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief  Show hide horizontal scroll bar
+
+   \param[in]  os32_Min  Minimum range
+   \param[in]  os32_Max  Maximum range
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueJ1939AddMessagesFromCatalogTreeView::m_ShowHideHorizontalScrollBar(const int32_t os32_Min,
+                                                                               const int32_t os32_Max) const
+{
+   // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
+   if ((os32_Min == 0) && (os32_Max == 0))
+   {
+      this->horizontalScrollBar()->hide();
+   }
+   else
+   {
+      this->horizontalScrollBar()->show();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get default column widths
 
    \return
@@ -239,7 +290,7 @@ std::map<C_SdBueJ1939AddMessagesFromCatalogTreeModel::E_Columns,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Called when a tree item is clicked
+/*! \brief  Called when a tree item is clicked i.e item checkbox is checked
 
    \param[in]       orc_Index     Index of the tree item clicked
 
@@ -282,4 +333,37 @@ const
    this->mc_Model.GetSelectedMessages(c_RetVal);
 
    return c_RetVal;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if any messages are visible
+
+   \return
+   True  visible
+   False none visible
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueJ1939AddMessagesFromCatalogTreeView::HasVisibleData() const
+{
+   return (this->mc_SortProxyModel.rowCount() != 0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten key press event slot
+
+   Here: Handle specific enter key cases
+
+   \param[in,out] opc_KeyEvent Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueJ1939AddMessagesFromCatalogTreeView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+{
+   // Shortcut (Ctrl + A) to select all messages
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_A))
+   {
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
+      {
+         this->SelectAllMessages();
+      }
+   }
 }

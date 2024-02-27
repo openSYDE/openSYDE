@@ -30,7 +30,7 @@ class C_CamOgeCbxTableSmall :
 
 public:
    explicit C_CamOgeCbxTableSmall(QWidget * const opc_Parent = NULL);
-   virtual ~C_CamOgeCbxTableSmall(void);
+   ~C_CamOgeCbxTableSmall(void) override;
 
 private:
    //Avoid call

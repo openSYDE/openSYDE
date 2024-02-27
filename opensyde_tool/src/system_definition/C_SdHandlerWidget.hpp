@@ -79,8 +79,9 @@ private:
    void m_Export(void);
    void m_Import(void) const;
    void m_RtfExport(void);
-   void m_TspImport(void);
+   bool m_TspImport();
    void m_GenerateHalcDatapools(void) const;
+   opensyde_gui_elements::C_OgeWiCustomMessage * m_ShowWarningUnstoredProjectPopupMessage();
 
    Ui::C_SdHandlerWidget * mpc_Ui;
    C_SdTopologyWidget * mpc_Topology;

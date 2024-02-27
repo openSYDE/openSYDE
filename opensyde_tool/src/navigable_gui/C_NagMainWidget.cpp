@@ -689,7 +689,9 @@ void C_NagMainWidget::m_AboutClicked()
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
 
    new C_NagAboutDialog(*c_New, "openSYDE", ":/images/LogoOpensyde_XXL.png", 27,
-                        C_GtGetText::h_GetText("QCustomPlot by Emanuel Eichhammer"));
+                        C_GtGetText::h_GetText("Vector::DBC Module by Tobias Lorenz;Bison;Flex;"
+                                               "Miniz;AES implementation by SergeyBel;OpenSSL;"
+                                               "QCustomPlot by Emanuel Eichhammer"));
 
    //Resize
    c_New->SetSize(QSize(650, 611));

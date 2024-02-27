@@ -35,7 +35,7 @@ class C_CamOgeWiSettingSubSection :
 
 public:
    explicit C_CamOgeWiSettingSubSection(QWidget * const opc_Parent = NULL);
-   virtual ~C_CamOgeWiSettingSubSection(void);
+   ~C_CamOgeWiSettingSubSection(void) override;
 
    void SetTitle(const QString & orc_Title) const;
    void SetIcon(const QString & orc_Icon) const;

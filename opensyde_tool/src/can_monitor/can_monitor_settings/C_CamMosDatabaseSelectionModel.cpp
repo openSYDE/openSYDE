@@ -346,7 +346,7 @@ void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OscCanMe
    pc_MessageItem->c_ToolTipContent = C_SdTooltipUtil::h_GetToolTipContentMessage(orc_Message);
    pc_MessageItem->c_Icon = QIcon(C_CamMosDatabaseSelectionModel::mhc_ICON_MESSAGE);
    opc_ParentItem->AddChild(pc_MessageItem);
-}
+} //lint !e429  no memory leak because of the parent and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append all items from the vector orc_SmallVectorToAdd to the vector orc_BigVectorToAppendTo

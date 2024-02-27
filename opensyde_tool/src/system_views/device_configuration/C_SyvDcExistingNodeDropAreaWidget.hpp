@@ -43,10 +43,10 @@ public:
    void InitStaticNames(void) const;
    void SetContent(const bool oq_ValidSerialNumber,
                    const stw::opensyde_core::C_OscProtocolSerialNumber & orc_PureSerialNumber, const std::map<uint8_t,
-                                                                                                              stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
+                                                                                                              stw::opensyde_core::C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
    bool IsAssigned(void) const;
    void GetContent(stw::opensyde_core::C_OscProtocolSerialNumber & orc_PureSerialNumber, std::map<uint8_t,
-                                                                                                  stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> * const opc_SubNodeIdsToOldNodeIds)
+                                                                                                  stw::opensyde_core::C_OscDcDeviceOldComConfig> * const opc_SubNodeIdsToOldNodeIds)
    const;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -63,7 +63,7 @@ private:
    Ui::C_SyvDcExistingNodeDropAreaWidget * mpc_Ui;
    stw::opensyde_core::C_OscProtocolSerialNumber mc_PureSerialNumber;
    bool mq_Assigned;
-   std::map<uint8_t, stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> mc_SubNodeIdsToOldNodeIds;
+   std::map<uint8_t, stw::opensyde_core::C_OscDcDeviceOldComConfig> mc_SubNodeIdsToOldNodeIds;
 
    void m_OnDisconnectRequest(void);
 

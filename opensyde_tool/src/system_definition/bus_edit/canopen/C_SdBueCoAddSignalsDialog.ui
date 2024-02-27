@@ -36,15 +36,18 @@
        <number>30</number>
       </property>
       <property name="rightMargin">
-       <number>30</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>13</number>
+       <number>0</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0">
+        <property name="rightMargin">
+         <number>30</number>
+        </property>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -105,7 +108,7 @@
              <number>1</number>
             </property>
             <property name="rightMargin">
-             <number>20</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
              <number>0</number>
@@ -146,7 +149,7 @@
             <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>20</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -341,6 +344,19 @@
           </layout>
          </widget>
         </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_9">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>10</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="stw::opensyde_gui::C_SdBueCoAddSignalsView" name="pc_TreeView"/>
         </item>
@@ -468,14 +484,25 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
+   <extends>QFrame</extends>
+   <header>C_OgeFraSeparator.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
    <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
-   <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.hpp</header>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -495,20 +522,9 @@
    <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeProperties.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.hpp</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui::C_SdBueCoAddSignalsView</class>

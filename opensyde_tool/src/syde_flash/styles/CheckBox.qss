@@ -1,0 +1,30 @@
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgeChxSettings[NoText="true"]
+{
+spacing: 0px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeChxSettings::indicator,
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator
+{
+width: 14px;
+height: 14px;
+border: 1px solid;
+padding: 2px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeChxSettings::indicator:checked:enabled,
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator:checked:enabled
+{
+image: url(://images/CheckBoxActiveWithoutBackground.svg);
+}
+
+stw--opensyde_gui_elements--C_CamOgeChxSettings::indicator:checked:disabled
+{
+image: url(://images/CheckBoxActiveDisabledWithoutBackground.svg);
+}
+
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator:checked:disabled
+{
+image: url(://images/CheckBoxDisabledGrayWithoutBackground.svg);
+}

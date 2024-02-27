@@ -129,6 +129,10 @@ public:
                                           uint32_t & oru32_RxMessageCount, uint32_t & oru32_TxMessageCount,
                                           uint32_t * const opu32_SignalCount);
    static QString h_GetCanOpenSignalObjectIndex(const uint32_t ou32_ObjectIndex, const uint32_t ou32_ObjectSubIndex);
+
+private:
+   static void mh_WriteEtherCanLogMessage(const opensyde_core::C_OscNodeProperties * const opc_NodeProperties,
+                                          const opensyde_core::C_OscDeviceDefinition * const opc_DevDef);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

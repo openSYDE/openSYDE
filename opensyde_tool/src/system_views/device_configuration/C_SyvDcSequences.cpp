@@ -53,161 +53,6 @@ using namespace stw::opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDcDeviceInformation::C_SyvDcDeviceInformation(void) :
-   c_DeviceName(""),
-   q_DeviceNameValid(false),
-   u8_NodeId(0U),
-   q_NodeIdValid(false),
-   q_IpAddressValid(false),
-   u8_SubNodeId(0U),
-   q_SecuirtyActivated(false),
-   q_ExtendedInfoValid(false)
-{
-   (void)std::memset(&au8_IpAddress[0], 0U, sizeof(au8_IpAddress));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a device name and its valid flag
-
-   \param[in]  orc_DeviceName    New device name
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetDeviceName(const C_SclString & orc_DeviceName)
-{
-   this->c_DeviceName = orc_DeviceName;
-   this->q_DeviceNameValid = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a node id and its valid flag
-
-   \param[in]  ou8_NodeId  New node id
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetNodeId(const uint8_t ou8_NodeId)
-{
-   this->u8_NodeId = ou8_NodeId;
-   this->q_NodeIdValid = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a ip address and its valid flag
-
-   \param[in]  orau8_IpAddress   New node id
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetIpAddress(const uint8_t (&orau8_IpAddress)[4])
-{
-   (void)memcpy(&this->au8_IpAddress[0], &orau8_IpAddress[0], sizeof(this->au8_IpAddress));
-   this->q_IpAddressValid = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a serial number and its valid flag
-
-   \param[in]  orc_SerialNumber   New serial number
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetSerialNumber(const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber)
-{
-   this->c_SerialNumber = orc_SerialNumber;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a extended specific information of a node and its valid flag
-
-   \param[in]  ou8_SubNodeId         New sub node id
-   \param[in]  oq_SecurityActivated  New security activated flag
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetExtendedInfo(const uint8_t ou8_SubNodeId, const bool oq_SecurityActivated)
-{
-   this->u8_SubNodeId = ou8_SubNodeId;
-   this->q_SecuirtyActivated = oq_SecurityActivated;
-   this->q_ExtendedInfoValid = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Comparison of serial number and all relevant members
-
-   \param[in] orc_Cmp Compared instance
-
-   \return
-   true     Current serial number equals orc_Cmp
-   false    Else
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDcDeviceInformation::IsSerialNumberIdentical(const C_SyvDcDeviceInformation & orc_Cmp) const
-{
-   const bool q_Return = (this->c_SerialNumber == orc_Cmp.c_SerialNumber);
-
-   return q_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SyvDcDeviceOldComConfig::C_SyvDcDeviceOldComConfig(void) :
-   u8_OldNodeId(0U),
-   q_OldIpAddressValid(false)
-{
-   memset(&au8_OldIpAddress, 0U, 4);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Assignment operator.
-
-   \param[in]  orc_Source  instance to assign
-
-   \return
-   reference to new instance
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SyvDcDeviceOldComConfig & C_SyvDcDeviceOldComConfig::operator =(const C_SyvDcDeviceOldComConfig & orc_Source) &
-{
-   if (this != &orc_Source)
-   {
-      this->u8_OldNodeId = orc_Source.u8_OldNodeId;
-      this->q_OldIpAddressValid = orc_Source.q_OldIpAddressValid;
-      memcpy(&this->au8_OldIpAddress, &orc_Source.au8_OldIpAddress, 4);
-   }
-
-   return (*this);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the content
-
-   \param[in]       ou8_OldNodeId        Old node id of node
-   \param[in]       oq_OldIpAddressValid Flag if IP address is valid
-   \param[in]       opu8_OldIpAddress    Optional pointer to old IP address
-                                         If pointer != NULL, q_OldIpAddressValid will be set to oq_OldIpAddressValid
-                                         If pointer == NULL, q_OldIpAddressValid will be set to false
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceOldComConfig::SetContent(const uint8_t ou8_OldNodeId, const bool oq_OldIpAddressValid,
-                                           const uint8_t * const opu8_OldIpAddress)
-{
-   this->u8_OldNodeId = ou8_OldNodeId;
-   if (opu8_OldIpAddress != NULL)
-   {
-      this->q_OldIpAddressValid = oq_OldIpAddressValid;
-      if (this->q_OldIpAddressValid == true)
-      {
-         memcpy(&this->au8_OldIpAddress[0], opu8_OldIpAddress, 4);
-      }
-   }
-   else
-   {
-      this->q_OldIpAddressValid = false;
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcDeviceConfiguation::C_SyvDcDeviceConfiguation(void) :
    u8_SubNodeId(0U)
 {
@@ -1100,7 +945,7 @@ bool C_SyvDcSequences::GetCanInitializationResult(void) const
    C_BUSY         previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_SyvDcSequences::GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformation> & orc_DeviceInfo) const
+int32_t C_SyvDcSequences::GetDeviceInfosResult(std::vector<C_OscDcDeviceInformation> & orc_DeviceInfo) const
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -1374,17 +1219,23 @@ int32_t C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32_t ou32_CanBi
                   // send STW Flashloader reset messages
                   s32_Return = this->mpc_ComDriver->SendStwRequestNodeReset();
                }
+
+               if (s32_Return != C_NO_ERR)
+               {
+                  osc_write_log_error("Scan CAN enter Flashloader",
+                                      "STW request node reset failed with error: " + C_SclString::IntToStr(s32_Return));
+               }
             }
             else
             {
-               osc_write_log_error("Scan CAN enter Flashloader",
-                                   "STW request node reset failed with error: " + C_SclString::IntToStr(s32_Return));
+               osc_write_log_error("Scan CAN enter Flashloader", "openSYDE ECU reset broadcast failed with error: " +
+                                   C_SclString::IntToStr(s32_Return));
             }
          }
          else
          {
             osc_write_log_error("Scan CAN enter Flashloader",
-                                "openSYDE ECU reset broadcast failed with error: " + C_SclString::IntToStr(s32_Return));
+                                "openSYDE request programming failed with error: " + C_SclString::IntToStr(s32_Return));
          }
       }
       else
@@ -1617,7 +1468,7 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint
 
                   if (s32_Return == C_NO_ERR)
                   {
-                     C_SyvDcDeviceInformation c_DeviceInfo;
+                     C_OscDcDeviceInformation c_DeviceInfo;
                      c_DeviceInfo.SetNodeId(c_ServerId.u8_NodeIdentifier);
                      c_DeviceInfo.SetSerialNumber(c_SerialNumber);
                      c_DeviceInfo.SetDeviceName(c_DeviceName);
@@ -1722,7 +1573,7 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
          // Fill the result container with the standard results
          for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadSnResult.size(); ++u32_ResultCounter)
          {
-            C_SyvDcDeviceInformation c_DeviceInfo;
+            C_OscDcDeviceInformation c_DeviceInfo;
             c_DeviceInfo.SetSerialNumber(c_ReadSnResult[u32_ResultCounter].c_SerialNumber);
             c_DeviceInfo.SetNodeId(c_ReadSnResult[u32_ResultCounter].c_SenderId.u8_NodeIdentifier);
             this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
@@ -1731,7 +1582,7 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
          // Fill the result container with the extended results
          for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadSnResultExt.size(); ++u32_ResultCounter)
          {
-            C_SyvDcDeviceInformation c_DeviceInfo;
+            C_OscDcDeviceInformation c_DeviceInfo;
             // Serial number length is not necessary, it was already cross checked with the string
             c_DeviceInfo.SetSerialNumber(c_ReadSnResultExt[u32_ResultCounter].c_SerialNumber);
             c_DeviceInfo.SetNodeId(c_ReadSnResultExt[u32_ResultCounter].c_SenderId.u8_NodeIdentifier);
@@ -1918,7 +1769,7 @@ int32_t C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
             // Fill the result container
             for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadDeviceInfoResults.size(); ++u32_ResultCounter)
             {
-               C_SyvDcDeviceInformation c_DeviceInfo;
+               C_OscDcDeviceInformation c_DeviceInfo;
                c_DeviceInfo.SetDeviceName(c_ReadDeviceInfoResults[u32_ResultCounter].c_DeviceName);
                c_DeviceInfo.SetIpAddress(c_ReadDeviceInfoResults[u32_ResultCounter].au8_IpAddress);
                c_DeviceInfo.SetNodeId(c_ReadDeviceInfoResults[u32_ResultCounter].c_NodeId.u8_NodeIdentifier);
@@ -1930,7 +1781,7 @@ int32_t C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
             for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadDeviceInfoExtendedResults.size();
                  ++u32_ResultCounter)
             {
-               C_SyvDcDeviceInformation c_DeviceInfo;
+               C_OscDcDeviceInformation c_DeviceInfo;
                c_DeviceInfo.SetDeviceName(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].c_DeviceName);
                c_DeviceInfo.SetIpAddress(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].au8_IpAddress);
                // Serial number length is not necessary, it was already cross checked with the string
@@ -3932,7 +3783,7 @@ int32_t C_SyvDcSequences::m_ReadBack(void)
       // * for all openSYDE nodes:
       for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_OpenSydeIds.size(); ++u32_DeviceCounter)
       {
-         C_SyvDcDeviceInformation c_OsyInfo;
+         C_OscDcDeviceInformation c_OsyInfo;
          stw::opensyde_core::C_OscProtocolDriverOsyNode & rc_OsyServerId = this->mc_OpenSydeIds[u32_DeviceCounter];
          C_OscProtocolSerialNumber c_SerialNumber;
 
@@ -4004,7 +3855,7 @@ int32_t C_SyvDcSequences::m_ReadBack(void)
          // * for all STW flashloader nodes:
          for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_StwIds.size(); ++u32_DeviceCounter)
          {
-            C_SyvDcDeviceInformation c_StwInfo;
+            C_OscDcDeviceInformation c_StwInfo;
             stw::opensyde_core::C_OscProtocolDriverOsyNode & rc_StwServerId = this->mc_StwIds[u32_DeviceCounter];
 
             c_StwInfo.SetNodeId(rc_StwServerId.u8_NodeIdentifier);

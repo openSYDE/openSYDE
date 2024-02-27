@@ -9,8 +9,7 @@
 #define C_CAMOGEPUBPATHVARIABLES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OgePubToolTipBase.hpp"
-#include "C_OgeMuSections.hpp"
+#include "C_CamOgePubPathVariablesBase.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -22,28 +21,14 @@ namespace opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamOgePubPathVariables :
-   public C_OgePubToolTipBase
+   public C_CamOgePubPathVariablesBase
 {
    Q_OBJECT
 
 public:
    explicit C_CamOgePubPathVariables(QWidget * const opc_Parent = NULL);
-   virtual ~C_CamOgePubPathVariables(void);
-
-   //The signals keyword is necessary for Qt signal slot functionality
-   //lint -save -e1736
-Q_SIGNALS:
-   //lint -restore
-   void SigVariableSelected(const QString & orc_Name);
 
 private:
-   stw::opensyde_gui_elements::C_OgeMuSections * mpc_Menu;
-
-   void m_CanMonitorExeTriggered(void);
-   void m_CanMonitorProjTriggered(void);
-   void m_UserNameTriggered(void);
-   void m_ComputerNameTriggered(void);
-
    //Avoid call
    C_CamOgePubPathVariables(const C_CamOgePubPathVariables &);
    C_CamOgePubPathVariables & operator =(const C_CamOgePubPathVariables &) &;

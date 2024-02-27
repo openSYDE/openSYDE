@@ -68,6 +68,7 @@ public:
    void DeleteData(void) override;
    void SetErrorForInvalidDlc(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_ElementId,
                               const uint8_t ou8_Dlc) override;
+   void SetCurrentDashboardName(const QString & orc_CurrentDashboardTabName) override;
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

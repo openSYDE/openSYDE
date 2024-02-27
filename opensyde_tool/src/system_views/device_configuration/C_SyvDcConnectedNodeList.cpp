@@ -18,8 +18,6 @@
 #include "constants.hpp"
 #include "TglUtils.hpp"
 #include "C_OgeWiUtil.hpp"
-#include "C_PuiSdHandler.hpp"
-#include "C_PuiSvHandler.hpp"
 #include "C_SyvDcConnectedNodeList.hpp"
 #include "C_SyvDcConnectedNodeWidget.hpp"
 
@@ -89,7 +87,7 @@ C_SyvDcConnectedNodeList::C_SyvDcConnectedNodeList(QWidget * const opc_Parent) :
    \param[in] orc_Infos Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::SetData(const std::vector<C_SyvDcDeviceInformation> & orc_Infos)
+void C_SyvDcConnectedNodeList::SetData(const std::vector<C_OscDcDeviceInformation> & orc_Infos)
 {
    this->mc_Data = orc_Infos;
    m_Init();
@@ -134,6 +132,72 @@ const
       {
          pc_Widget->setEnabled(false);
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets width of the list item
+
+   \param[in]       os32_WidgetWidth     Width value to be set
+
+   Note: This function should be called after "SetData" because in "SetData" an initial
+         width is set to the list item. (SetData -> m_Init -> AppendNode -> C_SyvDcConnectedNodeWidget::m_Init)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcConnectedNodeList::SetListItemWidth(const int32_t os32_WidgetWidth)
+{
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
+   {
+      C_SyvDcConnectedNodeWidget * const pc_Widget =
+         dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(s32_It)));
+      pc_Widget->SetWidth(os32_WidgetWidth);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Enable / disable drag and drop mode
+
+   \param[in]       oq_Enable     True = enable, False = disable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcConnectedNodeList::SetDragDropMode(const bool oq_Enable)
+{
+   this->setDragEnabled(oq_Enable);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fetch the selected node id
+
+   \return
+   Node Id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8_t C_SyvDcConnectedNodeList::GetSelectedNodeId(void) const
+{
+   uint8_t u8_NodeId = 0;
+   QListWidgetItem * const pc_Item = this->currentItem();
+
+   if (pc_Item != NULL)
+   {
+      C_SyvDcConnectedNodeWidget * const pc_Widget =
+         dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(pc_Item));
+      u8_NodeId = pc_Widget->GetNodeId();
+   }
+
+   return u8_NodeId;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select the given row number
+
+   \param[in]       os32_RowIndex     Row index to be selected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcConnectedNodeList::SelectRow(const int32_t os32_RowIndex)
+{
+   if ((os32_RowIndex >= 0) && (this->count() > 0) && (os32_RowIndex < this->count()))
+   {
+      this->setCurrentRow(os32_RowIndex);
    }
 }
 
@@ -204,9 +268,9 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
          if (pc_Widget != NULL)
          {
             QString c_StringSubNodeIdsToOldNodeIds;
-            const std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds =
+            const std::map<uint8_t, C_OscDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds =
                pc_Widget->GetSubNodeIdsToOldNodeIds();
-            std::map<uint8_t, C_SyvDcDeviceOldComConfig>::const_iterator c_ItIds;
+            std::map<uint8_t, C_OscDcDeviceOldComConfig>::const_iterator c_ItIds;
 
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA,
                                pc_Widget->GetPlainSerialNumberString().toStdString().c_str());
@@ -258,8 +322,8 @@ void C_SyvDcConnectedNodeList::m_Init(void)
 {
    uint32_t u32_ItData;
 
-   std::vector<C_SyvDcDeviceInformation> c_DataUnique;
-   std::vector<std::map<uint8_t, C_SyvDcDeviceOldComConfig> > c_DataUniqueSubNodeIdsToOldNodeIds;
+   std::vector<C_OscDcDeviceInformation> c_DataUnique;
+   std::vector<std::map<uint8_t, C_OscDcDeviceOldComConfig> > c_DataUniqueSubNodeIdsToOldNodeIds;
 
    //Init/Reinit UI
    this->clear();
@@ -270,19 +334,19 @@ void C_SyvDcConnectedNodeList::m_Init(void)
    // Check for Multi-CPU nodes
    for (u32_ItData = 0U; u32_ItData < this->mc_Data.size(); ++u32_ItData)
    {
-      const C_SyvDcDeviceInformation & rc_Data = this->mc_Data[u32_ItData];
+      const C_OscDcDeviceInformation & rc_Data = this->mc_Data[u32_ItData];
       uint32_t u32_ItDataUnique;
       bool q_MatchingSubNodeFound = false;
 
       // Check if already existing
       for (u32_ItDataUnique = 0U; u32_ItDataUnique < c_DataUnique.size(); ++u32_ItDataUnique)
       {
-         const C_SyvDcDeviceInformation & rc_DataUnique = c_DataUnique[u32_ItDataUnique];
+         const C_OscDcDeviceInformation & rc_DataUnique = c_DataUnique[u32_ItDataUnique];
 
          if (rc_DataUnique.IsSerialNumberIdentical(rc_Data) == true)
          {
             // Serial number is identical, add the sub node id
-            C_SyvDcDeviceOldComConfig c_OldComConfig;
+            C_OscDcDeviceOldComConfig c_OldComConfig;
             c_OldComConfig.SetContent(rc_Data.u8_NodeId, rc_Data.q_IpAddressValid, &rc_Data.au8_IpAddress[0]);
 
             c_DataUniqueSubNodeIdsToOldNodeIds[u32_ItDataUnique][rc_Data.u8_SubNodeId] = c_OldComConfig;
@@ -293,8 +357,8 @@ void C_SyvDcConnectedNodeList::m_Init(void)
 
       if (q_MatchingSubNodeFound == false)
       {
-         std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_SubNodeIdToNodeId;
-         C_SyvDcDeviceOldComConfig c_OldComConfig;
+         std::map<uint8_t, C_OscDcDeviceOldComConfig> c_SubNodeIdToNodeId;
+         C_OscDcDeviceOldComConfig c_OldComConfig;
          c_OldComConfig.SetContent(rc_Data.u8_NodeId, rc_Data.q_IpAddressValid, &rc_Data.au8_IpAddress[0]);
 
          c_SubNodeIdToNodeId[rc_Data.u8_SubNodeId] = c_OldComConfig;
@@ -323,8 +387,8 @@ void C_SyvDcConnectedNodeList::m_Init(void)
                                           - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info, const std::map<uint8_t,
-                                                                                                      C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+void C_SyvDcConnectedNodeList::m_AppendNode(const C_OscDcDeviceInformation & orc_Info, const std::map<uint8_t,
+                                                                                                      C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 {
    C_SyvDcConnectedNodeWidget * pc_Widget;
 
@@ -344,7 +408,7 @@ void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc
       this->mq_GridSizeSet = true;
       this->setGridSize(QSize(pc_Widget->width(), pc_Widget->height()));
    }
-}
+} //lint !e429  //no memory leak because of the parent of pc_Widget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::m_ScrollBarRangeChangedVer(const int32_t os32_Min, const int32_t os32_Max) const

@@ -117,8 +117,7 @@ C_SdNdeDbAddNewProject::~C_SdNdeDbAddNewProject(void) noexcept
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::InitStaticNames(void) const
 {
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import TSP"));
-   this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Extract from openSYDE Target Support Package"));
+   this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Import openSYDE Target Support Package"));
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Properties"));
    this->mpc_Ui->pc_LabelTSP->setText(C_GtGetText::h_GetText("openSYDE Target Support Package"));
    this->mpc_Ui->pc_LabelCreateIn->setText(C_GtGetText::h_GetText("Create In Directory"));
@@ -767,7 +766,7 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init based on specified application
+/*! \brief   Init path and title based on specified application
 
    \param[in] ou32_NodeIndex        Node index
 */
@@ -781,5 +780,11 @@ void C_SdNdeDbAddNewProject::m_Init(const uint32_t ou32_NodeIndex) const
       //Use default
       const QString c_NodePath = C_OscUtils::h_NiceifyStringForFileName(pc_Node->c_Properties.c_Name).c_str();
       this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_NodePath, C_PuiProject::h_GetInstance()->GetFolderPath());
+
+      //Set Title
+      const stw::scl::C_SclString c_NodeName = pc_Node->c_Properties.c_Name;
+      const QString c_QnodeName = static_cast<QString>(c_NodeName.c_str());
+      const QString c_Title = c_QnodeName;
+      this->mrc_ParentDialog.SetTitle(c_Title);
    }
 }

@@ -42,87 +42,22 @@ using namespace stw::opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamOgePubPathVariables::C_CamOgePubPathVariables(QWidget * const opc_Parent) :
-   C_OgePubToolTipBase(opc_Parent),
-   mpc_Menu(new C_OgeMuSections(opc_Parent))
+   C_CamOgePubPathVariablesBase(opc_Parent)
 {
-   QIcon c_Icon = QIcon("://images/IconPathVariables.svg").pixmap(16, 16);
-
    // menu
-   mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("CAN Monitor"));
-   mpc_Menu->addAction(C_GtGetText::h_GetText("CAN Monitor Binary"),
-                       this, &C_CamOgePubPathVariables::m_CanMonitorExeTriggered);
-   mpc_Menu->addAction(C_GtGetText::h_GetText("CAN Monitor Project"),
-                       this, &C_CamOgePubPathVariables::m_CanMonitorProjTriggered);
-   mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("System"));
-   mpc_Menu->addAction(C_GtGetText::h_GetText("User Name"), this, &C_CamOgePubPathVariables::m_UserNameTriggered);
-   mpc_Menu->addAction(C_GtGetText::h_GetText("Computer Name"), this,
-                       &C_CamOgePubPathVariables::m_ComputerNameTriggered);
-   mpc_Menu->setMinimumWidth(140);
-
-   this->setMenu(mpc_Menu);
-
-   // icon
-   c_Icon.addPixmap(QIcon("://images/IconPathVariablesDisabled.svg").pixmap(16, 16), QIcon::Disabled);
-   this->setIcon(c_Icon);
-
-   // tool tip
-   this->SetToolTipInformation(C_GtGetText::h_GetText("Insert Variable"),
-                               C_GtGetText::h_GetText("Use common locations like your project path as variables."));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_CamOgePubPathVariables::~C_CamOgePubPathVariables()
-{
-   delete this->mpc_Menu;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of openSYDE binary menu action.
-
-   Emit signal with variable as string.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamOgePubPathVariables::m_CanMonitorExeTriggered(void)
-{
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_CAN_MONITOR_BIN));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of openSYDE project menu action.
-
-   Emit signal with variable as string.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamOgePubPathVariables::m_CanMonitorProjTriggered(void)
-{
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_CAN_MONITOR_PROJ));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of user name menu action.
-
-   Emit signal with variable as string.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamOgePubPathVariables::m_UserNameTriggered(void)
-{
-   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_USER_NAME.c_str()));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of computer name menu action.
-
-   Emit signal with variable as string.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamOgePubPathVariables::m_ComputerNameTriggered(void)
-{
-   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_COMPUTER_NAME.c_str()));
+   this->m_AddHeading(C_GtGetText::h_GetText("CAN Monitor"));
+   //lint -save -e1938
+   //  we don't create global objects of this class; no race conditions can occur and
+   //  static const is guaranteed preinitialized before main
+   this->m_AddEntry(C_GtGetText::h_GetText("CAN Monitor Binary"), mc_PATH_VARIABLE_CAN_MONITOR_BIN);
+   this->m_AddEntry(C_GtGetText::h_GetText("CAN Monitor Project"), mc_PATH_VARIABLE_CAN_MONITOR_PROJ);
+   this->m_AddHeading(C_GtGetText::h_GetText("System"));
+   this->m_AddEntry(C_GtGetText::h_GetText("User Name"), C_OscUtils::hc_PATH_VARIABLE_USER_NAME.c_str());
+   this->m_AddEntry(C_GtGetText::h_GetText("Computer Name"), C_OscUtils::hc_PATH_VARIABLE_COMPUTER_NAME.c_str());
+   //lint -restore
+   this->m_SetMenuMinWidth(140);
 }

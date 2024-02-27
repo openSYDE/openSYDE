@@ -2288,7 +2288,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
             {
                this->endInsertRows();
             }
-         }
+         } //lint !e429  no memory leak because of the parent and the Qt memory management
          else
          {
             if ((oq_SignalInsert) && (os32_MessageRow >= 0))
@@ -2306,7 +2306,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
                   pc_Parent->AddChild(new C_TblTreSimpleItem());
                }
                opc_Item->AddChild(pc_Parent);
-            }
+            } //lint !e429  no memory leak because of the parent and the Qt memory management
             if ((oq_SignalInsert) && (os32_MessageRow >= 0))
             {
                this->endResetModel();
@@ -2314,7 +2314,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          }
       }
    }
-} //lint !e429  no memory leak because of the parent pc_Dialog and the Qt memory management
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compares one data entry with the search string

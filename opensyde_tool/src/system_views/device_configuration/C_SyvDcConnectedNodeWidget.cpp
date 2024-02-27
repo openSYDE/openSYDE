@@ -24,6 +24,11 @@ using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const int32_t C_SyvDcConnectedNodeWidget::mhs32_HEIGHT = 72;
+const int32_t C_SyvDcConnectedNodeWidget::mhs32_WIDTH = 294;
+
+// Refer ScrollBar.qss
+const int32_t C_SyvDcConnectedNodeWidget::mhs32_SCROLLBAR_WIDTH = 10;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -50,9 +55,9 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
-                                                       const C_SyvDcDeviceInformation & orc_Info,
+                                                       const C_OscDcDeviceInformation & orc_Info,
                                                        const std::map<uint8_t,
-                                                                      C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
+                                                                      C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDcConnectedNodeWidget),
@@ -161,7 +166,7 @@ bool C_SyvDcConnectedNodeWidget::GetDeviceNameValid(void) const
    Sub node ids mapping to node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<uint8_t, C_SyvDcDeviceOldComConfig> C_SyvDcConnectedNodeWidget::GetSubNodeIdsToOldNodeIds(void) const
+std::map<uint8_t, C_OscDcDeviceOldComConfig> C_SyvDcConnectedNodeWidget::GetSubNodeIdsToOldNodeIds(void) const
 {
    return this->mc_SubNodeIdsToOldNodeIds;
 }
@@ -213,8 +218,6 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    QString c_Name;
    QString c_Id;
    QString c_Device;
-   const int32_t s32_HEIGHT = 72;
-   const int32_t s32_WIDTH = 294;
 
    if (this->mc_Info.c_SerialNumber.q_IsValid == true)
    {
@@ -261,21 +264,52 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    }
    this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>("Type: %1").arg(c_Device));
    //Resize
-   this->resize(s32_WIDTH, s32_HEIGHT);
-   this->setMinimumHeight(s32_HEIGHT);
-   this->setMaximumHeight(s32_HEIGHT);
-   this->setMinimumWidth(s32_WIDTH);
-   this->setMaximumWidth(s32_WIDTH);
+   this->resize(mhs32_WIDTH, mhs32_HEIGHT);
+   this->setMinimumHeight(mhs32_HEIGHT);
+   this->setMaximumHeight(mhs32_HEIGHT);
+   this->setMinimumWidth(mhs32_WIDTH);
+   this->setMaximumWidth(mhs32_WIDTH);
    if (this->mpc_ListWidgetItem != NULL)
    {
-      this->mpc_ListWidgetItem->setSizeHint(QSize(s32_WIDTH, s32_HEIGHT));
+      this->mpc_ListWidgetItem->setSizeHint(QSize(mhs32_WIDTH, mhs32_HEIGHT));
    }
    else
    {
       //Adapted for missing borders
-      this->setMinimumWidth(s32_WIDTH);
-      this->setMaximumWidth(s32_WIDTH);
-      this->setMinimumHeight(s32_HEIGHT);
-      this->setMaximumHeight(s32_HEIGHT);
+      this->setMinimumWidth(mhs32_WIDTH);
+      this->setMaximumWidth(mhs32_WIDTH);
+      this->setMinimumHeight(mhs32_HEIGHT);
+      this->setMaximumHeight(mhs32_HEIGHT);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets width of the list item
+
+   \param[in]       os32_WidgetWidth     Width value to be set
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcConnectedNodeWidget::SetWidth(const int32_t os32_WidgetWidth)
+{
+   if (this->mpc_ListWidgetItem != NULL)
+   {
+      this->setMaximumWidth(os32_WidgetWidth - mhs32_SCROLLBAR_WIDTH);
+      this->mpc_ListWidgetItem->setSizeHint(QSize(os32_WidgetWidth - mhs32_SCROLLBAR_WIDTH, mhs32_HEIGHT));
+
+      // this applies the actual change in widget width (checked with .width() method)
+      this->resize(os32_WidgetWidth - mhs32_SCROLLBAR_WIDTH, mhs32_HEIGHT);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get node ID
+
+   \retval   Node ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8_t C_SyvDcConnectedNodeWidget::GetNodeId(void) const
+{
+   const uint8_t u8_Retval = this->mc_Info.u8_NodeId;
+
+   return u8_Retval;
 }

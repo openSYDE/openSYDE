@@ -170,6 +170,17 @@ QString C_SyvDaDashboardWidget::GetName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets current chart tab name
+
+ *     \param[in]  orc_CurrentDashboardTabName   current chart tab name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardWidget::SetCurrentDashboardTabName(const QString & orc_CurrentDashboardTabName) const
+{
+   this->mpc_Content->SetCurrentDashboardName(orc_CurrentDashboardTabName);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the edit mode
 
    \param[in]  oq_Active   Flag for edit mode
@@ -301,4 +312,6 @@ void C_SyvDaDashboardWidget::m_InitChartWidget(void)
 {
    this->mpc_Content = new C_SyvDaChaWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex, this);
    this->mpc_Ui->pc_DrawFrameLayout->addWidget(this->mpc_Content);
+   connect(this->mpc_Content, &C_SyvDaDashboardContentBaseWidget::SigGetCurrentDashboardTabName, this,
+           &C_SyvDaDashboardWidget::SigGetCurrentDashboardTabName);
 }

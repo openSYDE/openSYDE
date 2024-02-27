@@ -908,6 +908,7 @@ QString C_ImpUtil::h_FormatSourceFileInfoForReport(const QString & orc_FilePath,
    \param[in,out]  orc_Windows   All found windows
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e715 false positive: orc_ExeName is referenced in call of std::wcscmp, but somehow PC Lint does not get this
 void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName, std::vector<HWND> & orc_Windows)
 {
    PROCESSENTRY32 c_Entry;

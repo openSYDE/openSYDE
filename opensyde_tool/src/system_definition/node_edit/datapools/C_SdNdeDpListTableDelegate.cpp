@@ -273,7 +273,9 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
       case C_SdNdeDpListTableModel::eCOMMENT:
          if (pc_TextEdit != NULL)
          {
+            const bool q_ALLOWTABCHANGEFOCUS = true;
             pc_TextEdit->setText(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toString());
+            pc_TextEdit->setTabChangesFocus(q_ALLOWTABCHANGEFOCUS);
          }
          break;
       case C_SdNdeDpListTableModel::eVALUE_TYPE:

@@ -19,7 +19,6 @@
 #include <QEvent>
 #include <QSvgRenderer>
 #include <QPainter>
-
 #include "C_CamOgePubProjOp.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -47,7 +46,8 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_CamOgePubProjOp::C_CamOgePubProjOp(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent),
-   mc_SvgIcon(""),
+   mc_SvgIconEnable(""),
+   mc_SvgIconDisable(""),
    mq_IconOnly(false)
 {
 }
@@ -55,12 +55,17 @@ C_CamOgePubProjOp::C_CamOgePubProjOp(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set svg icon.
 
-   \param[in]     orc_Path        Path to svg Icon
+   \param[in]  orc_Path          Path to svg Icon
+   \param[in]  orc_PathDisable   Path to svg Icon in disabled state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgePubProjOp::SetSvg(const QString & orc_Path)
+void C_CamOgePubProjOp::SetSvg(const QString & orc_Path, const QString orc_PathDisable)
 {
-   this->mc_SvgIcon = orc_Path;
+   const QString c_DefaultParameter = "";
+
+   this->mc_SvgIconEnable = orc_Path;
+
+   this->mc_SvgIconDisable = (orc_PathDisable != c_DefaultParameter) ? orc_PathDisable : mc_SvgIconEnable;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,11 +92,14 @@ void C_CamOgePubProjOp::paintEvent(QPaintEvent * const opc_PaintEvent)
    // background & text
    C_OgePubToolTipBase::paintEvent(opc_PaintEvent);
 
-   if (this->mc_SvgIcon != "")
+   if ((this->mc_SvgIconEnable != "") && (this->mc_SvgIconDisable != ""))
    {
       QPainter c_Painter(this);
       QRect c_Rect;
-      QSvgRenderer c_Renderer(this->mc_SvgIcon);
+      QSvgRenderer c_Renderer;
+
+      const QString c_RenderIconPath = (this->isEnabled()) ? mc_SvgIconEnable : mc_SvgIconDisable;
+      c_Renderer.load(c_RenderIconPath);
 
       if (this->mq_IconOnly == true)
       {

@@ -28,6 +28,10 @@ opensyde_core_skip_modules += opensyde_core_skip_imports
 include(../libs/opensyde_core/opensyde_core.pri)
 
 SOURCES += \
+    ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubPathVariablesBase.cpp \
+    ../src/can_monitor/can_monitor_gui_elements/widget/C_CamOgeWiSettingsBase.cpp \
+    ../src/can_monitor/can_monitor_settings/C_CamMosDllWidgetLogic.cpp \
+    ../src/can_monitor/util/C_CamUtiGeneric.cpp \
     ../src/gettext/C_GtGetText.cpp \
     ../src/util/C_Uti.cpp \
     ../src/system_views/communication/C_SyvComMessageMonitor.cpp \
@@ -261,6 +265,10 @@ SOURCES += ../libs/dbc_driver_library/src/Vector/DBC/Scanner.cpp
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.hpp
 
 HEADERS  += \
+    ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubPathVariablesBase.hpp \
+    ../src/can_monitor/can_monitor_gui_elements/widget/C_CamOgeWiSettingsBase.hpp \
+    ../src/can_monitor/can_monitor_settings/C_CamMosDllWidgetLogic.hpp \
+    ../src/can_monitor/util/C_CamUtiGeneric.hpp \
     ../src/gettext/C_GtGetText.hpp \
     ../src/util/C_Uti.hpp \
     ../src/system_views/communication/C_SyvComMessageMonitor.hpp \

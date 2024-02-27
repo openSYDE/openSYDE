@@ -134,11 +134,16 @@ void C_SdNdeNodePropertiesTabContentWidget::ShowApplication(const uint32_t ou32_
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTsp()
+
+   \retval   true   Cancel
+   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesTabContentWidget::AddFromTsp()
+bool C_SdNdeNodePropertiesTabContentWidget::AddFromTsp(void)
 {
-   this->mpc_Ui->pc_WidgetApplications->AddFromTsp();
+   const bool q_Cancel = this->mpc_Ui->pc_WidgetApplications->AddFromTsp();
+
+   return q_Cancel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

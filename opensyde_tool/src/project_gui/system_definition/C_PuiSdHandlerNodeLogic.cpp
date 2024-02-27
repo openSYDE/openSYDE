@@ -1992,6 +1992,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdSharedDatapools & C_PuiSdHandlerNodeLogic::GetSharedDatapools(void)
 {
+   //lint -e{1536} it is intended to expose a private member to avoid copies of rather big data structures
    return this->mc_SharedDatapools;
 }
 

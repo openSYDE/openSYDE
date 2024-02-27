@@ -180,7 +180,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetCustomDll" native="true">
+         <widget class="QWidget" name="pc_WidgetCustomDll" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <property name="spacing">
             <number>0</number>
@@ -221,7 +221,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="stw::opensyde_gui_elements::C_CamOgeLeFilePath" name="pc_LineEditCustomDllPath">
+            <widget class="QLineEdit" name="pc_LineEditCustomDllPath">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -237,7 +237,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw::opensyde_gui_elements::C_CamOgePubPathVariables" name="pc_PushButtonVariables">
+            <widget class="QPushButton" name="pc_PushButtonVariables">
              <property name="minimumSize">
               <size>
                <width>30</width>
@@ -321,6 +321,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.hpp</header>
@@ -331,11 +336,6 @@
    <extends>QWidget</extends>
    <header>C_CamOgeWiSettingSubSection.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
@@ -351,22 +351,6 @@
    <class>stw::opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
    <extends>QPushButton</extends>
    <header>C_CamOgePubSettingsAdd.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
-   <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_CamOgePubPathVariables</class>
-   <extends>QPushButton</extends>
-   <header>C_CamOgePubPathVariables.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_CamOgeLeFilePath</class>
-   <extends>QLineEdit</extends>
-   <header>C_CamOgeLeFilePath.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

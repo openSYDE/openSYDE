@@ -20,7 +20,8 @@ How to build:
 2. Open a project located at .../pjt/*.pro
 2.1 openSYDE.pro:             Project for main openSYDE GUI Client
 2.2 openSYDE_CAN_Monitor.pro: Project for openSYDE GUI CAN Monitor
-2.3 openSYDE_Test.pro:        Project for openSYDE Unit Test as console application for testing openSYDE GUI specific modules
+2.3 SYDEflash.pro.pro:        Project for SYDEflash utility tool
+2.4 openSYDE_Test.pro:        Project for openSYDE Unit Test as console application for testing openSYDE GUI specific modules
 3. Select the Qt kit
 4. Go to the Projects view
 5. Select the Build button below your kit

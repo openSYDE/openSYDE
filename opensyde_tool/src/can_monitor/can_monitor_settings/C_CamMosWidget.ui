@@ -169,7 +169,7 @@
        <widget class="stw::opensyde_gui::C_CamMosLoggingWidget" name="pc_WiLogging" native="true"/>
       </item>
       <item>
-       <widget class="stw::opensyde_gui::C_CamMosDllWidget" name="pc_WiDllConfig" native="true"/>
+       <widget class="stw::opensyde_gui::C_CamMosDllWidgetLogic" name="pc_WiDllConfig" native="true"/>
       </item>
      </layout>
     </widget>
@@ -215,12 +215,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui::C_CamMosDllWidget</class>
-   <extends>QWidget</extends>
-   <header>C_CamMosDllWidget.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
    <extends>QPushButton</extends>
    <header>C_CamOgePubSettingsAdd.hpp</header>
@@ -229,6 +223,12 @@
    <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
    <header>C_OgeWiOnlyBackground.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_CamMosDllWidgetLogic</class>
+   <extends>QWidget</extends>
+   <header>C_CamMosDllWidgetLogic.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

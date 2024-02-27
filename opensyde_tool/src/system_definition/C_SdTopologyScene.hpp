@@ -34,6 +34,7 @@
 #include "C_GiTextElementBus.hpp"
 #include "C_SdTopologyDataSnapshot.hpp"
 #include "C_PuiBsTemporaryDataId.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -97,6 +98,7 @@ Q_SIGNALS:
                       const bool oq_ChangeUseCase = false);
    void SigNodeDeleted(const uint32_t ou32_Index);
    void SigBusDeleted(const uint32_t ou32_Index);
+   bool SigOpenTsp(const scl::C_SclString & orc_NodeName);
    void SigErrorChange(void);
 
 protected:
@@ -249,6 +251,15 @@ private:
                        const QString & orc_MainDevice) const;
    void m_InitNodeComIfSettings(stw::opensyde_core::C_OscNode & orc_OscNode, const QString & orc_NodeType,
                                 const QString & orc_MainDevice) const;
+
+   bool m_ActivateTspShortcut (const scl::C_SclString & orc_NodeName, const uint32_t & oru32_SubNodeIndex);
+   stw::opensyde_gui_elements::C_OgeWiCustomMessage * m_CreateTspShortcutDialog(
+      const stw::scl::C_SclString & orc_NodeName);
+
+   void m_AddTspForAllSubNodes(const uint32_t & oru32_SubDevicesSize, const uint32_t & oru32_OriginalOscNodeSize,
+                               const scl::C_SclString & orc_NodeName);
+   bool m_ShowShortcutTspOption(const opensyde_core::C_OscDeviceDefinition * const opc_MainDevice,
+                                const uint32_t & oru32_OriginalOscNodeSize, const uint32_t & oru32_SubDevicesSize);
 
    C_GiSvgGraphicsItem * mpc_EmptyConnectItem;
    C_GiNode * mpc_NodeConnectItem;

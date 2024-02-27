@@ -14,17 +14,17 @@
 #include <QColor>
 #include <QTimer>
 #include <vector>
+#include <QFile>
+#include <QTextStream>
+#include <algorithm>
 #include <qcustomplot.h>
 
 #include "stwtypes.hpp"
-
 #include "C_PuiSvDbNodeDataPoolListElementId.hpp"
 #include "C_PuiSvDbDataElementScaling.hpp"
 #include "C_PuiSvDbDataElementDisplayFormatterConfig.hpp"
-
 #include "C_PuiSvDbTabChart.hpp"
 #include "C_SyvDaChaPlot.hpp"
-
 #include "C_OgeMuTabChartFit.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -95,6 +95,7 @@ public:
 
    void SetManualOperationPossible(const bool oq_Possible);
    void ManualReadFinished(void);
+   void SetCurrentDashboardTabName(const QString & orc_CurrentDashboardTabName);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -106,6 +107,7 @@ Q_SIGNALS:
 
    void SigManualReadTriggered(void);
    void SigManualReadAbortTriggered(void);
+   void SigGetCurrentDashboardTabName(void);
 
 protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;
@@ -275,6 +277,13 @@ private:
                                                                                                               4> > & orc_ScreenState);
    void m_SaveState(bool & orq_IsPaused, int32_t & ors32_SplitterLeftWidth, bool & orq_AreSamplePointsShown,
                     std::vector<std::array<float64_t, 4> > & orc_ScreenState);
+   void m_ExtractDataToCsv(void);
+   void m_SetSaveLocationToCsv(void);
+   QString m_SaveCsvAs(void) const;
+
+   QFile mc_File;
+   QTextStream mc_Out;
+   QString mc_CurrentDashboardTabName;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

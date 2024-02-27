@@ -170,7 +170,7 @@ void C_OgePopUpDialog::SetTitle(const QString & orc_Str)
 {
    this->mpc_Ui->pc_LabelTitle->setText(orc_Str);
    mc_Title = orc_Str;
-   m_SetWindowTitle();
+   m_SetWindowTitle(orc_Str);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -184,7 +184,7 @@ void C_OgePopUpDialog::SetSubTitle(const QString & orc_Str)
 {
    this->mpc_Ui->pc_LabelSubTitle->setText(orc_Str);
    mc_Subtitle = orc_Str;
-   m_SetWindowTitle();
+   m_SetWindowTitle(orc_Str);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -192,11 +192,21 @@ void C_OgePopUpDialog::SetSubTitle(const QString & orc_Str)
 
    Set the title of the little window shown as preview when hovering
    over the windows task bar.
+
+   \param[in]   orc_EmptySubtitle   an empty string is given when the dialog shall have no subtitle
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePopUpDialog::m_SetWindowTitle()
+void C_OgePopUpDialog::m_SetWindowTitle(const QString & orc_EmptySubtitle)
 {
-   this->setWindowTitle("openSYDE - " + mc_Title + " - " + mc_Subtitle);
+   if (orc_EmptySubtitle.isEmpty())
+   {
+      this->mpc_Ui->pc_LabelTitleSpacer->setVisible(false);
+      this->setWindowTitle("openSYDE" + mc_Title);
+   }
+   else
+   {
+      this->setWindowTitle("openSYDE - " + mc_Title + " - " + mc_Subtitle);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

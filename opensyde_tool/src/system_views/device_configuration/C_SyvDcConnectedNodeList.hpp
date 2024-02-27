@@ -15,7 +15,7 @@
 #include <vector>
 #include <QListWidget>
 #include "stwtypes.hpp"
-#include "C_SyvDcSequences.hpp"
+#include "C_OscDcDeviceInformation.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -34,9 +34,14 @@ class C_SyvDcConnectedNodeList :
 public:
    C_SyvDcConnectedNodeList(QWidget * const opc_Parent = NULL);
 
-   void SetData(const std::vector<stw::opensyde_gui_logic::C_SyvDcDeviceInformation> & orc_Infos);
+   void SetData(const std::vector<stw::opensyde_core::C_OscDcDeviceInformation> & orc_Infos);
    void EnableSerialNumber(const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber) const;
    void DisableSerialNumber(const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber) const;
+
+   void SetListItemWidth(const int32_t os32_WidgetWidth);
+   void SetDragDropMode(const bool oq_Enable);
+   uint8_t GetSelectedNodeId(void) const;
+   void SelectRow(const int32_t os32_RowIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -52,7 +57,7 @@ protected:
 
 private:
    bool mq_GridSizeSet;
-   std::vector<stw::opensyde_gui_logic::C_SyvDcDeviceInformation> mc_Data;
+   std::vector<stw::opensyde_core::C_OscDcDeviceInformation> mc_Data;
    static const QString mhc_MIME_DATA;
    static const QString mhc_MIME_DATA_EXT_FORMAT;
    static const QString mhc_MIME_DATA_MANUFACTURER_FORMAT;
@@ -61,8 +66,8 @@ private:
    static const QString mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS;
 
    void m_Init(void);
-   void m_AppendNode(const stw::opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info, const std::map<uint8_t,
-                                                                                                        stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
+   void m_AppendNode(const stw::opensyde_core::C_OscDcDeviceInformation & orc_Info, const std::map<uint8_t,
+                                                                                                   stw::opensyde_core::C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
 
    void m_ScrollBarRangeChangedVer(const int32_t os32_Min, const int32_t os32_Max) const;
 };

@@ -31,6 +31,7 @@
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_SdNdeDpUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
 #include "C_SdBueUnoBusProtNodeConnectCommand.hpp"
 #include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.hpp"
 #include "C_SdBueUnoBusProtNodeDisconnectCommand.hpp"
@@ -524,7 +525,7 @@ uint8_t C_SdUtil::h_GetNodeIdMaximum(const uint32_t & oru32_NodeIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get selected node interface
+/*! \brief Get selected node interface
 
    \param[in]  orc_ComboBox      Combo with node interfaces
    \param[in]  oru32_NodeIndex   Corresponding node index
@@ -567,16 +568,15 @@ uint32_t C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize the combo box for one interface
+/*! \brief  Initiate combobox according to selected bus.
 
-   \param[in]      orc_Node                  Node
-   \param[in]      ore_BusType               Bus type
-   \param[in,out]  opc_ComboBox              ComboBox for using the node interfaces
-   \param[in]      ors32_SpecialInterface    Special interface to allow and use as default, even if already connected
+   \param[in]   orc_Node                 OSC Node
+   \param[in]   ore_BusType              Bus type
+   \param[in]   opc_ComboBox             Combobox
+   \param[in]   ors32_SpecialInterface   Special interface
 
    \return
-   True  At least one radio button is intractable
-   False No interaction possible
+   bool
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OscNode & orc_Node, const C_OscSystemBus::E_Type & ore_BusType,
@@ -588,41 +588,60 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OscNode & orc_Node, const C_O
 
    opc_ComboBox->clear();
 
+   const C_OscDeviceDefinition * const pc_DevDef = orc_Node.pc_DeviceDefinition;
+   const C_OscNodeProperties c_NodeProperties = orc_Node.c_Properties;
+
+   mh_WriteEtherCanLogMessage(&c_NodeProperties, pc_DevDef);
+
+   const std::vector<C_OscNodeComInterfaceSettings> c_EthernetInterfaces = c_NodeProperties.GetEthernetInterfaces();
+   const std::vector<C_OscNodeComInterfaceSettings> c_CanInterfaces = c_NodeProperties.GetCanInterfaces();
+   const std::vector<C_OscNodeComInterfaceSettings> & rc_Interfaces =
+      (ore_BusType == C_OscSystemBus::E_Type::eETHERNET) ? c_EthernetInterfaces : c_CanInterfaces;
+
+   const uint32_t u32_NumBusses = (ore_BusType == C_OscSystemBus::E_Type::eETHERNET) ?
+                                  static_cast<uint32_t> (pc_DevDef->u8_NumEthernetBusses) :
+                                  static_cast<uint32_t> (pc_DevDef->u8_NumCanBusses);
+
+   //original(when the project has been saved) devdef size of the specific element
+   uint32_t u32_InterfaceSize = (ore_BusType == C_OscSystemBus::E_Type::eETHERNET) ?
+                                c_EthernetInterfaces.size() :
+                                c_CanInterfaces.size();
+
+   u32_InterfaceSize = (u32_NumBusses <= u32_InterfaceSize) ? u32_NumBusses : u32_InterfaceSize;
+
    // Fill the combo box
-   for (u32_Counter = 0U; u32_Counter < orc_Node.c_Properties.c_ComInterfaces.size(); ++u32_Counter)
+   for (u32_Counter = 0U; u32_Counter < u32_InterfaceSize; ++u32_Counter)
    {
-      const C_OscNodeComInterfaceSettings & rc_Interface = orc_Node.c_Properties.c_ComInterfaces[u32_Counter];
+      const C_OscNodeComInterfaceSettings & rc_Interface = rc_Interfaces[u32_Counter];
 
-      if (rc_Interface.e_InterfaceType == ore_BusType)
+      const QString c_Name = C_PuiSdUtil::h_GetInterfaceName(
+         ore_BusType, rc_Interface.u8_InterfaceNumber);
+
+      if (rc_Interface.GetBusConnected())
       {
-         const QString c_Name = C_PuiSdUtil::h_GetInterfaceName(ore_BusType, rc_Interface.u8_InterfaceNumber);
-
-         if (rc_Interface.GetBusConnected() == true)
+         if (ors32_SpecialInterface >= 0)
          {
-            if (ors32_SpecialInterface >= 0)
+            if (static_cast<uint8_t>(ors32_SpecialInterface) == rc_Interface.u8_InterfaceNumber)
             {
-               if (static_cast<uint8_t>(ors32_SpecialInterface) == rc_Interface.u8_InterfaceNumber)
-               {
-                  // The already used interface for the bus
-                  opc_ComboBox->addItem(c_Name);
-                  opc_ComboBox->setCurrentIndex(opc_ComboBox->findText(c_Name));
+               // The already used interface for the bus
+               opc_ComboBox->addItem(c_Name);
+               opc_ComboBox->setCurrentIndex(opc_ComboBox->findText(c_Name));
 
-                  q_Retval = true;
-               }
+               q_Retval = true;
             }
          }
-         else
-         {
-            q_Retval = true;
+      }
+      else
+      {
+         q_Retval = true;
 
-            opc_ComboBox->addItem(c_Name);
-            if (ors32_SpecialInterface < 0)
+         opc_ComboBox->addItem(c_Name);
+         if (ors32_SpecialInterface < 0)
+         {
+            if (q_Chosen == false)
             {
-               if (q_Chosen == false)
-               {
-                  q_Chosen = true;
-                  opc_ComboBox->setCurrentIndex(opc_ComboBox->findText(c_Name));
-               }
+               q_Chosen = true;
+               opc_ComboBox->setCurrentIndex(opc_ComboBox->findText(c_Name));
             }
          }
       }
@@ -2504,4 +2523,42 @@ QString C_SdUtil::h_GetCanOpenSignalObjectIndex(const uint32_t ou32_ObjectIndex,
    const QString c_Retval = static_cast<QString>("%1sub%2").arg(c_ObjectIndexString).arg(c_ObjectSubIndexString);
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write ethernet and can messages in the log file if the number of interfaces differs from the original
+ *           stored value
+
+   \param[in]      opc_NodeProperties        Stored interfaces after storing the program
+   \param[in]      opc_DevDef                Node properties stored in Device definition file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::mh_WriteEtherCanLogMessage(const C_OscNodeProperties * const opc_NodeProperties,
+                                          const C_OscDeviceDefinition * const opc_DevDef)
+{
+   if (static_cast<uint32_t> (opc_DevDef->u8_NumEthernetBusses) !=
+       static_cast<uint32_t> (opc_NodeProperties->GetEthernetInterfaces().size()))
+   {
+      const stw::scl::C_SclString c_Activity = "Device definition deviation";
+
+      const stw::scl::C_SclString c_Message =
+         "Device definition deviation between original number of ethernet interfaces and new stored ethernet interfaces: "
+         +
+         stw::scl::C_SclString::IntToStr(opc_DevDef->u8_NumEthernetBusses) + "; " + stw::scl::C_SclString::IntToStr(
+            opc_NodeProperties->GetEthernetInterfaces().size());
+
+      osc_write_log_warning(c_Activity, c_Message);
+   }
+   if (static_cast<uint32_t> (opc_DevDef->u8_NumCanBusses) !=
+       static_cast<uint32_t> (opc_NodeProperties->GetCanInterfaces().size()))
+   {
+      const stw::scl::C_SclString c_Activity = "Device definition deviation";
+
+      const stw::scl::C_SclString c_Message =
+         "Device definition deviation between original number of can interfaces and new stored can interfaces: " +
+         stw::scl::C_SclString::IntToStr(opc_DevDef->u8_NumCanBusses) + "; " + stw::scl::C_SclString::IntToStr(
+            opc_NodeProperties->GetCanInterfaces().size());
+
+      osc_write_log_warning(c_Activity, c_Message);
+   }
 }

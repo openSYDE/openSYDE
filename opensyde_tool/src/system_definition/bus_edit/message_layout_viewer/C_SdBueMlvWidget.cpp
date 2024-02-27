@@ -375,7 +375,7 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OscCanMessageIdentifica
                {
                   QString c_ComboBoxEntry = c_SignalName + QString::number(*c_ItValue);
                   this->mpc_Ui->pc_ComboBoxMultiplexer->addItem(c_ComboBoxEntry);
-                  this->mc_MultiplexerValues.insert(std::pair<QString, uint16_t>(c_ComboBoxEntry, *c_ItValue));
+                  this->mc_MultiplexerValues.emplace(std::pair<QString, uint16_t>(c_ComboBoxEntry, *c_ItValue));
                }
 
                this->mpc_Ui->pc_ComboBoxMultiplexer->setEnabled(true);

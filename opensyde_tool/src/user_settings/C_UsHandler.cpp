@@ -138,6 +138,7 @@ void C_UsHandler::SetDefault(void)
    this->mc_RecentColors.fill(QColor(255, 255, 255, 255), 6);
 
    ms32_ScreenshotGifSucessTimeout = 3000;
+   mq_ActiveTspShortcut = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -402,6 +403,21 @@ int32_t C_UsHandler::GetNextRecentColorButtonNumber(void) const
 int32_t C_UsHandler::GetScreenshotGifSucessTimeout() const
 {
    return this->ms32_ScreenshotGifSucessTimeout;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get TSP shortcut activation
+
+   \return
+   bool
+
+   \retval   true   TSP shortcut dialog will be opened after adding a new node
+   \retval   false   TSP shortcut dialog will not appear after adding a new node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsHandler::GetTspShortcutActive() const
+{
+   return this->mq_ActiveTspShortcut;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -682,6 +698,18 @@ QString C_UsHandler::GetLastKnownRamViewProjectPath() const
 QString C_UsHandler::GetLastKnownJ1939CatalogPath() const
 {
    return this->mc_LastKnownJ1939CatalogPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known CSV Export file path
+
+   \return
+   Last known CSV Export file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownCsvExportPath() const
+{
+   return this->mc_LastKnownServiceProjectPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1099,6 +1127,17 @@ void C_UsHandler::SetNextRecentColorButtonNumber(const int32_t os32_NextRecentCo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set TSP shortcut activation
+
+   \param[in]       oq_Active     activate tsp shortcut dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetTspShortcutActive(const bool oq_Active)
+{
+   mq_ActiveTspShortcut = oq_Active;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add path & file to recent projects list
 
    \param[in]  orc_Str  Path and file name
@@ -1320,6 +1359,17 @@ void C_UsHandler::SetLastKnownRamViewProjectPath(const QString & orc_NewPath)
 void C_UsHandler::SetLastKnownJ1939CatalogPath(const QString & orc_NewPath)
 {
    this->mc_LastKnownJ1939CatalogPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known CSV Export file path
+
+   \param[in]  orc_NewPath    CSV Export file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownCsvExportPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownServiceProjectPath = orc_NewPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

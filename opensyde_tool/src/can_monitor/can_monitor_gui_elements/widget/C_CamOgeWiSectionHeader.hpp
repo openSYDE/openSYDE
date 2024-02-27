@@ -42,7 +42,7 @@ public:
    };
 
    explicit C_CamOgeWiSectionHeader(QWidget * const opc_Parent = NULL);
-   virtual ~C_CamOgeWiSectionHeader(void);
+   ~C_CamOgeWiSectionHeader(void) override;
    void SetIconType(const E_ButtonType & ore_ButtonType);
    void SetOpen(const bool & orq_IsOpen) const;
    void SetTitle(const QString & orc_Title) const;

@@ -31,7 +31,7 @@ public:
    enum E_Columns
    {
       ePGN_SPN = 0,
-      eCAN_ID,
+      eCAN_ID, // future use
       eNAME,
       eCOMMENT
    };
@@ -57,8 +57,8 @@ public:
    uint32_t GetCheckedItemCount(void) const override;
    void GetSelectedMessages(std::vector<C_CieConverter::C_CieNodeMessage> & orc_SelectedMessages) const;
    void SelectAllParentItems(void);
-   void SelectFilteredParentItems(const QStringList & orc_FilteredItems);
    void UnselectAllParentItems(void);
+   void SelectFilteredParentItems(const QModelIndexList & orc_FilteredItems);
 
 private:
    class C_SignalTableData

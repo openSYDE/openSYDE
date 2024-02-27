@@ -828,6 +828,12 @@ p, li { white-space: pre-wrap; }
          </item>
          <item row="3" column="4">
           <widget class="QWidget" name="pc_WidgetDlcSpinBox" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <property name="spacing">
              <number>0</number>
@@ -846,6 +852,12 @@ p, li { white-space: pre-wrap; }
             </property>
             <item>
              <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxDlc">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>100</width>

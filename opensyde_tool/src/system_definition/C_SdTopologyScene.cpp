@@ -49,6 +49,7 @@
 #include "C_SdManTopologyBusConnectorReconnectManager.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_Uti.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -169,6 +170,11 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
 
    if (pc_MainDevice != NULL)
    {
+      const uint32_t u32_SubDevicesSize = pc_MainDevice->c_SubDevices.size();
+      const uint32_t u32_OriginalOscNodeSize = C_PuiSdHandler::h_GetInstance()->GetOscNodesSize();
+      const bool q_TspShortcutActive = C_UsHandler::h_GetInstance()->GetTspShortcutActive();
+      bool q_UseShortcut = false;
+
       stw::opensyde_gui_logic::C_PuiSdNode c_UiNode;
       C_GiNode * pc_Item;
       int32_t s32_Index;
@@ -189,7 +195,7 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
 
       //UI
       c_UiNode.f64_ZetOrder = this->GetHighestUsedZetValueList(this->items()) + 1.0;
-      if (pc_MainDevice->c_SubDevices.size() == 1UL)
+      if (u32_SubDevicesSize == 1UL)
       {
          stw::opensyde_core::C_OscNode c_OscNode;
          //Object
@@ -201,19 +207,23 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
          std::vector<stw::opensyde_core::C_OscNode> c_OscNodes;
          std::vector<QString> c_OscNodeNames;
          std::vector<stw::opensyde_gui_logic::C_PuiSdNode> c_UiNodes;
-         for (uint32_t u32_ItSubDevice = 0UL; u32_ItSubDevice < pc_MainDevice->c_SubDevices.size(); ++u32_ItSubDevice)
+
+         for (uint32_t u32_ItSubDevice = 0UL; u32_ItSubDevice < u32_SubDevicesSize; ++u32_ItSubDevice)
          {
+            const stw::scl::C_SclString & rc_Title = pc_MainDevice->c_SubDevices[u32_ItSubDevice].c_SubDeviceName;
             stw::opensyde_core::C_OscNode c_OscNode;
             //Object
             this->m_InitNodeData(c_OscNode,
-                                 pc_MainDevice->c_SubDevices[u32_ItSubDevice].c_SubDeviceName.c_str(), orc_NodeType);
+                                 rc_Title.c_str(), orc_NodeType);
             c_OscNodes.push_back(c_OscNode);
-            c_OscNodeNames.emplace_back(pc_MainDevice->c_SubDevices[u32_ItSubDevice].c_SubDeviceName.c_str());
+            c_OscNodeNames.emplace_back(rc_Title.c_str());
             c_UiNodes.push_back(c_UiNode);
          }
+
          s32_Index = C_PuiSdHandler::h_GetInstance()->AddNodeSquadAndSort(c_OscNodes, c_UiNodes, c_OscNodeNames,
                                                                           orc_NodeType);
       }
+
       this->m_SyncIndex(C_GiNode::eNODE, s32_Index, C_GiNode::eADD);
 
       //Graphics
@@ -223,8 +233,19 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
 
       m_AddNodeToScene(pc_Item);
 
+      //TSP shortcut -> no 3rd Party TSP Shortcut
+      if (((pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeEthernet == true) ||
+           (pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeCan == true) ||
+           (pc_MainDevice->c_SubDevices[0].q_FlashloaderStwCan == true)) && q_TspShortcutActive)
+      {
+         q_UseShortcut = m_ShowShortcutTspOption(pc_MainDevice, u32_OriginalOscNodeSize, u32_SubDevicesSize);
+      }
+
       //Selection
-      m_UpdateSelection(pc_Item);
+      if (!q_UseShortcut)
+      {
+         m_UpdateSelection(pc_Item); //scene is available and visible. If not DON'T USE
+      }
 
       Q_EMIT this->SigNodeChanged(s32_Index);
    }
@@ -2066,8 +2087,11 @@ void C_SdTopologyScene::m_SelectionChanged(void)
 
       //Prepare selection
       //deactivate arrow cursor button selection
-      this->mpc_ArrowCursorButton->setSelected(false);
-      this->mpc_ArrowCursorButton->setVisible(false);
+      if (this->mpc_ArrowCursorButton != NULL)
+      {
+         this->mpc_ArrowCursorButton->setSelected(false);
+         this->mpc_ArrowCursorButton->setVisible(false);
+      }
       if (c_SelectedItems.size() > 1)
       {
          for (c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end(); ++c_ItItem)
@@ -3802,17 +3826,6 @@ void C_SdTopologyScene::m_InitNodeData(C_OscNode & orc_OscNode, const QString & 
          }
          //---Init COM IF Settings (BEFORE initial datablock)
          this->m_InitNodeComIfSettings(orc_OscNode, orc_NodeType, orc_MainDevice);
-         //Handle initial datablock (if necessary)
-         if ((orc_OscNode.pc_DeviceDefinition->c_SubDevices[orc_OscNode.u32_SubDeviceIndex].q_ProgrammingSupport ==
-              false) &&
-             (orc_OscNode.c_Properties.e_FlashLoader != C_OscNodeProperties::eFL_NONE))
-         {
-            C_OscNodeApplication c_Appl;
-            c_Appl.c_Name = C_GtGetText::h_GetText("Firmware");
-            c_Appl.e_Type = C_OscNodeApplication::eBINARY;
-            c_Appl.c_Comment = C_GtGetText::h_GetText("Automatically generated Data Block.");
-            orc_OscNode.c_Applications.push_back(c_Appl);
-         }
       }
    }
 }
@@ -3902,4 +3915,132 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OscNode & orc_OscNode, const Q
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Activate TSP shortcut
+
+   \param[in]      orc_NodeName     Node name
+   \param[in]      oru32_SubNodeIndex   Node Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool stw::opensyde_gui::C_SdTopologyScene::m_ActivateTspShortcut(const scl::C_SclString & orc_NodeName,
+                                                                 const uint32_t & oru32_SubNodeIndex)
+{
+   const uint32_t u32_FLAG = mu32_FLAG_OPEN_PROPERTIES;
+   const QString c_SUB_NODE_TITLE = static_cast<QString>(orc_NodeName.c_str());
+
+   Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, oru32_SubNodeIndex,
+                              c_SUB_NODE_TITLE,  "", u32_FLAG);
+
+   const bool q_Cancel = Q_EMIT (SigOpenTsp(orc_NodeName));
+
+   return q_Cancel;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create TSP shortcut dialog
+
+   \param[in]       orc_NodeName     Node name
+
+   \return
+   C_OgeWiCustomMessage
+
+   \retval      TSP shortcut dialog
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OgeWiCustomMessage * C_SdTopologyScene::m_CreateTspShortcutDialog(const stw::scl::C_SclString & orc_NodeName)
+{
+   const stw::scl::C_SclString c_TitleString = orc_NodeName;
+   const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
+   const stw::scl::C_SclString c_MessageBoxText = "Do you want to import openSYDE Target Support Package file(s) to " +
+                                                  c_TitleString  + "?";
+
+   QGraphicsView * const pc_View = this->views().at(0);
+   C_OgeWiCustomMessage * const pc_MessageBox = new C_OgeWiCustomMessage(pc_View,
+                                                                         C_OgeWiCustomMessage::E_Type::eQUESTION);
+
+   pc_MessageBox->SetHeading(C_GtGetText::h_GetText(c_MessageBoxTitle.c_str()));
+   pc_MessageBox->SetDescription(C_GtGetText::h_GetText(c_MessageBoxText.c_str()));
+   pc_MessageBox->SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+   pc_MessageBox->SetNoButtonText(C_GtGetText::h_GetText("Skip"));
+   pc_MessageBox->SetCustomMinHeight(180, 180);
+   pc_MessageBox->SetCustomMinWidth(650);
+
+   return pc_MessageBox;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  TSP Subnode Selection
+
+   Checks for sub nodes and uses them for TSP import
+
+   \param[in]      oru32_SubDevicesSize        SubDevices size
+   \param[in]      u32_OriginalOscNodeSize     Original OSC Node size
+   \param[in]      c_NodeName                  Node name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyScene::m_AddTspForAllSubNodes(const uint32_t & oru32_SubDevicesSize,
+                                               const uint32_t & oru32_OriginalOscNodeSize,
+                                               const stw::scl::C_SclString & orc_NodeName)
+{
+   const uint32_t u32_NodeSubs = oru32_OriginalOscNodeSize + oru32_SubDevicesSize;
+
+   for (uint32_t u32_CurrentNodeIndex = 0; u32_NodeSubs > (oru32_OriginalOscNodeSize + u32_CurrentNodeIndex);
+        ++u32_CurrentNodeIndex)
+   {
+      const uint32_t u32_SubNodeIndex = oru32_OriginalOscNodeSize + u32_CurrentNodeIndex;
+
+      const bool q_Cancel = m_ActivateTspShortcut(orc_NodeName, u32_SubNodeIndex);
+
+      if (q_Cancel)
+      {
+         break;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show TSP shortcut option
+kv
+   \param[in]      opc_MainDevice              main osc device
+   \param[in]      u32_OriginalOscNodeSize     Original OSC Node size
+   \param[in]      u32_SubDevicesSize          SubDevices size
+
+   \retval true     Use TSP Shortcut assistance
+   \retval false    Not use TSP shortcut assistance
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdTopologyScene::m_ShowShortcutTspOption(const C_OscDeviceDefinition * const opc_MainDevice,
+                                                const uint32_t & oru32_OriginalOscNodeSize,
+                                                const uint32_t & oru32_SubDevicesSize)
+{
+   bool q_UseShortcut = false;
+   const stw::scl::C_SclString c_NodeName = opc_MainDevice->c_DeviceName;
+
+   const stw::scl::C_SclString c_TitleString = c_NodeName;
+   const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
+   const stw::scl::C_SclString c_MessageBoxText = "Do you want to import openSYDE Target Support Package file(s) to " +
+                                                  c_TitleString  + "?";
+
+   QGraphicsView * const pc_View = this->views().at(0);
+   C_OgeWiCustomMessage pc_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
+
+   pc_MessageBox.SetHeading(C_GtGetText::h_GetText(c_MessageBoxTitle.c_str()));
+   pc_MessageBox.SetDescription(C_GtGetText::h_GetText(c_MessageBoxText.c_str()));
+   pc_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+   pc_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Skip"));
+   pc_MessageBox.SetCustomMinHeight(180, 180);
+   pc_MessageBox.SetCustomMinWidth(650);
+
+   const C_OgeWiCustomMessage::E_Outputs e_Output = pc_MessageBox.Execute();
+
+   if (e_Output == C_OgeWiCustomMessage::eOK)
+   {
+      q_UseShortcut = true;
+      m_AddTspForAllSubNodes(oru32_SubDevicesSize, oru32_OriginalOscNodeSize, c_NodeName);
+   }
+
+   return q_UseShortcut;
 }

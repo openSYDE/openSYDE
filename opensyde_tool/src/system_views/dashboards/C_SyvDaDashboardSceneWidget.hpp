@@ -54,6 +54,7 @@ public:
    void HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) override;
 
    void SetFocus(void) const override;
+   void SetCurrentDashboardName(const QString & orc_CurrentDashboardTabName) override;
 
 protected:
    void showEvent(QShowEvent * const opc_Event) override;

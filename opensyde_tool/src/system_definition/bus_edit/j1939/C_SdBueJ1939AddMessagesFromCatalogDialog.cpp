@@ -109,8 +109,6 @@ C_SdBueJ1939AddMessagesFromCatalogDialog::C_SdBueJ1939AddMessagesFromCatalogDial
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnModeChanged);
    connect(this->mpc_Ui->pc_TreeView, &C_SdBueJ1939AddMessagesFromCatalogTreeView::SigSelectionChanged, this,
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateSelection);
-   connect(this->mpc_Ui->pc_TreeView, &C_SdBueJ1939AddMessagesFromCatalogTreeView::SigAccept, this,
-           &C_SdBueJ1939AddMessagesFromCatalogDialog::m_AddClicked);
    connect(this->mpc_Ui->pc_LineEditMessageFilter, &QLineEdit::textChanged, this,
            &C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnSearch);
    connect(this->mpc_Ui->pc_TextBrowserStatusMessage, &QTextBrowser::anchorClicked, this,
@@ -124,9 +122,7 @@ C_SdBueJ1939AddMessagesFromCatalogDialog::C_SdBueJ1939AddMessagesFromCatalogDial
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
-// NOTE: 'noexcept' keyword is added (also in .hpp) to eliminate the warning - (1906) exception specification.
-// This warning appeared after adding the class variable "mc_CieCommDef".
-C_SdBueJ1939AddMessagesFromCatalogDialog::~C_SdBueJ1939AddMessagesFromCatalogDialog(void) noexcept
+C_SdBueJ1939AddMessagesFromCatalogDialog::~C_SdBueJ1939AddMessagesFromCatalogDialog(void)
 {
    delete this->mpc_Ui;
 }
@@ -411,6 +407,9 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_LoadCatalog()
       this->mpc_Ui->pc_TreeView->UpdateData(this->mc_MessagesImportedFromCatalog);
    }
 
+   // Clear filter text when new DBC file is loaded
+   this->mpc_Ui->pc_LineEditMessageFilter->clear();
+
    m_UpdateUi();
 }
 
@@ -486,6 +485,7 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_UpdateSelection(const uint32_t 
          this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                           "%1 selected message(s)")).
                                                   arg(ou32_SelectionCount));
+         this->mpc_Ui->pc_TreeView->update();
       }
       else
       {
@@ -680,7 +680,7 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnSearch(const QString & orc_Te
 void C_SdBueJ1939AddMessagesFromCatalogDialog::m_SelectAllMessages()
 {
    // Message selection varies depending on existence of the filter text
-   this->mpc_Ui->pc_TreeView->SelectAllMessages(this->mpc_Ui->pc_LineEditMessageFilter->text().isEmpty());
+   this->mpc_Ui->pc_TreeView->SelectAllMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -690,6 +690,16 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_SelectAllMessages()
 void C_SdBueJ1939AddMessagesFromCatalogDialog::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
+
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Expand all"),
+                                    this->mpc_Ui->pc_TreeView,
+                                    &C_SdBueJ1939AddMessagesFromCatalogTreeView::expandAll);
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Collapse all"),
+                                    this->mpc_Ui->pc_TreeView,
+                                    &C_SdBueJ1939AddMessagesFromCatalogTreeView::collapseAll);
+
+   // select all action
+   this->mpc_ContextMenu->addSeparator();
 
    // select all action
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select all visible"),
@@ -714,8 +724,8 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_OnCustomContextMenuRequested(co
 {
    const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
 
-   // check if position is on tree view
-   if (this->mpc_Ui->pc_TreeView->geometry().contains(orc_Pos))
+   // check if focus is on tree view
+   if ((this->mpc_Ui->pc_TreeView->hasFocus() && (this->mpc_Ui->pc_TreeView->HasVisibleData())))
    {
       this->mpc_ContextMenu->popup(c_PosGlobal);
    }

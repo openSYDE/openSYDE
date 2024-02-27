@@ -23,6 +23,7 @@
 #include "TglTasks.hpp"
 #include "C_OscComSequencesBase.hpp"
 #include "C_OscProtocolSerialNumber.hpp"
+#include "C_OscDcDeviceInformation.hpp"
 #include "C_SyvComDriverThread.hpp"
 #include "C_OscNodeComInterfaceSettings.hpp"
 #include "C_OscIpDispatcherWinSock.hpp"
@@ -36,54 +37,6 @@ namespace opensyde_gui_logic
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-
-///Basic information about one device
-class C_SyvDcDeviceInformation
-{
-public:
-   C_SyvDcDeviceInformation(void);
-
-   void SetDeviceName(const stw::scl::C_SclString & orc_DeviceName);
-   void SetNodeId(const uint8_t ou8_NodeId);
-   void SetIpAddress(const uint8_t (&orau8_IpAddress)[4]);
-   void SetSerialNumber(const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber);
-   void SetExtendedInfo(const uint8_t ou8_SubNodeId, const bool oq_SecurityActivated);
-
-   bool IsSerialNumberIdentical(const C_SyvDcDeviceInformation & orc_Cmp) const;
-
-   stw::scl::C_SclString c_DeviceName;
-   bool q_DeviceNameValid;
-
-   uint8_t u8_NodeId;
-   bool q_NodeIdValid;
-
-   uint8_t au8_IpAddress[4];
-   bool q_IpAddressValid;
-
-   stw::opensyde_core::C_OscProtocolSerialNumber c_SerialNumber;
-
-   // Extended specific information
-   uint8_t u8_SubNodeId;
-   bool q_SecuirtyActivated;
-   bool q_ExtendedInfoValid;
-};
-
-///Old communication configuration of a node
-class C_SyvDcDeviceOldComConfig
-{
-public:
-   C_SyvDcDeviceOldComConfig(void);
-   C_SyvDcDeviceOldComConfig & operator =(const C_SyvDcDeviceOldComConfig & orc_Source) &;
-
-   void SetContent(const uint8_t ou8_OldNodeId, const bool oq_OldIpAddressValid,
-                   const uint8_t * const opu8_OldIpAddress = NULL);
-
-   // Old node id which was used and detected by getting serial number
-   uint8_t u8_OldNodeId;
-   uint8_t au8_OldIpAddress[4];
-   bool q_OldIpAddressValid;
-};
-
 ///Target configuration for one device
 class C_SyvDcDeviceConfiguation
 {
@@ -96,7 +49,7 @@ public:
    uint8_t u8_SubNodeId;
 
    //Communication configuration of node which was detected by getting serial number
-   C_SyvDcDeviceOldComConfig c_OldComConfig;
+   stw::opensyde_core::C_OscDcDeviceOldComConfig c_OldComConfig;
 
    // Configuration parameters for all interfaces
    std::vector<uint8_t> c_NodeIds;
@@ -150,7 +103,7 @@ public:
 
    int32_t GetResults(int32_t & ors32_Result) const;
    bool GetCanInitializationResult(void) const;
-   int32_t GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformation> & orc_DeviceInfo) const;
+   int32_t GetDeviceInfosResult(std::vector<stw::opensyde_core::C_OscDcDeviceInformation> & orc_DeviceInfo) const;
    int32_t GetSecurityFeatureUsageResult(bool & orq_SecurityFeatureUsed) const;
 
    static const uint32_t hu32_SETNODEID = 0U;
@@ -272,7 +225,7 @@ private:
    mutable stw::tgl::C_TglCriticalSection mc_CriticalSectionCanInitialization;
 
    // Result information of several sequences
-   std::vector<C_SyvDcDeviceInformation> mc_DeviceInfoResult;
+   std::vector<stw::opensyde_core::C_OscDcDeviceInformation> mc_DeviceInfoResult;
    // Result of ScanCanGetInfoFromOpenSydeDevices and ScanEthGetInfoFromOpenSydeDevices
    // Input of ConfCanOpenSydeDevices and ConfEthOpenSydeDevices
    bool mq_SecurityFeatureUsed;

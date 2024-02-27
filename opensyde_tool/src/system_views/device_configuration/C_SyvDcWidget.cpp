@@ -608,7 +608,7 @@ void C_SyvDcWidget::m_ScanFinished(void)
    //check if found device types are trimmed
    for (uint32_t u32_ItDevice1 = 0; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
    {
-      const C_SyvDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
+      const C_OscDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
 
       //trim & check
       if (rc_Device1.c_DeviceName.Trim() != rc_Device1.c_DeviceName)
@@ -651,10 +651,10 @@ bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
    //Compare devices
    for (uint32_t u32_ItDevice1 = 0U; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
    {
-      const C_SyvDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
+      const C_OscDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
       for (uint32_t u32_ItDevice2 = u32_ItDevice1 + 1U; u32_ItDevice2 < this->mc_FoundDevices.size(); ++u32_ItDevice2)
       {
-         const C_SyvDcDeviceInformation & rc_Device2 = this->mc_FoundDevices[u32_ItDevice2];
+         const C_OscDcDeviceInformation & rc_Device2 = this->mc_FoundDevices[u32_ItDevice2];
 
          if ((rc_Device1.c_SerialNumber.q_FsnSerialNumber == false) &&
              (rc_Device2.c_SerialNumber.q_FsnSerialNumber == false))
@@ -1772,7 +1772,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const int32_t os32_ActualResult)
 {
    if (this->mpc_DcSequences != NULL)
    {
-      std::vector<C_SyvDcDeviceInformation> c_DeviceInfos;
+      std::vector<C_OscDcDeviceInformation> c_DeviceInfos;
       const int32_t s32_Return = this->mpc_DcSequences->GetDeviceInfosResult(c_DeviceInfos);
       QString c_Text;
 
@@ -1795,7 +1795,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const int32_t os32_ActualResult)
 
          for (u32_DeviceCounter = 0U; u32_DeviceCounter < c_DeviceInfos.size(); ++u32_DeviceCounter)
          {
-            const C_SyvDcDeviceInformation & rc_Info = c_DeviceInfos[u32_DeviceCounter];
+            const C_OscDcDeviceInformation & rc_Info = c_DeviceInfos[u32_DeviceCounter];
             const C_OscProtocolDriverOsyNode c_ServerId(this->mu8_BusId, rc_Info.u8_NodeId);
             uint32_t u32_NodeIndex;
             QString c_TopologyNodeName = "NA";
@@ -2395,7 +2395,7 @@ int32_t C_SyvDcWidget::m_GetBitRateValue(uint32_t & oru32_Value) const
 void C_SyvDcWidget::m_AssignmentConnect(const uint32_t ou32_NodeIndex,
                                         const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber,
                                         const std::map<uint8_t,
-                                                       C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+                                                       C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 const
 {
    this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->ConnectSerialNumber(ou32_NodeIndex, orc_SerialNumber,
@@ -2457,7 +2457,7 @@ void C_SyvDcWidget::m_Timer(void)
       bool q_ShowFinalErrorMessage = false;
       QString c_ErrorDescription = "";
 
-      std::vector<C_SyvDcDeviceInformation> c_DeviceInfo;
+      std::vector<C_OscDcDeviceInformation> c_DeviceInfo;
 
       if ((this->mq_InitializationFinished == false) &&
           (this->me_Step == eSCANCANENTERFLASHLOADER))
@@ -2889,7 +2889,7 @@ void C_SyvDcWidget::m_HandleDeviceVerificationStart(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_AllDeviceInfos,
-                                           const std::vector<C_SyvDcDeviceInformation> & orc_FoundDeviceInfos,
+                                           const std::vector<C_OscDcDeviceInformation> & orc_FoundDeviceInfos,
                                            QString & orc_ReportText) const
 {
    for (uint32_t u32_ItExpected = 0; u32_ItExpected < orc_AllDeviceInfos.size(); ++u32_ItExpected)
@@ -2898,7 +2898,7 @@ void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfig
       const C_SyvDcDeviceConfiguation & rc_ExpectedDevice = orc_AllDeviceInfos[u32_ItExpected];
       for (uint32_t u32_ItFound = 0; u32_ItFound < orc_FoundDeviceInfos.size(); ++u32_ItFound)
       {
-         const C_SyvDcDeviceInformation & rc_FoundDevice = orc_FoundDeviceInfos[u32_ItFound];
+         const C_OscDcDeviceInformation & rc_FoundDevice = orc_FoundDeviceInfos[u32_ItFound];
          if (rc_FoundDevice.c_SerialNumber == rc_ExpectedDevice.c_SerialNumber)
          {
             q_Found = true;

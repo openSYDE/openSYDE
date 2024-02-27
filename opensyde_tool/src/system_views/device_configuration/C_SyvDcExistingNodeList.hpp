@@ -37,7 +37,7 @@ public:
    void ConnectSerialNumber(const uint32_t ou32_NodeIndex,
                             const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber,
                             const std::map<uint8_t,
-                                           stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+                                           stw::opensyde_core::C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
    const;
    void DisconnectSerialNumber(const uint32_t ou32_NodeIndex,
                                const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber) const;
@@ -55,7 +55,7 @@ Q_SIGNALS:
    //lint -restore
    void SigConnect(const uint32_t ou32_NodeIndex,
                    const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber, const std::map<uint8_t,
-                                                                                                          stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
+                                                                                                          stw::opensyde_core::C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
    void SigDisconnect(const uint32_t ou32_NodeIndex,
                       const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber);
 

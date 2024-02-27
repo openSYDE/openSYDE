@@ -17,6 +17,7 @@
 #include "ui_C_SyvDcExistingNodeDropAreaWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
 
@@ -46,7 +47,7 @@ C_SyvDcExistingNodeDropAreaWidget::C_SyvDcExistingNodeDropAreaWidget(QWidget * c
    mq_Assigned(false)
 {
    const stw::opensyde_core::C_OscProtocolSerialNumber c_EmptySerialNumber;
-   const std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_EmptySubNodeIdsToOldNodeIds;
+   const std::map<uint8_t, C_OscDcDeviceOldComConfig> c_EmptySubNodeIdsToOldNodeIds;
    const QPixmap c_Device =
       static_cast<QPixmap>("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16), Qt::KeepAspectRatio,
                                                                             Qt::SmoothTransformation);
@@ -104,7 +105,7 @@ void C_SyvDcExistingNodeDropAreaWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeDropAreaWidget::SetContent(const bool oq_ValidSerialNumber,
                                                    const stw::opensyde_core::C_OscProtocolSerialNumber & orc_PureSerialNumber, const std::map<uint8_t,
-                                                                                                                                              C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+                                                                                                                                              C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 {
    const QString c_ShowedSerialNumber = orc_PureSerialNumber.GetSerialNumberAsFormattedString().c_str();
 
@@ -152,7 +153,7 @@ bool C_SyvDcExistingNodeDropAreaWidget::IsAssigned(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeDropAreaWidget::GetContent(stw::opensyde_core::C_OscProtocolSerialNumber & orc_PureSerialNumber,
                                                    std::map<uint8_t,
-                                                            C_SyvDcDeviceOldComConfig> * const opc_SubNodeIdsToOldNodeIds)
+                                                            C_OscDcDeviceOldComConfig> * const opc_SubNodeIdsToOldNodeIds)
 const
 {
    orc_PureSerialNumber = this->mc_PureSerialNumber;

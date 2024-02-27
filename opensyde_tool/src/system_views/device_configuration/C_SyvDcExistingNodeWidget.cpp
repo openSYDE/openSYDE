@@ -155,7 +155,7 @@ bool C_SyvDcExistingNodeWidget::CompareIndex(const uint32_t ou32_NodeIndex) cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::ConnectSerialNumber(const C_OscProtocolSerialNumber & orc_SerialNumber,
                                                     const std::map<uint8_t,
-                                                                   C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+                                                                   C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 const
 {
    this->mpc_Ui->pc_WidgetSerialNumber->SetContent(true, orc_SerialNumber, orc_SubNodeIdsToOldNodeIds);
@@ -170,7 +170,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::DisconnectSerialNumber(const C_OscProtocolSerialNumber & orc_SerialNumber) const
 {
-   const std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_EmptySubNodeIdsToOldNodeIds;
+   const std::map<uint8_t, C_OscDcDeviceOldComConfig> c_EmptySubNodeIdsToOldNodeIds;
 
    this->mpc_Ui->pc_WidgetSerialNumber->SetContent(false, orc_SerialNumber, c_EmptySubNodeIdsToOldNodeIds);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Assigned", false);
@@ -203,7 +203,7 @@ void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConf
    {
       C_SyvDcDeviceConfiguation c_Config;
       C_OscProtocolSerialNumber c_SerialNumber;
-      std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds;
+      std::map<uint8_t, C_OscDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds;
 
       // Prepare the config for all sub nodes with the same serial number
       this->mpc_Ui->pc_WidgetSerialNumber->GetContent(c_SerialNumber, &c_SubNodeIdsToOldNodeIds);
@@ -378,7 +378,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
          uint8_t u8_ManufacturerFormat = 0U;
          bool q_SubNodeIdsToNodeIdsValid = false;
          bool q_ErrorDetected = false;
-         std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds;
+         std::map<uint8_t, C_OscDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds;
 
          //Connect new one
          if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA) == true)
@@ -425,7 +425,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
 
                   if ((q_SubNodeIdOk == true) && (q_OldNodeIdOk == true) && (q_IpAddressValidFlagOk == true))
                   {
-                     C_SyvDcDeviceOldComConfig c_OldComConfig;
+                     C_OscDcDeviceOldComConfig c_OldComConfig;
                      bool q_IpAddressValid = (u8_IpAddressValid > 0);
 
                      if (q_IpAddressValid == true)
@@ -510,7 +510,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
                         const uint32_t u32_CountSubNodes = pc_Squad->c_SubNodeIndexes.size();
                         if (u32_CountSubNodes == c_SubNodeIdsToOldNodeIds.size())
                         {
-                           std::map<uint8_t, C_SyvDcDeviceOldComConfig>::const_iterator c_ItSubeNodeIds;
+                           std::map<uint8_t, C_OscDcDeviceOldComConfig>::const_iterator c_ItSubeNodeIds;
 
                            // Correct number of sub node ids
                            q_SubNodeIdsToNodeIdsValid = true;
@@ -701,7 +701,7 @@ void C_SyvDcExistingNodeWidget::mh_AppendDeviceConfigForNode(const uint32_t ou32
                                                              const uint32_t ou32_ConnectedBusIndex,
                                                              C_SyvDcDeviceConfiguation oc_NodeConfig,
                                                              const std::map<uint8_t,
-                                                                            C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
+                                                                            C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                                              std::vector<C_SyvDcDeviceConfiguation> & orc_Configs)
 {
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
@@ -715,7 +715,7 @@ void C_SyvDcExistingNodeWidget::mh_AppendDeviceConfigForNode(const uint32_t ou32
          if ((rc_CurInterface.GetBusConnected() == true) &&
              (rc_CurInterface.u32_BusIndex == ou32_ConnectedBusIndex))
          {
-            std::map<uint8_t, C_SyvDcDeviceOldComConfig>::const_iterator c_ItOldNodeId;
+            std::map<uint8_t, C_OscDcDeviceOldComConfig>::const_iterator c_ItOldNodeId;
             // Set the sub node id. In case of a not multiple CPU it is always 0
             oc_NodeConfig.u8_SubNodeId = static_cast<uint8_t>(pc_Node->u32_SubDeviceIndex);
 

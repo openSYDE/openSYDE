@@ -114,7 +114,7 @@ int32_t C_SyvDcExistingNodeList::SetView(const uint32_t ou32_Index, const bool o
 void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32_t ou32_NodeIndex,
                                                   const C_OscProtocolSerialNumber & orc_SerialNumber,
                                                   const std::map<uint8_t,
-                                                                 C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+                                                                 C_OscDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 const
 {
    for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)

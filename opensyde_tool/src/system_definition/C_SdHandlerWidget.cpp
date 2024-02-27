@@ -115,6 +115,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
    // forwarding of this signal
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigChangeMode, this, &C_SdHandlerWidget::SigChangeMode);
+   connect(this->mpc_Topology, &C_SdTopologyWidget::SigOpenTsp, this, &C_SdHandlerWidget::m_TspImport);
+
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigNodeChanged, this, &C_SdHandlerWidget::m_NodeChanged);
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigBusChanged, this, &C_SdHandlerWidget::m_BusChanged);
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigErrorChange, this,
@@ -1187,40 +1189,83 @@ void C_SdHandlerWidget::m_RtfExport(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  calls wrapper function in C_SdNdeNodeEditWidget when button for TSP import is clicked
+/*! \brief  Show warning unstored Project popup message
+
+   \return
+   C_OgeWiCustomMessage *
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_TspImport()
+C_OgeWiCustomMessage * C_SdHandlerWidget::m_ShowWarningUnstoredProjectPopupMessage()
 {
+   C_OgeWiCustomMessage * const pc_MessageBox = new C_OgeWiCustomMessage(this);
+
+   pc_MessageBox->SetType(C_OgeWiCustomMessage::eWARNING);
+
+   pc_MessageBox->SetHeading(C_GtGetText::h_GetText("Import TSP"));
+   pc_MessageBox->SetDescription(C_GtGetText::h_GetText(
+                                    "This project is not saved yet. Adding Data Blocks might cause "
+                                    "problems with file or directory paths."));
+   pc_MessageBox->SetDetails(C_GtGetText::h_GetText(
+                                "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
+   pc_MessageBox->SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+   pc_MessageBox->SetCustomMinHeight(230, 270);
+   pc_MessageBox->SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+
+   return pc_MessageBox;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create warning message box if unsaved project is used and calls TSP import function of node edit page
+
+   \return
+   bool
+
+   \retval   true   Cancel
+   \retval   false   No cancel
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdHandlerWidget::m_TspImport()
+{
+   bool q_Chance = false;
+
    if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
    {
-      // warn user
-      C_OgeWiCustomMessage c_MessageBox(this);
-      c_MessageBox.SetType(C_OgeWiCustomMessage::eWARNING);
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Import TSP"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "This project is not saved yet. Adding Data Blocks might cause "
-                                     "problems with file or directory paths."));
-      c_MessageBox.SetDetails(C_GtGetText::h_GetText(
-                                 "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
-      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
-      c_MessageBox.SetCustomMinHeight(230, 270);
-      c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-      if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eOK)
+      C_OgeWiCustomMessage pc_MessageBox(this);
+
+      pc_MessageBox.SetType(C_OgeWiCustomMessage::eWARNING);
+
+      pc_MessageBox.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+      pc_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                      "This project is not saved yet. Adding Data Blocks might cause "
+                                      "problems with file or directory paths."));
+      pc_MessageBox.SetDetails(C_GtGetText::h_GetText(
+                                  "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
+      pc_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+      pc_MessageBox.SetCustomMinHeight(230, 270);
+      pc_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+
+      const C_OgeWiCustomMessage::E_Outputs e_Output = pc_MessageBox.Execute();
+
+      if (e_Output == C_OgeWiCustomMessage::eOK)
       {
          if (mpc_ActNodeEdit != NULL)
          {
-            mpc_ActNodeEdit->AddFromTsp();
+            q_Chance = mpc_ActNodeEdit->AddFromTsp();
          }
+      }
+      else
+      {
+         q_Chance = true;
       }
    }
    else
    {
       if (mpc_ActNodeEdit != NULL)
       {
-         mpc_ActNodeEdit->AddFromTsp();
+         q_Chance = mpc_ActNodeEdit->AddFromTsp();
       }
    }
+   return q_Chance;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

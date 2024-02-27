@@ -1,0 +1,32 @@
+//-----------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Short description
+
+   Detailed description (optional). The module shall be described detailed if it is not described completely
+   by short description. (todo: remove this line for header files)
+
+   \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//-----------------------------------------------------------------------------
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+   FILEVERSION     1, 0, 0, 0
+BEGIN
+   BLOCK "StringFileInfo"
+BEGIN
+   BLOCK "040904E4"
+BEGIN
+   VALUE "CompanyName",        "Sensor-Technik Wiedemann GmbH\0"
+VALUE "FileDescription",    "SYDEflash\0"
+VALUE "LegalCopyright",     "STW (c) 2018\0"
+END
+END
+
+   BLOCK "VarFileInfo"
+BEGIN
+   VALUE "Translation", 0x409, 1252
+END
+END
+IDI_ICON1 ICON DISCARDABLE     "../src/syde_flash/images/SYDE_Flash_logo.ico"

@@ -31,6 +31,7 @@
 #include "C_OgeWiCustomMessage.hpp"
 #include "stwerrors.hpp"
 #include "C_CamUti.hpp"
+#include "C_CamUtiGeneric.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -378,13 +379,14 @@ void C_CamMosLoggingWidget::m_OnDroppedPath(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setter for full create in path.
 
-   \param[in] orc_New New value
+   \param[in]  orc_New  New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_SetLoggingPath(const QString & orc_New)
 {
    const QString c_Path =
-      C_CamUti::h_AskUserToSaveRelativePath(this, orc_New, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+      C_CamUtiGeneric::h_AskUserToSaveRelativePath(this, orc_New,
+                                                   C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
    // if path contains invalid characters this returned empty
    if (c_Path.isEmpty() == false)

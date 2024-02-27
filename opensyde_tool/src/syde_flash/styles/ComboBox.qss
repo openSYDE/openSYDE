@@ -1,0 +1,121 @@
+/* --------------------------------------------------------------------- */
+QComboBox
+{
+border-width:1px;
+border-style:solid;
+}
+
+QComboBox QAbstractItemView
+{
+outline:none;
+}
+
+QComboBox::down-arrow
+{
+border-image:url(://images/IconGroupBoxDownArrow.svg) 0 0 0 0 stretch stretch;
+}
+
+QComboBox::down-arrow:!enabled
+{
+border-image:url(:/images/GroupBoxDownArrowDisabled.png) 0 0 0 0 stretch stretch;
+}
+
+QComboBox::drop-down:button
+{
+border-width:0px;
+}
+
+/* Drop down menu */
+QComboBox QListView
+{
+border-width:1px;
+border-style:solid;
+}
+
+QComboBox
+{
+padding-right:0px;
+padding-left:6px;
+padding-bottom:5px;
+padding-top:4px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgeCbxTableSmall,
+stw--opensyde_gui_elements--C_OgeCbxText
+{
+padding-right:0px;
+padding-left:8px;
+padding-bottom:0px;
+padding-top:0px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeCbxTable
+{
+padding-right:0px;
+padding-left:6px;
+padding-bottom:0px;
+padding-top:0px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QAbstractItemView,
+stw--opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView
+{
+margin-left:0px;
+margin-right:0px;
+}
+
+stw--opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item
+{
+padding-top:2px;
+padding-bottom:2px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QAbstractItemView::item
+{
+padding-top:1px;
+padding-bottom:1px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView::item,
+stw--opensyde_gui_elements--C_CamOgeCbxWhite QAbstractItemView::item
+{
+padding-top:5px;
+padding-bottom:5px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgeCbxDark QListView::item
+{
+padding:5px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeCbxDark::down-arrow
+{
+border-image:url(://images/IconArrowDown.svg);
+margin-bottom:1px;
+margin-top:1px;
+margin-left:-4px;
+margin-right:6px;
+}
+
+stw--opensyde_gui_elements--C_CamOgeCbxDark::down-arrow:!enabled
+{
+border-image:url(://images/IconArrowDownDisabled.svg);
+margin-bottom:1px;
+margin-top:1px;
+margin-left:-4px;
+margin-right:6px;
+}
+
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_CamOgeCbxWhite::down-arrow
+{
+border-image:url(://images/IconArrowDownBright.svg) 0 0 0 0 stretch stretch;
+}
+
+/*drop down button style*/
+stw--opensyde_gui_elements--C_CamOgeCbxWhite::drop-down
+{
+width:28px;
+}

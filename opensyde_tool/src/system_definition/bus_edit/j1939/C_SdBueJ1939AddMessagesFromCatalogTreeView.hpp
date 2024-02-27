@@ -44,19 +44,24 @@ public:
    bool IsEmpty(void) const;
    void Search(const QString & orc_Text);
    void UpdateData(const std::vector<stw::opensyde_gui_logic::C_CieConverter::C_CieNodeMessage> & orc_MessagesImported);
-   void SelectAllMessages(const bool oq_IsFilterTextEmpty);
+   void SelectAllMessages();
    void UnSelectAllMessages(void);
    std::vector<stw::opensyde_gui_logic::C_CieConverter::C_CieNodeMessage> GetSelectedMessages(void) const;
+   bool HasVisibleData(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigAccept(void);
    void SigSelectionChanged(const uint32_t ou32_Count) const;
+
+protected:
+   void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
 
 private:
    void m_InitColumns(void);
+   void m_ShowHideVerticalScrollBar(const int32_t os32_Min, const int32_t os32_Max) const;
+   void m_ShowHideHorizontalScrollBar(const int32_t os32_Min, const int32_t os32_Max) const;
    static std::map<opensyde_gui_logic::C_SdBueJ1939AddMessagesFromCatalogTreeModel::E_Columns,
                    uint32_t> mh_GetDefaultColumnWidths(void);
    void m_OnItemChecked();

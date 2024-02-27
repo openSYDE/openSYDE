@@ -29,6 +29,7 @@
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_UsHandler.hpp"
 #include "C_CamUti.hpp"
+#include "C_CamUtiGeneric.hpp"
 #include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -335,7 +336,8 @@ void C_CamMosDatabaseWidget::AddDroppedDatabase(const QString & orc_Path)
       C_CamProDatabaseData c_Database;
 
       const QString c_DatabaseName =
-         C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+         C_CamUtiGeneric::h_AskUserToSaveRelativePath(this, c_Path,
+                                                      C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
       // if path contains invalid characters this returned empty
       if (c_DatabaseName.isEmpty() == false)
@@ -476,7 +478,8 @@ void C_CamMosDatabaseWidget::m_OnAddClicked()
    if (c_Name != "")
    {
       const QString c_DatabaseName =
-         C_CamUti::h_AskUserToSaveRelativePath(this, c_Name, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+         C_CamUtiGeneric::h_AskUserToSaveRelativePath(this, c_Name,
+                                                      C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
       // if path contains invalid characters this returned empty
       if (c_DatabaseName.isEmpty() == false)

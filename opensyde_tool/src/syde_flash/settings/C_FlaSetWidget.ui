@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_FlaSetWidget</class>
+ <widget class="QWidget" name="C_FlaSetWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>321</width>
+    <height>144</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_FlaSetWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="stw::opensyde_gui_elements::C_CamOgeWiSectionHeader" name="pc_WiTitle" native="true"/>
+   </item>
+   <item>
+    <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiCollapsed" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDll">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbAdvSett">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbProgress">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiEmpty" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiExpanded" native="true">
+     <layout class="QVBoxLayout" name="pc_VerticalLayout2" stretch="0,0,1">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="stw::opensyde_gui::C_FlaDllWidget" name="pc_WiDll" native="true"/>
+      </item>
+      <item>
+       <widget class="stw::opensyde_gui::C_FlaSetAdvancedPropertiesWidget" name="pc_WiAdvancedProperties" native="true"/>
+      </item>
+      <item>
+       <widget class="stw::opensyde_gui::C_FlaSetProgressWidget" name="pc_WiProgress" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_CamOgeWiSectionHeader</class>
+   <extends>QWidget</extends>
+   <header>C_CamOgeWiSectionHeader.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaSetProgressWidget</class>
+   <extends>QWidget</extends>
+   <header>C_FlaSetProgressWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaSetAdvancedPropertiesWidget</class>
+   <extends>QWidget</extends>
+   <header>C_FlaSetAdvancedPropertiesWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_FlaDllWidget</class>
+   <extends>QWidget</extends>
+   <header>C_FlaDllWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
+   <extends>QPushButton</extends>
+   <header>C_CamOgePubSettingsAdd.hpp</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
