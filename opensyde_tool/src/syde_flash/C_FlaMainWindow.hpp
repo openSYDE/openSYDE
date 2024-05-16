@@ -11,6 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMainWindow>
 #include <QTimer>
+#include <QWinTaskbarProgress>
 
 #include "C_FlaSenDcBasicSequences.hpp"
 #include "C_FlaUpSequences.hpp"
@@ -39,6 +40,7 @@ public:
    ~C_FlaMainWindow(void) override;
 
 protected:
+   void showEvent(QShowEvent * const opc_Event) override;
    void closeEvent(QCloseEvent * const opc_Event) override;
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
 
@@ -65,17 +67,42 @@ private:
    void m_OnSearchNode(void);
    void m_OnConfigureNode(void);
    void m_ShowProgress(const QString & orc_Text);
+   void m_SetHeadingText(const QString & orc_Text, const uint8_t & oru8_ProgressState) const;
+   void m_SetHeadingIcon(const uint8_t & oru8_State) const;
+   void m_SetProgressBarColor(const bool & orq_Success) const;
 
+   uint32_t m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage);
+   void m_InitWinTaskbar(void);
+   bool m_ErrorDetected(const bool & orq_ShowErrorMessage);
+   void m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage);
+   void m_UpdateFileIcon(const uint32_t & oru32_FileIndex, const uint8_t & oru8_ProgressState) const;
+   void m_UpdateWinProgress(const bool & orq_Visible, const uint8_t & oru8_Value);
+   uint8_t m_CalcualteTotalProgressInPercentage(void) const;
+   void m_ResetProgressBar();
+   void m_ResetFileIcons() const;
    int32_t m_InitUpdateSequence(void);
    void m_CleanupUpdateSequence(void);
    void m_TimerUpdate(void);
    void m_CheckDeviceName(const QString & orc_ReadDeviceName);
+   void m_CountTime(void) const;
+   void m_StartElapsedTimer(void);
+   void m_RestartElapsedTimer(void);
+   bool m_ShowErrorMessage(void);
 
    stw::opensyde_gui_logic::C_FlaUpSequences * mpc_UpSequences;
    QTimer mc_TimerUpdate;
+   QTimer mc_SecTimer;
+   QElapsedTimer mc_ElapsedTimer;
    stw::opensyde_gui_logic::C_FlaUpSequences::E_Sequence me_UpdateStep;
    int32_t ms32_NextHexFile;
    bool mq_ContinueUpdate;
+
+   uint32_t mu32_FlashedFilesCounter;
+   uint64_t mu64_FlashedBytes;
+   uint32_t mu32_FlashedBytesTmp;
+   bool mq_NewFile;
+
+   QWinTaskbarProgress * mpc_Progress;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

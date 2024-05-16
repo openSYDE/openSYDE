@@ -10,8 +10,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"
+#include <QFileInfo>
+#include <QDateTime>
+#include <QCryptographicHash>
 
+#include "precomp_headers.hpp"
 #include "stwtypes.hpp"
 #include "C_FlaUpHexFileInfo.hpp"
 #include "C_OscHexFile.hpp"
@@ -44,7 +47,7 @@ using namespace stw::scl;
 C_FlaUpHexFileInfo::C_FlaUpHexFileInfo(const QString & orc_File) :
    s32_CurrentHexFileIndex(0)
 {
-   m_SetHexFileInfo(orc_File);
+   SetHexFileInfo(orc_File);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,19 +56,19 @@ C_FlaUpHexFileInfo::C_FlaUpHexFileInfo(const QString & orc_File) :
    \param[in]     orc_File    HEX file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpHexFileInfo::m_SetHexFileInfo(const QString & orc_File)
+void C_FlaUpHexFileInfo::SetHexFileInfo(const QString & orc_File)
 {
    const QFileInfo c_FileInfo(orc_File);
    C_OscHexFile c_HexFile;
    uint32_t u32_Result;
+
+   C_SclDynamicArray<stw::diag_lib::C_XFLECUInformation> c_InfoBlocks;
 
    c_BlockInfo.resize(0);
    c_HexFileInfo.s32_NumberOfBlocks = 0;
    c_HexFileInfo.c_FileName = c_FileInfo.fileName();
 
    u32_Result = c_HexFile.LoadFromFile(orc_File.toStdString().c_str());
-
-   C_SclDynamicArray<stw::diag_lib::C_XFLECUInformation> c_InfoBlocks;
    c_HexFile.GetECUInformationBlocks(c_InfoBlocks, 0UL, false, false, false);
 
    if (u32_Result == stw::hex_file::NO_ERR)

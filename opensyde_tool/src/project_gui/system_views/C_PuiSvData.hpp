@@ -109,7 +109,8 @@ public:
    void OnSyncNodeAdded(const uint32_t ou32_Index);
    void OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
                                                                  C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew);
-   void OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index);
+   void OnSyncNodeReplace(const uint32_t ou32_Index);
+   void OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid);
    void OnSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);
    void OnSyncNodeDataPoolMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolSourceIndex,
                                 const uint32_t ou32_DataPoolTargetIndex);

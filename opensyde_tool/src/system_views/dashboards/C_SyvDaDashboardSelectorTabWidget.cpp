@@ -1014,7 +1014,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32_t ou32_Dat
          m_InitTabStyle(static_cast<uint32_t>(s32_Index), pc_Dashboard->GetName(), pc_Dashboard->GetComment(),
                         pc_Dashboard->GetActive(), pc_View->GetDarkModeActive());
          m_Connect(pc_Widget);
-      } //lint !e429  //no memory leak because of the parent of pc_Widget and the Qt memory management
+      } //lint !e429 !e593 //no memory leak because of the parent of pc_Widget and the Qt memory management
    }
 
    osc_write_log_performance_stop(u16_TimerId, "Load dashboard");

@@ -340,7 +340,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const int32_
 {
    QVariant c_Retval;
 
-   if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+   if (orc_Index.isValid() == true)
    {
       const C_CamGenSigTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
       if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
@@ -664,7 +664,7 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
 
    if (data(orc_Index, os32_Role) != orc_Value)
    {
-      if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+      if (orc_Index.isValid() == true)
       {
          const uint32_t u32_Index = this->m_TranslateRowToIndex(orc_Index.row());
          const C_CamGenSigTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());

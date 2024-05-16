@@ -1277,7 +1277,7 @@ int32_t C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_
 //----------------------------------------------------------------------------------------------------------------------
 const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const int32_t os32_Row) const
 {
-   const C_CamMetTreeLoggerData * pc_Retval;
+   const C_CamMetTreeLoggerData * pc_Retval = NULL;
 
    if (this->mq_UniqueMessageMode == false)
    {
@@ -1293,7 +1293,10 @@ const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const int32_t o
          this->mc_UniqueMessagesOrdering.begin() + os32_Row;
       const QMap<C_SclString, C_CamMetTreeLoggerData>::const_iterator c_It =
          this->mc_UniqueMessages.find(c_ItOrder.value());
-      pc_Retval = &c_It.value();
+      if (c_It != this->mc_UniqueMessages.end())
+      {
+         pc_Retval = &c_It.value();
+      }
    }
    return pc_Retval;
 }

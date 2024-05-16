@@ -1211,6 +1211,8 @@ void C_SdNdeDpListTableView::m_UpdateModelView(void)
          this->mu32_ListIndex);
       if (pc_Model != NULL)
       {
+         //Update necesssary!
+         pc_Model->Reset();
          this->setModel(pc_Model);
          this->mc_Delegate.SetModel(pc_Model);
       }
@@ -1258,57 +1260,54 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
             {
                e_ArrayEditType = C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET;
             }
-            if (orc_Index.row() >= 0)
+            const uint32_t u32_ElementIndex = static_cast<uint32_t>(orc_Index.row());
+            const uint32_t u32_DataSetIndex = static_cast<uint32_t>(s32_DataSetIndex);
+            C_OscNodeDataPoolListElement c_OscElement;
+            C_PuiSdNodeDataPoolListElement c_UiElement;
+            const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+
+            if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex,
+                                                                        this->mu32_DataPoolIndex,
+                                                                        this->mu32_ListIndex, u32_ElementIndex,
+                                                                        c_OscElement,
+                                                                        c_UiElement) == C_NO_ERR)
             {
-               const uint32_t u32_ElementIndex = static_cast<uint32_t>(orc_Index.row());
-               const uint32_t u32_DataSetIndex = static_cast<uint32_t>(s32_DataSetIndex);
-               C_OscNodeDataPoolListElement c_OscElement;
-               C_PuiSdNodeDataPoolListElement c_UiElement;
-               const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+               C_SdNdeDpListArrayEditWidget * const pc_ArrayEditWidget =
+                  new C_SdNdeDpListArrayEditWidget(
+                     *c_Dialog,
+                     this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                     this->mu32_ListIndex, u32_ElementIndex, e_ArrayEditType, u32_DataSetIndex);
 
-               if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex,
-                                                                           this->mu32_DataPoolIndex,
-                                                                           this->mu32_ListIndex, u32_ElementIndex,
-                                                                           c_OscElement,
-                                                                           c_UiElement) == C_NO_ERR)
+               pc_ArrayEditWidget->SetModelViewManager(this->mpc_ModelViewManager);
+               //Resize
+               c_Dialog->SetSize(QSize(871, 318));
+               if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
                {
-                  C_SdNdeDpListArrayEditWidget * const pc_ArrayEditWidget =
-                     new C_SdNdeDpListArrayEditWidget(
-                        *c_Dialog,
-                        this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                        this->mu32_ListIndex, u32_ElementIndex, e_ArrayEditType, u32_DataSetIndex);
-
-                  pc_ArrayEditWidget->SetModelViewManager(this->mpc_ModelViewManager);
-                  //Resize
-                  c_Dialog->SetSize(QSize(871, 318));
-                  if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+                  //Register undo
+                  QUndoCommand * const pc_UndoCommand = pc_ArrayEditWidget->TakeUndoCommand();
+                  if (pc_UndoCommand != NULL)
                   {
-                     //Register undo
-                     QUndoCommand * const pc_UndoCommand = pc_ArrayEditWidget->TakeUndoCommand();
-                     if (pc_UndoCommand != NULL)
-                     {
-                        //Undo all because push automatically redos
-                        pc_UndoCommand->undo();
-                        this->mc_UndoManager.DoPush(pc_UndoCommand);
-                     }
+                     //Undo all because push automatically redos
+                     pc_UndoCommand->undo();
+                     this->mc_UndoManager.DoPush(pc_UndoCommand);
                   }
-                  else
-                  {
-                     if (c_Dialog != NULL)
-                     {
-                        //Revert changes
-                        C_PuiSdHandler::h_GetInstance()->SetDataPoolListElement(this->mu32_NodeIndex,
-                                                                                this->mu32_DataPoolIndex,
-                                                                                this->mu32_ListIndex, u32_ElementIndex,
-                                                                                c_OscElement, c_UiElement);
-                     }
-                  }
-               } //lint !e429  //no memory leak because of the parent of pc_ArrayEditWidget and the Qt memory management
-               if (c_Dialog != NULL)
-               {
-                  c_Dialog->HideOverlay();
-                  c_Dialog->deleteLater();
                }
+               else
+               {
+                  if (c_Dialog != NULL)
+                  {
+                     //Revert changes
+                     C_PuiSdHandler::h_GetInstance()->SetDataPoolListElement(this->mu32_NodeIndex,
+                                                                             this->mu32_DataPoolIndex,
+                                                                             this->mu32_ListIndex, u32_ElementIndex,
+                                                                             c_OscElement, c_UiElement);
+                  }
+               }
+            } //lint !e429  //no memory leak because of the parent of pc_ArrayEditWidget and the Qt memory management
+            if (c_Dialog != NULL)
+            {
+               c_Dialog->HideOverlay();
+               c_Dialog->deleteLater();
             }
          }
       }

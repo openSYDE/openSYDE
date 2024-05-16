@@ -282,16 +282,13 @@ void C_SdNdeCoDeviceConfigWidget::m_OnSameAsOpensydeNodeIdChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoDeviceConfigWidget::m_HandleSameAsOpensydeNodeIdState(void) const
 {
+   m_HandleNodeIdRange(this->mpc_Ui->pc_CheckBoxSameAsOpensyde->isChecked());
+
    if (this->mpc_Ui->pc_CheckBoxSameAsOpensyde->isChecked() == true)
    {
       //get current node ID of node interface
       const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(
          this->mc_DeviceInterfaceId.u32_NodeIndex);
-
-      // set openSYDE node id min/max
-      // necessary to be compatible with complete openSYDE Node ID range
-      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_OS);
-      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_OS);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
@@ -310,11 +307,30 @@ void C_SdNdeCoDeviceConfigWidget::m_HandleSameAsOpensydeNodeIdState(void) const
    }
    else
    {
+      this->mpc_Ui->pc_SpinBoxCanOpenId->setEnabled(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle node id range
+
+   \param[in]  oq_IsOpensydeNodeId  Is opensyde node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoDeviceConfigWidget::m_HandleNodeIdRange(const bool oq_IsOpensydeNodeId) const
+{
+   if (oq_IsOpensydeNodeId == true)
+   {
+      // set openSYDE node id min/max
+      // necessary to be compatible with complete openSYDE Node ID range
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_OS);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_OS);
+   }
+   else
+   {
       // set CANopen node id min/max
       this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_CANOPEN);
       this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_CANOPEN);
-
-      this->mpc_Ui->pc_SpinBoxCanOpenId->setEnabled(true);
    }
 }
 
@@ -567,6 +583,9 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
    {
       std::set<uint8_t> c_Map = pc_CanOpenDeviceInfo->c_EdsFileContent.GetAllAvailableFactorySettingsSubIndices();
       std::set<uint8_t>::const_iterator c_ItResult;
+
+      //Change range before setting value
+      m_HandleNodeIdRange(pc_CanOpenDeviceInfo->q_UseOpenSydeNodeId);
 
       this->mpc_Ui->pc_SpinBoxCanOpenId->setValue(static_cast<int32_t>(pc_CanOpenDeviceInfo->u8_NodeIdValue));
       this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setChecked(pc_CanOpenDeviceInfo->q_UseOpenSydeNodeId);

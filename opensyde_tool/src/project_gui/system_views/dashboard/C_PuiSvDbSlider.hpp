@@ -42,7 +42,7 @@ public:
 
    E_Type e_Type;
    bool q_ShowMinMax;
-   int32_t s32_Value;
+   stw::opensyde_core::C_OscNodeDataPoolContent c_Value;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

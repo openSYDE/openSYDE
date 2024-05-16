@@ -316,7 +316,7 @@ QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const 
       const E_Columns e_Col = static_cast<E_Columns>(orc_Index.column());
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if ((static_cast<uint32_t>(orc_Index.row()) < this->mc_CoInfoAll.size()) && (orc_Index.row() >= 0))
+         if (static_cast<uint32_t>(orc_Index.row()) < this->mc_CoInfoAll.size())
          {
             switch (e_Col)
             {

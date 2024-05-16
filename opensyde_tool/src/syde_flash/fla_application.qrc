@@ -100,5 +100,8 @@
         <file>images/IconNothing.svg</file>
         <file>images/IconBrowseDisabled.svg</file>
         <file>images/IconBrowsePressed.svg</file>
+        <file>images/UpdateAnimationInProgress.gif</file>
+        <file>images/UpdateSummaryOk.svg</file>
+        <file>images/UpdateSummaryFailure.svg</file>
     </qresource>
 </RCC>

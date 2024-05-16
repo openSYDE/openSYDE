@@ -14,10 +14,10 @@
 
 #include <QProcess>
 #include <QFileDialog>
+#include <cmath>
 
 #include "C_FlaUpListItemWidget.hpp"
 #include "ui_C_FlaUpListItemWidget.h"
-#include "C_FlaUpListWidget.hpp"
 #include "C_Uti.hpp"
 #include "C_GtGetText.hpp"
 #include "C_FlaUpHexFileView.hpp"
@@ -46,21 +46,24 @@ using namespace stw::opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent        Optional pointer to parent
-   \param[in,out] opc_HexFileInfo   Current hex file Info
+   \param[in,out] opc_Parent          Optional pointer to parent
+   \param[in,out] opc_HexFileInfo     Current hex file Info
+   \param[in,out] oq_IsRelativePath   Is to add path as relative or absolute
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_FlaUpListItemWidget::C_FlaUpListItemWidget(C_FlaUpListWidget * const opc_Parent,
-                                             C_FlaUpHexFileInfo * const opc_HexFileInfo) :
+C_FlaUpListItemWidget::C_FlaUpListItemWidget(QListWidget * const opc_Parent, C_FlaUpHexFileInfo * const opc_HexFileInfo,
+                                             const bool oq_IsRelativePath) :
    C_OgeWiOnlyBackground(opc_Parent),
    pc_HexFileInfo(opc_HexFileInfo),
+   q_IsRelativePathToAdd(oq_IsRelativePath),
    mpc_Ui(new Ui::C_FlaUpListItemWidget),
-   mpc_ContextMenu(NULL),
+   mpc_ContextMenu(nullptr),
    ms32_ApplicationBlockIndex(0),
-   mpc_FileStatusChecktimer(NULL)
+   mpc_FileStatusChecktimer(nullptr),
+   mpc_Movie(new QMovie(":/images/UpdateAnimationInProgress.gif", QByteArray(), this))
 {
-   QSizePolicy c_SizePolicy;
-   const QSize c_SIZE(20, 20);
+   const QSize c_DEFAULT_SIZE = QSize(20, 20);
+   const QString c_StatusIconPath = ":/images/IconUpdateWaiting.svg";
 
    mpc_FileStatusChecktimer = new QTimer(this);
 
@@ -96,54 +99,28 @@ C_FlaUpListItemWidget::C_FlaUpListItemWidget(C_FlaUpListWidget * const opc_Paren
    stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_Separator,
                                                                    "HasColor9Background", true);
 
-   this->GetHexFileInformation(opc_HexFileInfo);
+   this->GetHexFileInformation();
    this->m_SetupContextMenu();
 
-   //retain icon labe size when hidden
-   c_SizePolicy = this->mpc_Ui->pc_StatusIcon->sizePolicy();
-   c_SizePolicy.setRetainSizeWhenHidden(true);
-   this->mpc_Ui->pc_StatusIcon->setSizePolicy(c_SizePolicy);
-   this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon("://images/IconUpdateWaiting.svg").pixmap(c_SIZE));
+   this->m_GetAbsoluteAndRelativePaths(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath, C_Uti::h_GetExePath());
 
-   connect(this->mpc_Ui->pc_DeleteButton, &QPushButton::clicked, this, [opc_Parent, opc_HexFileInfo] ()
-   {
-      opc_Parent->DeleteItem(opc_HexFileInfo->s32_CurrentHexFileIndex, true);
-   }
-           );
-
-   connect(this, &C_FlaUpListItemWidget::SigDeleteItemWidget, this, [opc_Parent, opc_HexFileInfo] ()
-   {
-      opc_Parent->DeleteItem(opc_HexFileInfo->s32_CurrentHexFileIndex, true);
-   }
-           );
-
-   connect(this->mpc_Ui->pc_BrowseButton, &QPushButton::clicked, this, [opc_Parent, opc_HexFileInfo] ()
-   {
-      opc_Parent->SelectFile(opc_HexFileInfo->s32_CurrentHexFileIndex);
-   }
-           );
-
-   connect(this, &C_FlaUpListItemWidget::SigSelectFile, this, [opc_Parent, opc_HexFileInfo] ()
-   {
-      opc_Parent->SelectFile(opc_HexFileInfo->s32_CurrentHexFileIndex);
-   }
-           );
-
-   connect(this, &C_FlaUpListItemWidget::SigReloadCurrentFile, this, [opc_Parent, opc_HexFileInfo] ()
-   {
-      opc_Parent->ReloadCurrentFile(opc_HexFileInfo->c_HexFileInfo.c_FilePath,
-                                    opc_HexFileInfo->s32_CurrentHexFileIndex);
-   }
-           );
+   connect(this->mpc_Ui->pc_DeleteButton, &QPushButton::clicked, this, &C_FlaUpListItemWidget::m_DeleteItem);
+   connect(this->mpc_Ui->pc_BrowseButton, &QPushButton::clicked, this, &C_FlaUpListItemWidget::m_SelectFile);
 
    connect(mpc_FileStatusChecktimer, &QTimer::timeout, this, &C_FlaUpListItemWidget::m_FileStatusCheck);
-   mpc_FileStatusChecktimer->start(100);
-}
+   mpc_FileStatusChecktimer->start(10);
+
+   m_SetSizePolicy();
+
+   this->mpc_Movie->setScaledSize(c_DEFAULT_SIZE);
+   this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon(c_StatusIconPath).pixmap(c_DEFAULT_SIZE));
+} //lint !e818
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Movie and the Qt memory management
 C_FlaUpListItemWidget::~C_FlaUpListItemWidget()
 {
    delete this->mpc_FileStatusChecktimer;
@@ -154,34 +131,46 @@ C_FlaUpListItemWidget::~C_FlaUpListItemWidget()
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get Hex File Information
-
-   \param[in]  opc_HexFileInfo   Current hex file info
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListItemWidget::GetHexFileInformation(C_FlaUpHexFileInfo * const opc_HexFileInfo)
+void C_FlaUpListItemWidget::GetHexFileInformation(void)
 {
    const QFileInfo & rc_FileInfo(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath);
 
    if (rc_FileInfo.exists())
    {
-      this->mpc_Ui->pc_FilePathLabel->setText(C_Uti::h_AdaptStringToSize(opc_HexFileInfo->c_HexFileInfo.c_FilePath,
-                                                                         this->mpc_Ui->pc_FilePathLabel->fontMetrics(),
-                                                                         this->width() - mhs32_TITLE_OFFSET));
-      if (opc_HexFileInfo->c_HexFileInfo.c_TimeStamp != "No information available")
+      if (this->q_IsRelativePathToAdd)
       {
-         for (int32_t s32_It = 0; s32_It < static_cast<int32_t>(opc_HexFileInfo->c_BlockInfo.size()); s32_It++)
+         this->mpc_Ui->pc_FilePathLabel->setText(C_Uti::h_MinimizePath(this->mc_CurrentRelativePath,
+                                                                       this->mpc_Ui->pc_FilePathLabel->font(),
+                                                                       static_cast<uint32_t>(this->width()) -
+                                                                       mhs32_TITLE_OFFSET, 0U));
+      }
+      else
+      {
+         this->mpc_Ui->pc_FilePathLabel->setText(C_Uti::h_MinimizePath(this->mc_CurrentAbsolutePath,
+                                                                       this->mpc_Ui->pc_FilePathLabel->font(),
+                                                                       static_cast<uint32_t>(this->width()) -
+                                                                       mhs32_TITLE_OFFSET, 0U));
+      }
+      if (pc_HexFileInfo->c_HexFileInfo.c_TimeStamp != "No information available")
+      {
+         for (int32_t s32_It = 0; s32_It < static_cast<int32_t>(pc_HexFileInfo->c_BlockInfo.size()); s32_It++)
          {
-            if (opc_HexFileInfo->c_BlockInfo.at(s32_It).c_BlockType == "Application")
+            if (pc_HexFileInfo->c_BlockInfo.at(s32_It).c_BlockType == "Application")
             {
+               QString c_Content;
+
                this->ms32_ApplicationBlockIndex = s32_It;
-               this->mpc_Ui->pc_DeviceIDLabel->setText(opc_HexFileInfo->c_BlockInfo.at(
+               c_Content = this->m_UpdateToolTipContent(this->ms32_ApplicationBlockIndex);
+
+               this->mpc_Ui->pc_DeviceIDLabel->setText(pc_HexFileInfo->c_BlockInfo.at(
                                                           this->ms32_ApplicationBlockIndex).c_DeviceId);
-               this->mpc_Ui->pc_ProjectNameLabel->setText(opc_HexFileInfo->c_BlockInfo.at(
+               this->mpc_Ui->pc_ProjectNameLabel->setText(pc_HexFileInfo->c_BlockInfo.at(
                                                              this->ms32_ApplicationBlockIndex).c_ProjectName);
-               this->mpc_Ui->pc_ProjectVersionLabel->setText(opc_HexFileInfo->c_BlockInfo.at(this->
-                                                                                             ms32_ApplicationBlockIndex).c_ProjectVersion);
-               const QString c_Content = this->m_UpdateToolTipContent(this->ms32_ApplicationBlockIndex);
-               this->SetToolTipInformation(opc_HexFileInfo->c_BlockInfo.at(
+               this->mpc_Ui->pc_ProjectVersionLabel->setText(pc_HexFileInfo->c_BlockInfo.at(this->
+                                                                                            ms32_ApplicationBlockIndex).c_ProjectVersion);
+               this->SetToolTipInformation(pc_HexFileInfo->c_BlockInfo.at(
                                               this->ms32_ApplicationBlockIndex).c_BlockType, c_Content);
             }
          }
@@ -251,15 +240,67 @@ bool C_FlaUpListItemWidget::IsFileExistingAndValid() const
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListItemWidget::EnableSettings(const bool oq_Enabled)
 {
-   this->mpc_Ui->pc_DeleteButton->setDisabled(!oq_Enabled);
-   this->mpc_Ui->pc_BrowseButton->setDisabled(!oq_Enabled);
-   this->mpc_ContextMenu->setDisabled(!oq_Enabled);
+   this->mpc_Ui->pc_DeleteButton->setEnabled(oq_Enabled);
+   this->mpc_Ui->pc_BrowseButton->setEnabled(oq_Enabled);
+   this->mpc_ContextMenu->setEnabled(oq_Enabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get File size information
+
+   \return
+   QString
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_FlaUpListItemWidget::GetFileSizeInformation() const
+{
+   return pc_HexFileInfo->c_HexFileInfo.c_NumberOfBytes;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the state of the application
+
+   The icon will be adapted
+
+   \param[in]  ou32_State  State of application
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListItemWidget::SetState(const uint32_t ou32_State)
+{
+   const QSize c_Size = this->mpc_Ui->pc_StatusIcon->size();
+
+   // Stop the GIF
+   disconnect(this->mpc_Movie, &QMovie::finished, this, &C_FlaUpListItemWidget::m_RestartMovie);
+   this->mpc_Movie->stop();
+
+   switch (ou32_State)
+   {
+   case C_FlaUpListItemWidget::hu32_STATE_DEFAULT:
+      this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon(":/images/IconUpdateWaiting.svg").pixmap(c_Size));
+      break;
+   case C_FlaUpListItemWidget::hu32_STATE_ERROR:
+      this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon(":/images/IconUpdateError.svg").pixmap(c_Size));
+      break;
+   case C_FlaUpListItemWidget::hu32_STATE_FINISHED:
+      this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon(":/images/IconUpdateSuccess.svg").pixmap(c_Size));
+      break;
+   case C_FlaUpListItemWidget::hu32_STATE_IN_PROGRESS:
+      this->mpc_Ui->pc_StatusIcon->setMovie(this->mpc_Movie);
+      connect(this->mpc_Movie, &QMovie::finished, this, &C_FlaUpListItemWidget::m_RestartMovie);
+      this->mpc_Movie->start();
+      break;
+   case C_FlaUpListItemWidget::hu32_STATE_TO_DO:
+      this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon(":/images/IconUpdateWaiting.svg").pixmap(c_Size));
+      break;
+   default:
+      this->mpc_Ui->pc_StatusIcon->setPixmap(QIcon(":/images/IconUpdateWaiting.svg").pixmap(c_Size));
+      break;
+   }
+   this->repaint();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Creating context menu with required actions
-
-   \param[in]  opc_Parent  parent widget of current widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListItemWidget::m_SetupContextMenu()
@@ -275,6 +316,8 @@ void C_FlaUpListItemWidget::m_SetupContextMenu()
    this->mpc_ContextMenu->addSeparator();
    this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("Remove File"), this, &C_FlaUpListItemWidget::m_DeleteItem);
+   this->mpc_ContextMenu->addAction(
+      C_GtGetText::h_GetText("Remove all Files"), this, &C_FlaUpListItemWidget::m_DeleteAllItems);
    this->setContextMenuPolicy(Qt::CustomContextMenu);
 
    connect(this, &C_FlaUpListItemWidget::customContextMenuRequested, this,
@@ -362,6 +405,10 @@ QString C_FlaUpListItemWidget::m_UpdateToolTipContent(const int32_t os32_Index)
 
    if (this->pc_HexFileInfo != NULL)
    {
+      const uint32_t u32_FileSize =
+         static_cast<uint32_t>(this->pc_HexFileInfo->c_HexFileInfo.c_Size.split(' ').at(0).toUInt());
+      const float64_t f64_FileSize = std::ceil(static_cast<float64_t>(u32_FileSize) / 1024.0);
+
       c_Content += C_GtGetText::h_GetText("Project Name: ");
       c_Content += this->pc_HexFileInfo->c_BlockInfo.at(os32_Index).c_ProjectName;
 
@@ -382,7 +429,7 @@ QString C_FlaUpListItemWidget::m_UpdateToolTipContent(const int32_t os32_Index)
 
       c_Content += C_GtGetText::h_GetText("\nFile size: ");
 
-      c_Content += this->pc_HexFileInfo->c_HexFileInfo.c_Size;
+      c_Content += QString::number(f64_FileSize);
       c_Content += C_GtGetText::h_GetText(" kB");
    }
 
@@ -395,7 +442,16 @@ QString C_FlaUpListItemWidget::m_UpdateToolTipContent(const int32_t os32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListItemWidget::m_DeleteItem()
 {
-   Q_EMIT this->SigDeleteItemWidget();
+   Q_EMIT this->SigDeleteItemWidget(pc_HexFileInfo->s32_CurrentHexFileIndex, true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  emit signal to delete all items from widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListItemWidget::m_DeleteAllItems()
+{
+   Q_EMIT this->SigDeleteAllItems();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -404,7 +460,7 @@ void C_FlaUpListItemWidget::m_DeleteItem()
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListItemWidget::m_SelectFile()
 {
-   Q_EMIT this->SigSelectFile();
+   Q_EMIT this->SigSelectFile(pc_HexFileInfo->s32_CurrentHexFileIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -421,7 +477,7 @@ void C_FlaUpListItemWidget::m_FileStatusCheck()
       {
          if (this->mpc_Ui->pc_DeviceIDLabel->text() != "Missing")
          {
-            Q_EMIT this->SigReloadCurrentFile();
+            Q_EMIT this->SigReloadCurrentFile(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath, this->pc_HexFileInfo);
             this->mpc_Ui->pc_DeviceIDLabel->SetBackgroundColor(18);
             this->mpc_Ui->pc_DeviceIDLabel->setText("Missing");
             this->mpc_Ui->pc_ProjectNameLabel->setVisible(false);
@@ -435,7 +491,7 @@ void C_FlaUpListItemWidget::m_FileStatusCheck()
             if (this->mpc_Ui->pc_DeviceIDLabel->text() != this->pc_HexFileInfo->c_BlockInfo.at(
                    this->ms32_ApplicationBlockIndex).c_DeviceId)
             {
-               Q_EMIT this->SigReloadCurrentFile();
+               Q_EMIT this->SigReloadCurrentFile(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath, this->pc_HexFileInfo);
                this->mpc_Ui->pc_DeviceIDLabel->SetBackgroundColor(9);
                this->mpc_Ui->pc_ProjectNameLabel->setVisible(true);
                this->mpc_Ui->pc_ProjectVersionLabel->setVisible(true);
@@ -451,7 +507,7 @@ void C_FlaUpListItemWidget::m_FileStatusCheck()
          {
             if (this->mpc_Ui->pc_DeviceIDLabel->text() != "Invalid")
             {
-               Q_EMIT this->SigReloadCurrentFile();
+               Q_EMIT this->SigReloadCurrentFile(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath, this->pc_HexFileInfo);
                this->mpc_Ui->pc_DeviceIDLabel->SetBackgroundColor(18);
                this->mpc_Ui->pc_DeviceIDLabel->setText("Invalid");
                this->mpc_Ui->pc_ProjectNameLabel->setVisible(false);
@@ -470,15 +526,26 @@ void C_FlaUpListItemWidget::m_FileStatusCheck()
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListItemWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   this->resize(this->parentWidget()->width(), 68);
    int32_t s32_Width = this->width();
+
    if (this->pc_HexFileInfo != NULL)
    {
-      this->mpc_Ui->pc_FilePathLabel->setText(C_Uti::h_MinimizePath(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath,
-                                                                    this->mpc_Ui->pc_FilePathLabel->font(),
-                                                                    static_cast<uint32_t>(s32_Width) -
-                                                                    mhs32_TITLE_OFFSET,
-                                                                    0U));
+      if (this->q_IsRelativePathToAdd)
+      {
+         this->mpc_Ui->pc_FilePathLabel->setText(C_Uti::h_MinimizePath(this->mc_CurrentRelativePath,
+                                                                       this->mpc_Ui->pc_FilePathLabel->font(),
+                                                                       static_cast<uint32_t>(s32_Width) -
+                                                                       mhs32_TITLE_OFFSET,
+                                                                       0U));
+      }
+      else
+      {
+         this->mpc_Ui->pc_FilePathLabel->setText(C_Uti::h_MinimizePath(this->mc_CurrentAbsolutePath,
+                                                                       this->mpc_Ui->pc_FilePathLabel->font(),
+                                                                       static_cast<uint32_t>(s32_Width) -
+                                                                       mhs32_TITLE_OFFSET,
+                                                                       0U));
+      }
    }
 
    if (this->mpc_Ui->pc_DeviceIDLabel->isVisible() == true)
@@ -508,4 +575,40 @@ void C_FlaUpListItemWidget::resizeEvent(QResizeEvent * const opc_Event)
    }
 
    QWidget::resizeEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set icon size policy
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListItemWidget::m_SetSizePolicy(void)
+{
+   QSizePolicy c_SizePolicy = this->mpc_Ui->pc_StatusIcon->sizePolicy();
+
+   c_SizePolicy.setRetainSizeWhenHidden(true);
+
+   this->mpc_Ui->pc_StatusIcon->setSizePolicy(c_SizePolicy);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Restart animation
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListItemWidget::m_RestartMovie(void)
+{
+   this->mpc_Movie->start();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get absolute or relative paths for hex files
+
+   \param[in]       orc_Path                  file path
+   \param[in]      orc_AbsoluteReferenceDir   Detailed output parameter description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListItemWidget::m_GetAbsoluteAndRelativePaths(const QString & orc_Path,
+                                                          const QString & orc_AbsoluteReferenceDir)
+{
+   C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, this->mc_CurrentAbsolutePath,
+                                this->mc_CurrentRelativePath);
 }

@@ -18,6 +18,7 @@
 #include "TglUtils.hpp"
 #include "C_SclString.hpp"
 #include "constants.hpp"
+#include "C_PuiSvDashboardFiler.hpp"
 #include "C_OscNodeDataPoolFilerV2.hpp"
 #include "C_PuiSvHandlerFilerV1.hpp"
 #include "C_PuiBsElementsFiler.hpp"
@@ -1376,8 +1377,8 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadTables(std::vector<C_PuiSvDbTable> & orc_W
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XmlParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1419,13 +1420,9 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadSliders(std::vector<C_PuiSvDbSlider> & orc
                }
             }
             //Value
-            if (orc_XmlParser.AttributeExists("value") == true)
+            if (s32_Retval == C_NO_ERR)
             {
-               c_Box.s32_Value = orc_XmlParser.GetAttributeSint32("value");
-            }
-            else
-            {
-               c_Box.s32_Value = 0;
+               s32_Retval = C_PuiSvDashboardFiler::h_LoadSliderValue(c_Box, orc_XmlParser);
             }
             //Add
             orc_Widgets.push_back(c_Box);
@@ -2798,8 +2795,8 @@ void C_PuiSvHandlerFilerV1::mh_SaveTables(const std::vector<C_PuiSvDbTable> & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFilerV1::mh_SaveSliders(const std::vector<C_PuiSvDbSlider> & orc_Widgets,
@@ -2814,7 +2811,8 @@ void C_PuiSvHandlerFilerV1::mh_SaveSliders(const std::vector<C_PuiSvDbSlider> & 
       orc_XmlParser.CreateNodeChild("type", C_PuiSvHandlerFilerV1::mh_SliderTypeToString(
                                        rc_Slider.e_Type).toStdString().c_str());
       orc_XmlParser.SetAttributeBool("show-min-max", rc_Slider.q_ShowMinMax);
-      orc_XmlParser.SetAttributeSint32("value", rc_Slider.s32_Value);
+      //Deprecated
+      orc_XmlParser.SetAttributeSint32("value", 0);
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "sliders");
    }

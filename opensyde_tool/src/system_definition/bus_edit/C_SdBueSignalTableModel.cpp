@@ -245,7 +245,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const int3
          if (e_Col == eAUTO_MIN_MAX)
          {
             const int32_t s32_Index = orc_Index.row();
-            if ((static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size()) && (s32_Index >= 0))
+            if (static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size())
             {
                c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.s32_AutoMinMax;
             }
@@ -258,7 +258,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const int3
          case eICON:
             {
                const int32_t s32_Index = orc_Index.row();
-               if ((static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size()) && (s32_Index >= 0))
+               if (static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size())
                {
                   c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_Icon;
                }

@@ -146,6 +146,25 @@ void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Sty
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reserve items
+
+   \param[in]  ou32_Number    Number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::ReserveItems(const uint32_t ou32_Number)
+{
+   this->mc_ScaledDisplayDataValues.reserve(ou32_Number);
+   this->mc_UnscaledLastDataValues.reserve(ou32_Number);
+   this->mc_UnscaledMaxValues.reserve(ou32_Number);
+   this->mc_UnscaledMinValues.reserve(ou32_Number);
+   this->mc_ArrayItemIndex.reserve(ou32_Number);
+   this->mc_Names.reserve(ou32_Number);
+   this->mc_Units.reserve(ou32_Number);
+   this->mc_InterpretAsStringFlags.reserve(ou32_Number);
+   this->mc_ShowPercentage.reserve(ou32_Number);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize min & max values and names for data elements
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,28 +181,16 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
       {
          const uint32_t u32_Count = pc_Item->c_DataPoolElementsConfig.size();
 
-         //Clear
-         this->mc_ScaledDisplayDataValues.clear();
-         this->mc_UnscaledLastDataValues.clear();
-         this->mc_UnscaledMaxValues.clear();
-         this->mc_UnscaledMinValues.clear();
-         this->mc_ArrayItemIndex.clear();
-         this->mc_Names.clear();
-         this->mc_Units.clear();
-         this->mc_Transparency.clear();
-         this->mc_InterpretAsStringFlags.clear();
-         this->mc_ShowPercentage.clear();
-
-         //Reserve
-         this->mc_ScaledDisplayDataValues.reserve(u32_Count);
-         this->mc_UnscaledLastDataValues.reserve(u32_Count);
-         this->mc_UnscaledMaxValues.reserve(u32_Count);
-         this->mc_UnscaledMinValues.reserve(u32_Count);
-         this->mc_ArrayItemIndex.reserve(u32_Count);
-         this->mc_Names.reserve(u32_Count);
-         this->mc_Units.reserve(u32_Count);
-         this->mc_InterpretAsStringFlags.reserve(u32_Count);
-         this->mc_ShowPercentage.reserve(u32_Count);
+         //Resize
+         this->mc_ScaledDisplayDataValues.resize(u32_Count);
+         this->mc_UnscaledLastDataValues.resize(u32_Count);
+         this->mc_UnscaledMaxValues.resize(u32_Count);
+         this->mc_UnscaledMinValues.resize(u32_Count);
+         this->mc_ArrayItemIndex.resize(u32_Count);
+         this->mc_Names.resize(u32_Count);
+         this->mc_Units.resize(u32_Count);
+         this->mc_InterpretAsStringFlags.resize(u32_Count);
+         this->mc_ShowPercentage.resize(u32_Count);
 
          //Init
          this->mc_Transparency.resize(u32_Count, 255);
@@ -191,13 +198,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
          //Look up
          for (uint32_t u32_ItElement = 0; u32_ItElement < u32_Count; ++u32_ItElement)
          {
-            const C_PuiSvDbNodeDataPoolListElementId * const pc_ElementId =
-               this->GetDataPoolElementIndex(u32_ItElement);
-            if (pc_ElementId != NULL)
-            {
-               this->m_InitMinMaxAndNameForOneRow(*pc_ElementId,
-                                                  pc_Item->c_DataPoolElementsConfig[u32_ItElement]);
-            }
+            m_InitMinMaxAndNameForItem(*pc_Item, u32_ItElement);
          }
       }
    }
@@ -481,7 +482,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const int32_t os3
 {
    QVariant c_Retval;
 
-   if ((orc_Index.isValid()) && (orc_Index.row() >= 0))
+   if (orc_Index.isValid() == true)
    {
       const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_SyvDaItTaModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
@@ -1259,7 +1260,7 @@ uint32_t C_SyvDaItTaModel::m_AddNewItem(const uint32_t ou32_SelectedIndex)
                                                                c_NewConfig.c_DisplayFormatter) == C_NO_ERR);
          }
          //Reinitialize static content
-         InitMinMaxAndName();
+         m_AddAndInitMinMaxAndNameForItem(static_cast<uint32_t>(s32_InsertAt));
          if (q_ChangeRowCount == true)
          {
             //New row
@@ -1642,10 +1643,12 @@ std::vector<uint32_t> C_SyvDaItTaModel::mh_GetSelectedRows(const QModelIndexList
 
    \param[in]  orc_ElementId        Element id
    \param[in]  orc_ElementConfig    Element config
+   \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
-                                                    const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig)
+                                                    const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
+                                                    const uint32_t ou32_Index)
 {
    if (orc_ElementId.GetIsValid() == true)
    {
@@ -1667,40 +1670,40 @@ void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolL
       tgl_assert(pc_Datapool != NULL);
       if ((pc_OscElement != NULL) && (pc_UiElement != NULL) && (pc_Datapool != NULL))
       {
-         this->m_InitValuesForOneRow(orc_ElementId, orc_ElementConfig, *pc_OscElement, *pc_UiElement);
+         this->m_InitValuesForOneRow(orc_ElementId, orc_ElementConfig, *pc_OscElement, *pc_UiElement, ou32_Index);
 
          if (orc_ElementConfig.c_DisplayName.compare("") == 0)
          {
             if ((pc_Datapool->e_Type == C_OscNodeDataPool::eHALC) ||
                 (pc_Datapool->e_Type == C_OscNodeDataPool::eHALC_NVM))
             {
-               this->mc_Names.emplace_back(C_PuiSvHandler::h_GetShortNamespace(orc_ElementId));
+               this->mc_Names[ou32_Index] = C_PuiSvHandler::h_GetShortNamespace(orc_ElementId);
             }
             else
             {
                if (orc_ElementId.GetUseArrayElementIndex())
                {
-                  this->mc_Names.emplace_back(static_cast<QString>("%1[%2]").
-                                              arg(pc_OscElement->c_Name.c_str()).
-                                              arg(orc_ElementId.GetArrayElementIndex()));
+                  this->mc_Names[ou32_Index] = static_cast<QString>("%1[%2]").
+                                               arg(pc_OscElement->c_Name.c_str()).
+                                               arg(orc_ElementId.GetArrayElementIndex());
                }
                else
                {
-                  this->mc_Names.emplace_back(pc_OscElement->c_Name.c_str());
+                  this->mc_Names[ou32_Index] = pc_OscElement->c_Name.c_str();
                }
             }
          }
          else
          {
-            this->mc_Names.emplace_back(orc_ElementConfig.c_DisplayName);
+            this->mc_Names[ou32_Index] = orc_ElementConfig.c_DisplayName;
          }
          if (orc_ElementConfig.c_ElementScaling.q_UseDefault == true)
          {
-            this->mc_Units.emplace_back(pc_OscElement->c_Unit.c_str());
+            this->mc_Units[ou32_Index] = pc_OscElement->c_Unit.c_str();
          }
          else
          {
-            this->mc_Units.emplace_back(orc_ElementConfig.c_ElementScaling.c_Unit);
+            this->mc_Units[ou32_Index] = orc_ElementConfig.c_ElementScaling.c_Unit;
          }
       }
    }
@@ -1708,15 +1711,15 @@ void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolL
    {
       const std::vector<float64_t> c_Empty;
       //Fill up values with dummies
-      this->mc_Names.emplace_back(orc_ElementId.GetInvalidNamePlaceholder());
-      this->mc_Units.emplace_back("");
-      this->mc_ShowPercentage.push_back(false);
-      this->mc_InterpretAsStringFlags.push_back(false);
-      this->mc_UnscaledMaxValues.push_back(c_Empty);
-      this->mc_UnscaledMinValues.push_back(c_Empty);
-      this->mc_ScaledDisplayDataValues.emplace_back(std::vector<QString>());
-      this->mc_UnscaledLastDataValues.push_back(c_Empty);
-      this->mc_ArrayItemIndex.push_back(0UL);
+      this->mc_Names[ou32_Index] = orc_ElementId.GetInvalidNamePlaceholder();
+      this->mc_Units[ou32_Index] = "";
+      this->mc_ShowPercentage[ou32_Index] = false;
+      this->mc_InterpretAsStringFlags[ou32_Index] = false;
+      this->mc_UnscaledMaxValues[ou32_Index] = c_Empty;
+      this->mc_UnscaledMinValues[ou32_Index] = c_Empty;
+      this->mc_ScaledDisplayDataValues[ou32_Index] = std::vector<QString>();
+      this->mc_UnscaledLastDataValues[ou32_Index] = c_Empty;
+      this->mc_ArrayItemIndex[ou32_Index] = 0UL;
    }
 }
 
@@ -1727,40 +1730,42 @@ void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolL
    \param[in]  orc_ElementConfig    Element config
    \param[in]  orc_OscElement       Osc element
    \param[in]  orc_UiElement        Ui element
+   \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
                                              const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                                              const C_OscNodeDataPoolListElement & orc_OscElement,
-                                             const C_PuiSdNodeDataPoolListElement & orc_UiElement)
+                                             const C_PuiSdNodeDataPoolListElement & orc_UiElement,
+                                             const uint32_t ou32_Index)
 {
    std::vector<float64_t> c_Values;
    C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_OscElement.c_MinValue, c_Values);
-   this->mc_UnscaledMinValues.push_back(c_Values);
+   this->mc_UnscaledMinValues[ou32_Index] = c_Values;
    C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_OscElement.c_MaxValue, c_Values);
-   this->mc_UnscaledMaxValues.push_back(c_Values);
-   this->m_InitStartValueForOneRow(orc_ElementConfig, orc_OscElement, orc_UiElement);
-   this->mc_ArrayItemIndex.push_back(orc_ElementId.GetArrayElementIndexOrZero());
+   this->mc_UnscaledMaxValues[ou32_Index] = c_Values;
+   this->m_InitStartValueForOneRow(orc_ElementConfig, orc_OscElement, orc_UiElement, ou32_Index);
+   this->mc_ArrayItemIndex[ou32_Index] = orc_ElementId.GetArrayElementIndexOrZero();
 
    //Percentage
    if (orc_OscElement.GetArray())
    {
       if (orc_ElementId.GetUseArrayElementIndex())
       {
-         this->mc_ShowPercentage.push_back(true);
+         this->mc_ShowPercentage[ou32_Index] = true;
       }
       else
       {
-         this->mc_ShowPercentage.push_back(false);
+         this->mc_ShowPercentage[ou32_Index] = false;
       }
    }
    else
    {
-      this->mc_ShowPercentage.push_back(true);
+      this->mc_ShowPercentage[ou32_Index] = true;
    }
 
    //String
-   this->mc_InterpretAsStringFlags.push_back(orc_UiElement.q_InterpretAsString);
+   this->mc_InterpretAsStringFlags[ou32_Index] = orc_UiElement.q_InterpretAsString;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1769,11 +1774,13 @@ void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElem
    \param[in]  orc_ElementConfig    Element config
    \param[in]  orc_OscElement       Osc element
    \param[in]  orc_UiElement        Ui element
+   \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                                                  const C_OscNodeDataPoolListElement & orc_OscElement,
-                                                 const C_PuiSdNodeDataPoolListElement & orc_UiElement)
+                                                 const C_PuiSdNodeDataPoolListElement & orc_UiElement,
+                                                 const uint32_t ou32_Index)
 {
    C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_FullyUsefulAndTotallyNecessaryVariable;
    C_OscNodeDataPoolContent c_Val = orc_OscElement.c_MinValue;
@@ -1795,6 +1802,64 @@ void C_SyvDaItTaModel::m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementC
    c_Formatted = c_Formatter.GetValuesContentFormatted(c_Val,
                                                        orc_ElementConfig.c_ElementScaling,
                                                        c_Values);
-   this->mc_ScaledDisplayDataValues.push_back(c_Formatted);
-   this->mc_UnscaledLastDataValues.push_back(c_Values);
+   this->mc_ScaledDisplayDataValues[ou32_Index] = c_Formatted;
+   this->mc_UnscaledLastDataValues[ou32_Index] = c_Values;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add and init min max and name for item
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_AddAndInitMinMaxAndNameForItem(const uint32_t ou32_Index)
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+
+   if (pc_TableWidget != NULL)
+   {
+      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
+      if (pc_Item != NULL)
+      {
+         //Reserve
+         this->mc_ScaledDisplayDataValues.insert(this->mc_ScaledDisplayDataValues.begin() + ou32_Index,
+                                                 std::vector<QString>());
+         this->mc_UnscaledLastDataValues.insert(this->mc_UnscaledLastDataValues.begin() + ou32_Index,
+                                                std::vector<float64_t>());
+         this->mc_UnscaledMaxValues.insert(this->mc_UnscaledMaxValues.begin() + ou32_Index, std::vector<float64_t>());
+         this->mc_UnscaledMinValues.insert(this->mc_UnscaledMinValues.begin() + ou32_Index, std::vector<float64_t>());
+         this->mc_ArrayItemIndex.insert(this->mc_ArrayItemIndex.begin() + ou32_Index, 0UL);
+         this->mc_Names.insert(this->mc_Names.begin() + ou32_Index, "");
+         this->mc_Units.insert(this->mc_Units.begin() + ou32_Index, "");
+         this->mc_InterpretAsStringFlags.insert(this->mc_InterpretAsStringFlags.begin() + ou32_Index, false);
+         this->mc_ShowPercentage.insert(this->mc_ShowPercentage.begin() + ou32_Index, false);
+
+         //Init
+         this->mc_Transparency.insert(this->mc_Transparency.begin() + ou32_Index, 255);
+
+         //Look up
+         m_InitMinMaxAndNameForItem(*pc_Item, ou32_Index);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init min max and name for item
+
+   \param[in]  orc_Table   Table
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_InitMinMaxAndNameForItem(const C_PuiSvDbTable & orc_Table, const uint32_t ou32_Index)
+{
+   const C_PuiSvDbNodeDataPoolListElementId * const pc_ElementId =
+      this->GetDataPoolElementIndex(ou32_Index);
+
+   if (pc_ElementId != NULL)
+   {
+      this->m_InitMinMaxAndNameForOneRow(*pc_ElementId,
+                                         orc_Table.c_DataPoolElementsConfig[ou32_Index], ou32_Index);
+   }
 }

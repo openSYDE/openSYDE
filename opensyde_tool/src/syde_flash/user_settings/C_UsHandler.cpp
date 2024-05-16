@@ -275,6 +275,18 @@ QStringList C_UsHandler::GetLastKnownUpdateHexFilePaths() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known Update Hex File Paths as relative or absolute
+
+   \return
+   std::vector<QString>
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QStringList C_UsHandler::GetHexFilePathsAsRelativeOrAbsolute() const
+{
+   return this->mc_HexFilePathsAsRelativeOrAbsolute;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get last know hex file location
 
    \return
@@ -513,6 +525,17 @@ void C_UsHandler::SetTransferDataTimeout(const int32_t & ors32_NewValue)
 void C_UsHandler::SetLastKnownUpdateHexFilePaths(const QStringList & orc_HexFilePaths)
 {
    this->mc_HexFilePaths = orc_HexFilePaths;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known Update Hex File Paths as relative or absolute
+
+   \param[in]  orc_HexFilePathsAsRelativeOrAbsolute   vector of hex file paths as relative or absolute
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetHexFilePathsAsRelativeOrAbsolute(const QStringList & orc_HexFilePathsAsRelativeOrAbsolute)
+{
+   this->mc_HexFilePathsAsRelativeOrAbsolute = orc_HexFilePathsAsRelativeOrAbsolute;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

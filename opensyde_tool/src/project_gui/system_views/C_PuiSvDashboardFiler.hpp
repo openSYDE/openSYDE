@@ -36,6 +36,8 @@ public:
                              stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                              stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static int32_t h_LoadSliderValue(C_PuiSvDbSlider & orc_Slider,
+                                    stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
 
 private:
    static int32_t mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widgets,
@@ -120,6 +122,8 @@ private:
                                           stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveTabChartScreenRegion(const std::vector<std::array<float64_t, 4> > & orc_ScreenRegion,
                                            stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+
+   static void mh_HandlePreviousSliderValue(const int32_t os32_PrevInternalValue, C_PuiSvDbSlider & orc_Slider);
 
    static QString mh_TabTypeToString(const C_PuiSvDashboard::E_TabType oe_Type);
    static QString mh_DisplayStyleToString(const C_PuiSvDbWidgetBase::E_Style oe_Style);

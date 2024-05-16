@@ -28,6 +28,7 @@
 #include "C_PuiSdHandler.hpp"
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_OscNodeDataPoolListElement.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -38,6 +39,9 @@ using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const int32_t C_GiSvDaSliderBase::mhs32_SLIDER_MIN = std::numeric_limits<int32_t>::lowest();
+// Slider stops working (no interaction possible) with values > 999999999, please do not increase
+const int32_t C_GiSvDaSliderBase::mhs32_SLIDER_RANGE = 999999999;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -179,7 +183,8 @@ void C_GiSvDaSliderBase::UpdateData(void)
          this->UpdateSvBasicData(c_Box);
          if (this->mpc_SliderWidget != NULL)
          {
-            c_Box.s32_Value = this->mpc_SliderWidget->GetValue();
+            const float64_t f64_Value = this->m_GetCurrentUnscaledValue();
+            C_OscNodeDataPoolContentUtil::h_SetValueInContent(f64_Value, c_Box.c_Value);
          }
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
@@ -278,22 +283,7 @@ void C_GiSvDaSliderBase::SendCurrentValue(void)
       C_PuiSvDbDataElementScaling c_Scaling;
       tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
       // Prepare the value
-      //We use unscaled values in the original range to have the number of steps the original range would have
-      if (C_OscUtils::h_IsFloat64NearlyEqual(this->mf64_SliderFactor, 1.0) == true)
-      {
-         this->mf64_WriteValue = this->mf64_UnscaledMinValue  +
-                                 (static_cast<float64_t>(this->mpc_SliderWidget->GetValue()) -
-                                  static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue()));
-      }
-      else
-      {
-         //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
-         this->mf64_WriteValue =
-            this->mf64_UnscaledMinValue  +
-            ((static_cast<float64_t>(this->mpc_SliderWidget->GetValue()) -
-              static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue())) *
-             this->mf64_SliderFactor);
-      }
+      this->mf64_WriteValue = this->m_GetCurrentUnscaledValue();
       //For precision reasons we only use valid values (in range of actual type),
       // but this means we have to scale the actual value,
       // so we can apply the generic transmission method (which expects a scaled value)
@@ -375,7 +365,20 @@ bool C_GiSvDaSliderBase::CallProperties(void)
             c_Box.c_DataPoolElementsConfig.clear();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
+               const C_OscNodeDataPoolListElement * const pc_Element = C_PuiSdHandler
+                                                                       ::h_GetInstance()->GetOscDataPoolListElement(
+                  c_Tmp.c_ElementId);
                c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+               tgl_assert(pc_Element != NULL);
+               if (pc_Element != NULL)
+               {
+                  C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_Tmp;
+                  c_Box.c_Value = pc_Element->c_MinValue;
+                  C_OscNodeDataPoolContentUtil::h_ZeroContent(c_Box.c_Value);
+                  tgl_assert(C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_Element->c_MinValue,
+                                                                                   pc_Element->c_MaxValue,
+                                                                                   c_Box.c_Value, e_Tmp) == C_NO_ERR);
+               }
             }
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
             c_Box.q_AutoWriteOnConnect = pc_Dialog->GetAutoWriteOnConnect();
@@ -507,11 +510,11 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                   {
                      if (u64_Steps > 0)
                      {
-                        if (u64_Steps <= static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()))
+                        if (u64_Steps <= static_cast<uint64_t>(C_GiSvDaSliderBase::mhs32_SLIDER_RANGE))
                         {
                            //Standard
                            const int32_t s32_Max =
-                              static_cast<int32_t>(static_cast<int64_t>(std::numeric_limits<int32_t>::lowest()) +
+                              static_cast<int32_t>(static_cast<int64_t>(C_GiSvDaSliderBase::mhs32_SLIDER_MIN) +
                                                    static_cast<int64_t>(u64_Steps));
                            const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
                            const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_UnscaledMax);
@@ -525,7 +528,8 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                                                                         rc_Config.c_ElementScaling,
                                                                         pc_Element->GetType(), c_Formatter);
                            //Start value
-                           this->mpc_SliderWidget->SetValue(pc_Box->s32_Value);
+                           this->mpc_SliderWidget->SetValue(C_GiSvDaSliderBase::m_GetSliderValueFromContent(pc_Box->
+                                                                                                            c_Value));
                         }
                         else
                         {
@@ -534,26 +538,27 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                            //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
                            for (this->mf64_SliderFactor = 2.0;
                                 (static_cast<float64_t>(u64_Steps) / this->mf64_SliderFactor) >
-                                static_cast<float64_t>(std::numeric_limits<uint32_t>::max());
+                                static_cast<float64_t>(C_GiSvDaSliderBase::mhs32_SLIDER_RANGE);
                                 this->mf64_SliderFactor *= 2.0)
                            {
                               //All in for :)
                            }
                            const float64_t f64_Temp = static_cast<float64_t>(u64_Steps) / this->mf64_SliderFactor;
                            const int32_t s32_Max =
-                              static_cast<int32_t>(static_cast<int64_t>(std::numeric_limits<int32_t>::lowest()) +
+                              static_cast<int32_t>(static_cast<int64_t>(C_GiSvDaSliderBase::mhs32_SLIDER_MIN) +
                                                    (static_cast<int64_t>(f64_Temp)));
                            const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
                            const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_UnscaledMax);
-                           this->mpc_SliderWidget->SetMinMax(
-                              std::numeric_limits<int32_t>::lowest(), c_MinText, s32_Max, c_MaxText);
+                           this->mpc_SliderWidget->SetMinMax(C_GiSvDaSliderBase::mhs32_SLIDER_MIN, c_MinText, s32_Max,
+                                                             c_MaxText);
                            //Tool tip (BEFORE start value)
                            this->mpc_SliderWidget->SetToolTipParameters(this->mf64_SliderFactor,
                                                                         this->mf64_UnscaledMinValue,
                                                                         rc_Config.c_ElementScaling,
                                                                         pc_Element->GetType(), c_Formatter);
                            //Start value
-                           this->mpc_SliderWidget->SetValue(pc_Box->s32_Value);
+                           this->mpc_SliderWidget->SetValue(C_GiSvDaSliderBase::m_GetSliderValueFromContent(pc_Box->
+                                                                                                            c_Value));
                         }
                      }
                      else
@@ -576,18 +581,18 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                   {
                      const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
                      const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_UnscaledMax);
-                     this->mpc_SliderWidget->SetMinMax(
-                        std::numeric_limits<int32_t>::lowest(), c_MinText, std::numeric_limits<int32_t>::max(),
-                        c_MaxText);
+                     this->mpc_SliderWidget->SetMinMax(C_GiSvDaSliderBase::mhs32_SLIDER_MIN, c_MinText,
+                                                       C_GiSvDaSliderBase::mhs32_SLIDER_MIN + C_GiSvDaSliderBase::mhs32_SLIDER_RANGE,
+                                                       c_MaxText);
                      //factor for uint32_t::max steps
                      this->mf64_SliderFactor = (f64_UnscaledMax - this->mf64_UnscaledMinValue) /
-                                               static_cast<float64_t>(std::numeric_limits<uint32_t>::max());
+                                               static_cast<float64_t>(C_GiSvDaSliderBase::mhs32_SLIDER_RANGE);
                      //Tool tip (BEFORE start value)
                      this->mpc_SliderWidget->SetToolTipParameters(this->mf64_SliderFactor, this->mf64_UnscaledMinValue,
                                                                   rc_Config.c_ElementScaling,
                                                                   pc_Element->GetType(), c_Formatter);
                      //Start value
-                     this->mpc_SliderWidget->SetValue(pc_Box->s32_Value);
+                     this->mpc_SliderWidget->SetValue(C_GiSvDaSliderBase::m_GetSliderValueFromContent(pc_Box->c_Value));
                   }
                }
             }
@@ -640,4 +645,64 @@ void C_GiSvDaSliderBase::m_SetUnscaledValueToSliderWidget(const float64_t of64_N
                                         static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue());
       this->mpc_SliderWidget->SetValue(static_cast<int32_t>(f64_SliderValue));
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get current unscaled value
+
+   \return
+   Current unscaled value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+float64_t C_GiSvDaSliderBase::m_GetCurrentUnscaledValue() const
+{
+   float64_t f64_Retval;
+
+   //We use unscaled values in the original range to have the number of steps the original range would have
+   if (C_OscUtils::h_IsFloat64NearlyEqual(this->mf64_SliderFactor, 1.0) == true)
+   {
+      f64_Retval = this->mf64_UnscaledMinValue  +
+                   (static_cast<float64_t>(this->mpc_SliderWidget->GetValue()) -
+                    static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue()));
+   }
+   else
+   {
+      //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
+      f64_Retval =
+         this->mf64_UnscaledMinValue  +
+         ((static_cast<float64_t>(this->mpc_SliderWidget->GetValue()) -
+           static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue())) *
+          this->mf64_SliderFactor);
+   }
+   return f64_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get slider value from content
+
+   \param[in]  orc_Content    Content
+
+   \return
+   Slider value from content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_GiSvDaSliderBase::m_GetSliderValueFromContent(const C_OscNodeDataPoolContent & orc_Content) const
+{
+   int32_t s32_Retval;
+   float64_t f64_ContentValue;
+
+   tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Content, f64_ContentValue, 0UL) == C_NO_ERR);
+   if (C_OscUtils::h_IsFloat64NearlyEqual(this->mf64_SliderFactor, 1.0) == true)
+   {
+      const float64_t f64_Tmp = (f64_ContentValue - this->mf64_UnscaledMinValue) +
+                                static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue());
+      s32_Retval = static_cast<int32_t>(f64_Tmp);
+   }
+   else
+   {
+      const float64_t f64_Tmp = ((f64_ContentValue - this->mf64_UnscaledMinValue) / this->mf64_SliderFactor) +
+                                static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue());
+      s32_Retval = static_cast<int32_t>(f64_Tmp);
+   }
+   return s32_Retval;
 }

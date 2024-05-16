@@ -2229,6 +2229,30 @@ void C_OscNode::RecalculateAddress(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Count all local messages
+
+   \return
+   Total number of local messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t C_OscNode::CountAllLocalMessages(void) const
+{
+   uint32_t u32_MessageCount = 0UL;
+
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < this->c_ComProtocols.size(); ++u32_ItProt)
+   {
+      const C_OscCanProtocol & rc_Prot = this->c_ComProtocols[u32_ItProt];
+      for (uint32_t u32_ItCont = 0UL; u32_ItCont < rc_Prot.c_ComMessages.size(); ++u32_ItCont)
+      {
+         const C_OscCanMessageContainer & rc_Cont = rc_Prot.c_ComMessages[u32_ItCont];
+         u32_MessageCount += static_cast<uint32_t>(rc_Cont.c_RxMessages.size());
+         u32_MessageCount += static_cast<uint32_t>(rc_Cont.c_TxMessages.size());
+      }
+   }
+   return u32_MessageCount;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Utility: get specific data pool element
 
    Returns pointer to specific data pool element.

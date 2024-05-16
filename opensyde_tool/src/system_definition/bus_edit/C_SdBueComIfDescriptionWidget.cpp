@@ -512,9 +512,11 @@ void C_SdBueComIfDescriptionWidget::SetInitialFocus(void) const
    \param[in]  oe_Protocol    Current protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::SetProtocol(const C_OscCanProtocol::E_Type oe_Protocol) const
+void C_SdBueComIfDescriptionWidget::SetProtocol(const C_OscCanProtocol::E_Type oe_Protocol)
 {
-   this->mpc_Ui->pc_ProtocolTabWidget->setCurrentIndex(mh_GetIndexOfProtocol(oe_Protocol));
+   const int32_t s32_ProtocolIndex = C_SdBueComIfDescriptionWidget::h_GetIndexOfProtocol(oe_Protocol);
+
+   this->mpc_Ui->pc_ProtocolTabWidget->setCurrentIndex(s32_ProtocolIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -572,8 +574,7 @@ void C_SdBueComIfDescriptionWidget::SelectMessageSearch(const uint32_t ou32_Node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SelectSignalSearch(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
-                                                       const uint32_t ou32_ListIndex,
-                                                       const uint32_t ou32_ElementIndex) const
+                                                       const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex)
 {
    C_OscCanMessageIdentificationIndices c_MessageId;
 
@@ -1090,9 +1091,27 @@ void C_SdBueComIfDescriptionWidget::m_FillNodeDatapoolIndexes(const C_OscNode * 
 //----------------------------------------------------------------------------------------------------------------------
 C_OscCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) const
 {
-   C_OscCanProtocol::E_Type e_Protocol;
+   const uint32_t u32_TabIndex = this->mpc_Ui->pc_ProtocolTabWidget->currentIndex();
 
-   switch (this->mpc_Ui->pc_ProtocolTabWidget->currentIndex())
+   const C_OscCanProtocol::E_Type e_Protocol = h_GetProtocolOfIndex(u32_TabIndex);
+
+   return e_Protocol;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get Protocol of index
+
+   \param[in]       ou32_ProtocolIndex     Protocol index
+
+   \return
+   C_OscCanProtocol::E_Type - Communication Protocol Type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscCanProtocol::E_Type C_SdBueComIfDescriptionWidget::h_GetProtocolOfIndex(const uint32_t ou32_ProtocolIndex)
+{
+   C_OscCanProtocol::E_Type e_Protocol = C_OscCanProtocol::eLAYER2;
+
+   switch (ou32_ProtocolIndex)
    {
    case 1:
       e_Protocol = C_OscCanProtocol::eECES;
@@ -1106,12 +1125,9 @@ C_OscCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) con
    case 4:
       e_Protocol = C_OscCanProtocol::eJ1939;
       break;
-   case 0: // default case: layer 2
    default:
-      e_Protocol = C_OscCanProtocol::eLAYER2;
       break;
    }
-
    return e_Protocol;
 }
 
@@ -1423,17 +1439,17 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the index of the protocol
 
-   \param[in]  oe_Protocol    Current protocol
+   \param[in]  ore_Protocol    Current protocol
 
    \return
    Index of protocol in tab order
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_SdBueComIfDescriptionWidget::mh_GetIndexOfProtocol(const C_OscCanProtocol::E_Type oe_Protocol)
+int32_t C_SdBueComIfDescriptionWidget::h_GetIndexOfProtocol(const C_OscCanProtocol::E_Type & ore_Protocol)
 {
    int32_t s32_Index = 0;
 
-   switch (oe_Protocol)
+   switch (ore_Protocol)
    {
    case C_OscCanProtocol::eECES:
       s32_Index = 1;
@@ -1905,7 +1921,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
 /*! \brief   Updates the tab text with protocol names and its unique CAN messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::m_UpdateTabText(void) const
+void C_SdBueComIfDescriptionWidget::m_UpdateTabText(void)
 {
    this->m_UpdateTabText(C_OscCanProtocol::eLAYER2);
    this->m_UpdateTabText(C_OscCanProtocol::eECES);
@@ -1920,7 +1936,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateTabText(void) const
    \param[in]  oe_Protocol    Current protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::m_UpdateTabText(const C_OscCanProtocol::E_Type oe_Protocol) const
+void C_SdBueComIfDescriptionWidget::m_UpdateTabText(const C_OscCanProtocol::E_Type oe_Protocol)
 {
    QString c_Text;
    uint32_t u32_Count = 0U;
@@ -1947,7 +1963,9 @@ void C_SdBueComIfDescriptionWidget::m_UpdateTabText(const C_OscCanProtocol::E_Ty
    c_Text = C_PuiSdUtil::h_ConvertProtocolTypeToString(oe_Protocol);
    c_Text += " (" + QString::number(u32_Count) + ")";
 
-   this->mpc_Ui->pc_ProtocolTabWidget->setTabText(mh_GetIndexOfProtocol(oe_Protocol), c_Text);
+   const int32_t s32_CommProtocolIndex = C_SdBueComIfDescriptionWidget::h_GetIndexOfProtocol(oe_Protocol);
+
+   this->mpc_Ui->pc_ProtocolTabWidget->setTabText(s32_CommProtocolIndex, c_Text);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

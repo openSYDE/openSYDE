@@ -8,13 +8,7 @@
 </style>
 <title>Element 188</title>
 <g id="Ebene_2_1_">
-	<g id="Platzhalter">
-		<rect y="0" class="st0" width="24" height="24"/>
-	</g>
-	<g id="Ebene_1-2">
-		<polygon class="st1" points="10.5,17.5 12,19 12,19 12,19 13.4,17.6 13.4,17.5 18.7,12.2 17.3,10.8 13,15.1 13,0 11,0 11,15.2 
-			6.6,10.8 5.2,12.2 10.6,17.5 		"/>
-		<rect y="22" class="st1" width="24" height="2"/>
-	</g>
+	<polygon class="st1" points="10.4,17.37 12,19.0 18.8,12.2 17.50,10.8 13,15.2 13,0 11,0 11,15.2 6.5,10.8 5.2,12.1 10,17"/>		
+	<rect y="22" class="st1" width="24" height="2"/>
 </g>
 </svg>

@@ -180,6 +180,7 @@ void C_SdNdeDpContentUtil::h_GetValuesAsFloat64(const C_OscNodeDataPoolContent &
 
    if (orc_Content.GetArray() == true)
    {
+      orc_Output.reserve(orc_Content.GetArraySize());
       for (uint32_t u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
       {
          switch (orc_Content.GetType())
@@ -1204,6 +1205,7 @@ int32_t C_SdNdeDpContentUtil::h_GetMinimalTypeAfterScaling(const C_OscNodeDataPo
          if (((c_Min.size() == c_Max.size()) && (c_Min.size() == orc_Min.GetArraySize())) &&
              (orc_Min.GetArraySize() == orc_Max.GetArraySize()))
          {
+            orc_Types.reserve(orc_Max.GetArraySize());
             for (uint32_t u32_ItArray = 0; u32_ItArray < orc_Max.GetArraySize(); ++u32_ItArray)
             {
                f64_Min = C_OscUtils::h_GetValueScaled(c_Min[u32_ItArray], of64_Factor, of64_Offset);

@@ -1167,26 +1167,54 @@ void C_PuiSvData::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_Pui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sync view node indices to deleted node index
+/*! \brief  Sync view node indices to node replace change
 
-   \param[in]  ou32_Index  Deleted node index
+   \param[in]  ou32_Index  Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
+void C_PuiSvData::OnSyncNodeReplace(const uint32_t ou32_Index)
+{
+   if (ou32_Index <= this->mc_NodeUpdateInformation.size())
+   {
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_Index);
+
+      tgl_assert(pc_Node != NULL);
+      if (pc_Node != NULL)
+      {
+         //Handle node applications (could not be synced up to this point) AFTER node update information was added
+         for (uint32_t u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
+         {
+            OnSyncNodeApplicationAdded(ou32_Index, u32_ItApplication);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view node indices to deleted node index
+
+   \param[in]  ou32_Index           Deleted node index
+   \param[in]  oq_OnlyMarkInvalid   Only mark invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid)
 {
    QMap<C_OscNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
-   if (ou32_Index < this->mc_NodeActiveFlags.size())
+   if (!oq_OnlyMarkInvalid)
    {
-      this->mc_NodeActiveFlags.erase(this->mc_NodeActiveFlags.begin() + ou32_Index);
-   }
-   if (ou32_Index < this->mc_NodeUpdateInformation.size())
-   {
-      this->mc_NodeUpdateInformation.erase(this->mc_NodeUpdateInformation.begin() + ou32_Index);
+      if (ou32_Index < this->mc_NodeActiveFlags.size())
+      {
+         this->mc_NodeActiveFlags.erase(this->mc_NodeActiveFlags.begin() + ou32_Index);
+      }
+      if (ou32_Index < this->mc_NodeUpdateInformation.size())
+      {
+         this->mc_NodeUpdateInformation.erase(this->mc_NodeUpdateInformation.begin() + ou32_Index);
+      }
    }
    for (uint32_t u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
    {
       C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[u32_ItDashboard];
-      rc_Dashboard.OnSyncNodeAboutToBeDeleted(ou32_Index);
+      rc_Dashboard.OnSyncNodeAboutToBeDeleted(ou32_Index, oq_OnlyMarkInvalid);
    }
    //Read rail assignments
    for (QMap<C_OscNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::iterator c_ItReadItem =
@@ -1195,7 +1223,7 @@ void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
          c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
-      C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(c_Id, ou32_Index);
+      C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(c_Id, ou32_Index, oq_OnlyMarkInvalid);
       if (c_Id.GetIsValid() == true)
       {
          //Add

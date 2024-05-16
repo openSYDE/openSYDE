@@ -125,6 +125,24 @@ int32_t C_SdBueBusEditWidget::GetTabIndex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the active protocol type depending on which tab the user is navigating.
+
+   \return
+   protocol as member of enum
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscCanProtocol::E_Type C_SdBueBusEditWidget::GetActProtocol(void) const
+{
+   C_OscCanProtocol::E_Type e_Type = C_OscCanProtocol::eLAYER2;
+   tgl_assert(this->mpc_WidgetComIfDescr != NULL);
+   if (this->mpc_WidgetComIfDescr != NULL)
+   {
+      e_Type = this->mpc_WidgetComIfDescr->GetActProtocol();
+   }
+   return e_Type;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Forward call to import messages from DBC, EDS or DCF file to this bus.
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -140,11 +158,32 @@ void C_SdBueBusEditWidget::ImportMessages(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Change to comm messages tab
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditWidget::ChangeToCommMessagesTab()
+{
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_SdBueBusEditWidget::hs32_TAB_INDEX_COMM);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Change the communication protocol view
+
+   \param[in]       ore_Protocol     Protocol that will be viewed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditWidget::ChangeProtocolTab(const C_OscCanProtocol::E_Type & ore_Protocol) const
+{
+   mpc_WidgetComIfDescr->SetProtocol(ore_Protocol);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} //no memory leak; widgets owned and cleaned up by Qt engine
 C_SdBueBusEditWidget::~C_SdBueBusEditWidget()
 {
    delete mpc_Ui;

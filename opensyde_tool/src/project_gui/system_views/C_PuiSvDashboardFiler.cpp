@@ -14,9 +14,13 @@
 
 #include "TglUtils.hpp"
 #include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 #include "C_PuiBsElementsFiler.hpp"
 #include "C_PuiSvDashboardFiler.hpp"
 #include "C_OscNodeDataPoolFiler.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
@@ -356,6 +360,44 @@ void C_PuiSvDashboardFiler::h_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElement
                                  C_OscNodeDataPoolFiler::h_DataPoolToString(orc_Id.GetInvalidTypePlaceholder()));
    orc_XmlParser.CreateNodeChild("invalid-name-placeholder", orc_Id.GetInvalidNamePlaceholder().toStdString().c_str());
    orc_XmlParser.CreateNodeChild("hal-channel-name", orc_Id.GetHalChannelName().toStdString().c_str());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load slider value
+
+   \param[in,out]  orc_Slider       Slider
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "slider" element
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSvDashboardFiler::h_LoadSliderValue(C_PuiSvDbSlider & orc_Slider, C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.AttributeExists("value") == true)
+   {
+      C_PuiSvDashboardFiler::mh_HandlePreviousSliderValue(orc_XmlParser.GetAttributeSint32("value"), orc_Slider);
+   }
+   else
+   {
+      if (orc_XmlParser.SelectNodeChild("content") == "content")
+      {
+         if (C_OscNodeDataPoolFiler::h_LoadDataPoolContentV1(orc_Slider.c_Value, orc_XmlParser) != C_NO_ERR)
+         {
+            s32_Retval = C_CONFIG;
+         }
+         //Return
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "slider");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1075,13 +1117,9 @@ int32_t C_PuiSvDashboardFiler::mh_LoadSliders(std::vector<C_PuiSvDbSlider> & orc
                }
             }
             //Value
-            if (orc_XmlParser.AttributeExists("value") == true)
+            if (s32_Retval == C_NO_ERR)
             {
-               c_Box.s32_Value = orc_XmlParser.GetAttributeSint32("value");
-            }
-            else
-            {
-               c_Box.s32_Value = 0;
+               s32_Retval = C_PuiSvDashboardFiler::h_LoadSliderValue(c_Box, orc_XmlParser);
             }
             //Add
             orc_Widgets.push_back(c_Box);
@@ -2111,7 +2149,10 @@ void C_PuiSvDashboardFiler::mh_SaveSliders(const std::vector<C_PuiSvDbSlider> & 
       orc_XmlParser.CreateNodeChild("type", C_PuiSvDashboardFiler::mh_SliderTypeToString(
                                        rc_Slider.e_Type).toStdString().c_str());
       orc_XmlParser.SetAttributeBool("show-min-max", rc_Slider.q_ShowMinMax);
-      orc_XmlParser.SetAttributeSint32("value", rc_Slider.s32_Value);
+      orc_XmlParser.CreateAndSelectNodeChild("content");
+      C_OscNodeDataPoolFiler::h_SaveDataPoolContentV1(rc_Slider.c_Value, orc_XmlParser);
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "slider");
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "sliders");
    }
@@ -2332,6 +2373,105 @@ void C_PuiSvDashboardFiler::mh_SaveTabChartScreenRegion(const std::vector<std::a
    }
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "tab-chart");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle previous slider value
+
+   \param[in]      os32_PrevInternalValue    Previous internal value
+   \param[in,out]  orc_Slider                Slider
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboardFiler::mh_HandlePreviousSliderValue(const int32_t os32_PrevInternalValue,
+                                                         C_PuiSvDbSlider & orc_Slider)
+{
+   if (orc_Slider.c_DataPoolElementsConfig.size() > 0)
+   {
+      const C_PuiSvDbNodeDataElementConfig & rc_Config = orc_Slider.c_DataPoolElementsConfig[0];
+      if (rc_Config.c_ElementId.GetIsValid() == true)
+      {
+         const C_OscNodeDataPoolListElement * const pc_Element =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                       rc_Config.c_ElementId.u32_DataPoolIndex,
+                                                                       rc_Config.c_ElementId.u32_ListIndex,
+                                                                       rc_Config.c_ElementId.u32_ElementIndex);
+         if (pc_Element != NULL)
+         {
+            uint64_t u64_Steps;
+            float64_t f64_UnscaledValue;
+            float64_t f64_SliderMin;
+            float64_t f64_SliderFactor;
+            float64_t f64_UnscaledMin;
+            tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, f64_UnscaledMin,
+                                                                 0UL) == C_NO_ERR);
+            if (C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(pc_Element->c_MinValue,
+                                                                  pc_Element->c_MaxValue,
+                                                                  u64_Steps, 0) == C_NO_ERR)
+            {
+               if (u64_Steps > 0)
+               {
+                  if (u64_Steps <= static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()))
+                  {
+                     //Standard
+                     f64_SliderMin = static_cast<float64_t>(std::numeric_limits<int32_t>::lowest());
+                     //Default
+                     f64_SliderFactor = 1.0;
+                  }
+                  else
+                  {
+                     //Start with half steps
+                     //Step reduction necessary
+                     //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
+                     for (f64_SliderFactor = 2.0;
+                          (static_cast<float64_t>(u64_Steps) / f64_SliderFactor) >
+                          static_cast<float64_t>(std::numeric_limits<uint32_t>::max());
+                          f64_SliderFactor *= 2.0)
+                     {
+                        //All in for :)
+                     }
+                     f64_SliderMin = static_cast<float64_t>(std::numeric_limits<int32_t>::lowest());
+                  }
+               }
+               else
+               {
+                  //No range at all
+                  f64_SliderMin = 0.0;
+                  //Default
+                  f64_SliderFactor = 1.0;
+               }
+            }
+            else
+            {
+               float64_t f64_UnscaledMax;
+               tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, f64_UnscaledMax,
+                                                                    0UL) == C_NO_ERR);
+               f64_SliderMin = static_cast<float64_t>(std::numeric_limits<int32_t>::lowest());
+               //factor for uint32_t::max steps
+               f64_SliderFactor = (f64_UnscaledMax - f64_UnscaledMin) /
+                                  static_cast<float64_t>(std::numeric_limits<uint32_t>::max());
+            }
+
+            // Prepare the value
+            //We use unscaled values in the original range to have the number of steps the original range would have
+            if (C_OscUtils::h_IsFloat64NearlyEqual(f64_SliderFactor, 1.0) == true)
+            {
+               f64_UnscaledValue = f64_UnscaledMin  +
+                                   (static_cast<float64_t>(os32_PrevInternalValue) -
+                                    static_cast<float64_t>(f64_SliderMin));
+            }
+            else
+            {
+               //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
+               f64_UnscaledValue = f64_UnscaledMin +
+                                   ((static_cast<float64_t>(os32_PrevInternalValue) -
+                                     static_cast<float64_t>(f64_SliderMin)) *
+                                    f64_SliderFactor);
+            }
+            orc_Slider.c_Value = pc_Element->c_MinValue;
+            C_OscNodeDataPoolContentUtil::h_SetValueInContent(f64_UnscaledValue, orc_Slider.c_Value);
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

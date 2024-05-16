@@ -56,7 +56,7 @@ public:
 
 protected:
 private:
-   static const QString mhc_SCREENSHOT_FOLDER_PATH;
+   static QString mhc_ScreenshotFolderPath;
    static const int32_t mhs32_SCREENSHOT_GIF_LABEL_WIDTH;
    static const int32_t mhs32_SCREENSHOT_GIF_LABEL_HEIGHT;
    static const QString mhc_SCREENSHOT_ICON_LIGHT;

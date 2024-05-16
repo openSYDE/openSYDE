@@ -172,11 +172,8 @@ void C_FlaSenSearchNodePopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    // Handle escape key manually: do not close on escape if currently searching and make sure to reset else
    else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
-      q_CallOrg = false;
-      if (this->mpc_Ui->pc_LabelScanningNodes->isVisible() == false)
-      {
-         this->m_OnCancel();
-      }
+      q_CallOrg = true;
+      this->m_OnCancel();
    }
    else
    {
@@ -258,7 +255,8 @@ void C_FlaSenSearchNodePopup::m_ApplyClicked(void)
 
    if (s32_CurrentItem > 0)
    {
-      this->mpc_DcSequences->ResetSystem();
+      this->mpc_DcSequences->StartResetSystem();
+      this->mc_Timer.start();
 
       this->mrc_ParentDialog.accept();
    }
@@ -270,7 +268,22 @@ void C_FlaSenSearchNodePopup::m_ApplyClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaSenSearchNodePopup::m_OnCancel(void)
 {
-   this->mpc_DcSequences->ResetSystem();
+   int32_t s32_Result;
+
+   QApplication::setOverrideCursor(Qt::WaitCursor);
+
+   while (this->mpc_DcSequences->GetResults(s32_Result) == C_BUSY)
+   {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+   }
+   this->mpc_DcSequences->StartResetSystem();
+   this->mc_Timer.start();
+
+   while (this->mpc_DcSequences->GetResults(s32_Result) == C_BUSY)
+   {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+   }
+   QApplication::restoreOverrideCursor();
 
    this->mrc_ParentDialog.reject();
 }
@@ -287,7 +300,6 @@ void C_FlaSenSearchNodePopup::m_ScanNodes(const uint32_t ou32_FlashloaderResetWa
 
    // Disable user interaction
    this->mpc_Ui->pc_PushButtonOk->setEnabled(false);
-   this->mpc_Ui->pc_PushButtonCancel->setEnabled(false);
 
    // Start scan
    if ((this->mpc_DcSequences->StartScanEnterFlashloader(ou32_FlashloaderResetWaitTime)) == C_NO_ERR)
@@ -367,12 +379,28 @@ void C_FlaSenSearchNodePopup::m_Timer(void)
       // We need all information for showing the result
       QApplication::processEvents();
 
-      // Thread finished
-      this->mc_Timer.stop();
-      s32_ThreadResult = this->mpc_DcSequences->StartScanGetInfo();
-
-      // very unlikely that thread start failed (C_BUSY)
-      tgl_assert(s32_ThreadResult == C_NO_ERR);
+      switch (this->mpc_DcSequences->GetCurrentSequence())
+      {
+      case C_FlaSenDcBasicSequences::eSCAN_ENTER_FLASHLOADER:
+         //stop FL sequence
+         this->mc_Timer.stop();
+         this->mpc_DcSequences->StartScanGetInfo();
+         this->mc_Timer.start();
+         break;
+      case C_FlaSenDcBasicSequences::eSCAN_GET_INFO:
+         //stop Scan sequence
+         this->mc_Timer.stop();
+         break;
+      case C_FlaSenDcBasicSequences::eRESET_SYSTEM:
+         //stop reset sequence
+         this->mc_Timer.stop();
+         break;
+      //those sequences are irrelevant here
+      case C_FlaSenDcBasicSequences::eCONF_DEVICES:
+      case C_FlaSenDcBasicSequences::eNOT_ACTIVE:
+      default:
+         break;
+      }
    }
 }
 

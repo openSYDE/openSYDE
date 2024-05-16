@@ -242,7 +242,8 @@ private:
    //Sync to system definition
    void m_OnSyncNodeAdded(const uint32_t ou32_Index);
    void m_OnSyncNodeHalc(const uint32_t ou32_Index);
-   void m_OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index);
+   void m_OnSyncNodeReplace(const uint32_t ou32_Index);
+   void m_OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid);
    void m_OnSyncBusAdded(const uint32_t ou32_Index);
    void m_OnSyncBusDeleted(const uint32_t ou32_Index);
    void m_OnSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);

@@ -40,7 +40,7 @@ public:
    void SaveToData(void) const;
    void SelectName(void) const;
    void ShowApplication(const uint32_t ou32_ApplicationIndex) const;
-   bool AddFromTsp(void);
+   bool AddFromTsp(const bool oq_IsNewNode);
    void SaveUserSettings(void);
    void LoadUserSettings(void);
 
@@ -57,9 +57,11 @@ Q_SIGNALS:
                        const bool oq_CombineItemAndSubSubName);
    void SigBusBitrateClicked(const uint32_t & oru32_BusIndex, const QString & orc_BusName);
    void SigNodePropChanged(void);
+   void SigUpdateTrigger(void);
 
 private:
    Ui::C_SdNdeNodePropertiesTabContentWidget * mpc_Ui;
+   void m_UpdateTrigger(const uint32_t ou32_NodeIndex);
 
    //Avoid call
    C_SdNdeNodePropertiesTabContentWidget(const C_SdNdeNodePropertiesTabContentWidget &);

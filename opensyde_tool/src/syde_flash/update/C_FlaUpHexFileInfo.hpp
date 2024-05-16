@@ -11,9 +11,6 @@
 #define C_FLAUPHEXFILEINFO_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QFileInfo>
-#include <QDateTime>
-#include <QCryptographicHash>
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -28,6 +25,7 @@ class C_FlaUpHexFileInfo
 {
 public:
    C_FlaUpHexFileInfo(const QString & orc_File);
+   void SetHexFileInfo(const QString & orc_File);
    class C_HexFileInfo
    {
    public:
@@ -39,9 +37,9 @@ public:
       QString c_FileName;
       QString c_FilePath;
       int32_t s32_NumberOfBlocks;
-   }
+   };
 
-   c_HexFileInfo;
+   C_HexFileInfo c_HexFileInfo;
 
    class C_BlockInfo
    {
@@ -60,7 +58,6 @@ public:
    int32_t s32_CurrentHexFileIndex;
 
 private:
-   void m_SetHexFileInfo(const QString & orc_File);
    static QString mh_GetMd5Hex(const QString & orc_Path);
 };
 

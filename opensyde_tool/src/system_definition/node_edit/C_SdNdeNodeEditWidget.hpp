@@ -51,7 +51,7 @@ public:
    void SetFlag(const uint32_t ou32_Flag) const;
    void OpenDetail(const int32_t os32_MainIndex, const int32_t os32_ListIndex, const int32_t os32_ElementIndex,
                    const int32_t os32_Flag);
-   bool AddFromTsp(void);
+   bool AddFromTsp(const bool oq_IsNewNode);
 
    int32_t GetTabIndex(void) const;
 
@@ -117,6 +117,7 @@ private:
    void m_CreateCoManagerTab(const bool oq_AdaptCursor);
    static void mh_StartWaitingCursor(void);
    static void mh_EndWaitingCursor(void);
+   void m_UpdateTrigger(void);
 
    Ui::C_SdNdeNodeEditWidget * mpc_Ui;
    const uint32_t mu32_NodeIndex;

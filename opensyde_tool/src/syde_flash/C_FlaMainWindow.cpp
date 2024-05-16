@@ -11,9 +11,9 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
+#include <QWinTaskbarButton>
 
 #include "stwerrors.hpp"
-
 #include "C_OscLoggingHandler.hpp"
 #include "C_HeHandler.hpp"
 #include "C_OgeWiUtil.hpp"
@@ -24,8 +24,9 @@
 #include "C_FlaSenDcBasicSequences.hpp"
 #include "C_FlaSenSearchNodePopup.hpp"
 #include "C_Uti.hpp"
-
+#include "C_FlaUpListItemWidget.hpp"
 #include "C_FlaMainWindow.hpp"
+
 #include "ui_C_FlaMainWindow.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -61,8 +62,14 @@ C_FlaMainWindow::C_FlaMainWindow(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_FlaMainWindow),
    mpc_UpSequences(NULL),
    ms32_NextHexFile(0),
-   mq_ContinueUpdate(false)
+   mq_ContinueUpdate(false),
+   mu32_FlashedFilesCounter(0),
+   mu64_FlashedBytes(0),
+   mu32_FlashedBytesTmp(0),
+   mq_NewFile(true)
 {
+   const uint16_t u16_COUTER_TIMEOUT_IN_MILLIS = 1000;
+
    this->mpc_Ui->setupUi(this);
 
    // set stretch factor to have the splitter at real user settings position on tool start
@@ -100,9 +107,12 @@ C_FlaMainWindow::C_FlaMainWindow(QWidget * const opc_Parent) :
    connect(&this->mc_TimerUpdate, &QTimer::timeout, this, &C_FlaMainWindow::m_TimerUpdate);
    this->mc_TimerUpdate.setInterval(25);
 
+   connect(&this->mc_SecTimer, &QTimer::timeout, this, &C_FlaMainWindow::m_CountTime);
+   this->mc_SecTimer.setInterval(u16_COUTER_TIMEOUT_IN_MILLIS);
+
    // User settings
    this->m_LoadUserSettings();
-}
+} //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
@@ -111,8 +121,26 @@ C_FlaMainWindow::C_FlaMainWindow(QWidget * const opc_Parent) :
 C_FlaMainWindow::~C_FlaMainWindow()
 {
    delete this->mpc_Ui;
+   delete this->mpc_Progress;
    delete this->mpc_UpSequences;
    this->mpc_UpSequences = NULL;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten show event slot
+
+   Init progress in Windows taskbar
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::showEvent(QShowEvent * const opc_Event)
+{
+   //handle task bar button
+   m_InitWinTaskbar();
+
+   opc_Event->accept();
+   QMainWindow::showEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -319,48 +347,72 @@ void C_FlaMainWindow::m_OnSettingsSplitterMoved(const int32_t & ors32_Pos, const
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaMainWindow::m_OnUpdateNode()
 {
-   bool q_EnableAction = false;
+   bool q_ProgressError = false;
+   bool q_ProgressUpdate = false;
+   QString orc_Text = "";
+   const bool q_ENABLE_ACTION = true;
 
-   this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_EnableAction);
+   m_ResetProgressBar();
+   m_ResetFileIcons();
+   m_SetProgressBarColor(q_ENABLE_ACTION);
 
    if (this->mpc_Ui->pc_UpdateWidget->GetHexFilePaths().isEmpty() == true)
    {
+      q_ProgressError = true;
+
       C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_TitleBarWidget, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Hex-Files missing"));
       c_Message.SetDescription(
          C_GtGetText::h_GetText("No HEX file(s) found for flashing."));
       c_Message.Execute();
 
-      q_EnableAction = true;
-      this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_EnableAction);
+      this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_ENABLE_ACTION);
    }
    else if (this->mpc_Ui->pc_UpdateWidget->AreAllFilesValid() == false)
    {
+      q_ProgressError = true;
+
       C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_TitleBarWidget, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Hex-Files invalid"));
       c_Message.SetDescription(C_GtGetText::h_GetText("At least one HEX file is missing or invalid."));
       c_Message.Execute();
 
-      q_EnableAction = true;
-      this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_EnableAction);
+      this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_ENABLE_ACTION);
    }
    else
    {
-      this->mpc_Ui->pc_SettingsWidget->ClearProgress();
-
       if (this->m_InitUpdateSequence() == C_NO_ERR)
       {
+         QApplication::setOverrideCursor(Qt::WaitCursor);
+         orc_Text = "Entering update mode ...";
+
          this->me_UpdateStep = C_FlaUpSequences::eACTIVATEFLASHLOADER;
          if (this->mpc_UpSequences->StartActivateFlashLoader(
                 this->mpc_Ui->pc_SettingsWidget->GetFlashloaderResetWaitTime()) == C_NO_ERR)
          {
+            q_ProgressUpdate = true;
+
             this->mc_TimerUpdate.start();
+            this->mc_SecTimer.start();
+            this->m_StartElapsedTimer();
          }
          else
          {
             tgl_assert(false);
          }
       }
+   }
+
+   if (q_ProgressError || q_ProgressUpdate)
+   {
+      uint8_t u8_ProgressState = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_DEFAULT);
+      if (q_ProgressError)
+      {
+         u8_ProgressState = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_ERROR);
+      }
+
+      m_SetHeadingText(orc_Text, u8_ProgressState);
+      m_SetHeadingIcon(u8_ProgressState);
    }
 }
 
@@ -371,14 +423,15 @@ void C_FlaMainWindow::m_OnUpdateNode()
 void C_FlaMainWindow::m_OnSearchNode()
 {
    bool q_EnableAction = false;
-
-   this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_EnableAction);
+   const QSize c_SIZE(550, 510);
 
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_FlaSenSearchNodePopup * const pc_Dialog = new C_FlaSenSearchNodePopup(*c_New);
 
-   //Resize
-   const QSize c_SIZE(550, 510);
+   m_ResetProgressBar();
+   m_ResetFileIcons();
+
+   this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_EnableAction);
 
    c_New->SetSize(c_SIZE);
 
@@ -412,6 +465,9 @@ void C_FlaMainWindow::m_OnSearchNode()
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaMainWindow::m_OnConfigureNode()
 {
+   m_ResetProgressBar();
+   m_ResetFileIcons();
+
    bool q_EnalbeAction = false;
 
    this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_EnalbeAction);
@@ -462,6 +518,261 @@ void C_FlaMainWindow::m_ShowProgress(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show progress bar text
+
+   \param[in]  orc_Text             Text that will be presented
+   \param[in]  u8_ProgressState     State of the progress (hu32_STATE_DEFAULT - black,
+                                                           hu32_STATE_FINISHED - green,
+                                                           hu32_STATE_ERROR - red)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_SetHeadingText(const QString & orc_Text, const uint8_t & oru8_ProgressState) const
+{
+   this->mpc_Ui->pc_UpdateWidget->SetHeadingText(orc_Text, oru8_ProgressState);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set Heading Icon
+
+   \param[in]  u8_ProgressState     Progress state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_SetHeadingIcon(const uint8_t & oru8_State) const
+{
+   this->mpc_Ui->pc_UpdateWidget->SetHeadingIcon(oru8_State);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set progress bar color
+
+   \param[in]  oq_Success    If oq_Success bar is green else red
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_SetProgressBarColor(const bool & orq_Success) const
+{
+   this->mpc_Ui->pc_UpdateWidget->SetProgressBarColor(orq_Success);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calcualte how many bytes of a specific file have been flashed
+
+   \param[in]       s32_FlashableBytesPerFile     Amount of flashable bytes
+   \param[in]       oru8_ProgressInPercentage     Progress in percentage
+
+   \return
+   uint32_t
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t stw::opensyde_gui::C_FlaMainWindow::m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage)
+{
+   const uint8_t u8_MAX_PERCENTAGE = 100;
+
+   const uint32_t u32_FlashableBytesPerFile = this->mpc_Ui->pc_UpdateWidget->GetHexFileSize(mu32_FlashedFilesCounter);
+   const float32_t f32_PercentageDecimal = static_cast<float32_t>(oru8_ProgressInPercentage) /
+                                           static_cast<float32_t>(u8_MAX_PERCENTAGE);
+   const float32_t f32_FlashedBytes = f32_PercentageDecimal * static_cast<float32_t>(u32_FlashableBytesPerFile);
+   const uint32_t u32_FlashedBytes = static_cast<uint32_t>(f32_FlashedBytes);
+
+   return u32_FlashedBytes;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init windows taskbar progress bar
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_InitWinTaskbar(void)
+{
+   const uint8_t u8_MINIMUM_PERCENTAGE = 0;
+   const uint8_t u8_MAXIMUM_PERCENTAGE = 100;
+
+   QWidget * const pc_Top = C_OgeWiUtil::h_GetWidgetUnderNextPopUp(this);
+   QWinTaskbarButton * const pc_Button = new QWinTaskbarButton(pc_Top);
+
+   pc_Button->setWindow(pc_Top->windowHandle());
+
+   this->mpc_Progress = pc_Button->progress();
+   this->mpc_Progress->setMinimum(u8_MINIMUM_PERCENTAGE);
+   this->mpc_Progress->setMaximum(u8_MAXIMUM_PERCENTAGE);
+} //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Error has been detected
+
+   Reset progress bar, taskbar progress, necessary values and show a popup window if wanted
+
+   \param[in]       orq_ShowErrorMessage     Show error message popup window
+
+   \return
+   true        reset
+   false       no reset
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_FlaMainWindow::m_ErrorDetected(const bool & orq_ShowErrorMessage)
+{
+   bool q_CallReset = true;
+
+   const uint8_t u8_STATE = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_ERROR);
+   const QString c_Text = "Update failed!";
+   const uint8_t u8_PROGRESS_STATE = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_ERROR);
+   const bool q_ENABLEACTION = true;
+   const bool q_SUCCESSFULL_UPDATE = false;
+
+   m_UpdateFileIcon(mu32_FlashedFilesCounter, u8_STATE);
+
+   this->mc_SecTimer.stop();
+   this->m_RestartElapsedTimer();
+   this->mpc_Ui->pc_UpdateWidget->ResetSummary();
+
+   m_SetHeadingText(c_Text, u8_PROGRESS_STATE);
+   m_SetHeadingIcon(u8_PROGRESS_STATE);
+   m_SetProgressBarColor(q_SUCCESSFULL_UPDATE);
+
+   if (orq_ShowErrorMessage)
+   {
+      q_CallReset = m_ShowErrorMessage();
+   }
+
+   C_OscLoggingHandler::h_Flush();
+   this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_ENABLEACTION);
+
+   mq_NewFile = q_ENABLEACTION;
+
+   return q_CallReset;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update bottom bar
+
+   Update progress bar and the data transfer
+
+   \param[in]       oru8_ProgressInPercentage     Progress in percentage
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage)
+{
+   const uint8_t u8_MAX_PERCENTAGE = 100;
+   const bool q_VISIBLE_WIN_PROGRESS = true;
+
+   if ((oru8_ProgressInPercentage == 0) && mq_NewFile)
+   {
+      const uint8_t u8_STATE_PROGRESS = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_IN_PROGRESS);
+      const QString orc_Text = "Updating Node ...";
+      m_SetHeadingText(orc_Text, u8_STATE_PROGRESS);
+      m_UpdateFileIcon(mu32_FlashedFilesCounter, u8_STATE_PROGRESS);
+
+      mu32_FlashedBytesTmp = 0;
+      mq_NewFile = false;
+   }
+
+   const uint32_t u32_CalculateFileBytesFlashed = m_CalculateFileBytesFlashed(oru8_ProgressInPercentage);
+   if ((u32_CalculateFileBytesFlashed > 0) && (u32_CalculateFileBytesFlashed > mu32_FlashedBytesTmp))
+   {
+      uint8_t u8_TotalProgressInPercentage;
+
+      const uint32_t u32_Differences = u32_CalculateFileBytesFlashed - mu32_FlashedBytesTmp;
+
+      mu32_FlashedBytesTmp += u32_Differences;
+      mu64_FlashedBytes += u32_Differences;
+
+      u8_TotalProgressInPercentage = m_CalcualteTotalProgressInPercentage();
+
+      this->mpc_Ui->pc_UpdateWidget->UpdateProgressBar(u8_TotalProgressInPercentage);
+      this->m_UpdateWinProgress(q_VISIBLE_WIN_PROGRESS, u8_TotalProgressInPercentage);
+      this->mpc_Ui->pc_UpdateWidget->UpdateDataTransfer(mu64_FlashedBytes);
+   }
+
+   //Calculate the total file bytes percentage
+   if (oru8_ProgressInPercentage == u8_MAX_PERCENTAGE)
+   {
+      const uint8_t u8_STATE_FINISHED = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_FINISHED);
+      m_UpdateFileIcon(mu32_FlashedFilesCounter, u8_STATE_FINISHED);
+      mu32_FlashedFilesCounter += 1;
+      mq_NewFile = true;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Updates the already flashed file by updating its icon
+
+   \param[in]      oru32_FileIndex    File index
+   \param[in]      u8_ProgressState   State of the file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_UpdateFileIcon(const uint32_t & oru32_FileIndex, const uint8_t & oru8_ProgressState) const
+{
+   this->mpc_Ui->pc_UpdateWidget->SetStatusIcon(oru32_FileIndex, oru8_ProgressState);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set task bar progress
+
+   \param[in]  orq_Visible  Progress is visible flag
+   \param[in]  oru8_Value  Progress value (0-100)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_UpdateWinProgress(const bool & orq_Visible, const uint8_t & oru8_Value)
+{
+   this->mpc_Progress->setVisible(orq_Visible);
+   this->mpc_Progress->setValue(oru8_Value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calcualte total progress in percentage
+
+   \return
+   uint8_t
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8_t C_FlaMainWindow::m_CalcualteTotalProgressInPercentage(void) const
+{
+   const uint8_t u8_MINIMUM_PROGRESS_PERCENTAGE = 2; // defined in C_OscBuSequences
+
+   const uint8_t u8_MAX_PERCENTAGE = 100;
+   const uint32_t u32_TotalNumberOfFlashableSize = this->mpc_Ui->pc_UpdateWidget->GetHexFileSize();
+   uint8_t u8_ProgressInPercentage =
+      static_cast<uint8_t>((u8_MAX_PERCENTAGE * mu64_FlashedBytes) / u32_TotalNumberOfFlashableSize);
+
+   if (u8_ProgressInPercentage < (u8_MAX_PERCENTAGE - u8_MINIMUM_PROGRESS_PERCENTAGE))
+   {
+      u8_ProgressInPercentage += u8_MINIMUM_PROGRESS_PERCENTAGE;
+   }
+   return u8_ProgressInPercentage;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset the progress bar with default values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_ResetProgressBar()
+{
+   const bool q_VISIBLE_PROGRESSBAR = false;
+   const uint8_t u8_PROGRESSBAR_VALUE = 0;
+   const uint8_t u8_FLAHSED_FILES_COUNTER = 0;
+
+   /*Reset progress bar*/
+   this->mpc_Ui->pc_UpdateWidget->ResetSummary();
+   this->mpc_Ui->pc_UpdateWidget->UpdateProgressBar(u8_PROGRESSBAR_VALUE);
+   this->mpc_Ui->pc_UpdateWidget->UpdateDataTransfer(u8_PROGRESSBAR_VALUE);
+
+   /*Reset taskbar progress*/
+   m_UpdateWinProgress(q_VISIBLE_PROGRESSBAR, u8_PROGRESSBAR_VALUE);
+
+   /*Reset local variables*/
+   this->mc_SecTimer.stop();
+   this->m_RestartElapsedTimer();
+   mu32_FlashedFilesCounter = u8_FLAHSED_FILES_COUNTER;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset flashable file Icons
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_ResetFileIcons() const
+{
+   this->mpc_Ui->pc_UpdateWidget->ResetStatusIcons();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize update sequence
 
    \return
@@ -476,13 +787,14 @@ int32_t C_FlaMainWindow::m_InitUpdateSequence(void)
    if (this->mpc_UpSequences == NULL)
    {
       this->mpc_UpSequences = new C_FlaUpSequences();
-   }
 
-   // connect signals
-   connect(mpc_UpSequences, &C_FlaUpSequences::SigReportProgress, this, &C_FlaMainWindow::m_ShowProgress);
-   connect(mpc_UpSequences, &C_FlaUpSequences::SigReportFlashloaderInformationText,
-           this, &C_FlaMainWindow::m_ShowProgress);
-   connect(mpc_UpSequences, &C_FlaUpSequences::SigReportDeviceName, this, &C_FlaMainWindow::m_CheckDeviceName);
+      // connect signals
+      connect(mpc_UpSequences, &C_FlaUpSequences::SigReportProgress, this, &C_FlaMainWindow::m_ShowProgress);
+      connect(mpc_UpSequences, &C_FlaUpSequences::SigReportFlashingProgress, this, &C_FlaMainWindow::m_UpdateBottomBar);
+      connect(mpc_UpSequences, &C_FlaUpSequences::SigReportFlashloaderInformationText,
+              this, &C_FlaMainWindow::m_ShowProgress);
+      connect(mpc_UpSequences, &C_FlaUpSequences::SigReportDeviceName, this, &C_FlaMainWindow::m_CheckDeviceName);
+   }
 
    // disable UI
    this->mpc_Ui->pc_TitleBarWidget->EnableActions(false);
@@ -554,6 +866,8 @@ void C_FlaMainWindow::m_TimerUpdate(void)
    // Thread finished if result is C_NO_ERR
    if (s32_ThreadResult == C_NO_ERR)
    {
+      QApplication::setOverrideCursor(Qt::ArrowCursor);
+
       bool q_CallReset = false;
 
       // In the event queue could be some emitted signals from thread left.
@@ -564,20 +878,8 @@ void C_FlaMainWindow::m_TimerUpdate(void)
 
       if (s32_SequenceResult != C_NO_ERR)
       {
-         C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_TitleBarWidget, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Update failed"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("Failure when updating node with ID ") +
-                                  QString::number(this->mpc_Ui->pc_GeneralPropertiesWidget->GetNodeId()) + ".");
-         c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("For details see ")) +
-                              C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                               C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()) + ".");
-         C_OscLoggingHandler::h_Flush();
-         c_Message.Execute();
-
-         const bool q_ENABLEACTION = true;
-         this->mpc_Ui->pc_TitleBarWidget->EnableActions(q_ENABLEACTION);
-
-         q_CallReset = true;
+         const bool q_SHOW_ERROR_MESSAGE = true;
+         q_CallReset = m_ErrorDetected(q_SHOW_ERROR_MESSAGE);
       }
       else
       {
@@ -619,20 +921,40 @@ void C_FlaMainWindow::m_TimerUpdate(void)
                }
                else
                {
-                  // no more steps to do (reset is done on success and failure)
+                  const QString c_Text = "Update successful!";
+                  const uint8_t u8_PROGRESS_STATE = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_FINISHED);
+
                   C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_TitleBarWidget);
+
+                  m_SetHeadingIcon(u8_PROGRESS_STATE);
+                  m_SetHeadingText(c_Text, u8_PROGRESS_STATE);
+                  this->mc_SecTimer.stop();
+
+                  // no more steps to do (reset is done on success and failure)
                   c_Message.SetHeading(C_GtGetText::h_GetText("Update successful"));
                   c_Message.SetDescription(C_GtGetText::h_GetText("Successfully updated node with ID ") +
                                            QString::number(this->mpc_Ui->pc_GeneralPropertiesWidget->GetNodeId()) +
                                            ".");
                   c_Message.SetDetails("Flashed HEX file(s):\n" +
                                        this->mpc_Ui->pc_UpdateWidget->GetHexFilePaths().join("\n"));
-                  c_Message.Execute();
-                  q_CallReset = true;
+
+                  if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+                  {
+                     const uint8_t u8_STATE = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_FINISHED);
+                     const uint32_t u32_FlashedFileIndex = mu32_FlashedFilesCounter - 1;
+
+                     this->m_RestartElapsedTimer();
+                     m_UpdateFileIcon(u32_FlashedFileIndex, u8_STATE);
+
+                     q_CallReset = true;
+                  }
                }
             }
             else
             {
+               const bool q_SHOW_ERROR_MESSAGE = false;
+               m_ErrorDetected(q_SHOW_ERROR_MESSAGE);
+
                q_CallReset = true;
             }
             break;
@@ -647,6 +969,14 @@ void C_FlaMainWindow::m_TimerUpdate(void)
 
       if (q_CallReset == true)
       {
+         mu32_FlashedFilesCounter = 0;
+         mu64_FlashedBytes = 0;
+         mu32_FlashedBytesTmp = 0;
+         const uint8_t u8_WIN_PROGRESS_PERCENTAGE = 0;
+         const bool q_VISIBLE_WIN_PROGRESS = false;
+
+         this->m_UpdateWinProgress(q_VISIBLE_WIN_PROGRESS, u8_WIN_PROGRESS_PERCENTAGE);
+
          this->me_UpdateStep = C_FlaUpSequences::eRESETSYSTEM;
          this->ms32_NextHexFile = 0; // reset
          s32_ThreadResult = this->mpc_UpSequences->StartResetSystem();
@@ -655,9 +985,6 @@ void C_FlaMainWindow::m_TimerUpdate(void)
             this->mc_TimerUpdate.start();
          }
       }
-
-      // very unlikely that thread start failed (C_BUSY)
-      tgl_assert(s32_ThreadResult == C_NO_ERR);
    }
 }
 
@@ -719,4 +1046,75 @@ void C_FlaMainWindow::m_CheckDeviceName(const QString & orc_ReadDeviceName)
    // Start timer always to trigger reset anyway
    this->me_UpdateStep = C_FlaUpSequences::eUPDATENODE;
    this->mc_TimerUpdate.start();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start elapsed timer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_CountTime(void) const
+{
+   const uint64_t u64_ELAPSED_MS = this->mc_ElapsedTimer.elapsed();
+   const uint64_t u64_MS_TO_SEC = 1000ULL;
+   const uint64_t u64_MS_TO_MIN = 60000ULL;
+   const uint64_t u64_MS_TO_HOURS = 3600000ULL;
+   const uint64_t u64_MODULOR_OPERATION_VALUE = 60ULL;
+
+   const uint64_t u64_ElapsedSeconds = (u64_ELAPSED_MS / u64_MS_TO_SEC) % u64_MODULOR_OPERATION_VALUE;
+   const uint64_t u64_ElapsedMin = (u64_ELAPSED_MS / u64_MS_TO_MIN) % u64_MODULOR_OPERATION_VALUE;
+   const uint64_t u64_ElapsedHours = u64_ELAPSED_MS / u64_MS_TO_HOURS;
+
+   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedHours, 2, 10, QChar('0')).
+                          arg(u64_ElapsedMin, 2, 10, QChar('0')).arg(u64_ElapsedSeconds, 2, 10, QChar('0'));
+
+   this->mpc_Ui->pc_UpdateWidget->SetElapsedTime(c_Time);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start elapsed timer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_StartElapsedTimer(void)
+{
+   this->mc_ElapsedTimer.start();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restart elapsed timer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_RestartElapsedTimer(void)
+{
+   this->mc_ElapsedTimer.restart();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show error message popup window
+
+   \param[in]       oq_ShowErrorMessage     Show error message (Id is wrong)
+
+   \return
+   true        reset
+   false       no reset
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool stw::opensyde_gui::C_FlaMainWindow::m_ShowErrorMessage(void)
+{
+   bool q_CallReset = false;
+
+   C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_TitleBarWidget, C_OgeWiCustomMessage::eERROR);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Update failed"));
+   c_Message.SetDescription(C_GtGetText::h_GetText("Failure when updating node with ID ") +
+                            QString::number(this->mpc_Ui->pc_GeneralPropertiesWidget->GetNodeId()) + ".");
+   c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("For details see ")) +
+                        C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                         C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()) + ".");
+
+   if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+   {
+      q_CallReset = true;
+   }
+
+   return q_CallReset;
 }

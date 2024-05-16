@@ -147,10 +147,6 @@ public:
                         const C_PuiSdNodeCanSignal & orc_UiSignal);
    int32_t SetCanSignalMuxValue(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                                 const uint32_t & oru32_SignalIndex, const uint16_t ou16_MultiplexValue);
-   int32_t SetCanSignalPosition(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
-                                const uint32_t & oru32_SignalIndex,
-                                const stw::opensyde_core::C_OscCanSignal & orc_OscSignal,
-                                const C_PuiSdNodeCanSignal & orc_UiSignal);
 
    //Can protocol add/delete/move
    int32_t AddCanMessage(const uint32_t & oru32_NodeIndex,
@@ -195,6 +191,7 @@ public:
                                    const uint32_t & oru32_SignalIndex, const bool oq_ToolTip) const;
    QString GetCanMessageDisplayName(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                                     const bool oq_ToolTip) const;
+   int32_t CountLocalMessages(const uint32_t & oru32_NodeIndex, uint32_t & oru32_MessageCount) const;
 
 protected:
    C_PuiSdHandlerBusLogic(QObject * const opc_Parent = NULL);

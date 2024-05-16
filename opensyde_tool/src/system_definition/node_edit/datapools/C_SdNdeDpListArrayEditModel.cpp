@@ -238,43 +238,40 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
    {
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if (orc_Index.column() >= 0)
+         const C_OscNodeDataPoolListElement * const pc_OscElement =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
+                                                                       this->mu32_DataPoolIndex,
+                                                                       this->mu32_ListIndex,
+                                                                       this->mu32_ElementIndex);
+         if (pc_OscElement != NULL)
          {
-            const C_OscNodeDataPoolListElement * const pc_OscElement =
-               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
-                                                                          this->mu32_DataPoolIndex,
-                                                                          this->mu32_ListIndex,
-                                                                          this->mu32_ElementIndex);
-            if (pc_OscElement != NULL)
+            switch (this->me_ArrayEditType)
             {
-               switch (this->me_ArrayEditType)
+            case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
+               c_Retval =
+                  C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OscElement->c_MinValue,
+                                                                        pc_OscElement->f64_Factor,
+                                                                        pc_OscElement->f64_Offset,
+                                                                        static_cast<uint32_t>(orc_Index.column()));
+               break;
+            case C_SdNdeDpUtil::eARRAY_EDIT_MAX:
+               c_Retval =
+                  C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OscElement->c_MaxValue,
+                                                                        pc_OscElement->f64_Factor,
+                                                                        pc_OscElement->f64_Offset,
+                                                                        static_cast<uint32_t>(orc_Index.column()));
+               break;
+            case C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET:
+               if (this->mu32_DataSetIndex < pc_OscElement->c_DataSetValues.size())
                {
-               case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
                   c_Retval =
-                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OscElement->c_MinValue,
-                                                                           pc_OscElement->f64_Factor,
-                                                                           pc_OscElement->f64_Offset,
-                                                                           static_cast<uint32_t>(orc_Index.column()));
-                  break;
-               case C_SdNdeDpUtil::eARRAY_EDIT_MAX:
-                  c_Retval =
-                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OscElement->c_MaxValue,
-                                                                           pc_OscElement->f64_Factor,
-                                                                           pc_OscElement->f64_Offset,
-                                                                           static_cast<uint32_t>(orc_Index.column()));
-                  break;
-               case C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET:
-                  if (this->mu32_DataSetIndex < pc_OscElement->c_DataSetValues.size())
-                  {
-                     c_Retval =
-                        C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-                           pc_OscElement->c_DataSetValues[this->mu32_DataSetIndex], pc_OscElement->f64_Factor,
-                           pc_OscElement->f64_Offset, static_cast<uint32_t>(orc_Index.column()));
-                  }
-                  break;
-               default:
-                  break;
+                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
+                        pc_OscElement->c_DataSetValues[this->mu32_DataSetIndex], pc_OscElement->f64_Factor,
+                        pc_OscElement->f64_Offset, static_cast<uint32_t>(orc_Index.column()));
                }
+               break;
+            default:
+               break;
             }
          }
       }
@@ -289,8 +286,6 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
          switch (this->me_ArrayEditType)
          {
          case C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET:
-            //Check error
-            if (orc_Index.column() >= 0)
             {
                bool q_ValueBelowMin = false;
                const C_OscNodeDataPoolList * const pc_OscElement =
@@ -317,8 +312,6 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
             break;
          case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
          case C_SdNdeDpUtil::eARRAY_EDIT_MAX:
-            //Check error
-            if (orc_Index.column() >= 0)
             {
                bool q_MinMaxError = false;
                const C_OscNodeDataPoolListElement * const pc_OscElement =

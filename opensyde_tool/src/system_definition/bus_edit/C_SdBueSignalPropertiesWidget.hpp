@@ -14,6 +14,7 @@
 #include <QWidget>
 #include <QDoubleSpinBox>
 #include "stwtypes.hpp"
+#include "C_PuiSdNodeCanUtil.hpp"
 #include "C_OgeWiSpinBoxGroup.hpp"
 #include "C_OscCanMessageIdentificationIndices.hpp"
 #include "C_PuiSdNodeCanMessageSyncManager.hpp"
@@ -82,21 +83,13 @@ private:
       eCHA_J1939_SPN
    };
 
-   enum E_Type
-   {
-      eTY_UNSIGNED = 0,
-      eTY_SIGNED = 1,
-      eTY_FLOAT32 = 2,
-      eTY_FLOAT64 = 3
-   };
-
    Ui::C_SdBueSignalPropertiesWidget * mpc_Ui;
 
    stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;
    stw::opensyde_core::C_OscCanProtocol::E_Type me_ComProtocol;
    stw::opensyde_core::C_OscCanMessageIdentificationIndices mc_MessageId;
    uint32_t mu32_SignalIndex;
-   E_Type me_DataType;
+   stw::opensyde_gui_logic::C_PuiSdNodeCanUtil::E_SignalType me_DataType;
    stw::opensyde_core::C_OscCanSignal mc_DataOscSignal;
    stw::opensyde_gui_logic::C_PuiSdNodeCanSignal mc_DataUiSignal;
    stw::opensyde_core::C_OscNodeDataPoolListElement mc_DataOscSignalCommon;
@@ -125,8 +118,6 @@ private:
    void m_HandleMuxTypeChange(void);
    void m_HandleMuxValueChange(void);
    void m_HandleJ1939SpnChange(void);
-   static void mh_AdaptValueToSignalLength(const uint16_t ou16_BitLength,
-                                           stw::opensyde_core::C_OscNodeDataPoolContent & orc_Content);
    int32_t m_LoadGeneric(stw::opensyde_gui_elements::C_OgeWiSpinBoxGroup * const opc_Widget,
                          const stw::opensyde_core::C_OscNodeDataPoolContent & orc_Content, const float64_t of64_Factor,
                          const float64_t of64_Offset, const uint16_t ou16_BitLength,

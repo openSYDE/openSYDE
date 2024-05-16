@@ -32,7 +32,8 @@ stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView::item:!selected:hove
 stw--opensyde_gui--C_FlaConNodeConfigPopup,
 stw--opensyde_gui--C_FlaSenSearchNodePopup,
 stw--opensyde_gui--C_SyvDcConnectedNodeList,
-stw--opensyde_gui--C_FlaUpHexFileView
+stw--opensyde_gui--C_FlaUpHexFileView,
+stw--opensyde_gui--C_FlaBottomBar
 {
 background-color:transparent;
 }
@@ -205,7 +206,8 @@ background-color:rgb(57, 57, 109);
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_COLOR_5 */
 stw--opensyde_gui_elements--C_OgeLabUpdateAppVersion,
-stw--opensyde_gui_elements--C_CamOgeLabStatusBar
+stw--opensyde_gui_elements--C_CamOgeLabStatusBar,
+stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="5"]
 {
 color:rgb(71, 71, 99);
 }
@@ -452,6 +454,11 @@ stw--opensyde_gui_elements--C_OgePubMessageOk:enabled
 background-color:rgb(126, 199, 98);
 }
 
+stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="21"]
+{
+color:rgb(94, 163, 67);
+}
+
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_COLOR_18 */
 stw--opensyde_gui_elements--C_CamOgeLabStatusBar[Error="true"]
@@ -496,7 +503,8 @@ border-color:rgb(203, 235, 193);
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_COLOR_24 */
-stw--opensyde_gui_elements--C_OgeLePropertiesName[Valid="false"]
+stw--opensyde_gui_elements--C_OgeLePropertiesName[Valid="false"],
+stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="24"]
 {
 color: rgb(230, 58, 63);
 }

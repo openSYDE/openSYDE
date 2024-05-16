@@ -50,13 +50,14 @@ public:
    void SetProtocolByDataPool(const uint32_t ou32_DataPoolIndexw);
    void SetBusId(const uint32_t ou32_BusIndex);
    void SetInitialFocus(void) const;
-   void SetProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol) const;
+   void SetProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol);
+
    void PartialReload(void);
    void SelectMessageSearch(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                             const uint32_t ou32_ListIndex, const uint32_t ou32_MessageIndex);
 
    void SelectSignalSearch(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
-                           const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex) const;
+                           const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex);
    void AddSignal(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                   const uint16_t ou16_StartBit) const;
    void AddSignalMultiplexed(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
@@ -77,6 +78,8 @@ public:
    void TriggerSaveOfSplitterUserSettings(void) const;
    void SaveUserSettings(void) const;
    void LoadUserSettings(void);
+   static stw::opensyde_core::C_OscCanProtocol::E_Type h_GetProtocolOfIndex(const uint32_t ou32_ProtocolIndex);
+   static int32_t h_GetIndexOfProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -115,7 +118,6 @@ private:
    void m_SelectSignal(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                        const uint32_t & oru32_SignalIndex) const;
    void m_FillNodeDatapoolIndexes(const stw::opensyde_core::C_OscNode * const opc_Node);
-   static int32_t mh_GetIndexOfProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol);
    void m_SelectMessageProperties(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId) const;
    void m_SelectSignalProperties(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                                  const uint32_t & oru32_SignalIndex) const;
@@ -139,13 +141,15 @@ private:
    const;
    void m_OnLinkSwitchToBus(const QString & orc_Link) const;
    void m_UpdateText(void);
-   void m_UpdateTabText(void) const;
-   void m_UpdateTabText(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol) const;
+   void m_UpdateTabText(void);
+   void m_UpdateTabText(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol);
    void m_UpdateInterfaceText(void) const;
    void m_UpdateInterfaceText(const uint32_t ou32_InterfaceIndex) const;
    void m_GetNodeMessageAndSignalCount(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol,
                                        const uint32_t ou32_InterfaceIndex, uint32_t & oru32_MessageCount,
                                        uint32_t & oru32_SignalCount) const;
+   //int32_t m_GetIndexOfProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol);
+   //int32_t m_Test(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol);
 
    Ui::C_SdBueComIfDescriptionWidget * mpc_Ui;
    uint32_t mu32_BusIndex;                               // For bus mode

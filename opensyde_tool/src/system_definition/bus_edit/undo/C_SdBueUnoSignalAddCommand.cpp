@@ -100,18 +100,27 @@ void C_SdBueUnoSignalAddCommand::SetInitialData(const std::vector<C_OscCanSignal
    this->mc_OscSignalCommon = orc_OscSignalCommon;
    this->mc_UiSignalCommon = orc_UiSignalCommon;
    this->mc_UiSignal = orc_UiSignal;
-   for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
+   tgl_assert(this->mc_Signal.size() == this->mc_UniqueId.size());
+   if (this->mc_Signal.size() == this->mc_UniqueId.size())
    {
-      this->mc_UiSignal[u32_ItStep].u8_ColorIndex = 0U;
-
-      tgl_assert(this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size());
-      if (this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size())
+      for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
       {
-         // Adapt do safety protocol restrictions
-         C_SdUtil::h_AdaptSignalToProtocolType(
-            this->mc_Signal[u32_ItStep],
-            this->mc_OscSignalCommon[this->mc_Signal[u32_ItStep].u32_ComDataElementIndex],
-            orc_ProtocolType[u32_ItStep], NULL);
+         this->mc_UiSignal[u32_ItStep].u8_ColorIndex = 0U;
+
+         tgl_assert(this->mc_Signal.size() == this->mc_OscSignalCommon.size());
+         if (this->mc_Signal.size() == this->mc_OscSignalCommon.size())
+         {
+            //Reinitialize index as current index is not related to data handling
+            this->mc_Signal[u32_ItStep].u32_ComDataElementIndex = u32_ItStep;
+            if (this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size())
+            {
+               // Adapt do safety protocol restrictions
+               C_SdUtil::h_AdaptSignalToProtocolType(
+                  this->mc_Signal[u32_ItStep],
+                  this->mc_OscSignalCommon[this->mc_Signal[u32_ItStep].u32_ComDataElementIndex],
+                  orc_ProtocolType[u32_ItStep], NULL);
+            }
+         }
       }
    }
    tgl_assert(this->m_CheckSignalsSortedAscending());

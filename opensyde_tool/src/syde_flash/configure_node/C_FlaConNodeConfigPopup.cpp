@@ -431,7 +431,7 @@ void C_FlaConNodeConfigPopup::m_MonitorSequence()
             ms32_SequenceResult = C_NO_ERR;
          }
          break;
-      //those sequence are irrelevant here
+      //this sequence is irrelevant here
       case C_FlaSenDcBasicSequences::eNOT_ACTIVE:
       default:
          break;

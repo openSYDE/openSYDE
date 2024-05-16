@@ -404,12 +404,14 @@ bool C_SyvSeScene::IsSceneRubberBandAvailable() const
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SyvSeScene::m_GetContextMenuManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_ContextMenuManager;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager * C_SyvSeScene::m_GetUndoManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_UndoManager;
 }
 

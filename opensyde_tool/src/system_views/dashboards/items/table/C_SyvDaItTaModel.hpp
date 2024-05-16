@@ -15,6 +15,7 @@
 #include "C_TblModelAction.hpp"
 #include <QIcon>
 #include "stwtypes.hpp"
+#include "C_PuiSvDbTable.hpp"
 #include "C_PuiSvDbWidgetBase.hpp"
 #include "C_PuiSvDbDataElementHandler.hpp"
 #include "C_PuiSdNodeDataPoolListElement.hpp"
@@ -46,6 +47,7 @@ public:
 
    void SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode);
 
+   void ReserveItems(const uint32_t ou32_Number);
    void InitMinMaxAndName(void);
    void UpdateValue(void);
    void UpdateError(void);
@@ -128,14 +130,20 @@ private:
    QString m_GetValue(const uint32_t ou32_Index) const;
    static std::vector<uint32_t> mh_GetSelectedRows(const QModelIndexList & orc_Indices);
    void m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
-                                     const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig);
+                                     const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
+                                     const uint32_t ou32_Index);
    void m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
                               const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                               const stw::opensyde_core::C_OscNodeDataPoolListElement & orc_OscElement,
-                              const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiElement);
+                              const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiElement,
+                              const uint32_t ou32_Index);
    void m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                                   const stw::opensyde_core::C_OscNodeDataPoolListElement & orc_OscElement,
-                                  const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiElement);
+                                  const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiElement,
+                                  const uint32_t ou32_Index);
+   void m_AddAndInitMinMaxAndNameForItem(const uint32_t ou32_Index);
+   void m_InitMinMaxAndNameForItem(const stw::opensyde_gui_logic::C_PuiSvDbTable & orc_Table,
+                                   const uint32_t ou32_Index);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

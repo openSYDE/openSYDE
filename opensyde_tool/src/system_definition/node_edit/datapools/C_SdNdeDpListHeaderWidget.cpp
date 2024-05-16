@@ -178,6 +178,7 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} //no memory leak; widgets owned and cleaned up by Qt engine
 C_SdNdeDpListHeaderWidget::~C_SdNdeDpListHeaderWidget(void)
 {
    delete mpc_Ui;

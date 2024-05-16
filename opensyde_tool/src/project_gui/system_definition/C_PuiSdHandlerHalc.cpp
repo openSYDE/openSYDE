@@ -1982,6 +1982,18 @@ bool C_PuiSdHandlerHalc::CheckHalcChannelNameAvailable(const uint32_t ou32_NodeI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clear system definition
+
+   \param[in]  oq_TriggerSyncSignals   Trigger sync signals
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerHalc::Clear(const bool oq_TriggerSyncSignals)
+{
+   this->mc_PreviousHashes.clear();
+   C_PuiSdHandlerNodeLogic::Clear(oq_TriggerSyncSignals);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle data sync for node added
 
    \param[in]  ou32_Index  Index

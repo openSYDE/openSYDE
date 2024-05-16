@@ -191,32 +191,29 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const int32_t o
    {
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if (orc_Index.column() >= 0)
+         const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscElement();
+         if (pc_Element != NULL)
          {
-            const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscElement();
-            if (pc_Element != NULL)
+            if (this->mq_EcuValues == true)
             {
-               if (this->mq_EcuValues == true)
+               c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
+                                                                                pc_Element->f64_Factor,
+                                                                                pc_Element->f64_Offset,
+                                                                                static_cast<uint32_t>(orc_Index.
+                                                                                                      column()),
+                                                                                false);
+            }
+            else
+            {
+               const C_OscNodeDataPoolContent * const pc_Data = this->GetElementData();
+               if (pc_Data != NULL)
                {
-                  c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Data,
                                                                                    pc_Element->f64_Factor,
                                                                                    pc_Element->f64_Offset,
-                                                                                   static_cast<uint32_t>(orc_Index.
-                                                                                                         column()),
-                                                                                   false);
-               }
-               else
-               {
-                  const C_OscNodeDataPoolContent * const pc_Data = this->GetElementData();
-                  if (pc_Data != NULL)
-                  {
-                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Data,
-                                                                                      pc_Element->f64_Factor,
-                                                                                      pc_Element->f64_Offset,
-                                                                                      static_cast<uint32_t>(
-                                                                                         orc_Index.
-                                                                                         column()), false);
-                  }
+                                                                                   static_cast<uint32_t>(
+                                                                                      orc_Index.
+                                                                                      column()), false);
                }
             }
          }

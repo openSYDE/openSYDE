@@ -76,6 +76,7 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
       if (s32_Return == C_NO_ERR)
       {
          uint16_t u16_FileVersion;
+         this->Clear(false);
          //We need to use the old format to improve loading performance in compatibility mode
          s32_Return = C_OscSystemDefinitionFiler::h_LoadSystemDefinition(
             mc_CoreDefinition, c_XmlParser,
@@ -104,8 +105,6 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
                   s32_Return = C_PuiSdHandlerFilerV2::h_LoadBuses(this->mc_UiBuses, c_XmlParser);
                }
                //GUI items
-               this->c_Elements.Clear();
-               this->c_BusTextElements.clear();
                if (s32_Return == C_NO_ERR)
                {
                   //Return
@@ -388,9 +387,11 @@ uint32_t C_PuiSdHandlerData::CalcHashSystemDefinition(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear system definition
+
+   \param[in]  oq_TriggerSyncSignals   Trigger sync signals
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerData::Clear(void)
+void C_PuiSdHandlerData::Clear(const bool oq_TriggerSyncSignals)
 {
    this->mc_UiBuses.clear();
    this->mc_UiNodes.clear();
@@ -403,11 +404,14 @@ void C_PuiSdHandlerData::Clear(void)
 
    //Reset hash
    this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
-   //signal "node change"
-   Q_EMIT this->SigNodesChanged();
-   //signal "bus change"
-   Q_EMIT this->SigBussesChanged();
-   Q_EMIT this->SigSyncClear();
+   if (oq_TriggerSyncSignals)
+   {
+      //signal "node change"
+      Q_EMIT this->SigNodesChanged();
+      //signal "bus change"
+      Q_EMIT this->SigBussesChanged();
+      Q_EMIT this->SigSyncClear();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -691,7 +695,7 @@ void C_PuiSdHandlerData::m_HandleSyncNodeAdded(const uint32_t ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerData::m_HandleSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
 {
-   Q_EMIT this->SigSyncNodeAboutToBeDeleted(ou32_Index);
+   Q_EMIT this->SigSyncNodeAboutToBeDeleted(ou32_Index, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

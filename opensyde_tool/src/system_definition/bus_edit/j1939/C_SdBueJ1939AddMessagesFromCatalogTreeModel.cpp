@@ -12,6 +12,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QIcon>
+#include <QApplication>
 
 #include "precomp_headers.hpp"
 #include "stwerrors.hpp"
@@ -92,6 +93,7 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::UpdateData(
 void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_FillMessageInfo()
 {
    this->mpc_InvisibleRootItem = new C_TblTreeModelCheckableItem();
+   this->mpc_InvisibleRootItem->ReserveChildrenSpace(this->mc_MessagesImportedFromCatalog.size());
 
    this->mc_MessageInfoList.clear();
    this->mc_MessageInfoList.reserve(this->mc_MessagesImportedFromCatalog.size());
@@ -104,56 +106,67 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_FillMessageInfo()
          this->mc_MessagesImportedFromCatalog[u32_MessageIndex];
 
       C_MsgTableData c_MessageData;
+
       c_MessageData.c_Name = rc_Message.c_CanMessage.c_Name;
       c_MessageData.c_Comment = rc_Message.c_CanMessage.c_Comment;
       c_MessageData.c_CanId =  "0x" + QString::number(rc_Message.c_CanMessage.u32_CanId, 16).toUpper();
 
       //PGN
-      C_OscCanUtilJ1939PgInfo c_PgInfo;
-      C_OscCanUtil::h_GetJ1939PgInfoFromCanId(rc_Message.c_CanMessage.u32_CanId, c_PgInfo);
-      c_MessageData.c_J1939Pgn = C_OscCanUtil::h_GetVisiblePgn(c_PgInfo.u32_Pgn);
-
-      // Add message details to the tree
-      C_TblTreeModelCheckableItem * const pc_MessageItem = new C_TblTreeModelCheckableItem();
-      pc_MessageItem->c_Name = c_MessageData.c_J1939Pgn.toString();
-      pc_MessageItem->u32_Index = u32_MessageIndex; // Message index in the vector
-      pc_MessageItem->c_Icon = QIcon(":images/system_definition/IconMessage.svg");
-
-      pc_MessageItem->q_CheckBoxVisible = true;
-      pc_MessageItem->e_CheckState = Qt::Unchecked;
-
-      pc_MessageItem->q_Selectable = true;
-      pc_MessageItem->q_Enabled = true;
-
-      // Add signal details to the tree
-      const uint32_t u32_SignalCount = rc_Message.c_CanMessage.c_Signals.size();
-      if (u32_SignalCount > 0)
       {
-         for (uint32_t u32_SignalIndex = 0; u32_SignalIndex < u32_SignalCount; u32_SignalIndex++)
-         {
-            C_SignalTableData c_SignalData;
-            c_SignalData.u32_Spn = rc_Message.c_CanMessage.c_Signals.at(u32_SignalIndex).u32_J1939Spn;
-            c_SignalData.c_Name = rc_Message.c_CanMessage.c_Signals.at(u32_SignalIndex).c_Element.c_Name;
-            c_SignalData.c_Comment = rc_Message.c_CanMessage.c_Signals.at(u32_SignalIndex).c_Element.c_Comment;
-
-            c_MessageData.c_Signals.push_back(c_SignalData);
-
-            C_TblTreeModelCheckableItem * const pc_SignalItem = new C_TblTreeModelCheckableItem();
-            pc_SignalItem->c_Name = QString::number(c_SignalData.u32_Spn);
-            pc_SignalItem->u32_Index = u32_SignalIndex; // Signal index in the vector
-            pc_SignalItem->c_Icon = QIcon(":/images/system_definition/IconSignal.svg");
-
-            pc_SignalItem->q_Enabled = true;
-            pc_SignalItem->q_Selectable = true;
-
-            pc_SignalItem->q_CheckBoxVisible = false;
-            pc_SignalItem->e_CheckState = Qt::Unchecked;
-
-            pc_MessageItem->AddChild(pc_SignalItem);
-         }
+         C_OscCanUtilJ1939PgInfo c_PgInfo;
+         C_OscCanUtil::h_GetJ1939PgInfoFromCanId(rc_Message.c_CanMessage.u32_CanId, c_PgInfo);
+         c_MessageData.c_J1939Pgn = C_OscCanUtil::h_GetVisiblePgn(c_PgInfo.u32_Pgn);
       }
-      this->mc_MessageInfoList.push_back(c_MessageData);
-      this->mpc_InvisibleRootItem->AddChild(pc_MessageItem);
+
+      {
+         // Add message details to the tree
+         C_TblTreeModelCheckableItem * const pc_MessageItem = new C_TblTreeModelCheckableItem();
+         pc_MessageItem->c_Name = c_MessageData.c_J1939Pgn.toString();
+         pc_MessageItem->u32_Index = u32_MessageIndex; // Message index in the vector
+         pc_MessageItem->c_Icon = QIcon(":images/system_definition/IconMessage.svg");
+
+         pc_MessageItem->q_CheckBoxVisible = true;
+         pc_MessageItem->e_CheckState = Qt::Unchecked;
+
+         pc_MessageItem->q_Selectable = true;
+         pc_MessageItem->q_Enabled = true;
+
+         {
+            // Add signal details to the tree
+            const uint32_t u32_SignalCount = rc_Message.c_CanMessage.c_Signals.size();
+
+            if (u32_SignalCount > 0)
+            {
+               pc_MessageItem->ReserveChildrenSpace(u32_SignalCount);
+
+               for (uint32_t u32_SignalIndex = 0; u32_SignalIndex < u32_SignalCount; u32_SignalIndex++)
+               {
+                  C_SignalTableData c_SignalData;
+                  c_SignalData.u32_Spn = rc_Message.c_CanMessage.c_Signals.at(u32_SignalIndex).u32_J1939Spn;
+                  c_SignalData.c_Name = rc_Message.c_CanMessage.c_Signals.at(u32_SignalIndex).c_Element.c_Name;
+                  c_SignalData.c_Comment = rc_Message.c_CanMessage.c_Signals.at(u32_SignalIndex).c_Element.c_Comment;
+
+                  c_MessageData.c_Signals.push_back(c_SignalData);
+
+                  C_TblTreeModelCheckableItem * const pc_SignalItem = new C_TblTreeModelCheckableItem();
+                  pc_SignalItem->c_Name = QString::number(c_SignalData.u32_Spn);
+                  pc_SignalItem->u32_Index = u32_SignalIndex; // Signal index in the vector
+                  pc_SignalItem->c_Icon = QIcon(":/images/system_definition/IconSignal.svg");
+
+                  pc_SignalItem->q_Enabled = true;
+                  pc_SignalItem->q_Selectable = true;
+
+                  pc_SignalItem->q_CheckBoxVisible = false;
+                  pc_SignalItem->e_CheckState = Qt::Unchecked;
+
+                  pc_MessageItem->AddChild(pc_SignalItem);
+               }
+            }
+         }
+         this->mc_MessageInfoList.push_back(c_MessageData);
+         this->mpc_InvisibleRootItem->AddChild(pc_MessageItem);
+      }
+      QApplication::processEvents();
    }
 }
 
@@ -339,55 +352,50 @@ QVariant C_SdBueJ1939AddMessagesFromCatalogTreeModel::data(const QModelIndex & o
          const C_SdBueJ1939AddMessagesFromCatalogTreeModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
          {
-            const int32_t s32_Index = orc_Index.row();
+            uint32_t u32_MessageIndex = 0UL;
+            uint32_t u32_SignalIndex = 0UL;
+            bool q_IsSignal = false;
 
-            if (s32_Index >= 0)
+            // QModelIndex (orc_Index) could be of main tree item (message) or sub tree item (signal).
+            // Analyze the index and accordingly fetch the item to be displayed.
+            this->m_DecodeIndex(orc_Index, u32_MessageIndex, u32_SignalIndex, q_IsSignal);
+            if (q_IsSignal == false)
             {
-               uint32_t u32_MessageIndex = 0UL;
-               uint32_t u32_SignalIndex = 0UL;
-               bool q_IsSignal = false;
-
-               // QModelIndex (orc_Index) could be of main tree item (message) or sub tree item (signal).
-               // Analyze the index and accordingly fetch the item to be displayed.
-               this->m_DecodeIndex(orc_Index, u32_MessageIndex, u32_SignalIndex, q_IsSignal);
-               if (q_IsSignal == false)
+               switch (e_Col)
                {
-                  switch (e_Col)
-                  {
-                  // Note: CAN Id data is commented out to exclude it's contents from the sort filter results.
-                  // (Sort Proxy model has role set as Qt::DisplayRole). Kept for future use
-                  case eCAN_ID:
-                     //                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_CanId;
-                     break;
-                  case eNAME:
-                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Name.c_str();
-                     break;
-                  case eCOMMENT:
-                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Comment.c_str();
-                     break;
-                  case ePGN_SPN:
-                  // PGN / SPN contained in tree item field "c_Name" (column 0)
-                  default:
-                     break;
-                  }
+               // Note: CAN Id data is commented out to exclude it's contents from the sort filter results.
+               // (Sort Proxy model has role set as Qt::DisplayRole). Kept for future use
+               case eCAN_ID:
+                  //                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_CanId;
+                  break;
+               case eNAME:
+                  c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Name.c_str();
+                  break;
+               case eCOMMENT:
+                  c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Comment.c_str();
+                  break;
+               case ePGN_SPN:
+               // PGN / SPN contained in tree item field "c_Name" (column 0)
+               default:
+                  break;
                }
-               else
+            }
+            else
+            {
+               switch (e_Col)
                {
-                  switch (e_Col)
-                  {
-                  case eNAME:
-                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Signals[u32_SignalIndex].c_Name.c_str();
-                     break;
-                  case eCOMMENT:
-                     c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Signals[u32_SignalIndex].c_Comment.c_str();
-                     break;
-                  case eCAN_ID:
-                  // not applicable for signals
-                  case ePGN_SPN:
-                  // PGN / SPN contained in tree item field "c_Name"(column 0)
-                  default:
-                     break;
-                  }
+               case eNAME:
+                  c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Signals[u32_SignalIndex].c_Name.c_str();
+                  break;
+               case eCOMMENT:
+                  c_Retval = this->mc_MessageInfoList[u32_MessageIndex].c_Signals[u32_SignalIndex].c_Comment.c_str();
+                  break;
+               case eCAN_ID:
+               // not applicable for signals
+               case ePGN_SPN:
+               // PGN / SPN contained in tree item field "c_Name"(column 0)
+               default:
+                  break;
                }
             }
          }

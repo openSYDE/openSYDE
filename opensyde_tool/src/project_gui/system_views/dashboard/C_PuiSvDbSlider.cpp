@@ -36,8 +36,7 @@ using namespace stw::opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbSlider::C_PuiSvDbSlider(void) :
    e_Type(C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1),
-   q_ShowMinMax(true),
-   s32_Value(0)
+   q_ShowMinMax(true)
 {
 }
 
@@ -53,7 +52,7 @@ void C_PuiSvDbSlider::CalcHash(uint32_t & oru32_HashValue) const
 {
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_ShowMinMax, sizeof(this->q_ShowMinMax), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->s32_Value, sizeof(this->s32_Value), oru32_HashValue);
+   this->c_Value.CalcHash(oru32_HashValue);
    C_PuiSvDbWriteWidgetBase::CalcHash(oru32_HashValue);
 }
 

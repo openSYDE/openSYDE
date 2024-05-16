@@ -547,7 +547,7 @@ void C_PuiProject::LoadEmpty(void)
    this->c_ModificationTime = c_Tmp.c_ModificationTime;
    this->c_Template = C_GtGetText::h_GetText("New project");
    this->c_Version = c_Tmp.c_Version;
-   C_PuiSdHandler::h_GetInstance()->Clear();
+   C_PuiSdHandler::h_GetInstance()->Clear(true);
    C_PuiSvHandler::h_GetInstance()->Clear();
    //Update hash
    this->mu32_CalculatedProjectHash = this->m_CalcHashProject();

@@ -1174,6 +1174,7 @@ void C_SyvDcSequences::m_ThreadFunc(void)
               no com driver installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+              setting request programming flag was not accepted by at least one node
    C_RANGE    Broadcast protocol not initialized
    C_COM      could not send request
 */
@@ -1203,6 +1204,7 @@ int32_t C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32_t ou32_CanBi
             s32_Return = this->mpc_ComDriver->SendOsyBroadcastRequestProgramming(q_RequestNotAccepted);
          }
 
+         // Check for error or if all nodes accepted the request
          if ((s32_Return == C_NO_ERR) && (q_RequestNotAccepted == false))
          {
             if (this->mq_OpenSydeDevicesActive == true)
@@ -1234,8 +1236,20 @@ int32_t C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32_t ou32_CanBi
          }
          else
          {
-            osc_write_log_error("Scan CAN enter Flashloader",
-                                "openSYDE request programming failed with error: " + C_SclString::IntToStr(s32_Return));
+            if (s32_Return != C_NO_ERR)
+            {
+               osc_write_log_error("Scan CAN enter Flashloader",
+                                   "openSYDE request programming failed with error: " + C_SclString::IntToStr(
+                                      s32_Return));
+            }
+            else
+            {
+               // Special case: At least one node responded with an error on the request programming request
+               // This is an error. This node is still in the application and this would cause problems
+               s32_Return = C_RD_WR;
+               osc_write_log_error("Scan CAN enter Flashloader",
+                                   "openSYDE request programming broadcast was not accepted by at least one node.");
+            }
          }
       }
       else
@@ -2205,7 +2219,7 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
                         if (s32_Return == C_NO_ERR)
                         {
                            // Set node id
-                           s32_Return = this->mpc_ComDriver->SendOsySetNodeIdForChannel(
+                           s32_Return = C_OscComDriverFlash::h_SendOsySetNodeIdForChannel(
                               c_TemporaryProtocol, static_cast<uint8_t>(rc_InterfaceSettings.e_InterfaceType),
                               rc_InterfaceSettings.u8_InterfaceNumber, c_ServerIdOfCurBus, &u8_ErrCode);
 
@@ -2233,7 +2247,7 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
                         if (s32_Return == C_NO_ERR)
                         {
                            // Set node id
-                           s32_Return = this->mpc_ComDriver->SendOsySetIpAddressForChannel(
+                           s32_Return = C_OscComDriverFlash::h_SendOsySetIpAddressForChannel(
                               c_TemporaryProtocol,
                               rc_InterfaceSettings.u8_InterfaceNumber,
                               rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,

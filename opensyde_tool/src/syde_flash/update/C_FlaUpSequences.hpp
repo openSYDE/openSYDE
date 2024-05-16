@@ -54,10 +54,12 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigReportProgress(const QString & orc_Information);
+   void SigReportFlashingProgress(const uint8_t ou8_Progress);
    void SigReportFlashloaderInformationText(const QString & orc_Information);
    void SigReportDeviceName(const QString & orc_DeviceName);
 
 protected:
+   void m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage) override;
    void m_ReportProgress(const int32_t os32_Result, const stw::scl::C_SclString & orc_Information) override;
    void m_ReportFlashloaderInformationRead(const stw::scl::C_SclString & orc_DeviceName,
                                            const stw::opensyde_core::C_OscComFlashloaderInformation & orc_Information)

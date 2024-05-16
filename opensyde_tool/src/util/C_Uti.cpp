@@ -128,13 +128,22 @@ bool C_Uti::h_CheckFloatHasNoFractionPart(const float64_t of64_Value)
 {
    bool q_Retval;
 
-   if (C_Uti::h_GetNumberOfDecimals(of64_Value) == 0)
+   //Attempt fast way
+   //lint -e{777} Required float equal check
+   if (of64_Value == std::round(of64_Value))
    {
       q_Retval = true;
    }
    else
    {
-      q_Retval = false;
+      if (C_Uti::h_GetNumberOfDecimals(of64_Value) == 0)
+      {
+         q_Retval = true;
+      }
+      else
+      {
+         q_Retval = false;
+      }
    }
    return q_Retval;
 }
@@ -513,6 +522,8 @@ bool C_Uti::h_CheckStyleState(const QStyle::State & orc_ActiveState, const QStyl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current executable path (No slash at end)
 
+   Note: Needs a QApplication object to have been instanced (otherwise the DirPath is empty)
+
    \return
    Current executable path
 */
@@ -520,6 +531,19 @@ bool C_Uti::h_CheckStyleState(const QStyle::State & orc_ActiveState, const QStyl
 QString C_Uti::h_GetExePath(void)
 {
    return QCoreApplication::applicationDirPath();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current directory to exe directory
+
+   Depending on how the binary is executed those might be different when starting
+    resulting in unexpected behavior.
+   This function can be used to make sure both folders are the same.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_Uti::h_SetCurrentDirectoryToExeDirectory(void)
+{
+   QDir::setCurrent(C_Uti::h_GetExePath());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

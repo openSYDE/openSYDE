@@ -1110,10 +1110,11 @@ void C_PuiSvDashboard::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in]  ou32_Index  Node index
+   \param[in]  ou32_Index           Node index
+   \param[in]  oq_OnlyMarkInvalid   Only mark invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
+void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid)
 {
    std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
    m_GetAllWidgetItems(c_Widgets);
@@ -1127,7 +1128,7 @@ void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
          {
             C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
             C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
-            h_OnSyncNodeAboutToBeDeleted(rc_DataElementId, ou32_Index);
+            h_OnSyncNodeAboutToBeDeleted(rc_DataElementId, ou32_Index, oq_OnlyMarkInvalid);
          }
       }
       if (pc_Param != NULL)
@@ -1135,7 +1136,7 @@ void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
          for (uint32_t u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
          {
             C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
-            h_OnSyncNodeAboutToBeDeleted(rc_DataElementConfig.c_ExpandedId, ou32_Index);
+            h_OnSyncNodeAboutToBeDeleted(rc_DataElementConfig.c_ExpandedId, ou32_Index, oq_OnlyMarkInvalid);
          }
       }
    }
@@ -1803,6 +1804,14 @@ bool C_PuiSvDashboard::OnSyncElementTypeOrArrayChanged(const uint32_t ou32_NodeI
             }
          }
       }
+      else
+      {
+         C_PuiSvDashboard::mh_SyncSlidersToElementTypeOrArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex,
+                                                                     ou32_ListIndex, ou32_ElementIndex,
+                                                                     oe_Type,
+                                                                     oq_IsArray,
+                                                                     pc_Widget);
+      }
    }
    return q_Retval;
 }
@@ -2013,16 +2022,20 @@ void C_PuiSvDashboard::h_OnSyncNodeHalc(C_PuiSvDbNodeDataPoolListElementId & orc
 
    \param[in,out]  orc_DataElementId   Data element ID
    \param[in]      ou32_Index          Node index
+   \param[in]      oq_OnlyMarkInvalid  Flag to only mark invalid (in case of replacement rather than delete)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
-                                                    const uint32_t ou32_Index)
+                                                    const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid)
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
       if (orc_DataElementId.u32_NodeIndex > ou32_Index)
       {
-         --orc_DataElementId.u32_NodeIndex;
+         if (!oq_OnlyMarkInvalid)
+         {
+            --orc_DataElementId.u32_NodeIndex;
+         }
       }
       else if (orc_DataElementId.u32_NodeIndex == ou32_Index)
       {
@@ -3592,6 +3605,51 @@ void C_PuiSvDashboard::mh_SyncContentToRangeChanged(const uint32_t ou32_NodeInde
                                                                              orc_Element.c_InitialValue, e_Unused,
                                                                              C_OscNodeDataPoolContentUtil::eLEAVE_VALUE) ==
                        C_NO_ERR);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
+   \param[in]      oe_Type             New element type
+   \param[in]      oq_IsArray          New array type
+   \param[in,out]  opc_Widget          Widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::mh_SyncSlidersToElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex,
+                                                                 const uint32_t ou32_DataPoolIndex,
+                                                                 const uint32_t ou32_ListIndex,
+                                                                 const uint32_t ou32_ElementIndex,
+                                                                 const C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                                 const bool oq_IsArray,
+                                                                 C_PuiSvDbWidgetBase * const opc_Widget)
+{
+   C_PuiSvDbSlider * const pc_SliderWidgets = dynamic_cast<C_PuiSvDbSlider * const>(opc_Widget);
+
+   if (pc_SliderWidgets != NULL)
+   {
+      for (uint32_t u32_ItElement = 0; u32_ItElement < pc_SliderWidgets->c_DataPoolElementsConfig.size();
+           ++u32_ItElement)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+            pc_SliderWidgets->c_DataPoolElementsConfig[u32_ItElement];
+         const C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+         if (rc_DataElementId ==
+             C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                ou32_ElementIndex,
+                                                C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
+                                                0UL))
+         {
+            C_OscNodeDataPoolContent & rc_CurElement = pc_SliderWidgets->c_Value;
+
+            rc_CurElement.SetType(oe_Type);
+            rc_CurElement.SetArray(oq_IsArray);
          }
       }
    }

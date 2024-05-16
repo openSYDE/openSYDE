@@ -362,6 +362,10 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_LoadCatalog()
 
    stw::opensyde_gui_logic::C_CieConverter::C_CieCommDefinition c_CieCommDef;
 
+   // Clear (1)filter text (2)Selected messages, when new DBC file is loaded
+   this->mpc_Ui->pc_LineEditMessageFilter->clear();
+   this->mpc_Ui->pc_LabelSelection->setText(C_GtGetText::h_GetText("No selected message"));
+
    // import network of DBC file
    QApplication::setOverrideCursor(Qt::WaitCursor); // big DBC file can take some time to load
    QApplication::processEvents();                   // update cursor
@@ -369,8 +373,8 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_LoadCatalog()
       c_FullFilePath.toStdString().c_str(),
       c_CieCommDef, c_WarningMessages, c_ErrorMessage,
       true);
-   QApplication::restoreOverrideCursor(); // get old cursor again
-   QApplication::processEvents();         // update cursor
+
+   QApplication::processEvents();
 
    // Set the file import status
    m_SetStatus();
@@ -407,8 +411,8 @@ void C_SdBueJ1939AddMessagesFromCatalogDialog::m_LoadCatalog()
       this->mpc_Ui->pc_TreeView->UpdateData(this->mc_MessagesImportedFromCatalog);
    }
 
-   // Clear filter text when new DBC file is loaded
-   this->mpc_Ui->pc_LineEditMessageFilter->clear();
+   QApplication::restoreOverrideCursor(); // get old cursor again
+   QApplication::processEvents();         // update cursor
 
    m_UpdateUi();
 }

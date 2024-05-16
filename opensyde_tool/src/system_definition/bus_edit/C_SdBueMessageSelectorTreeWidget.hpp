@@ -15,11 +15,13 @@
 #include <QItemSelection>
 
 #include "stwtypes.hpp"
+#include "C_CieConverter.hpp"
 #include "C_SdBueUnoManager.hpp"
+#include "C_CieImportDataAssignment.hpp"
 #include "C_OgeTreeWidgetToolTipBase.hpp"
 #include "C_PuiSdNodeCanMessageSyncManager.hpp"
 #include "C_OscCanMessageIdentificationIndices.hpp"
-#include "C_SdBusMessageSelectorTreeWidgetItem.hpp"
+#include "C_SdBueMessageSelectorTreeWidgetItem.hpp"
 #include "C_SdBueMessageSelectorTreeDelegate.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -53,7 +55,9 @@ public:
    void Add(void);
    void AddMessage(void);
    void AddMessageFromCatalog(void);
-   void AddSignal(void);
+
+   void AddSignalFromMenu(void);
+   void AddSignal(const bool oq_SelectSignal = true);
    void AddSignalWithStartBit(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                               const uint16_t ou16_StartBit, const bool oq_MultiplexedSignal,
                               const uint16_t ou16_MultiplexValue);
@@ -72,6 +76,8 @@ public:
    void ExpandAll(void);
    void CollapseAll(void);
    void EditName(void);
+   void DisconnectSelectionHandling() const;
+   void ReconnectSelectionHandling() const;
    void InternalAddMessage(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId);
    void InternalAddMessageCommit(void);
    uint32_t InternalDeleteMessage(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId);
@@ -128,7 +134,7 @@ private:
    C_SdBueMessageSelectorTreeWidget & operator =(const C_SdBueMessageSelectorTreeWidget &) &;
 
    void m_ReloadTree(const bool & orq_HandleSelection = true);
-   void m_AddSignal(const uint32_t ou32_MessageIndex);
+   void m_AddSignal(const uint32_t ou32_MessageIndex, const bool oq_SelectSignal = true);
    void m_AddCoSignal(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                       const uint32_t ou32_SignalIndex, const uint16_t ou16_StartBit);
    void m_AutoAdaptCoDlc(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId);
@@ -137,7 +143,7 @@ private:
                        const QString & orc_SignalName) const;
 
    void m_SelectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected);
-   void m_CoMessageCheckedStateChanged(C_SdBusMessageSelectorTreeWidgetItem * const opc_Item);
+   void m_CoMessageCheckedStateChanged(C_SdBueMessageSelectorTreeWidgetItem * const opc_Item);
    void m_DeselectChildren(const QTreeWidgetItem * const opc_Parent) const;
    void m_TreeSizeChanged(void);
    void m_ScrollBarRangeChanged(const int32_t os32_Min, const int32_t os32_Max) const;
@@ -170,6 +176,8 @@ private:
                                   const uint16_t ou16_SignalSize,
                                   const stw::opensyde_core::C_OscCanSignal::E_ByteOrderType oe_Type);
    bool m_GetHighestSelected(QModelIndex & orc_Index) const;
+   std::vector<C_CieImportDataAssignment> m_GetJ1939DefaultNodeAssignment(
+      const stw::opensyde_gui_logic::C_CieConverter::C_CieNode & orc_NodeInfo) const;
 
    stw::opensyde_gui_logic::C_SdBueUnoManager * mpc_UndoManager;
    stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;

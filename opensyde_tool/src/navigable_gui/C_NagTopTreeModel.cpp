@@ -95,7 +95,7 @@ QVariant C_NagTopTreeModel::data(const QModelIndex & orc_Index, const int32_t os
 {
    QVariant c_Retval = C_TblTreModel::data(orc_Index, os32_Role);
 
-   if ((orc_Index.isValid() == true) && (orc_Index.column() == 0))
+   if (orc_Index.isValid() == true)
    {
       if (os32_Role == ms32_USER_ROLE_TOOL_TIP_TYPE)
       {

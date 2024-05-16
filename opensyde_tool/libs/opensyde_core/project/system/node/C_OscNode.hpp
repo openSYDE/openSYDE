@@ -137,6 +137,7 @@ public:
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
+   uint32_t CountAllLocalMessages(void) const;
 
    C_OscNodeDataPoolListElement * GetDataPoolListElement(const uint32_t ou32_DataPoolIndex,
                                                          const uint32_t ou32_ListIndex,

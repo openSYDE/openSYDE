@@ -161,6 +161,7 @@ public:
    bool CheckHalcChannelNameAvailable(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
                                       const stw::scl::C_SclString & orc_ChannelName,
                                       const uint32_t * const opu32_ChannelIndexToSkip = NULL) const;
+   void Clear(const bool oq_TriggerSyncSignals) override;
 
 protected:
    void m_HandleSyncNodeAdded(const uint32_t ou32_Index) override;

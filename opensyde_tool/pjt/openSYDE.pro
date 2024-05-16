@@ -45,7 +45,9 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebLabel.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.cpp \
+    ../src/project_gui/C_PuiTargetSupportPackageFiler.cpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.cpp \
+    ../src/project_gui/system_definition/node/can/C_PuiSdNodeCanUtil.cpp \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatter.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatterConfig.cpp \
@@ -54,8 +56,10 @@ SOURCES += ../src/main.cpp \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.cpp \
     ../src/project_operations/C_PopPasswordDialogWidget.cpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.cpp \
+    ../src/system_definition/bus_edit/C_SdBueImportCommMessagesWidget.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
     ../src/system_definition/bus_edit/C_SdBueMessageSelectorTreeDelegate.cpp \
+    ../src/system_definition/bus_edit/C_SdBueMessageSelectorTreeWidgetItem.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.cpp \
@@ -398,7 +402,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/bus_edit/C_SdBueSortHelper.cpp \
     ../src/system_definition/C_SdUtil.cpp \
     ../src/system_views/dashboards/C_SyvDaDashboardSelectorTabBar.cpp \
-    ../src/system_definition/bus_edit/C_SdBusMessageSelectorTreeWidgetItem.cpp \
     ../src/graphic_items/widgets/C_GiWiProxyBase.cpp \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabCheckBox.cpp \
     ../src/system_definition/bus_edit/C_SdBueMessageTableModel.cpp \
@@ -949,7 +952,9 @@ HEADERS  += \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebLabel.hpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.hpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.hpp \
+    ../src/project_gui/C_PuiTargetSupportPackageFiler.hpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.hpp \
+    ../src/project_gui/system_definition/node/can/C_PuiSdNodeCanUtil.hpp \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatter.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatterConfig.hpp \
@@ -958,8 +963,10 @@ HEADERS  += \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.hpp \
     ../src/project_operations/C_PopPasswordDialogWidget.hpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.hpp \
+    ../src/system_definition/bus_edit/C_SdBueImportCommMessagesWidget.hpp \
     ../src/system_definition/C_SdTopologyWidget.hpp \
     ../src/system_definition/bus_edit/C_SdBueMessageSelectorTreeDelegate.hpp \
+    ../src/system_definition/bus_edit/C_SdBueMessageSelectorTreeWidgetItem.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.hpp \
@@ -1304,7 +1311,6 @@ HEADERS  += \
     ../src/system_definition/bus_edit/C_SdBueSortHelper.hpp \
     ../src/system_definition/C_SdUtil.hpp \
     ../src/system_views/dashboards/C_SyvDaDashboardSelectorTabBar.hpp \
-    ../src/system_definition/bus_edit/C_SdBusMessageSelectorTreeWidgetItem.hpp \
     ../src/graphic_items/widgets/C_GiWiProxyBase.hpp \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabCheckBox.hpp \
     ../src/system_definition/bus_edit/C_SdBueMessageTableModel.hpp \
@@ -1811,6 +1817,7 @@ FORMS    += \
     ../src/navigable_gui/C_NagServiceModeInfo.ui \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
+    ../src/system_definition/bus_edit/C_SdBueImportCommMessagesWidget.ui \
     ../src/system_definition/C_SdTopologyWidget.ui \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.ui \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogDialog.ui \

@@ -51,8 +51,11 @@ public:
    void OpenDetail(const int32_t os32_NodeIndex, const int32_t os32_DataPoolIndex, const int32_t os32_ListIndex,
                    const int32_t os32_ElementIndex, const int32_t os32_Flag) const;
    int32_t GetTabIndex(void) const;
+   opensyde_core::C_OscCanProtocol::E_Type GetActProtocol(void) const;
 
    void ImportMessages(void);
+   void ChangeToCommMessagesTab(void);
+   void ChangeProtocolTab(const opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol) const;
 
    static const int32_t hs32_TAB_INDEX_PROPERTIES;
    static const int32_t hs32_TAB_INDEX_COMM;
@@ -68,6 +71,7 @@ Q_SIGNALS:
                        const bool oq_CombineItemAndSubSubName = false);
    void SigSwitchToCoManager(const uint32_t ou32_NodeIndex, const QString & orc_NodeName,
                              const uint8_t ou8_InterfaceNumber) const;
+   void SigCommunicationProtocolChanged(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ActiveProtocolProtocol);
 
 protected:
    void showEvent(QShowEvent * const opc_Event) override;

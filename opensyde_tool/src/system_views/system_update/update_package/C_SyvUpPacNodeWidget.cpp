@@ -14,6 +14,7 @@
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QFileInfo>
+#include <QTimer>
 
 #include "C_SyvUpPacNodeWidget.hpp"
 #include "ui_C_SyvUpPacNodeWidget.h"
@@ -1135,107 +1136,136 @@ void C_SyvUpPacNodeWidget::dropEvent(QDropEvent * const opc_Event)
                             &c_FilePathsPemFiles,
                             &pc_App) == true)
       {
-         const QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
+         const uint8_t u8_TIMER_THRESHOLD_IN_MSEC = 100;
 
-         if ((pc_App != NULL) &&
-             (c_FilePathsDatablocks.size() == 1))
+         QTimer::singleShot(u8_TIMER_THRESHOLD_IN_MSEC, this,
+                            [this, c_FilePathsDatablocks, pc_App, c_FilePathsParamsetFiles, c_FilePathsFileBased,
+                             c_FilePathsPemFiles, opc_Event] ()
          {
-            // Datablock only
+            QStringList c_TimerFilePathsDatablocks = c_FilePathsDatablocks;
+            C_SyvUpPacListNodeItemWidget * const pc_TimerApp = pc_App;
+            const QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
 
-            // Check if relative paths are possible and appreciated
-            c_FilePathsDatablocks[0] =
-               C_ImpUtil::h_AskUserToSaveRelativePath(this, c_FilePathsDatablocks[0], c_Folder);
-
-            if (c_FilePathsDatablocks[0] != "")
+            if ((pc_App != NULL) &&
+                (c_FilePathsDatablocks.size() == 1))
             {
-               this->AdaptFile(c_FilePathsDatablocks[0], pc_App);
-            }
-         }
-         else
-         {
-            // Param sets and file based entries
+  // Datablock only
 
-            // Check if relative paths are possible and appreciated (for all files ask once)
-            QStringList c_PathsParamAndPemAndFile;
-            // Concatenate paths
-            c_PathsParamAndPemAndFile.append(c_FilePathsParamsetFiles);
-            c_PathsParamAndPemAndFile.append(c_FilePathsFileBased);
-            c_PathsParamAndPemAndFile.append(c_FilePathsPemFiles);
+               // Check if relative paths are possible and appreciated
 
-            // Ask
-            c_PathsParamAndPemAndFile =
-               C_ImpUtil::h_AskUserToSaveRelativePath(this, c_PathsParamAndPemAndFile, c_Folder);
+               c_TimerFilePathsDatablocks[0] =
+                  C_ImpUtil::h_AskUserToSaveRelativePath(this, c_TimerFilePathsDatablocks[0], c_Folder);
 
-            if (c_PathsParamAndPemAndFile.size() > 0)
-            {
-               // Re-split paths
-               tgl_assert(c_PathsParamAndPemAndFile.size() ==
-                          (c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size() + c_FilePathsPemFiles.size()));
-
-               c_FilePathsParamsetFiles = c_PathsParamAndPemAndFile.mid(0, c_FilePathsParamsetFiles.size());
-
-               c_FilePathsFileBased = c_PathsParamAndPemAndFile.mid(
-                  c_FilePathsParamsetFiles.size(), c_FilePathsFileBased.size());
-
-               c_FilePathsPemFiles = c_PathsParamAndPemAndFile.mid(
-                  c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size(),
-                  -1);
-
-               if ((pc_App != NULL) &&
-                   (c_FilePathsFileBased.size() == 1) &&
-                   (c_FilePathsParamsetFiles.size() == 0) &&
-                   (c_FilePathsPemFiles.size() == 0))
+               if (c_FilePathsDatablocks[0] != "")
                {
-                  // Replace one file based entry
-                  this->AdaptFile(c_FilePathsFileBased[0], pc_App);
+                  this->AdaptFile(c_FilePathsDatablocks[0], pc_TimerApp);
                }
-               else if ((pc_App != NULL) &&
-                        (c_FilePathsFileBased.size() == 0) &&
-                        (c_FilePathsParamsetFiles.size() == 1) &&
-                        (c_FilePathsPemFiles.size() == 0))
+
+               if (pc_TimerApp != NULL)
                {
-                  // Replace one parameter set image entry
-                  this->AdaptFile(c_FilePathsParamsetFiles[0], pc_App);
-               }
-               else if ((pc_App != NULL) &&
-                        (c_FilePathsFileBased.size() == 0) &&
-                        (c_FilePathsParamsetFiles.size() == 0) &&
-                        (c_FilePathsPemFiles.size() == 1))
-               {
-                  // Replace one PEM file entry
-                  this->AdaptFile(c_FilePathsPemFiles[0], pc_App);
-               }
-               else
-               {
-                  int32_t s32_FileCounter;
-                  // Add all files as new
-                  for (s32_FileCounter = 0; s32_FileCounter < c_FilePathsFileBased.size(); ++s32_FileCounter)
-                  {
-                     // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsFileBased[s32_FileCounter], false, false);
-                  }
-                  for (s32_FileCounter = 0; s32_FileCounter < c_FilePathsParamsetFiles.size(); ++s32_FileCounter)
-                  {
-                     // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsParamsetFiles[s32_FileCounter], true, false);
-                  }
-                  for (s32_FileCounter = 0; s32_FileCounter < c_FilePathsPemFiles.size(); ++s32_FileCounter)
-                  {
-                     // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsPemFiles[s32_FileCounter], false, true);
-                  }
+                  pc_TimerApp->SetSelected(false);
                }
             }
-         }
+            else
+            {
+  // Param sets and file based entries
 
-         if (pc_App != NULL)
-         {
-            pc_App->SetSelected(false);
+               QStringList c_TimerFilePathsParamsetFiles = c_FilePathsParamsetFiles;
+               QStringList c_TimerFilePathsFileBased = c_FilePathsFileBased;
+               QStringList c_TimerFilePathsPemFiles = c_FilePathsPemFiles;
+
+  // Check if relative paths are possible and appreciated (for all files ask once)
+               QStringList c_PathsParamAndPemAndFile;
+
+               // Concatenate paths
+               c_PathsParamAndPemAndFile.append(c_TimerFilePathsParamsetFiles);
+               c_PathsParamAndPemAndFile.append(c_TimerFilePathsFileBased);
+               c_PathsParamAndPemAndFile.append(c_TimerFilePathsPemFiles);
+
+               c_PathsParamAndPemAndFile =
+                  C_ImpUtil::h_AskUserToSaveRelativePath(this, c_PathsParamAndPemAndFile, c_Folder);
+
+               if (c_PathsParamAndPemAndFile.size() > 0)
+               {
+  // Re-split paths
+                  tgl_assert(c_PathsParamAndPemAndFile.size() ==
+                             (c_TimerFilePathsParamsetFiles.size() + c_TimerFilePathsFileBased.size() +
+                              c_TimerFilePathsPemFiles.size()));
+
+                  c_TimerFilePathsParamsetFiles = c_PathsParamAndPemAndFile.mid(0,
+                                                                                c_TimerFilePathsParamsetFiles.size());
+
+                  c_TimerFilePathsFileBased = c_PathsParamAndPemAndFile.mid(
+                     c_TimerFilePathsParamsetFiles.size(), c_TimerFilePathsFileBased.size());
+
+                  c_TimerFilePathsPemFiles = c_PathsParamAndPemAndFile.mid(
+                     c_TimerFilePathsParamsetFiles.size() + c_TimerFilePathsFileBased.size());
+
+                  if ((pc_TimerApp != NULL) &&
+                      (c_TimerFilePathsFileBased.size() == 1) &&
+                      (c_TimerFilePathsParamsetFiles.size() == 0) &&
+                      (c_TimerFilePathsPemFiles.size() == 0))
+                  {
+  // Replace one file based entry
+                     this->AdaptFile(c_TimerFilePathsFileBased[0], pc_TimerApp);
+                  }
+                  else if ((pc_TimerApp != NULL) &&
+                           (c_TimerFilePathsFileBased.size() == 0) &&
+                           (c_TimerFilePathsParamsetFiles.size() == 1) &&
+                           (c_TimerFilePathsPemFiles.size() == 0))
+                  {
+  // Replace one parameter set image entry
+                     this->AdaptFile(c_TimerFilePathsParamsetFiles[0], pc_TimerApp);
+                  }
+                  else if ((pc_TimerApp != NULL) &&
+                           (c_TimerFilePathsFileBased.size() == 0) &&
+                           (c_TimerFilePathsParamsetFiles.size() == 0) &&
+                           (c_TimerFilePathsPemFiles.size() == 1))
+                  {
+  // Replace one PEM file entry
+                     this->AdaptFile(c_TimerFilePathsPemFiles[0], pc_TimerApp);
+                  }
+                  else
+                  {
+                     int32_t s32_TimerFileCounter = 0;
+
+  // Add all files as new
+                     while (s32_TimerFileCounter < c_TimerFilePathsFileBased.size())
+                     {
+  // Add new file. If list does not support adding new files, nothing will happen
+                        this->AddNewFile(c_TimerFilePathsFileBased[s32_TimerFileCounter], false, false);
+                        s32_TimerFileCounter = s32_TimerFileCounter + 1;
+                     }
+
+                     s32_TimerFileCounter = 0;
+
+                     while (s32_TimerFileCounter < c_TimerFilePathsParamsetFiles.size())
+                     {
+  // Add new file. If list does not support adding new files, nothing will happen
+                        this->AddNewFile(c_TimerFilePathsParamsetFiles[s32_TimerFileCounter], true, false);
+                        s32_TimerFileCounter = s32_TimerFileCounter + 1;
+                     }
+
+                     s32_TimerFileCounter = 0;
+
+                     while (s32_TimerFileCounter < c_TimerFilePathsPemFiles.size())
+                     {
+  // Add new file. If list does not support adding new files, nothing will happen
+                        this->AddNewFile(c_TimerFilePathsPemFiles[s32_TimerFileCounter], false, true);
+                        s32_TimerFileCounter = s32_TimerFileCounter + 1;
+                     }
+                  }
+               }
+               if (pc_App != NULL)
+               {
+                  pc_App->SetSelected(false);
+               }
+            }
+            QWidget::dropEvent(opc_Event);
          }
+                            );
       }
    }
-
-   QWidget::dropEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

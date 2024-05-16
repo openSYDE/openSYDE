@@ -8,7 +8,7 @@ QT       += core gui
 CONFIG   += precompile_header
 CONFIG   += no_keywords
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets svg
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets svg winextras
 
 TARGET = SYDEflash
 TEMPLATE = app
@@ -139,6 +139,7 @@ SOURCES += \
     ../src/opensyde_gui_elements/tool_button/C_OgeTobToolTipBase.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiError.cpp \
+    ../src/opensyde_gui_elements/widget/C_OgeWiProgressBar.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiOnlyBackground.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiUtil.cpp \
@@ -146,6 +147,7 @@ SOURCES += \
     ../src/project_operations/C_PopErrorHandling.cpp \
     ../src/syde_flash/C_FlaMainWindow.cpp \
     ../src/syde_flash/C_FlaTitleBarWidget.cpp \
+    ../src/syde_flash/bottom_bar/C_FlaBottomBar.cpp \
     ../src/syde_flash/configure_node/C_FlaConNodeConfigPopup.cpp \
     ../src/syde_flash/fla_main.cpp \
     ../src/syde_flash/gui_elements/line_edit/C_FlaOgeLeFilePath.cpp \
@@ -306,6 +308,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/tool_button/C_OgeTobToolTipBase.hpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.hpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiError.hpp \
+    ../src/opensyde_gui_elements/widget/C_OgeWiProgressBar.hpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiOnlyBackground.hpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.hpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiUtil.hpp \
@@ -313,6 +316,7 @@ HEADERS  += \
     ../src/project_operations/C_PopErrorHandling.hpp \
     ../src/syde_flash/C_FlaMainWindow.hpp \
     ../src/syde_flash/C_FlaTitleBarWidget.hpp \
+    ../src/syde_flash/bottom_bar/C_FlaBottomBar.hpp \
     ../src/syde_flash/configure_node/C_FlaConNodeConfigPopup.hpp \
     ../src/syde_flash/fla_constants.hpp \
     ../src/syde_flash/gui_elements/line_edit/C_FlaOgeLeFilePath.hpp \
@@ -368,6 +372,7 @@ FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.ui \
     ../src/syde_flash/C_FlaMainWindow.ui \
     ../src/syde_flash/C_FlaTitleBarWidget.ui \
+    ../src/syde_flash/bottom_bar/C_FlaBottomBar.ui \
     ../src/syde_flash/configure_node/C_FlaConNodeConfigPopup.ui \
     ../src/syde_flash/properties/C_FlaPropWidget.ui \
     ../src/syde_flash/search_nodes/C_FlaSenSearchNodePopup.ui \
@@ -423,6 +428,7 @@ INCLUDEPATH += \
                ../src/precompiled_headers/syde_flash \
                ../src/project_operations/ \
                ../src/syde_flash \
+               ../src/syde_flash/bottom_bar \
                ../src/syde_flash/configure_node \
                ../src/syde_flash/properties \
                ../src/syde_flash/search_nodes \

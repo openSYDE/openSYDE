@@ -878,11 +878,12 @@ void C_SdBueMessageSelectorWidget::m_SetupContextMenu(void)
 
    this->mpc_AddSignalAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new Signal"),
                                                                 this->mpc_Ui->pc_MessageTreeWidget,
-                                                                &C_SdBueMessageSelectorTreeWidget::AddSignal);
+                                                                &C_SdBueMessageSelectorTreeWidget::AddSignalFromMenu);
 
-   this->mpc_AddSignalActionWithKey = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new Signal"),
+   this->mpc_AddSignalActionWithKey = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                                                          "Add new Signal"),
                                                                        this->mpc_Ui->pc_MessageTreeWidget,
-                                                                       &C_SdBueMessageSelectorTreeWidget::AddSignal,
+                                                                       &C_SdBueMessageSelectorTreeWidget::AddSignalFromMenu,
                                                                        static_cast<int32_t>(Qt::CTRL) +
                                                                        static_cast<int32_t>(Qt::Key_Plus));
 

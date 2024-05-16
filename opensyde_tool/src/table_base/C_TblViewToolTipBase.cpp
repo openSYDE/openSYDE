@@ -237,26 +237,23 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                {
                   const int32_t s32_ToolTipRow = c_Index.row();
                   const int32_t s32_ToolTipCol = c_Index.column();
-                  if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
+                  const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                  const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                  const C_NagToolTip::E_Type e_Type =
+                     static_cast<C_NagToolTip::E_Type>(c_Index.data(ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
+                  if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                   {
-                     const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
-                     const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
-                     const C_NagToolTip::E_Type e_Type =
-                        static_cast<C_NagToolTip::E_Type>(c_Index.data(ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
-                     if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
-                     {
-                        this->ms32_HoveredRow = s32_ToolTipRow;
-                        this->ms32_HoveredCol = s32_ToolTipCol;
-                        //Update text
-                        // Do not set mouse tracking here as it could disturb focus handling of persistent editor
-                        // widgets
-                        this->mpc_ToolTip->SetHeading(c_Heading);
-                        this->mpc_ToolTip->SetContent(c_Content);
-                        this->mpc_ToolTip->SetType(e_Type);
-                        this->mpc_ToolTip->show();
-                        //Use global pos for move because that's the actual target position
-                        this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
-                     }
+                     this->ms32_HoveredRow = s32_ToolTipRow;
+                     this->ms32_HoveredCol = s32_ToolTipCol;
+                     //Update text
+                     // Do not set mouse tracking here as it could disturb focus handling of persistent editor
+                     // widgets
+                     this->mpc_ToolTip->SetHeading(c_Heading);
+                     this->mpc_ToolTip->SetContent(c_Content);
+                     this->mpc_ToolTip->SetType(e_Type);
+                     this->mpc_ToolTip->show();
+                     //Use global pos for move because that's the actual target position
+                     this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
                   }
                }
             }

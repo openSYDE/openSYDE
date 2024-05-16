@@ -3,28 +3,13 @@
 <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#2A2A5B;}
-	.st1{fill:#39396D;}
-	.st2{fill:#5EA343;}
-	.st3{fill:#FFFFFF;}
-	.st4{fill:#E63A3F;}
 	.st5{fill:#B2B2BD;}
-	.st6{fill:#DFEDD9;}
-	.st7{fill:url(#SVGID_1_);}
 </style>
 <g>
-	<g>
-		<g>
-			
-				<rect x="8.1" y="10.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.827 11.6828)" class="st5" width="7.17" height="2.13"/>
-			<rect x="9" y="4" class="st5" width="2" height="10"/>
-			
-				<rect x="7.07" y="8.03" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -5.872 9.1708)" class="st5" width="2.13" height="7.28"/>
-		</g>
-	</g>
-	<g>
-		<path class="st5" d="M10,2.5c4.14,0,7.5,3.36,7.5,7.5s-3.36,7.5-7.5,7.5S2.5,14.14,2.5,10S5.86,2.5,10,2.5 M10,1
-			c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9S14.97,1,10,1L10,1z"/>
-	</g>
+	<rect x="8" y="11" transform="matrix(0.70 -0.70 0.70 0.70 -4.82 11.68)" class="st5" width="7.17" height="2.13"/>
+	<rect x="9" y="4" class="st5" width="2" height="9"/>
+	<rect x="7.3" y="8." transform="matrix(0.70 -0.70 0.70 0.70 -5.82 9.68)" class="st5" width="2.13" height="7.17"/>
+	<path class="st5" d="M10,2.5c4.14,0,7.5,3.36,7.5,7.5s-3.36,7.5-7.5,7.5S2.5,14.14,2.5,10S5.86,2.5,10,2.5 M10,1
+		c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9S14.97,1,10,1L10,1z"/>
 </g>
 </svg>

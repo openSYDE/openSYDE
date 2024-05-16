@@ -294,305 +294,302 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
 
    if (orc_Index.isValid() == true)
    {
-      if (orc_Index.row() >= 0)
+      const uint32_t u32_Index = orc_Index.row();
+      if ((u32_Index < this->mc_UniqueDataElementIds.size()) &&
+          (u32_Index < this->mc_DataElementConfigurations.size()))
       {
-         const uint32_t u32_Index = orc_Index.row();
-         if ((u32_Index < this->mc_UniqueDataElementIds.size()) &&
-             (u32_Index < this->mc_DataElementConfigurations.size()))
+         const C_OscNodeDataPoolListElementId & rc_CurId = this->mc_UniqueDataElementIds[u32_Index];
+         const C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
+         const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
+         if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
          {
-            const C_OscNodeDataPoolListElementId & rc_CurId = this->mc_UniqueDataElementIds[u32_Index];
-            const C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
-            const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-            if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
+            const C_OscNodeDataPool * pc_DataPool;
+            const C_OscNodeDataPoolListElement * pc_OscElement;
+            const C_PuiSdNodeDataPoolListElement * pc_UiElement;
+            switch (e_Col)
             {
-               const C_OscNodeDataPool * pc_DataPool;
-               const C_OscNodeDataPoolListElement * pc_OscElement;
-               const C_PuiSdNodeDataPoolListElement * pc_UiElement;
-               switch (e_Col)
+            case eICON:
+               //No content
+               break;
+            case eINDEX:
+               c_Retval = orc_Index.row() + 1;
+               break;
+            case eNAME:
+               c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
+               break;
+            case eVALUE_TYPE:
+               pc_UiElement =
+                  C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(rc_CurId.u32_NodeIndex,
+                                                                            rc_CurId.u32_DataPoolIndex,
+                                                                            rc_CurId.u32_ListIndex,
+                                                                            rc_CurId.u32_ElementIndex);
+               if (pc_UiElement->q_InterpretAsString == true)
                {
-               case eICON:
-                  //No content
-                  break;
-               case eINDEX:
-                  c_Retval = orc_Index.row() + 1;
-                  break;
-               case eNAME:
-                  c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
-                  break;
-               case eVALUE_TYPE:
-                  pc_UiElement =
-                     C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                               rc_CurId.u32_DataPoolIndex,
-                                                                               rc_CurId.u32_ListIndex,
-                                                                               rc_CurId.u32_ElementIndex);
-                  if (pc_UiElement->q_InterpretAsString == true)
-                  {
-                     c_Retval = C_GtGetText::h_GetText("string");
-                  }
-                  else
-                  {
-                     pc_OscElement =
-                        C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                                   rc_CurId.u32_DataPoolIndex,
-                                                                                   rc_CurId.u32_ListIndex,
-                                                                                   rc_CurId.u32_ElementIndex);
-                     if (pc_OscElement != NULL)
-                     {
-                        c_Retval = C_SdNdeDpUtil::h_ConvertContentTypeToString(pc_OscElement->c_Value.GetType());
-                     }
-                  }
-                  break;
-               case eARRAY_SIZE:
+                  c_Retval = C_GtGetText::h_GetText("string");
+               }
+               else
+               {
                   pc_OscElement =
                      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurId.u32_NodeIndex,
                                                                                 rc_CurId.u32_DataPoolIndex,
                                                                                 rc_CurId.u32_ListIndex,
                                                                                 rc_CurId.u32_ElementIndex);
-                  if (pc_OscElement->GetArray() == false)
+                  if (pc_OscElement != NULL)
                   {
-                     c_Retval = "-";
-                  }
-                  else
-                  {
-                     c_Retval = static_cast<int32_t>(pc_OscElement->GetArraySize());
-                  }
-                  break;
-               case eDATA_POOL:
-                  pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(rc_CurId.u32_NodeIndex,
-                                                                                rc_CurId.u32_DataPoolIndex);
-                  if (pc_DataPool != NULL)
-                  {
-                     c_Retval = pc_DataPool->c_Name.c_str();
-                  }
-                  break;
-               case eTRANSMISSION_MODE:
-                  c_Retval =
-                     C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToString(rc_CurConfig.e_TransmissionMode);
-                  break;
-               case eCYCLIC_INTERVAL:
-                  if (rc_CurConfig.e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
-                  {
-                     c_Retval =
-                        C_SyvDaPeUpdateModeTableModel::m_RailIndexToString(rc_CurConfig.u8_RailIndex);
-                  }
-                  else
-                  {
-                     c_Retval = static_cast<QString>('-');
-                  }
-                  break;
-               case eTHRESHOLD:
-                  if (rc_CurConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
-                  {
-                     c_Retval =
-                        C_SdNdeDpContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
-                  }
-                  else
-                  {
-                     c_Retval = static_cast<QString>('-');
-                  }
-                  break;
-               case eUSAGE:
-                  if (u32_Index < this->mc_Usage.size())
-                  {
-                     c_Retval = this->mc_Usage[u32_Index];
-                  }
-                  break;
-               default:
-                  //Unknown
-                  break;
-               }
-            }
-            else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
-            {
-               if (e_Col == eNAME)
-               {
-                  c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
-               }
-            }
-            else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
-            {
-               if (e_Col == eNAME)
-               {
-                  c_Retval = C_SdUtil::h_GetToolTipContentDpListElement(rc_CurId);
-               }
-            }
-            else if (os32_Role == static_cast<int32_t>(Qt::EditRole))
-            {
-               switch (e_Col) //lint !e788 //not all columns handled explicitly
-               {
-               case eTRANSMISSION_MODE:
-                  c_Retval = C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(rc_CurConfig.e_TransmissionMode);
-                  break;
-               case eCYCLIC_INTERVAL:
-                  c_Retval = static_cast<int32_t>(rc_CurConfig.u8_RailIndex);
-                  break;
-               case eTHRESHOLD:
-                  c_Retval = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
-                  break;
-               default:
-                  //Not necessary
-                  break;
-               }
-            }
-            else if (os32_Role == ms32_USER_ROLE_ICON)
-            {
-               QStringList c_Tmp;
-               C_OscNodeDataPool::E_Type e_DataPoolType;
-               if (e_Col == eICON)
-               {
-                  if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(rc_CurId.u32_NodeIndex,
-                                                                       rc_CurId.u32_DataPoolIndex,
-                                                                       e_DataPoolType) == C_NO_ERR)
-                  {
-                     c_Tmp.push_back(QString::number(16)); // icon size
-                     if (e_DataPoolType == C_OscNodeDataPool::E_Type::eDIAG)
-                     {
-                        c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
-                     }
-                     else if (e_DataPoolType == C_OscNodeDataPool::E_Type::eCOM)
-                     {
-                        c_Tmp.push_back(":/images/system_definition/IconSignal.svg");
-                     }
-                     else if (e_DataPoolType == C_OscNodeDataPool::E_Type::eNVM)
-                     {
-                        c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
-                     }
-                     else
-                     {
-                        uint32_t u32_DomainIndex;
-                        bool q_UseChannelIndex;
-                        uint32_t u32_ChannelIndex;
-
-                        C_OscHalcDefDomain::E_VariableSelector e_Selector;
-                        uint32_t u32_ParameterIndex;
-                        bool q_UseElementIndex;
-                        uint32_t u32_ParameterElementIndex;
-                        bool q_IsUseCaseIndex;
-                        bool q_IsChanNumIndex;
-                        bool q_IsSafetyFlagIndex;
-
-                        if (C_PuiSdHandler::h_GetInstance()->TranslateToHalcIndex(rc_CurId, 0,
-                                                                                  u32_DomainIndex, q_UseChannelIndex,
-                                                                                  u32_ChannelIndex, e_Selector,
-                                                                                  u32_ParameterIndex,
-                                                                                  q_UseElementIndex,
-                                                                                  u32_ParameterElementIndex,
-                                                                                  q_IsUseCaseIndex,
-                                                                                  q_IsChanNumIndex,
-                                                                                  q_IsSafetyFlagIndex) == C_NO_ERR)
-                        {
-                           const C_OscHalcDefDomain * const pc_Domain =
-                              C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileDataConst(rc_CurId.u32_NodeIndex,
-                                                                                          u32_DomainIndex);
-                           if (pc_Domain != NULL)
-                           {
-                              switch (pc_Domain->e_Category)
-                              {
-                              case C_OscHalcDefDomain::eCA_INPUT:
-                                 c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
-                                 break;
-                              case C_OscHalcDefDomain::eCA_OUTPUT:
-                                 c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
-                                 break;
-                              case C_OscHalcDefDomain::eCA_OTHER:
-                                 c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
-                                 break;
-                              default:
-                                 tgl_assert(false);
-                                 break;
-                              }
-                           }
-                        }
-                     }
-                     c_Retval = c_Tmp;
+                     c_Retval = C_SdNdeDpUtil::h_ConvertContentTypeToString(pc_OscElement->c_Value.GetType());
                   }
                }
-            }
-            else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
-            {
-               const QColor c_INACTIVE_1 = mc_STYLE_GUIDE_COLOR_8;
-               const QColor c_INACTIVE_2 = mc_STYLE_GUIDE_COLOR_10;
-               const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_6;
-               //Stylesheets do not allow access of specific columns so we need to set it manually
-               if (this->flags(orc_Index).testFlag(Qt::ItemIsEditable) == true)
+               break;
+            case eARRAY_SIZE:
+               pc_OscElement =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurId.u32_NodeIndex,
+                                                                             rc_CurId.u32_DataPoolIndex,
+                                                                             rc_CurId.u32_ListIndex,
+                                                                             rc_CurId.u32_ElementIndex);
+               if (pc_OscElement->GetArray() == false)
                {
-                  c_Retval = c_ACTIVE;
+                  c_Retval = "-";
                }
                else
                {
-                  switch (e_Col)
-                  {
-                  case eINDEX:
-                  case eNAME:
-                  case eVALUE_TYPE:
-                  case eARRAY_SIZE:
-                  case eDATA_POOL:
-                  case eUSAGE:
-                     c_Retval = c_INACTIVE_1;
-                     break;
-                  case eICON:
-                  case eTRANSMISSION_MODE:
-                  case eCYCLIC_INTERVAL:
-                  case eTHRESHOLD:
-                     c_Retval = c_INACTIVE_2;
-                     break;
-                  default:
-                     tgl_assert(false);
-                     break;
-                  }
+                  c_Retval = static_cast<int32_t>(pc_OscElement->GetArraySize());
                }
-            }
-            else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
-            {
-               c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
-            }
-            else if (os32_Role == ms32_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
-            {
-               //Max requested
-               if (e_Col == eTHRESHOLD)
+               break;
+            case eDATA_POOL:
+               pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(rc_CurId.u32_NodeIndex,
+                                                                             rc_CurId.u32_DataPoolIndex);
+               if (pc_DataPool != NULL)
                {
-                  switch (rc_CurConfig.c_ChangeThreshold.GetType())
-                  {
-                  case C_OscNodeDataPoolContent::eUINT8:
-                     c_Retval = static_cast<uint64_t>(std::numeric_limits<uint8_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::eUINT16:
-                     c_Retval = static_cast<uint64_t>(std::numeric_limits<uint16_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::eUINT32:
-                     c_Retval = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::eUINT64:
-                     c_Retval = std::numeric_limits<uint64_t>::max();
-                     break;
-                  case C_OscNodeDataPoolContent::eSINT8:
-                     c_Retval = static_cast<int64_t>(std::numeric_limits<int8_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::eSINT16:
-                     c_Retval = static_cast<int64_t>(std::numeric_limits<int16_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::eSINT32:
-                     c_Retval = static_cast<int64_t>(std::numeric_limits<int32_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::eSINT64:
-                     c_Retval = std::numeric_limits<int64_t>::max();
-                     break;
-                  case C_OscNodeDataPoolContent::eFLOAT32:
-                     c_Retval = static_cast<float64_t>(std::numeric_limits<float32_t>::max());
-                     break;
-                  case C_OscNodeDataPoolContent::E_Type::eFLOAT64:
-                     c_Retval = std::numeric_limits<float64_t>::max();
-                     break;
-                  default:
-                     //Nothing to do
-                     break;
-                  }
+                  c_Retval = pc_DataPool->c_Name.c_str();
                }
+               break;
+            case eTRANSMISSION_MODE:
+               c_Retval =
+                  C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToString(rc_CurConfig.e_TransmissionMode);
+               break;
+            case eCYCLIC_INTERVAL:
+               if (rc_CurConfig.e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+               {
+                  c_Retval =
+                     C_SyvDaPeUpdateModeTableModel::m_RailIndexToString(rc_CurConfig.u8_RailIndex);
+               }
+               else
+               {
+                  c_Retval = static_cast<QString>('-');
+               }
+               break;
+            case eTHRESHOLD:
+               if (rc_CurConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
+               {
+                  c_Retval =
+                     C_SdNdeDpContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
+               }
+               else
+               {
+                  c_Retval = static_cast<QString>('-');
+               }
+               break;
+            case eUSAGE:
+               if (u32_Index < this->mc_Usage.size())
+               {
+                  c_Retval = this->mc_Usage[u32_Index];
+               }
+               break;
+            default:
+               //Unknown
+               break;
+            }
+         }
+         else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
+         {
+            if (e_Col == eNAME)
+            {
+               c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
+            }
+         }
+         else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
+         {
+            if (e_Col == eNAME)
+            {
+               c_Retval = C_SdUtil::h_GetToolTipContentDpListElement(rc_CurId);
+            }
+         }
+         else if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+         {
+            switch (e_Col) //lint !e788 //not all columns handled explicitly
+            {
+            case eTRANSMISSION_MODE:
+               c_Retval = C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(rc_CurConfig.e_TransmissionMode);
+               break;
+            case eCYCLIC_INTERVAL:
+               c_Retval = static_cast<int32_t>(rc_CurConfig.u8_RailIndex);
+               break;
+            case eTHRESHOLD:
+               c_Retval = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
+               break;
+            default:
+               //Not necessary
+               break;
+            }
+         }
+         else if (os32_Role == ms32_USER_ROLE_ICON)
+         {
+            QStringList c_Tmp;
+            C_OscNodeDataPool::E_Type e_DataPoolType;
+            if (e_Col == eICON)
+            {
+               if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(rc_CurId.u32_NodeIndex,
+                                                                    rc_CurId.u32_DataPoolIndex,
+                                                                    e_DataPoolType) == C_NO_ERR)
+               {
+                  c_Tmp.push_back(QString::number(16)); // icon size
+                  if (e_DataPoolType == C_OscNodeDataPool::E_Type::eDIAG)
+                  {
+                     c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
+                  }
+                  else if (e_DataPoolType == C_OscNodeDataPool::E_Type::eCOM)
+                  {
+                     c_Tmp.push_back(":/images/system_definition/IconSignal.svg");
+                  }
+                  else if (e_DataPoolType == C_OscNodeDataPool::E_Type::eNVM)
+                  {
+                     c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
+                  }
+                  else
+                  {
+                     uint32_t u32_DomainIndex;
+                     bool q_UseChannelIndex;
+                     uint32_t u32_ChannelIndex;
+
+                     C_OscHalcDefDomain::E_VariableSelector e_Selector;
+                     uint32_t u32_ParameterIndex;
+                     bool q_UseElementIndex;
+                     uint32_t u32_ParameterElementIndex;
+                     bool q_IsUseCaseIndex;
+                     bool q_IsChanNumIndex;
+                     bool q_IsSafetyFlagIndex;
+
+                     if (C_PuiSdHandler::h_GetInstance()->TranslateToHalcIndex(rc_CurId, 0,
+                                                                               u32_DomainIndex, q_UseChannelIndex,
+                                                                               u32_ChannelIndex, e_Selector,
+                                                                               u32_ParameterIndex,
+                                                                               q_UseElementIndex,
+                                                                               u32_ParameterElementIndex,
+                                                                               q_IsUseCaseIndex,
+                                                                               q_IsChanNumIndex,
+                                                                               q_IsSafetyFlagIndex) == C_NO_ERR)
+                     {
+                        const C_OscHalcDefDomain * const pc_Domain =
+                           C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileDataConst(rc_CurId.u32_NodeIndex,
+                                                                                       u32_DomainIndex);
+                        if (pc_Domain != NULL)
+                        {
+                           switch (pc_Domain->e_Category)
+                           {
+                           case C_OscHalcDefDomain::eCA_INPUT:
+                              c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
+                              break;
+                           case C_OscHalcDefDomain::eCA_OUTPUT:
+                              c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
+                              break;
+                           case C_OscHalcDefDomain::eCA_OTHER:
+                              c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
+                              break;
+                           default:
+                              tgl_assert(false);
+                              break;
+                           }
+                        }
+                     }
+                  }
+                  c_Retval = c_Tmp;
+               }
+            }
+         }
+         else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
+         {
+            const QColor c_INACTIVE_1 = mc_STYLE_GUIDE_COLOR_8;
+            const QColor c_INACTIVE_2 = mc_STYLE_GUIDE_COLOR_10;
+            const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_6;
+            //Stylesheets do not allow access of specific columns so we need to set it manually
+            if (this->flags(orc_Index).testFlag(Qt::ItemIsEditable) == true)
+            {
+               c_Retval = c_ACTIVE;
             }
             else
             {
-               //Unknown
+               switch (e_Col)
+               {
+               case eINDEX:
+               case eNAME:
+               case eVALUE_TYPE:
+               case eARRAY_SIZE:
+               case eDATA_POOL:
+               case eUSAGE:
+                  c_Retval = c_INACTIVE_1;
+                  break;
+               case eICON:
+               case eTRANSMISSION_MODE:
+               case eCYCLIC_INTERVAL:
+               case eTHRESHOLD:
+                  c_Retval = c_INACTIVE_2;
+                  break;
+               default:
+                  tgl_assert(false);
+                  break;
+               }
             }
+         }
+         else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
+         {
+            c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
+         }
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
+         {
+            //Max requested
+            if (e_Col == eTHRESHOLD)
+            {
+               switch (rc_CurConfig.c_ChangeThreshold.GetType())
+               {
+               case C_OscNodeDataPoolContent::eUINT8:
+                  c_Retval = static_cast<uint64_t>(std::numeric_limits<uint8_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::eUINT16:
+                  c_Retval = static_cast<uint64_t>(std::numeric_limits<uint16_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::eUINT32:
+                  c_Retval = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::eUINT64:
+                  c_Retval = std::numeric_limits<uint64_t>::max();
+                  break;
+               case C_OscNodeDataPoolContent::eSINT8:
+                  c_Retval = static_cast<int64_t>(std::numeric_limits<int8_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::eSINT16:
+                  c_Retval = static_cast<int64_t>(std::numeric_limits<int16_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::eSINT32:
+                  c_Retval = static_cast<int64_t>(std::numeric_limits<int32_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::eSINT64:
+                  c_Retval = std::numeric_limits<int64_t>::max();
+                  break;
+               case C_OscNodeDataPoolContent::eFLOAT32:
+                  c_Retval = static_cast<float64_t>(std::numeric_limits<float32_t>::max());
+                  break;
+               case C_OscNodeDataPoolContent::E_Type::eFLOAT64:
+                  c_Retval = std::numeric_limits<float64_t>::max();
+                  break;
+               default:
+                  //Nothing to do
+                  break;
+               }
+            }
+         }
+         else
+         {
+            //Unknown
          }
       }
    }
@@ -681,63 +678,60 @@ Qt::ItemFlags C_SyvDaPeUpdateModeTableModel::flags(const QModelIndex & orc_Index
    Qt::ItemFlags c_Retval = Qt::NoItemFlags;
    if (orc_Index.isValid() == true)
    {
-      if (orc_Index.row() >= 0)
+      const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+      if (u32_Index < this->mc_DataElementConfigurations.size())
       {
-         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-         if (u32_Index < this->mc_DataElementConfigurations.size())
+         const C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
+         const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
+         const C_OscNodeDataPoolListElementId * pc_Id;
+         //Default
+         c_Retval =  Qt::ItemIsSelectable;
+         switch (e_Col)
          {
-            const C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
-            const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-            const C_OscNodeDataPoolListElementId * pc_Id;
-            //Default
-            c_Retval =  Qt::ItemIsSelectable;
-            switch (e_Col)
+         case eINDEX:
+         case eICON:
+         case eNAME:
+         case eVALUE_TYPE:
+         case eARRAY_SIZE:
+         case eDATA_POOL:
+         case eUSAGE:
+            //For design
+            c_Retval = c_Retval | Qt::ItemIsEnabled;
+            break;
+         case eTRANSMISSION_MODE:
+            pc_Id = this->GetIndex(orc_Index.row());
+            if (pc_Id != NULL)
             {
-            case eINDEX:
-            case eICON:
-            case eNAME:
-            case eVALUE_TYPE:
-            case eARRAY_SIZE:
-            case eDATA_POOL:
-            case eUSAGE:
-               //For design
-               c_Retval = c_Retval | Qt::ItemIsEnabled;
-               break;
-            case eTRANSMISSION_MODE:
-               pc_Id = this->GetIndex(orc_Index.row());
-               if (pc_Id != NULL)
-               {
-                  const C_OscNodeDataPoolListElement * const pc_Element =
-                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(pc_Id->u32_NodeIndex,
-                                                                                pc_Id->u32_DataPoolIndex,
-                                                                                pc_Id->u32_ListIndex,
-                                                                                pc_Id->u32_ElementIndex);
-                  if ((((pc_Element->GetArray() == false) &&
-                        (pc_Element->GetType() != C_OscNodeDataPoolContent::eFLOAT64)) &&
-                       (pc_Element->GetType() != C_OscNodeDataPoolContent::eUINT64)) &&
-                      (pc_Element->GetType() != C_OscNodeDataPoolContent::eSINT64))
-                  {
-                     c_Retval = c_Retval | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-                  }
-               }
-               break;
-            case eCYCLIC_INTERVAL:
-               //Only editable in special case
-               if (rc_CurConfig.e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+               const C_OscNodeDataPoolListElement * const pc_Element =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(pc_Id->u32_NodeIndex,
+                                                                             pc_Id->u32_DataPoolIndex,
+                                                                             pc_Id->u32_ListIndex,
+                                                                             pc_Id->u32_ElementIndex);
+               if ((((pc_Element->GetArray() == false) &&
+                     (pc_Element->GetType() != C_OscNodeDataPoolContent::eFLOAT64)) &&
+                    (pc_Element->GetType() != C_OscNodeDataPoolContent::eUINT64)) &&
+                   (pc_Element->GetType() != C_OscNodeDataPoolContent::eSINT64))
                {
                   c_Retval = c_Retval | Qt::ItemIsEnabled | Qt::ItemIsEditable;
                }
-               break;
-            case eTHRESHOLD:
-               //Only editable in special case
-               if (rc_CurConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
-               {
-                  c_Retval = c_Retval | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-               }
-               break;
-            default:
-               break;
             }
+            break;
+         case eCYCLIC_INTERVAL:
+            //Only editable in special case
+            if (rc_CurConfig.e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+            {
+               c_Retval = c_Retval | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+            }
+            break;
+         case eTHRESHOLD:
+            //Only editable in special case
+            if (rc_CurConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
+            {
+               c_Retval = c_Retval | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+            }
+            break;
+         default:
+            break;
          }
       }
    }

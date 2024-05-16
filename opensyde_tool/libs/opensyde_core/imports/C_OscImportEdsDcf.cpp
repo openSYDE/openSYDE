@@ -1349,11 +1349,8 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
    const C_OscCanOpenObject * const pc_CoMessageMappingObject =
       mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset, 0);
 
-   if (oq_RestrictForCanOpenUsage == true)
-   {
-      // In case of CANopen the DLC is adapted automatically
-      orc_OscMessageData.u16_Dlc = 0U;
-   }
+   // Adapt the DLC automatically
+   orc_OscMessageData.u16_Dlc = 0U;
 
    if (pc_CoMessageMappingObject != NULL)
    {
@@ -1433,9 +1430,8 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
                               orc_OscSignalData.push_back(c_CurDataPoolSignal);
                               orc_SignalDefaultMinMaxValuesUsed.push_back(static_cast<uint8_t>(q_DefaultMinMax));
 
-                              if (oq_RestrictForCanOpenUsage == true)
                               {
-                                 // In case of CANopen the DLC is adapted automatically. Adapt to the added signals
+                                 // Adapt the DLC automatically. Adapt to the added signals
                                  const uint16_t u16_LastBit = c_CurSignal.u16_ComBitStart +
                                                               c_CurSignal.u16_ComBitLength;
                                  uint16_t u16_NeededBytes = u16_LastBit / 8U;

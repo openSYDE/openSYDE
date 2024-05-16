@@ -66,6 +66,7 @@ private:
    void m_OnPdoSyncTimeValueChanged(void) const;
    void m_OnSameAsOpensydeNodeIdChanged(void) const;
    void m_HandleSameAsOpensydeNodeIdState(void) const;
+   void m_HandleNodeIdRange(const bool oq_IsOpensydeNodeId) const;
    void m_OnCoNodeIdChanged(void) const;
    void m_CheckCoNodeId(void) const;
    void m_OnHeartbeatProducerTimeChanged(void) const;

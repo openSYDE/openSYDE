@@ -241,29 +241,26 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const in
       const C_SdNdeDpListDataSetModel::E_Rows e_Col = h_RowToEnum(orc_Index.row());
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if (orc_Index.row() >= 0)
+         const C_OscNodeDataPoolList * const pc_OscElement =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(this->mu32_NodeIndex,
+                                                                this->mu32_DataPoolIndex,
+                                                                this->mu32_ListIndex);
+         if (pc_OscElement != NULL)
          {
-            const C_OscNodeDataPoolList * const pc_OscElement =
-               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(this->mu32_NodeIndex,
-                                                                   this->mu32_DataPoolIndex,
-                                                                   this->mu32_ListIndex);
-            if (pc_OscElement != NULL)
+            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.column());
+            if (u32_Index < pc_OscElement->c_DataSets.size())
             {
-               const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.column());
-               if (u32_Index < pc_OscElement->c_DataSets.size())
+               const C_OscNodeDataPoolDataSet & rc_DataSet = pc_OscElement->c_DataSets[u32_Index];
+               switch (e_Col)
                {
-                  const C_OscNodeDataPoolDataSet & rc_DataSet = pc_OscElement->c_DataSets[u32_Index];
-                  switch (e_Col)
-                  {
-                  case eNAME:
-                     c_Retval = static_cast<QString>(rc_DataSet.c_Name.c_str());
-                     break;
-                  case eCOMMENT:
-                     c_Retval = static_cast<QString>(rc_DataSet.c_Comment.c_str());
-                     break;
-                  default:
-                     break;
-                  }
+               case eNAME:
+                  c_Retval = static_cast<QString>(rc_DataSet.c_Name.c_str());
+                  break;
+               case eCOMMENT:
+                  c_Retval = static_cast<QString>(rc_DataSet.c_Comment.c_str());
+                  break;
+               default:
+                  break;
                }
             }
          }
@@ -343,30 +340,27 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const in
          if (e_Col == eNAME)
          {
             //Check error
-            if (orc_Index.row() >= 0)
+            QString c_Output;
+            const C_OscNodeDataPoolList * const pc_OscList = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
+               this->mu32_NodeIndex,
+               this->mu32_DataPoolIndex,
+               this->mu32_ListIndex);
+            if (pc_OscList != NULL)
             {
-               QString c_Output;
-               const C_OscNodeDataPoolList * const pc_OscList = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
-                  this->mu32_NodeIndex,
-                  this->mu32_DataPoolIndex,
-                  this->mu32_ListIndex);
-               if (pc_OscList != NULL)
+               bool q_NameInvalid = false;
+               bool q_NameConflict = false;
+               pc_OscList->CheckErrorDataSet(static_cast<uint32_t>(orc_Index.column()), &q_NameConflict,
+                                             &q_NameInvalid);
+               if (q_NameInvalid == true)
                {
-                  bool q_NameInvalid = false;
-                  bool q_NameConflict = false;
-                  pc_OscList->CheckErrorDataSet(static_cast<uint32_t>(orc_Index.column()), &q_NameConflict,
-                                                &q_NameInvalid);
-                  if (q_NameInvalid == true)
-                  {
-                     c_Output += C_GtGetText::h_GetText("- is empty or contains invalid characters\n");
-                  }
-                  if (q_NameConflict == true)
-                  {
-                     c_Output += C_GtGetText::h_GetText("- is already in use\n");
-                  }
+                  c_Output += C_GtGetText::h_GetText("- is empty or contains invalid characters\n");
                }
-               c_Retval = c_Output;
+               if (q_NameConflict == true)
+               {
+                  c_Output += C_GtGetText::h_GetText("- is already in use\n");
+               }
             }
+            c_Retval = c_Output;
          }
          else
          {
@@ -379,28 +373,24 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const in
          {
             //Default
             c_Retval = false;
-            //Check error
-            if (orc_Index.row() >= 0)
+            bool q_NameInvalid = false;
+            const C_OscNodeDataPoolList * const pc_OscList = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
+               this->mu32_NodeIndex,
+               this->mu32_DataPoolIndex,
+               this->mu32_ListIndex);
+            if (pc_OscList != NULL)
             {
-               bool q_NameInvalid = false;
-               const C_OscNodeDataPoolList * const pc_OscList = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
-                  this->mu32_NodeIndex,
-                  this->mu32_DataPoolIndex,
-                  this->mu32_ListIndex);
-               if (pc_OscList != NULL)
+               bool q_NameConflict = false;
+               pc_OscList->CheckErrorDataSet(static_cast<uint32_t>(orc_Index.column()), &q_NameConflict,
+                                             &q_NameInvalid);
+               if (q_NameConflict == true)
                {
-                  bool q_NameConflict = false;
-                  pc_OscList->CheckErrorDataSet(static_cast<uint32_t>(orc_Index.column()), &q_NameConflict,
-                                                &q_NameInvalid);
-                  if (q_NameConflict == true)
-                  {
-                     q_NameInvalid = true;
-                  }
+                  q_NameInvalid = true;
                }
-               if (q_NameInvalid == true)
-               {
-                  c_Retval = true;
-               }
+            }
+            if (q_NameInvalid == true)
+            {
+               c_Retval = true;
             }
          }
          else

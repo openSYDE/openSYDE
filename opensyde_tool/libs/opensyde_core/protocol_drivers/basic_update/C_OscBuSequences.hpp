@@ -42,6 +42,7 @@ public:
                                 uint32_t & oru32_SignatureBlockAddress);
 
 protected:
+   virtual void m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage);
    virtual void m_ReportProgress(const int32_t os32_Result, const stw::scl::C_SclString & orc_Information);
    virtual void m_ReportFlashloaderInformationRead(const stw::scl::C_SclString & orc_DeviceName,
                                                    const C_OscComFlashloaderInformation & orc_Information);

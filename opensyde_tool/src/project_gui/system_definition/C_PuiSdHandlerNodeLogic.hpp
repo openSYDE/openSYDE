@@ -73,6 +73,8 @@ public:
    bool HasNodeAnAvailableFlashloader(const uint32_t ou32_NodeIndex) const;
    bool CheckNodeIndexAssociatedWithAnotherNodeIndex(const uint32_t ou32_FirstNodeIndex,
                                                      const uint32_t ou32_SecondNodeIndex) const;
+   void ReplaceNode(const uint32_t ou32_NodeIndex, const opensyde_core::C_OscNode & orc_OscNode,
+                    const C_PuiSdNode & orc_UiNode);
 
    //Datapool
    int32_t AddDataPool(const uint32_t & oru32_NodeIndex, const stw::opensyde_core::C_OscNodeDataPool & orc_OscContent,

@@ -230,6 +230,11 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
    if (this->mpc_MessageSyncManager != NULL)
    {
       uint32_t u32_InternalMessageIndex = 0UL;
+      //Avoid selection change triggers during uncertain tree state
+      if (this->mpc_MessageTreeWidget != NULL)
+      {
+         this->mpc_MessageTreeWidget->DisconnectSelectionHandling();
+      }
       for (uint32_t u32_ItStep = this->mc_UniqueId.size(); u32_ItStep > 0; --u32_ItStep)
       {
          tgl_assert(this->mpc_MessageSyncManager->DeleteCanMessage(this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
@@ -250,6 +255,8 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
       }
       if (this->mpc_MessageTreeWidget != NULL)
       {
+         //Reactivate selection handling
+         this->mpc_MessageTreeWidget->ReconnectSelectionHandling();
          //At this point we can't get the message ID by unique ID because it was already deleted
          // but this should be no problem as we do always remember the message ID anyways
          this->mpc_MessageTreeWidget->InternalDeleteMessageCommit(u32_InternalMessageIndex);

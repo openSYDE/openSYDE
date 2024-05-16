@@ -18,6 +18,7 @@
 #include "C_SdTopologyWidget.hpp"
 #include "C_SdNdeNodeEditWidget.hpp"
 #include "C_SdBueBusEditWidget.hpp"
+#include "C_OgePopUpDialog.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -77,11 +78,16 @@ private:
    void m_ErrorChange(void);
    void m_GenerateCode(void) const;
    void m_Export(void);
-   void m_Import(void) const;
+   void m_TriggerImport(void);
+   void m_ContinueImporting(const opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol);
    void m_RtfExport(void);
-   bool m_TspImport();
+   bool m_TspImport(const bool oq_IsNodeNew);
+   void m_TspImportForNewNode();
    void m_GenerateHalcDatapools(void) const;
    opensyde_gui_elements::C_OgeWiCustomMessage * m_ShowWarningUnstoredProjectPopupMessage();
+   void m_SwitchProtocolTab(const opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol) const;
+   void m_Import(void);
+   bool m_CheckImportPossible(void);
 
    Ui::C_SdHandlerWidget * mpc_Ui;
    C_SdTopologyWidget * mpc_Topology;
@@ -105,6 +111,7 @@ private:
    const QString mc_TooltipGenerateCodeHeading;
    const QString mc_TooltipGenerateCodeContentSysdef;
    const QString mc_TooltipGenerateCodeContentNode;
+   const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> m_CreateImportPopupDialog(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

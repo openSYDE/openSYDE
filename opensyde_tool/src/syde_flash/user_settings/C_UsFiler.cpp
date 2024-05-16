@@ -141,6 +141,7 @@ int32_t C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pa
 void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
 {
    const QStringList c_HexFilePaths = orc_UserSettings.GetLastKnownUpdateHexFilePaths();
+   const QStringList c_HexFilePathsAsRelativeOrAbsolute = orc_UserSettings.GetHexFilePathsAsRelativeOrAbsolute();
 
    //Screen position
    orc_Ini.WriteInteger("Screen", "Position_x", orc_UserSettings.GetScreenPos().x());
@@ -187,6 +188,10 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
       const std::string c_HexFilePath = c_HexFilePaths[s32_SectionCounter].toStdString();
       orc_Ini.WriteString("Update", "HexFiles[" + std::to_string(s32_SectionCounter) + "]",
                           c_HexFilePath);
+      const std::string c_HexFilePathAsRelativeOrAbsolute =
+         c_HexFilePathsAsRelativeOrAbsolute[s32_SectionCounter].toStdString();
+      orc_Ini.WriteString("Update", "HexFilesAsRelativeOrAbsolute[" + std::to_string(s32_SectionCounter) + "]",
+                          c_HexFilePathAsRelativeOrAbsolute);
    }
 
    orc_Ini.WriteString("Update", "LastKnownHexFileLocation",
@@ -208,6 +213,7 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    int32_t s32_Value;
    QString c_Tmp;
    QStringList c_HexFilePaths;
+   QStringList c_HexFilePathsAsRelativeOrAbsolute;
 
    // Screen position
    c_Pos.setX(orc_Ini.ReadInteger("Screen", "Position_x", 50));
@@ -268,8 +274,12 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    {
       c_HexFilePaths.append(
          orc_Ini.ReadString("Update", "HexFiles[" + C_SclString::IntToStr(s32_SectionCounter) + "]", "").c_str());
+      c_HexFilePathsAsRelativeOrAbsolute.append(
+         orc_Ini.ReadString("Update", "HexFilesAsRelativeOrAbsolute[" + C_SclString::IntToStr(s32_SectionCounter) + "]",
+                            "").c_str());
    }
    orc_UserSettings.SetLastKnownUpdateHexFilePaths(c_HexFilePaths);
+   orc_UserSettings.SetHexFilePathsAsRelativeOrAbsolute(c_HexFilePathsAsRelativeOrAbsolute);
 
    c_Tmp = orc_Ini.ReadString("Update", "LastKnownHexFileLocation", "").c_str();
    orc_UserSettings.SetLastKnownUpdateHexFileLocation(c_Tmp);

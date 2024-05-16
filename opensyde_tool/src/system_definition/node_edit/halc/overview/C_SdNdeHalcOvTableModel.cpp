@@ -350,7 +350,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const int3
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          const int32_t s32_Index = orc_Index.row();
-         if ((static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size()) && (s32_Index >= 0))
+         if (static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size())
          {
             switch (e_Col)
             {
@@ -400,7 +400,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const int3
          if (e_Col == eSAFETY_RELEVANT)
          {
             const int32_t s32_Index = orc_Index.row();
-            if ((static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size()) && (s32_Index >= 0))
+            if (static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size())
             {
                c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.s32_SafetyRelevant;
             }
@@ -413,7 +413,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const int3
          case eTYPE:
             {
                const int32_t s32_Index = orc_Index.row();
-               if ((static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size()) && (s32_Index >= 0))
+               if (static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size())
                {
                   c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_Icon;
                }

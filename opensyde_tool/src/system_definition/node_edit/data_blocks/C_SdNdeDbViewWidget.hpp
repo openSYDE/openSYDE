@@ -45,7 +45,7 @@ public:
    void ShowApplication(const uint32_t ou32_ApplicationIndex) const;
    void AddApp(void);
    void UpdateApplications(void) const;
-   bool AddFromTsp(void);
+   bool AddFromTsp(const bool oq_IsNewNode);
    void AddHalcDefFromTsp(stw::opensyde_gui::C_SdNdeDbAddNewProject * const opc_Dialog);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -56,6 +56,7 @@ Q_SIGNALS:
    void SigErrorChange(void);
    void SigOwnedDataPoolsChanged(void) const;
    void SigHalcLoadedFromTsp(void);
+   void SigUpdateTrigger(uint32_t ou32_NodeIndex);
 
 private:
    //Avoid call
@@ -74,6 +75,7 @@ private:
    void m_HandleAddButtonAvailability(void) const;
    uint32_t m_AddApplication(const stw::opensyde_core::C_OscNodeApplication::E_Type oe_Type) const;
    uint32_t m_AddApplication(stw::opensyde_core::C_OscNodeApplication & orc_Application) const;
+   void m_UpdateTrigger();
 
    Ui::C_SdNdeDbViewWidget * mpc_Ui;
    uint32_t mu32_NodeIndex;

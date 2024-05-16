@@ -342,7 +342,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const int32_t o
 {
    QVariant c_Retval;
 
-   if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+   if (orc_Index.isValid() == true)
    {
       const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(u32_Index);
@@ -698,7 +698,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
 
    if (data(orc_Index, os32_Role) != orc_Value)
    {
-      if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+      if (orc_Index.isValid() == true)
       {
          bool q_UpdateCyclicMessage = false;
          const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
@@ -1113,7 +1113,7 @@ QString C_CamGenTableModel::UpdateDataForAutoProtocol(const QModelIndex & orc_In
 {
    QString c_Tmp;
 
-   if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+   if (orc_Index.isValid() == true)
    {
       const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(u32_Index);

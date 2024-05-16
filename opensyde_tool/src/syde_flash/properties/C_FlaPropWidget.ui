@@ -51,6 +51,13 @@
        <property name="verticalSpacing">
         <number>9</number>
        </property>
+       <item row="0" column="0">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNodeId">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="2">
         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_CbxBitrate">
          <property name="minimumSize">
@@ -67,26 +74,10 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNodeId">
+       <item row="1" column="0">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelBitrate">
          <property name="text">
           <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="stw::opensyde_gui_elements::C_CamOgeSpxProperties" name="pc_SpxNodeId">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>30</height>
-          </size>
          </property>
         </widget>
        </item>
@@ -106,10 +97,19 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="0">
-        <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelBitrate">
-         <property name="text">
-          <string>TextLabel</string>
+       <item row="0" column="2">
+        <widget class="stw::opensyde_gui_elements::C_CamOgeSpxProperties" name="pc_SpxNodeId">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -130,6 +130,19 @@
      </item>
     </layout>
    </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -137,6 +150,12 @@
    <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_CamOgeWiSectionHeader</class>
+   <extends>QWidget</extends>
+   <header>C_CamOgeWiSectionHeader.hpp</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
@@ -147,12 +166,6 @@
    <class>stw::opensyde_gui_elements::C_CamOgeSpxProperties</class>
    <extends>QSpinBox</extends>
    <header>C_CamOgeSpxProperties.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_CamOgeWiSectionHeader</class>
-   <extends>QWidget</extends>
-   <header>C_CamOgeWiSectionHeader.hpp</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

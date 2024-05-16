@@ -102,8 +102,7 @@ C_SdBueMessageSelectorTreeWidget::C_SdBueMessageSelectorTreeWidget(QWidget * con
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 
-   connect(this->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-           &C_SdBueMessageSelectorTreeWidget::m_SelectionChanged);
+   this->ReconnectSelectionHandling();
    connect(this, &C_SdBueMessageSelectorTreeWidget::expanded, this,
            &C_SdBueMessageSelectorTreeWidget::m_TreeSizeChanged);
    connect(this, &C_SdBueMessageSelectorTreeWidget::collapsed, this,
@@ -212,8 +211,8 @@ void C_SdBueMessageSelectorTreeWidget::DeselectAllItems(void)
 
    for (s32_CounterTopLevelItem = 0; s32_CounterTopLevelItem < this->topLevelItemCount(); ++s32_CounterTopLevelItem)
    {
-      C_SdBusMessageSelectorTreeWidgetItem * const pc_TopLevelItem =
-         dynamic_cast<C_SdBusMessageSelectorTreeWidgetItem *>(this->topLevelItem(s32_CounterTopLevelItem));
+      C_SdBueMessageSelectorTreeWidgetItem * const pc_TopLevelItem =
+         dynamic_cast<C_SdBueMessageSelectorTreeWidgetItem *>(this->topLevelItem(s32_CounterTopLevelItem));
       if (pc_TopLevelItem != NULL)
       {
          this->m_DeselectChildren(pc_TopLevelItem);
@@ -281,10 +280,13 @@ void C_SdBueMessageSelectorTreeWidget::Add(void)
 
             if (this->m_GetMessageIdForAdd(c_MessageId) == C_NO_ERR)
             {
+               const bool q_SELECT_SIGNAL = false;
+
                //Core
                this->mpc_UndoManager->DoAddMessage(c_MessageId, this->mpc_MessageSyncManager, this);
 
                this->SelectMessage(c_MessageId, false);
+               this->AddSignal(q_SELECT_SIGNAL);
             }
          }
       }
@@ -319,10 +321,14 @@ void C_SdBueMessageSelectorTreeWidget::AddMessage(void)
 
       if (this->m_GetMessageIdForAdd(c_MessageId) == C_NO_ERR)
       {
+         const bool q_SELECT_SIGNAL = false;
+
          //Core
          this->mpc_UndoManager->DoAddMessage(c_MessageId, this->mpc_MessageSyncManager, this);
 
          this->SelectMessage(c_MessageId, false);
+         this->AddSignal(q_SELECT_SIGNAL);
+
          Q_EMIT (this->SigSelectName());
       }
    }
@@ -352,54 +358,8 @@ void C_SdBueMessageSelectorTreeWidget::AddMessageFromCatalog(void)
 
       if (c_NodeForCatalogMessages.c_TxMessages.size() > 0)
       {
-         // Fetch nodes and interfaces of the current bus
-         std::vector<QString> c_NodeNames;
-         std::vector<uint32_t> c_NodeIndexes;
-         std::vector<uint32_t> c_InterfaceIndexes;
-
-         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
-                                                                                            c_NodeIndexes,
-                                                                                            c_InterfaceIndexes);
-         tgl_assert(C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames, false) ==
-                    stw::errors::C_NO_ERR);
-
-         // Assign the imported messages to the first active node on the current bus
-         std::vector<C_CieImportDataAssignment> c_NodeAssignments;
-         C_CieImportDataAssignment c_NodeAssignmentConverted;
-         c_NodeAssignmentConverted.c_ImportData = C_CieDataPoolListAdapter::h_GetStructureFromDbcFileImport(
+         const std::vector<C_CieImportDataAssignment> c_NodeAssignments = m_GetJ1939DefaultNodeAssignment(
             c_NodeForCatalogMessages);
-
-         // Find an active node to which the messages imported from the catalog will be added
-         if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
-         {
-            bool q_NodeFound = false;
-            for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
-            {
-               std::vector<const C_OscCanMessageContainer *> c_MessageContainers =
-                  C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainers(c_NodeIndexes[u32_ItNode],
-                                                                                   this->me_ProtocolType,
-                                                                                   c_InterfaceIndexes[u32_ItNode]);
-               uint32_t u32_Counter;
-               for (u32_Counter = 0U; u32_Counter < c_MessageContainers.size(); ++u32_Counter)
-               {
-                  const C_OscCanMessageContainer * const pc_MessageContainer = c_MessageContainers[u32_Counter];
-                  if (pc_MessageContainer->q_IsComProtocolUsedByInterface == true)
-                  {
-                     c_NodeAssignmentConverted.u32_OsyNodeIndex = c_NodeIndexes[u32_ItNode];
-                     c_NodeAssignmentConverted.u32_OsyInterfaceIndex = c_InterfaceIndexes[u32_ItNode];
-                     q_NodeFound = true;
-                     break;
-                  }
-               }
-
-               if (q_NodeFound == true)
-               {
-                  break;
-               }
-            }
-         }
-
-         c_NodeAssignments.push_back(c_NodeAssignmentConverted);
 
          const std::vector<C_CieImportDataAssignment> c_SkippedImportDataAssigned;
 
@@ -443,10 +403,24 @@ void C_SdBueMessageSelectorTreeWidget::AddMessageFromCatalog(void)
 } //lint !e429  //no memory leak because of the parent of pc_AddMessageFromCatalogDialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Action add signal
+/*! \brief  Add signal from Menu
+ *
+ *  It is working as a container; otherwise, the parameter that comes from the signal is wrong and so is the slot
+ *  signal then
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
+void C_SdBueMessageSelectorTreeWidget::AddSignalFromMenu(void)
+{
+   AddSignal();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action add signal
+
+   \param[in]       oq_SelectSignal     Select signal if true else keep the selection you have
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::AddSignal(const bool oq_SelectSignal)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
    if (this->mpc_UndoManager != NULL)
@@ -469,9 +443,12 @@ void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
          }
          if (u32_MessageIndex < this->mc_UniqueMessageIds.size())
          {
-            this->m_AddSignal(u32_MessageIndex);
+            this->m_AddSignal(u32_MessageIndex, oq_SelectSignal);
 
-            Q_EMIT (this->SigSelectName());
+            if (oq_SelectSignal)
+            {
+               Q_EMIT (this->SigSelectName());
+            }
          }
       }
    }
@@ -1160,6 +1137,26 @@ void C_SdBueMessageSelectorTreeWidget::EditName(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Disconnect selection handling
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::DisconnectSelectionHandling() const
+{
+   disconnect(this->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+              &C_SdBueMessageSelectorTreeWidget::m_SelectionChanged);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reconnect selection handling
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::ReconnectSelectionHandling() const
+{
+   connect(this->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+           &C_SdBueMessageSelectorTreeWidget::m_SelectionChanged);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class after internal add message
 
    \param[in]  orc_MessageId  Message identification indices
@@ -1513,8 +1510,8 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OscCanMessageIdentif
       uint32_t u32_InternalId = 0;
       if (this->m_MapMessageIdToInternalMessageIndex(orc_MessageId, u32_InternalId) == C_NO_ERR)
       {
-         C_SdBusMessageSelectorTreeWidgetItem * const pc_TopLevelItem =
-            dynamic_cast<C_SdBusMessageSelectorTreeWidgetItem * const>(this->topLevelItem(u32_InternalId));
+         C_SdBueMessageSelectorTreeWidgetItem * const pc_TopLevelItem =
+            dynamic_cast<C_SdBueMessageSelectorTreeWidgetItem * const>(this->topLevelItem(u32_InternalId));
          const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
          const C_OscCanMessageContainer * const pc_MessageContainer =
             C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageId.u32_NodeIndex,
@@ -1588,8 +1585,8 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OscCanMessageIdentif
                      if (m_MapSignalDataIndexToInternalIndex(u32_InternalId, u32_ItSignal,
                                                              u32_SignalInternalIndex) == C_NO_ERR)
                      {
-                        C_SdBusMessageSelectorTreeWidgetItem * const pc_ChildItem =
-                           dynamic_cast<C_SdBusMessageSelectorTreeWidgetItem * const>(pc_TopLevelItem->child(
+                        C_SdBueMessageSelectorTreeWidgetItem * const pc_ChildItem =
+                           dynamic_cast<C_SdBueMessageSelectorTreeWidgetItem * const>(pc_TopLevelItem->child(
                                                                                          u32_SignalInternalIndex));
                         if (pc_ChildItem != NULL)
                         {
@@ -2244,7 +2241,7 @@ void C_SdBueMessageSelectorTreeWidget::m_ReloadTree(const bool & orq_HandleSelec
    \param[in]  ou32_MessageIndex Index of message which will get the new signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSelectorTreeWidget::m_AddSignal(const uint32_t ou32_MessageIndex)
+void C_SdBueMessageSelectorTreeWidget::m_AddSignal(const uint32_t ou32_MessageIndex, const bool oq_SelectSignal)
 {
    const C_OscCanMessageIdentificationIndices c_MessageId = this->mc_UniqueMessageIds[ou32_MessageIndex];
    const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
@@ -2267,7 +2264,10 @@ void C_SdBueMessageSelectorTreeWidget::m_AddSignal(const uint32_t ou32_MessageIn
          this->m_AddCoSignal(c_MessageId, u32_ItSignal, u16_StartBit);
       }
 
-      this->SelectSignal(c_MessageId, u32_ItSignal, false);
+      if (oq_SelectSignal)
+      {
+         this->SelectSignal(c_MessageId, u32_ItSignal, false);
+      }
    }
 }
 
@@ -2379,7 +2379,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32_t & oru32_Me
       const C_OscCanMessage * const pc_MessageData = C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MessageId);
       if (pc_MessageData != NULL)
       {
-         C_SdBusMessageSelectorTreeWidgetItem * const pc_Message = new C_SdBusMessageSelectorTreeWidgetItem(true);
+         C_SdBueMessageSelectorTreeWidgetItem * const pc_Message = new C_SdBueMessageSelectorTreeWidgetItem(true);
 
          uint32_t u32_Counter;
          uint32_t u32_SignalDataIndex;
@@ -2418,7 +2418,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32_t & oru32_Me
             // second, special case: CANopen PDO messages can be activated/deactivated
             pc_Message->setCheckState(0, ((pc_MessageData->q_CanOpenManagerMessageActive == true) ?
                                           Qt::Checked : Qt::Unchecked));
-            connect(pc_Message, &C_SdBusMessageSelectorTreeWidgetItem::SigCheckedStateChanged,
+            connect(pc_Message, &C_SdBueMessageSelectorTreeWidgetItem::SigCheckedStateChanged,
                     this, &C_SdBueMessageSelectorTreeWidget::m_CoMessageCheckedStateChanged);
          }
 
@@ -2447,7 +2447,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertSignal(QTreeWidgetItem * const op
                                                       const uint32_t ou32_SignalIndex,
                                                       const QString & orc_SignalName) const
 {
-   QTreeWidgetItem * const pc_Signal = new C_SdBusMessageSelectorTreeWidgetItem(false);
+   QTreeWidgetItem * const pc_Signal = new C_SdBueMessageSelectorTreeWidgetItem(false);
 
    pc_Signal->setText(0, orc_SignalName);
    pc_Signal->setForeground(0, mc_STYLE_GUIDE_COLOR_8);
@@ -2463,7 +2463,7 @@ void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection &
    Q_UNUSED(orc_Deselected)
 
    int32_t s32_CounterTopLevelItem;
-   C_SdBusMessageSelectorTreeWidgetItem * pc_TopLevelItem;
+   C_SdBueMessageSelectorTreeWidgetItem * pc_TopLevelItem;
    // last selected parent item
    QTreeWidgetItem * pc_Parent = NULL;
    QTreeWidgetItem * pc_Current = NULL;
@@ -2499,7 +2499,7 @@ void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection &
       for (s32_CounterTopLevelItem = 0; s32_CounterTopLevelItem < this->topLevelItemCount(); ++s32_CounterTopLevelItem)
       {
          pc_TopLevelItem =
-            dynamic_cast<C_SdBusMessageSelectorTreeWidgetItem *>(this->topLevelItem(s32_CounterTopLevelItem));
+            dynamic_cast<C_SdBueMessageSelectorTreeWidgetItem *>(this->topLevelItem(s32_CounterTopLevelItem));
          if (pc_TopLevelItem != NULL)
          {
             if (pc_Parent == pc_TopLevelItem)
@@ -2558,7 +2558,7 @@ void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection &
       for (s32_CounterTopLevelItem = 0; s32_CounterTopLevelItem < this->topLevelItemCount(); ++s32_CounterTopLevelItem)
       {
          pc_TopLevelItem =
-            dynamic_cast<C_SdBusMessageSelectorTreeWidgetItem *>(this->topLevelItem(s32_CounterTopLevelItem));
+            dynamic_cast<C_SdBueMessageSelectorTreeWidgetItem *>(this->topLevelItem(s32_CounterTopLevelItem));
          if (pc_TopLevelItem != NULL)
          {
             // default case: not selected
@@ -2591,7 +2591,7 @@ void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection &
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_CoMessageCheckedStateChanged(
-   C_SdBusMessageSelectorTreeWidgetItem * const opc_Item)
+   C_SdBueMessageSelectorTreeWidgetItem * const opc_Item)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
    if (this->mpc_UndoManager != NULL)
@@ -3068,6 +3068,7 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetC
                   else
                   {
                      //Always expand for signal selection
+
                      this->expandItem(pc_TopLevelItem);
 
                      //Signal(s)
@@ -3406,4 +3407,69 @@ bool C_SdBueMessageSelectorTreeWidget::m_GetHighestSelected(QModelIndex & orc_In
       q_Retval = false;
    }
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get j1939 default node assignment
+
+   \param[in]  orc_NodeInfo   Node info
+
+   \return
+   J1939 default node assignment
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_CieImportDataAssignment> C_SdBueMessageSelectorTreeWidget::m_GetJ1939DefaultNodeAssignment(
+   const C_CieConverter::C_CieNode & orc_NodeInfo) const
+{
+   // Assign the imported messages to the first active node on the current bus
+   std::vector<C_CieImportDataAssignment> c_NodeAssignments;
+   C_CieImportDataAssignment c_NodeAssignmentConverted;
+   c_NodeAssignmentConverted.c_ImportData = C_CieDataPoolListAdapter::h_GetStructureFromDbcFileImport(orc_NodeInfo);
+   if (this->mq_ModeSingleNode)
+   {
+      c_NodeAssignmentConverted.u32_OsyNodeIndex = this->mu32_NodeIndex;
+      c_NodeAssignmentConverted.u32_OsyInterfaceIndex = this->mu32_InterfaceIndex;
+   }
+   else
+   {
+      // Fetch nodes and interfaces of the current bus
+      std::vector<uint32_t> c_NodeIndexes;
+      std::vector<uint32_t> c_InterfaceIndexes;
+
+      C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
+                                                                                         c_NodeIndexes,
+                                                                                         c_InterfaceIndexes);
+
+      // Find an active node to which the messages imported from the catalog will be added
+      if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+      {
+         bool q_NodeFound = false;
+         for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+         {
+            std::vector<const C_OscCanMessageContainer *> c_MessageContainers =
+               C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainers(c_NodeIndexes[u32_ItNode],
+                                                                                this->me_ProtocolType,
+                                                                                c_InterfaceIndexes[u32_ItNode]);
+            uint32_t u32_Counter;
+            for (u32_Counter = 0U; u32_Counter < c_MessageContainers.size(); ++u32_Counter)
+            {
+               const C_OscCanMessageContainer * const pc_MessageContainer = c_MessageContainers[u32_Counter];
+               if (pc_MessageContainer->q_IsComProtocolUsedByInterface == true)
+               {
+                  c_NodeAssignmentConverted.u32_OsyNodeIndex = c_NodeIndexes[u32_ItNode];
+                  c_NodeAssignmentConverted.u32_OsyInterfaceIndex = c_InterfaceIndexes[u32_ItNode];
+                  q_NodeFound = true;
+                  break;
+               }
+            }
+
+            if (q_NodeFound == true)
+            {
+               break;
+            }
+         }
+      }
+   }
+   c_NodeAssignments.push_back(c_NodeAssignmentConverted);
+   return c_NodeAssignments;
 }

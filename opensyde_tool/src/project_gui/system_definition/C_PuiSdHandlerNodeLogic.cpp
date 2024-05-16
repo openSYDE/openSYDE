@@ -1188,6 +1188,35 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeIndexAssociatedWithAnotherNodeIndex(const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Replace node
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_OscNode       Osc node
+   \param[in]  orc_UiNode        Ui node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::ReplaceNode(const uint32_t ou32_NodeIndex,
+                                          const stw::opensyde_core::C_OscNode & orc_OscNode,
+                                          const C_PuiSdNode & orc_UiNode)
+{
+   //Save device definition
+   const stw::opensyde_core::C_OscDeviceDefinition * const pc_DevDef =
+      this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex].pc_DeviceDefinition;
+
+   Q_EMIT (this->SigSyncNodeAboutToBeDeleted(ou32_NodeIndex, true));
+   this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex] = orc_OscNode;
+   //Restore device definition
+   this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex].pc_DeviceDefinition = pc_DevDef;
+
+   //insert UI part at same position as OSC part:
+   this->mc_UiNodes[ou32_NodeIndex] = orc_UiNode;
+
+   Q_EMIT (this->SigSyncNodeReplace(ou32_NodeIndex));
+
+   //do not signal "node change" (unselects node in node bar and should not be necessary)
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add data pool
 
    \param[in]  oru32_NodeIndex            Node index

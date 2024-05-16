@@ -1528,7 +1528,7 @@ int32_t C_PuiSdHandlerFiler::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C
             //Dir for sub folder
             const QFileInfo c_FileInfo(c_FilePathCombined);
             const QDir c_Dir = c_FileInfo.dir();
-            s32_Retval = mh_LoadNodeFile(c_Node, c_FilePathCombined, &c_Dir);
+            s32_Retval = h_LoadNodeFile(c_Node, c_FilePathCombined, &c_Dir);
          }
          else
          {
@@ -1556,6 +1556,83 @@ int32_t C_PuiSdHandlerFiler::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C
                               orc_Nodes.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node UI part
+
+   \param[in,out]  orc_Node      Node UI data storage
+   \param[in]      orc_FilePath  File path
+   \param[in]      opc_BasePath  Base path (Optional for save to string)
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerFiler::h_LoadNodeFile(C_PuiSdNode & orc_Node, const QString & orc_FilePath,
+                                            const QDir * const opc_BasePath)
+{
+   C_OscXmlParser c_XmlParser;
+   int32_t s32_Retval = C_OscSystemFilerUtil::h_GetParserForExistingFile(c_XmlParser,
+                                                                         orc_FilePath.toStdString().c_str(),
+                                                                         "opensyde-node-ui-definition");
+
+   //File version
+   if (c_XmlParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16_t u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16_t>(c_XmlParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading UI node", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading UI node", "Value of \"file-version\": " +
+                            C_SclString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading UI node",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XmlParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading UI node", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (c_XmlParser.SelectNodeChild("node") == "node")
+      {
+         s32_Retval = C_PuiSdHandlerFiler::mh_LoadNode(orc_Node, c_XmlParser, opc_BasePath);
+      }
+      else
+      {
+         osc_write_log_error("Loading UI node", "Could not find \"node\" node.");
+         s32_Retval = C_CONFIG;
+      }
+   }
+   else
+   {
+      //More details are in log
+      s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
@@ -2045,83 +2122,6 @@ QString C_PuiSdHandlerFiler::h_GetSharedDatapoolUiFilePath(const QString & orc_S
    const QFileInfo c_Info(orc_SystemDefinitionCoreFilePath);
 
    return c_Info.dir().absoluteFilePath("shared_datapools_ui.xml");
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node UI part
-
-   \param[in,out]  orc_Node      Node UI data storage
-   \param[in]      orc_FilePath  File path
-   \param[in]      opc_BasePath  Base path (Optional for save to string)
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerFiler::mh_LoadNodeFile(C_PuiSdNode & orc_Node, const QString & orc_FilePath,
-                                             const QDir * const opc_BasePath)
-{
-   C_OscXmlParser c_XmlParser;
-   int32_t s32_Retval = C_OscSystemFilerUtil::h_GetParserForExistingFile(c_XmlParser,
-                                                                         orc_FilePath.toStdString().c_str(),
-                                                                         "opensyde-node-ui-definition");
-
-   //File version
-   if (c_XmlParser.SelectNodeChild("file-version") == "file-version")
-   {
-      uint16_t u16_FileVersion = 0U;
-      try
-      {
-         u16_FileVersion = static_cast<uint16_t>(c_XmlParser.GetNodeContent().ToInt());
-      }
-      catch (...)
-      {
-         osc_write_log_error("Loading UI node", "\"file-version\" could not be converted to a number.");
-         s32_Retval = C_CONFIG;
-      }
-
-      //is the file version one we know ?
-      if (s32_Retval == C_NO_ERR)
-      {
-         osc_write_log_info("Loading UI node", "Value of \"file-version\": " +
-                            C_SclString::IntToStr(u16_FileVersion));
-         //Check file version
-         if (u16_FileVersion != 1U)
-         {
-            osc_write_log_error("Loading UI node",
-                                "Version defined by \"file-version\" is not supported.");
-            s32_Retval = C_CONFIG;
-         }
-      }
-
-      //Return
-      c_XmlParser.SelectNodeParent();
-   }
-   else
-   {
-      osc_write_log_error("Loading UI node", "Could not find \"file-version\" node.");
-      s32_Retval = C_CONFIG;
-   }
-
-   if (s32_Retval == C_NO_ERR)
-   {
-      if (c_XmlParser.SelectNodeChild("node") == "node")
-      {
-         s32_Retval = C_PuiSdHandlerFiler::mh_LoadNode(orc_Node, c_XmlParser, opc_BasePath);
-      }
-      else
-      {
-         osc_write_log_error("Loading UI node", "Could not find \"node\" node.");
-         s32_Retval = C_CONFIG;
-      }
-   }
-   else
-   {
-      //More details are in log
-      s32_Retval = C_CONFIG;
-   }
-   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

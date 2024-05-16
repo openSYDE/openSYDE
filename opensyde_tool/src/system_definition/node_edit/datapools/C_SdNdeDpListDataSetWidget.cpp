@@ -128,6 +128,7 @@ C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw::opensyde_gui_element
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} //no memory leak; widgets owned and cleaned up by Qt engine
 C_SdNdeDpListDataSetWidget::~C_SdNdeDpListDataSetWidget(void)
 {
    delete mpc_Ui;

@@ -162,7 +162,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const int
 {
    QVariant c_Retval;
 
-   if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+   if (orc_Index.isValid() == true)
    {
       const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_CamProFilterItemData c_FilterItem = mc_FilterItemsData[u32_Index];
@@ -341,7 +341,7 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
 
    if (data(orc_Index, os32_Role) != orc_Value)
    {
-      if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
+      if (orc_Index.isValid() == true)
       {
          const int32_t s32_ColumnDetails = h_EnumToColumn(eDETAILS);
          const uint32_t u32_RowIndex = static_cast<uint32_t>(orc_Index.row());

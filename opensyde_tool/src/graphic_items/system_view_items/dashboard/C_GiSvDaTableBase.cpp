@@ -899,6 +899,8 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
          {
             uint32_t u32_Counter;
 
+            this->mpc_TableWidget->ReserveItems(std::min(c_DataElements.size() + this->GetWidgetDataPoolElementCount(),
+                                                         C_SyvDaItTaModel::hu32_MAX_ELEMENTS));
             for (u32_Counter = 0U;
                  (u32_Counter < c_DataElements.size()) &&
                  (this->GetWidgetDataPoolElementCount() < C_SyvDaItTaModel::hu32_MAX_ELEMENTS); ++u32_Counter)

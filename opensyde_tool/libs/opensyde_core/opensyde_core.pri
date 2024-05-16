@@ -182,6 +182,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
                   $${PWD}/project/system/node \
                   $${PWD}/project/system/node/can \
                   $${PWD}/project/system/node/can/can_open \
+                  $${PWD}/project/system/target_support_package \
                   $${PWD}/project/view
 
    SOURCES += \
@@ -225,8 +226,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/C_OscSystemDefinition.cpp \
        $${PWD}/project/system/C_OscSystemDefinitionFiler.cpp \
        $${PWD}/project/system/C_OscSystemFilerUtil.cpp \
-       $${PWD}/project/system/C_OscTargetSupportPackage.cpp \
-       $${PWD}/project/system/C_OscTargetSupportPackageFiler.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackage.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageFiler.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2Filer.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeDataPoolFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscSystemBusFilerV2.cpp \
@@ -316,8 +319,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/C_OscSystemDefinition.hpp \
        $${PWD}/project/system/C_OscSystemDefinitionFiler.hpp \
        $${PWD}/project/system/C_OscSystemFilerUtil.hpp \
-       $${PWD}/project/system/C_OscTargetSupportPackage.hpp \
-       $${PWD}/project/system/C_OscTargetSupportPackageFiler.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackage.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageFiler.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2Filer.hpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeDataPoolFilerV2.hpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeFilerV2.hpp \
        $${PWD}/project/system/FileLoadersV2/C_OscSystemBusFilerV2.hpp \

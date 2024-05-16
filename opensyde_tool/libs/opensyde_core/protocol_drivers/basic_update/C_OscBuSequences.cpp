@@ -97,6 +97,9 @@ int32_t C_OscBuSequences::Init(const C_SclString & orc_CanDllPath, const int32_t
 
    m_ReportProgress(s32_Return, "Starting the initialization of CAN driver and protocol ...");
 
+   const uint8_t u8_MINIMUM_PERCENTAGE = 0;
+   m_ReportProgressPercentage(u8_MINIMUM_PERCENTAGE);
+
    osc_write_log_info(c_LogActivity, "CAN DLL path used: " + orc_CanDllPath);
 
    ms32_CanBitrate = os32_CanBitrate;
@@ -414,6 +417,8 @@ int32_t C_OscBuSequences::ReadDeviceInformation(void)
    }
 
    m_ReportProgress(s32_Return, "Read device information finished.");
+   const uint8_t u8_PROGRESS_PERCENTAGE = 2;
+   m_ReportProgressPercentage(u8_PROGRESS_PERCENTAGE);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -665,6 +670,11 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
                                         s32_Size - s32_RemainingBytes, s32_Size);
                   m_ReportProgress(s32_Return, c_Text);
 
+                  const uint8_t u8_MAX_PERCENTAGE = 100;
+                  const uint8_t u8_Percentage =
+                     static_cast<uint8_t>((u8_MAX_PERCENTAGE * (s32_Size - s32_RemainingBytes)) / s32_Size);
+                  m_ReportProgressPercentage(u8_Percentage);
+
                   s32_RemainingBytes -= static_cast<int32_t>(c_Data.size());
                   u8_BlockSequenceCounter = (u8_BlockSequenceCounter < 0xFFU) ? (u8_BlockSequenceCounter + 1U) : 0x00U;
                }
@@ -686,6 +696,10 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
             C_SclString c_Text;
             c_Text.PrintFormatted("Transferring area %02d/%02d  byte %08d/%08d",
                                   u16_Area + 1, pc_HexDump->at_Blocks.GetLength(), s32_Size, s32_Size);
+
+            const uint8_t u8_MAX_PERCENTAGE = 100;
+            m_ReportProgressPercentage(u8_MAX_PERCENTAGE);
+
             m_ReportProgress(s32_Return, c_Text);
             m_ReportProgress(s32_Return, "Finished writing area, finalizing ...");
 
@@ -825,6 +839,19 @@ int32_t C_OscBuSequences::h_ReadHexFile(const C_SclString & orc_HexFilePath, C_O
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report progress in percentage
+
+   Has only to be overridden if needed.
+
+   \param[in]       ou8_ProgressInPercentage     Progress in percentage
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscBuSequences::m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage)
+{
+   std::cout << "Progress in Percentage: " << static_cast<int32_t>(ou8_ProgressInPercentage) << std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

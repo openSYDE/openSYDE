@@ -1022,24 +1022,31 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
          //No restrictions
          break;
       }
+   }
+   if (orc_Message.u16_Dlc > 8U)
+   {
+      c_Info.push_back(
+         static_cast<QString>(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 because "
+                                                     "of CAN message limits.")).arg(orc_Message.u16_Dlc));
+      orc_Message.u16_Dlc = 8U;
+   }
 
-      if (oq_IncludeSignalUpdate)
+   if (oq_IncludeSignalUpdate)
+   {
+      //Adapt signals
+      for (std::vector<C_OscCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
+           c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
       {
-         //Adapt signals
-         for (std::vector<C_OscCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
-              c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
+         tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size());
+         if (c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size())
          {
-            tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size());
-            if (c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size())
-            {
-               h_AdaptSignalToProtocolType(*c_SignalIt,
-                                           orc_SignalListElements[c_SignalIt->u32_ComDataElementIndex],
-                                           oe_Type, &c_Info);
-            }
+            h_AdaptSignalToProtocolType(*c_SignalIt,
+                                        orc_SignalListElements[c_SignalIt->u32_ComDataElementIndex],
+                                        oe_Type, &c_Info);
          }
       }
-      c_Info.removeDuplicates();
    }
+   c_Info.removeDuplicates();
 
    if (opc_AdaptationInfos != NULL)
    {
@@ -1085,6 +1092,22 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
             orc_Signal.u16_ComBitStart = 0;
          }
       }
+   }
+
+   if (orc_Signal.u16_ComBitStart >= mu16_SIGNAL_BIT_MAX)
+   {
+      c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
+                                                                "of CAN message limits.")).
+                    arg(orc_Signal.u16_ComBitStart));
+      orc_Signal.u16_ComBitStart = 0;
+   }
+
+   if (orc_Signal.u16_ComBitLength > mu16_SIGNAL_BIT_MAX)
+   {
+      c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Bit length of signal set from %1 to %2 because "
+                                                                "of CAN message limits.")).
+                    arg(orc_Signal.u16_ComBitLength).arg(mu16_SIGNAL_BIT_MAX));
+      orc_Signal.u16_ComBitLength = mu16_SIGNAL_BIT_MAX;
    }
 
    if (oe_Type == C_OscCanProtocol::eJ1939)

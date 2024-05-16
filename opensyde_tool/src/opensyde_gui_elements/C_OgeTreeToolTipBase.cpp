@@ -123,26 +123,23 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
                {
                   const int32_t s32_ToolTipRow = c_Index.row();
                   const int32_t s32_ToolTipCol = c_Index.column();
-                  if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
+                  const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                  const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                  const C_NagToolTip::E_Type e_Type =
+                     static_cast<C_NagToolTip::E_Type>(c_Index.data(ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
+                  if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                   {
-                     const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
-                     const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
-                     const C_NagToolTip::E_Type e_Type =
-                        static_cast<C_NagToolTip::E_Type>(c_Index.data(ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
-                     if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
-                     {
-                        this->ms32_HoveredRow = s32_ToolTipRow;
-                        this->ms32_HoveredCol = s32_ToolTipCol;
-                        this->ms32_HoveredNumberOfParents = mh_CountParents(c_Index);
-                        //Update text
-                        this->m_SetMouseTracking(true);
-                        this->m_GetToolTip()->SetHeading(c_Heading);
-                        this->m_GetToolTip()->SetContent(c_Content);
-                        this->m_GetToolTip()->SetType(e_Type);
-                        this->m_GetToolTip()->show();
-                        //Use global pos for move because that's the actual target position
-                        this->m_GetToolTip()->DoMove(pc_HelpEvent->globalPos());
-                     }
+                     this->ms32_HoveredRow = s32_ToolTipRow;
+                     this->ms32_HoveredCol = s32_ToolTipCol;
+                     this->ms32_HoveredNumberOfParents = mh_CountParents(c_Index);
+                     //Update text
+                     this->m_SetMouseTracking(true);
+                     this->m_GetToolTip()->SetHeading(c_Heading);
+                     this->m_GetToolTip()->SetContent(c_Content);
+                     this->m_GetToolTip()->SetType(e_Type);
+                     this->m_GetToolTip()->show();
+                     //Use global pos for move because that's the actual target position
+                     this->m_GetToolTip()->DoMove(pc_HelpEvent->globalPos());
                   }
                }
             }

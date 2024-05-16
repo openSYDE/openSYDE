@@ -3532,6 +3532,8 @@ C_PuiSvHandler::C_PuiSvHandler(QObject * const opc_Parent) :
            &C_PuiSvHandler::m_OnSyncNodeAdded);
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeHalc, this,
            &C_PuiSvHandler::m_OnSyncNodeHalc);
+   connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeReplace, this,
+           &C_PuiSvHandler::m_OnSyncNodeReplace);
    connect(
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeAboutToBeDeleted, this,
       &C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted);
@@ -3735,17 +3737,33 @@ void C_PuiSvHandler::m_OnSyncNodeHalc(const uint32_t ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sync view node indices to deleted node index
+/*! \brief  Sync view node indices to node replace change
 
-   \param[in]  ou32_Index  Deleted node index
+   \param[in]  ou32_Index  Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
+void C_PuiSvHandler::m_OnSyncNodeReplace(const uint32_t ou32_Index)
 {
    for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
-      rc_View.OnSyncNodeAboutToBeDeleted(ou32_Index);
+      rc_View.OnSyncNodeReplace(ou32_Index);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view node indices to deleted node index
+
+   \param[in]  ou32_Index           Deleted node index
+   \param[in]  oq_OnlyMarkInvalid   Only mark invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid)
+{
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   {
+      C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
+      rc_View.OnSyncNodeAboutToBeDeleted(ou32_Index, oq_OnlyMarkInvalid);
    }
    // HALC
    {
@@ -3755,7 +3773,7 @@ void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
            c_It != this->mc_LastKnownHalcCrcs.end(); ++c_It)
       {
          C_PuiSvDbNodeDataPoolListElementId c_Id = c_It->first;
-         C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(c_Id, ou32_Index);
+         C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(c_Id, ou32_Index, oq_OnlyMarkInvalid);
          c_Tmp[c_Id] = c_It->second;
       }
       this->mc_LastKnownHalcCrcs = c_Tmp;

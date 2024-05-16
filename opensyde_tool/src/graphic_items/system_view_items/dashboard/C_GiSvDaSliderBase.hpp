@@ -58,6 +58,9 @@ private:
    float64_t mf64_SliderFactor;
    float64_t mf64_UnscaledMinValue;
 
+   static const int32_t mhs32_SLIDER_MIN;
+   static const int32_t mhs32_SLIDER_RANGE;
+
    //Avoid call
    C_GiSvDaSliderBase(const C_GiSvDaSliderBase &);
    C_GiSvDaSliderBase & operator =(const C_GiSvDaSliderBase &) &; //lint !e1511 //we want to hide the base func.
@@ -65,6 +68,8 @@ private:
    void m_UpdateStaticValues(void);
    bool m_IsOnChange(void) const;
    void m_SetUnscaledValueToSliderWidget(const float64_t of64_NewValue) const;
+   float64_t m_GetCurrentUnscaledValue(void) const;
+   int32_t m_GetSliderValueFromContent(const opensyde_core::C_OscNodeDataPoolContent & orc_Content) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

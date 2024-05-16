@@ -33,6 +33,7 @@
 #include "C_PuiSdHandler.hpp"
 #include "C_OscUtils.hpp"
 #include "constants.hpp"
+#include "C_PuiSdNodeCanUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -656,9 +657,9 @@ int32_t C_PuiSdNodeCanMessageSyncManager::SetCanSignalPosition(
    for (uint32_t u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
-      s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanSignalPosition(c_MatchingMessageIds[u32_ItMessageId],
-                                                                         oru32_SignalIndex, orc_OscSignal,
-                                                                         orc_UiSignal);
+      s32_Retval = C_PuiSdNodeCanUtil::h_SetCanSignalPosition(c_MatchingMessageIds[u32_ItMessageId],
+                                                              oru32_SignalIndex, orc_OscSignal,
+                                                              orc_UiSignal);
       //Stop on error
       if (s32_Retval != C_NO_ERR)
       {

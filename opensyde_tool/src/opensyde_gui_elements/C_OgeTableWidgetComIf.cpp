@@ -255,24 +255,21 @@ bool C_OgeTableWidgetComIf::event(QEvent * const opc_Event)
                {
                   const int32_t s32_ToolTipRow = c_Index.row();
                   const int32_t s32_ToolTipCol = c_Index.column();
-                  if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
+                  std::map<C_ItemId, C_ToolTipContent>::const_iterator c_ItToolTip;
+                  C_ItemId c_Id;
+                  c_Id.s32_Row = s32_ToolTipRow;
+                  c_Id.s32_Col = s32_ToolTipCol;
+                  c_ItToolTip = this->mc_ToolTips.find(c_Id);
+                  if (c_ItToolTip != this->mc_ToolTips.end())
                   {
-                     std::map<C_ItemId, C_ToolTipContent>::const_iterator c_ItToolTip;
-                     C_ItemId c_Id;
-                     c_Id.s32_Row = s32_ToolTipRow;
-                     c_Id.s32_Col = s32_ToolTipCol;
-                     c_ItToolTip = this->mc_ToolTips.find(c_Id);
-                     if (c_ItToolTip != this->mc_ToolTips.end())
-                     {
-                        this->mc_HoveredRow = c_Id;
-                        //Update text
-                        this->setMouseTracking(true);
-                        this->mpc_ToolTip->SetHeading(c_ItToolTip->second.c_Heading);
-                        this->mpc_ToolTip->SetContent(c_ItToolTip->second.c_Content);
-                        this->mpc_ToolTip->SetType(c_ItToolTip->second.e_Type);
-                        this->mpc_ToolTip->show();
-                        this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
-                     }
+                     this->mc_HoveredRow = c_Id;
+                     //Update text
+                     this->setMouseTracking(true);
+                     this->mpc_ToolTip->SetHeading(c_ItToolTip->second.c_Heading);
+                     this->mpc_ToolTip->SetContent(c_ItToolTip->second.c_Content);
+                     this->mpc_ToolTip->SetType(c_ItToolTip->second.e_Type);
+                     this->mpc_ToolTip->show();
+                     this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
                   }
                }
             }

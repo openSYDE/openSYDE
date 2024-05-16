@@ -57,7 +57,7 @@ void C_GiSvTextElementBus::GenerateHint(void)
    if ((this->mq_ErrorIconHovered == true) && (this->ms32_Index >= 0))
    {
       this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Invalid Bus Content"));
-      this->SetDefaultToolTipContent(C_GtGetText::h_GetText("For further details switch to system definition"));
+      this->SetDefaultToolTipContent(C_GtGetText::h_GetText("For further details switch to SYSTEM DEFINITION"));
       this->SetDefaultToolTipType(C_NagToolTip::eERROR);
    }
    else

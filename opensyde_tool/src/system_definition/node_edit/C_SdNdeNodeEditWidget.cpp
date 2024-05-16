@@ -92,6 +92,7 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32_t ou32_NodeIndex, cons
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} //no memory leak; widgets owned and cleaned up by Qt engine
 C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
 {
    //Store splitter position
@@ -296,11 +297,13 @@ void C_SdNdeNodeEditWidget::OpenDetail(const int32_t os32_MainIndex, const int32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTsp()
 
+   \param[in]  oq_IsNewNode       Is Node new or not
+
    \retval   true   Cancel
    \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeNodeEditWidget::AddFromTsp(void)
+bool C_SdNdeNodeEditWidget::AddFromTsp(const bool oq_IsNewNode)
 {
    bool q_Cancel = false;
    const bool q_ADAPT_CURSOR = true; //to set Cursor to WaitCursor
@@ -310,7 +313,7 @@ bool C_SdNdeNodeEditWidget::AddFromTsp(void)
    tgl_assert(this->mpc_PropertiesWidget != NULL);
    if (this->mpc_PropertiesWidget != NULL)
    {
-      q_Cancel = this->mpc_PropertiesWidget->AddFromTsp();
+      q_Cancel = this->mpc_PropertiesWidget->AddFromTsp(oq_IsNewNode);
    }
    return q_Cancel;
 }
@@ -702,6 +705,8 @@ void C_SdNdeNodeEditWidget::m_CreatePropertiesTab(const bool oq_AdaptCursor)
               &C_SdNdeNodeEditWidget::m_ReloadDataPools);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigHalcLoadedFromTsp, this,
               &C_SdNdeNodeEditWidget::m_HalcLoadedFromTsp);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigUpdateTrigger, this,
+              &C_SdNdeNodeEditWidget::m_UpdateTrigger);
 
       this->mpc_PropertiesWidget->SetNodeIndex(this->mu32_NodeIndex);
       this->mpc_Ui->pc_TabPropertiesLayout->addWidget(this->mpc_PropertiesWidget);
@@ -883,4 +888,16 @@ void C_SdNdeNodeEditWidget::mh_StartWaitingCursor()
 void C_SdNdeNodeEditWidget::mh_EndWaitingCursor()
 {
    QApplication::restoreOverrideCursor();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload tabs on getting Update trigger
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_UpdateTrigger()
+{
+   this->m_ReloadDataPools();
+   this->m_ReloadCommMessages();
+   this->m_ReloadCanOpenConfig();
+   this->m_ReloadHalc();
 }

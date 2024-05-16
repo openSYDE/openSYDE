@@ -160,6 +160,17 @@ void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_Dat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reserve items
+
+   \param[in]  ou32_Number    Number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaView::ReserveItems(const uint32_t ou32_Number)
+{
+   this->mc_Model.ReserveItems(ou32_Number);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Move selected items
 
    \param[in]  oq_Up    Flag to switch to move one step up or down

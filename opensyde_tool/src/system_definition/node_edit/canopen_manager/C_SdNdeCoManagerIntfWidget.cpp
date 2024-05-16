@@ -408,15 +408,11 @@ void C_SdNdeCoManagerIntfWidget::m_OnSameAsOpensydeNodeIdChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoManagerIntfWidget::m_HandleSameAsOpensydeNodeIdState(void) const
 {
+   m_HandleNodeIdRange(this->mpc_Ui->pc_CheckBoxSameAsOpensyde->isChecked());
    if (this->mpc_Ui->pc_CheckBoxSameAsOpensyde->isChecked() == true)
    {
       //get current node ID of node interface
       const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
-
-      // set openSYDE node id min/max
-      // necessary to be compatible with complete openSYDE Node ID range
-      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_OS);
-      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_OS);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
@@ -435,11 +431,30 @@ void C_SdNdeCoManagerIntfWidget::m_HandleSameAsOpensydeNodeIdState(void) const
    }
    else
    {
+      this->mpc_Ui->pc_SpinBoxCanOpenId->setEnabled(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle node id range
+
+   \param[in]  oq_IsOpensydeNodeId  Is opensyde node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoManagerIntfWidget::m_HandleNodeIdRange(const bool oq_IsOpensydeNodeId) const
+{
+   if (oq_IsOpensydeNodeId == true)
+   {
+      // set openSYDE node id min/max
+      // necessary to be compatible with complete openSYDE Node ID range
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_OS);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_OS);
+   }
+   else
+   {
       // set CANopen node id min/max
       this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_CANOPEN);
       this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_CANOPEN);
-
-      this->mpc_Ui->pc_SpinBoxCanOpenId->setEnabled(true);
    }
 }
 
@@ -593,6 +608,9 @@ void C_SdNdeCoManagerIntfWidget::m_LoadFromData(void)
 
    if (pc_CanOpenManagerInfo != NULL)
    {
+      //Change range before setting value
+      m_HandleNodeIdRange(pc_CanOpenManagerInfo->q_UseOpenSydeNodeId);
+
       this->mpc_Ui->pc_SpinBoxCanOpenId->setValue(static_cast<int32_t>(pc_CanOpenManagerInfo->u8_NodeIdValue));
       this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setChecked(pc_CanOpenManagerInfo->q_UseOpenSydeNodeId);
       this->mpc_Ui->pc_CheckBoxAutostart->setChecked(pc_CanOpenManagerInfo->q_AutostartCanOpenManager);

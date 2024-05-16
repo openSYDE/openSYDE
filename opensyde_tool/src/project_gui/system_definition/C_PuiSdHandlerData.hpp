@@ -39,7 +39,7 @@ public:
    int32_t SaveToFile(const stw::scl::C_SclString & orc_Path, const bool oq_UseDeprecatedFileFormatV2);
    bool HasHashChanged(void) const;
    uint32_t CalcHashSystemDefinition(void) const;
-   void Clear(void);
+   virtual void Clear(const bool oq_TriggerSyncSignals);
    C_SdTopologyDataSnapshot GetSnapshot(void) const;
 
    stw::opensyde_core::C_OscSystemDefinition & GetOscSystemDefinition(void);
@@ -80,7 +80,8 @@ Q_SIGNALS:
    void SigBusChanged(const uint32_t ou32_Index);
    void SigSyncNodeAdded(const uint32_t ou32_Index);
    void SigSyncNodeHalc(const uint32_t ou32_Index);
-   void SigSyncNodeAboutToBeDeleted(const uint32_t ou32_Index);
+   void SigSyncNodeReplace(const uint32_t ou32_Index);
+   void SigSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid);
    void SigSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);
    void SigSyncNodeDataPoolMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolSourceIndex,
                                  const uint32_t ou32_DataPoolTargetIndex);

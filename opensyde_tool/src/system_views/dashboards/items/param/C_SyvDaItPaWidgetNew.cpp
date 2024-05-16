@@ -125,6 +125,7 @@ C_SyvDaItPaWidgetNew::C_SyvDaItPaWidgetNew(const uint32_t & oru32_ViewIndex,
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} //no memory leak; widgets owned and cleaned up by Qt engine
 C_SyvDaItPaWidgetNew::~C_SyvDaItPaWidgetNew()
 {
    delete mpc_Ui;

@@ -57,7 +57,6 @@ const QString C_SyvDaDashboardScreenshot::mhc_SCREENSHOT_WATERMARK_ICON =
 const QString C_SyvDaDashboardScreenshot::mhc_SCREENSHOT_SUCCESS_GIF =
    "../../src/images/ScreenshotCustom.gif";
 
-const QString C_SyvDaDashboardScreenshot::mhc_SCREENSHOT_FOLDER_PATH = QDir::currentPath() + "/Screenshots/";
 const int32_t C_SyvDaDashboardScreenshot::mhs32_SCREENSHOT_GIF_LABEL_WIDTH = 200;
 const int32_t C_SyvDaDashboardScreenshot::mhs32_SCREENSHOT_GIF_LABEL_HEIGHT = 200;
 const int32_t C_SyvDaDashboardScreenshot::mhs32_SCREENSHOT_ICON_CHANGE_TIMEOUT = 250;
@@ -65,6 +64,7 @@ const int32_t C_SyvDaDashboardScreenshot::mhs32_SCREENSHOT_ICON_CHANGE_TIMEOUT =
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
+QString C_SyvDaDashboardScreenshot::mhc_ScreenshotFolderPath;
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
@@ -169,7 +169,10 @@ QString C_SyvDaDashboardScreenshot::mh_SaveScreenshotAs(const C_SclString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScreenshot::m_ShootScreenshot()
 {
-   const QDir c_Dir(mhc_SCREENSHOT_FOLDER_PATH);
+   //Initialize path. Do *not* do this const. Otherwise we'd get the currentPath before it might
+   // be changed by the startup logic.
+   C_SyvDaDashboardScreenshot::mhc_ScreenshotFolderPath = QDir::currentPath() + "/Screenshots/";
+   const QDir c_Dir(mhc_ScreenshotFolderPath);
 
    C_SyvDaDashboardScreenshot::m_ChangeToActionScreenshotIcon();
    QPixmap oc_CurrentTabPixmap(this->parentWidget()->size());
@@ -287,7 +290,7 @@ void C_SyvDaDashboardScreenshot::m_SaveScreenshot(QPixmap oc_CurrentTabPixmap, c
    //Copy screenshot to clipboard
    pc_Clipboard->setPixmap(oc_CurrentTabPixmap);
 
-   const QString c_ScreenshotSavedPath = mhc_SCREENSHOT_FOLDER_PATH + C_SyvDaDashboardScreenshot::mh_SaveScreenshotAs(
+   const QString c_ScreenshotSavedPath = mhc_ScreenshotFolderPath + C_SyvDaDashboardScreenshot::mh_SaveScreenshotAs(
       orc_DashboardName);
 
    const QString c_ScreenshotFileName = c_ScreenshotSavedPath + "." + c_ScreenshotFormat;
@@ -323,9 +326,9 @@ void C_SyvDaDashboardScreenshot::m_ShowMessageBox(QWidget * const opc_ParentWidg
 {
    C_OgeWiCustomMessage c_MessageBox(opc_ParentWidget, C_OgeWiCustomMessage::E_Type::eINFORMATION);
 
-   const QString c_ScreenshotLocationPath = C_Uti::h_GetLink(mhc_SCREENSHOT_FOLDER_PATH,
+   const QString c_ScreenshotLocationPath = C_Uti::h_GetLink(mhc_ScreenshotFolderPath,
                                                              mc_STYLE_GUIDE_COLOR_4,
-                                                             mhc_SCREENSHOT_FOLDER_PATH);
+                                                             mhc_ScreenshotFolderPath);
 
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard Screenshot"));
    c_MessageBox.SetDescription(C_GtGetText::h_GetText(

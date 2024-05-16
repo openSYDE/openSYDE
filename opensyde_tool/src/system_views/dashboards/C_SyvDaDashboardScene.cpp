@@ -1144,12 +1144,14 @@ uint32_t C_SyvDaDashboardScene::GetViewIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 stw::opensyde_gui_logic::C_SebUnoBaseManager * C_SyvDaDashboardScene::m_GetUndoManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_UndoManager;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SyvDaDashboardScene::m_GetContextMenuManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_ContextMenuManager;
 }
 
@@ -1163,6 +1165,7 @@ C_SebBaseContextMenuManager * C_SyvDaDashboardScene::m_GetContextMenuManager(voi
 //----------------------------------------------------------------------------------------------------------------------
 stw::opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_CopyPasteManager;
 }
 

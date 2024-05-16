@@ -579,6 +579,7 @@ void C_OscNodeDataPoolContent::SetValueArrU8Element(const uint8_t ou8_Value, con
 const std::vector<uint8_t> C_OscNodeDataPoolContent::GetValueArrU8(void) const
 {
    std::vector<uint8_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eUINT8, c_RetVal);
    return c_RetVal;
 }
@@ -635,6 +636,7 @@ void C_OscNodeDataPoolContent::SetValueArrU16Element(const uint16_t ou16_Value, 
 const std::vector<uint16_t> C_OscNodeDataPoolContent::GetValueArrU16(void) const
 {
    std::vector<uint16_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eUINT16, c_RetVal);
    return c_RetVal;
 }
@@ -849,6 +851,7 @@ void C_OscNodeDataPoolContent::SetValueArrU32Element(const uint32_t ou32_Value, 
 const std::vector<uint32_t> C_OscNodeDataPoolContent::GetValueArrU32(void) const
 {
    std::vector<uint32_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eUINT32, c_RetVal);
    return c_RetVal;
 }
@@ -905,6 +908,7 @@ void C_OscNodeDataPoolContent::SetValueArrU64Element(const uint64_t ou64_Value, 
 const std::vector<uint64_t> C_OscNodeDataPoolContent::GetValueArrU64(void) const
 {
    std::vector<uint64_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eUINT64, c_RetVal);
    return c_RetVal;
 }
@@ -961,6 +965,7 @@ void C_OscNodeDataPoolContent::SetValueArrS8Element(const int8_t os8_Value, cons
 const std::vector<int8_t> C_OscNodeDataPoolContent::GetValueArrS8(void) const
 {
    std::vector<int8_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eSINT8, c_RetVal);
    return c_RetVal;
 }
@@ -1017,6 +1022,7 @@ void C_OscNodeDataPoolContent::SetValueArrS16Element(const int16_t os16_Value, c
 const std::vector<int16_t> C_OscNodeDataPoolContent::GetValueArrS16(void) const
 {
    std::vector<int16_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eSINT16, c_RetVal);
    return c_RetVal;
 }
@@ -1073,6 +1079,7 @@ void C_OscNodeDataPoolContent::SetValueArrS32Element(const int32_t os32_Value, c
 const std::vector<int32_t> C_OscNodeDataPoolContent::GetValueArrS32(void) const
 {
    std::vector<int32_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eSINT32, c_RetVal);
    return c_RetVal;
 }
@@ -1129,6 +1136,7 @@ void C_OscNodeDataPoolContent::SetValueArrS64Element(const int64_t os64_Value, c
 const std::vector<int64_t> C_OscNodeDataPoolContent::GetValueArrS64(void) const
 {
    std::vector<int64_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eSINT64, c_RetVal);
    return c_RetVal;
 }
@@ -1185,6 +1193,7 @@ void C_OscNodeDataPoolContent::SetValueArrF32Element(const float32_t of32_Value,
 const std::vector<float32_t> C_OscNodeDataPoolContent::GetValueArrF32(void) const
 {
    std::vector<float32_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eFLOAT32, c_RetVal);
    return c_RetVal;
 }
@@ -1241,6 +1250,7 @@ void C_OscNodeDataPoolContent::SetValueArrF64Element(const float64_t of64_Value,
 const std::vector<float64_t> C_OscNodeDataPoolContent::GetValueArrF64(void) const
 {
    std::vector<float64_t> c_RetVal;
+
    m_GetValueArray(C_OscNodeDataPoolContent::eFLOAT64, c_RetVal);
    return c_RetVal;
 }
@@ -2847,6 +2857,7 @@ void C_OscNodeDataPoolContent::GetValueAsScaledString(const float64_t of64_Facto
                                                       const bool oq_AllowSpecialHandling) const
 {
    std::stringstream c_Stream;
+
    if (C_OscUtils::h_IsScalingActive(of64_Factor, of64_Offset) == true)
    {
       float64_t f64_Tmp;
@@ -3044,6 +3055,52 @@ void C_OscNodeDataPoolContent::GetAnyValueAsFloat64(float64_t & orf64_Output, co
          break;
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns pointer to the used const memory of the content
+
+   The usage of the associated critical section must be considered when accessing the memory
+
+   \param[out]      oppc_CriticalSection   Optional pointer to the associated critical section
+
+   \return
+   Pointer to the vector with the const value data of the content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<uint8_t> * stw::opensyde_core::C_OscNodeDataPoolContent::GetDataAccessConst(
+   stw::tgl::C_TglCriticalSection ** const oppc_CriticalSection) const
+{
+   if (oppc_CriticalSection != NULL)
+   {
+      *oppc_CriticalSection = &this->mc_CriticalSection;
+   }
+
+   return &this->mc_Data;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns pointer to the used memory of the content
+
+   The usage of the associated critical section must be considered when accessing the memory
+
+   \param[out]      oppc_CriticalSection   Optional pointer to the associated critical section
+
+   \return
+   Pointer to the vector with the value data of the content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint8_t> * stw::opensyde_core::C_OscNodeDataPoolContent::GetDataAccess(
+   stw::tgl::C_TglCriticalSection ** const oppc_CriticalSection)
+{
+   if (oppc_CriticalSection != NULL)
+   {
+      *oppc_CriticalSection = &this->mc_CriticalSection;
+   }
+
+   //lint -e{1536} it is intended to expose a private member to increase performance when data transfers without
+   // type knowledge is possible
+   return &this->mc_Data;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

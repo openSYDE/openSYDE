@@ -249,7 +249,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          const int32_t s32_Index = orc_Index.row();
-         if ((static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size()) && (s32_Index >= 0))
+         if (static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size())
          {
             switch (e_Col)
             {
@@ -347,7 +347,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int
       else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
          const int32_t s32_Index = orc_Index.row();
-         if ((static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size()) && (s32_Index >= 0))
+         if (static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size())
          {
             if (e_Col == eEXTENDED)
             {
@@ -369,7 +369,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int
          case eICON:
             {
                const int32_t s32_Index = orc_Index.row();
-               if ((static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size()) && (s32_Index >= 0))
+               if (static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size())
                {
                   c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Icon;
                }

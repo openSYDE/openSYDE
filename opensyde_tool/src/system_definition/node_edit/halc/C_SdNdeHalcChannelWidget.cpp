@@ -183,6 +183,7 @@ void C_SdNdeHalcChannelWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mpc_Ui->pc_TreeConfig->SetNode(this->mu32_NodeIndex);
+   this->m_LoadChannelData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

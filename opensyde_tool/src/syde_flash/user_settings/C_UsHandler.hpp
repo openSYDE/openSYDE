@@ -72,6 +72,7 @@ public:
    int32_t GetRequestDownloadTimeout(void) const;
    int32_t GetTransferDataTimeout(void) const;
    QStringList GetLastKnownUpdateHexFilePaths(void) const;
+   QStringList GetHexFilePathsAsRelativeOrAbsolute(void) const;
    QString GetLastKnownUpdateHexFileLocation(void) const;
    E_CanDllType GetCanDllType(void) const;
    QString GetCanDllPath(void) const;
@@ -94,6 +95,7 @@ public:
    void SetRequestDownloadTimeout(const int32_t & ors32_NewValue);
    void SetTransferDataTimeout(const int32_t & ors32_NewValue);
    void SetLastKnownUpdateHexFilePaths(const QStringList & orc_HexFilePaths);
+   void SetHexFilePathsAsRelativeOrAbsolute(const QStringList & orc_HexFilePathsAsRelativeOrAbsolute);
    void SetLastKnownUpdateHexFileLocation(const QString & orc_NewPath);
    void SetCanDllType(const E_CanDllType oe_NewValue);
    void SetCustomCanDllPath(const QString & orc_NewValue);
@@ -112,28 +114,29 @@ private:
    C_UsHandler(const C_UsHandler &);
    C_UsHandler & operator =(const C_UsHandler &) &;
 
-   const QString mc_IniPathAndName;           ///< Fix location of user settings
-   QPoint mc_ScreenPos;                       ///< History of last known screen position
-   QSize mc_AppSize;                          ///< History of last known openSyde window size
-   bool mq_AppMaximized;                      ///< History of openSyde window state
-   int32_t ms32_SplitterSettingsHorizontal;   ///< History of last known settings-splitter position x value
-   bool mq_SettingsAreExpanded;               ///< History of last known settings state
-                                              // (collapsed/expanded)
-   bool mq_WiProgressExpanded;                ///< History of last known progress widget expanded state
-   bool mq_WiAdvSettExpanded;                 ///< History of last known advanced settings widget expanded state
-   bool mq_WiDllConfigExpanded;               ///< History of last known DLL configuration widget expanded
-                                              // state
-   E_SettingsSubSection me_PopOpenSection;    ///< History of last known expanded settings subsection
-   int32_t ms32_PropNodeId;                   ///< History of last known Node ID in Properties widget
-   int32_t ms32_PropBitrate;                  ///< History of last known Bus Bitrate in Properties widget
-   int32_t ms32_NodeCfgInterfaceIndex;        ///< History of last known connected interface in Node Config dialog
-   int32_t ms32_FlashloaderResetWaitTime;     ///< History of last known Flashloader Reset Wait Time
-   int32_t ms32_RequestDownloadTimeout;       ///< History of last known Request Download Timeout
-   int32_t ms32_TransferDataTimeout;          ///< History of last known Transfer Data Timeout
-   QStringList mc_HexFilePaths;               ///< History of last known Hex file paths
-   QString mc_LastKnownUpdateHexFileLocation; ///< History of last known Hex file location
-   E_CanDllType me_CanDllType;                ///< History of last used CAN DLL type
-   QString mc_CustomCanDllPath;               ///< History of last used custom CAN DLL path
+   const QString mc_IniPathAndName;                 ///< Fix location of user settings
+   QPoint mc_ScreenPos;                             ///< History of last known screen position
+   QSize mc_AppSize;                                ///< History of last known openSyde window size
+   bool mq_AppMaximized;                            ///< History of openSyde window state
+   int32_t ms32_SplitterSettingsHorizontal;         ///< History of last known settings-splitter position x value
+   bool mq_SettingsAreExpanded;                     ///< History of last known settings state
+                                                    // (collapsed/expanded)
+   bool mq_WiProgressExpanded;                      ///< History of last known progress widget expanded state
+   bool mq_WiAdvSettExpanded;                       ///< History of last known advanced settings widget expanded state
+   bool mq_WiDllConfigExpanded;                     ///< History of last known DLL configuration widget expanded
+                                                    // state
+   E_SettingsSubSection me_PopOpenSection;          ///< History of last known expanded settings subsection
+   int32_t ms32_PropNodeId;                         ///< History of last known Node ID in Properties widget
+   int32_t ms32_PropBitrate;                        ///< History of last known Bus Bitrate in Properties widget
+   int32_t ms32_NodeCfgInterfaceIndex;              ///< History of last known connected interface in Node Config dialog
+   int32_t ms32_FlashloaderResetWaitTime;           ///< History of last known Flashloader Reset Wait Time
+   int32_t ms32_RequestDownloadTimeout;             ///< History of last known Request Download Timeout
+   int32_t ms32_TransferDataTimeout;                ///< History of last known Transfer Data Timeout
+   QStringList mc_HexFilePaths;                     ///< History of last known Hex file paths
+   QStringList mc_HexFilePathsAsRelativeOrAbsolute; ///< History of last known Hex file paths as relative or absolute
+   QString mc_LastKnownUpdateHexFileLocation;       ///< History of last known Hex file location
+   E_CanDllType me_CanDllType;                      ///< History of last used CAN DLL type
+   QString mc_CustomCanDllPath;                     ///< History of last used custom CAN DLL path
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

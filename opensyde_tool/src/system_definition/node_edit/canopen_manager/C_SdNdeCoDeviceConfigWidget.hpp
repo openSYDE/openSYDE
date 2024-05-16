@@ -67,6 +67,7 @@ private:
    void m_OnFactorySetingsChanged(void) const;
    void m_OnSameAsOpensydeNodeIdChanged(void);
    void m_HandleSameAsOpensydeNodeIdState(void) const;
+   void m_HandleNodeIdRange(const bool oq_IsOpensydeNodeId) const;
    void m_OnCoNodeIdChanged(void);
    void m_CheckCoNodeId(void) const;
    void m_OnConsumerTimeAutoChanged(void);

@@ -179,6 +179,7 @@ const uint8_t mu8_MAX_NODE_ID_CANOPEN = static_cast<uint8_t> (127);
 const uint32_t mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN = 0x101U;
 const uint32_t mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX = 0x17FU;
 const uint32_t mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX = 48U;
+const uint16_t mu16_SIGNAL_BIT_MAX = 64U;
 //Data set restrictions
 const uint32_t mu32_NODE_DATA_SET_PER_LIST_MAX = 16U;
 

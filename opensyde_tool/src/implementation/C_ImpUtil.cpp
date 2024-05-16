@@ -911,20 +911,20 @@ QString C_ImpUtil::h_FormatSourceFileInfoForReport(const QString & orc_FilePath,
 //lint -e715 false positive: orc_ExeName is referenced in call of std::wcscmp, but somehow PC Lint does not get this
 void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName, std::vector<HWND> & orc_Windows)
 {
-   PROCESSENTRY32 c_Entry;
+   PROCESSENTRY32W c_Entry;
    bool q_Exists = false;
    HANDLE pv_Snapshot;
    uint32_t u32_ProcessId = 0;
 
    //Get process ID
-   c_Entry.dwSize = sizeof(PROCESSENTRY32);
+   c_Entry.dwSize = sizeof(PROCESSENTRY32W);
 
    pv_Snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
    //lint -e{909} Windows library interface
-   if (Process32First(pv_Snapshot, &c_Entry) != 0)
+   if (Process32FirstW(pv_Snapshot, &c_Entry) != 0)
    {
-      while (Process32Next(pv_Snapshot, &c_Entry) != 0)
+      while (Process32NextW(pv_Snapshot, &c_Entry) != 0)
       {
          if (std::wcscmp(c_Entry.szExeFile, orc_ExeName.c_str()) == 0) //lint !e64 //Windows library interface
          {

@@ -42,6 +42,7 @@ public:
    static bool h_CheckNameAvailable(const std::vector<const QString *> & orc_ExistingStrings,
                                     const QString & orc_Proposal, const uint32_t * const opu32_SkipIndex);
    static QString h_ConvertBusTypeToStringUppercase(const stw::opensyde_core::C_OscSystemBus::E_Type & ore_Type);
+
    static QString h_ConvertProtocolTypeToString(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Type);
    static QString h_ConvertProtocolTypeToDatapoolNameString(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type);
    static QString h_ConvertDataPoolTypeToString(const stw::opensyde_core::C_OscNodeDataPool::E_Type & ore_Type);

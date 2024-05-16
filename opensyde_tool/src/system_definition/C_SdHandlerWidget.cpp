@@ -37,6 +37,8 @@
 #include "C_OgePopUpDialog.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_SdCodeGenerationDialog.hpp"
+#include "C_SdBueImportCommMessagesWidget.hpp"
+#include "C_PuiSdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -115,7 +117,7 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
    // forwarding of this signal
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigChangeMode, this, &C_SdHandlerWidget::SigChangeMode);
-   connect(this->mpc_Topology, &C_SdTopologyWidget::SigOpenTsp, this, &C_SdHandlerWidget::m_TspImport);
+   connect(this->mpc_Topology, &C_SdTopologyWidget::SigOpenTsp, this, &C_SdHandlerWidget::m_TspImportForNewNode);
 
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigNodeChanged, this, &C_SdHandlerWidget::m_NodeChanged);
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigBusChanged, this, &C_SdHandlerWidget::m_BusChanged);
@@ -227,7 +229,7 @@ void C_SdHandlerWidget::UserInputFunc(const uint32_t ou32_FuncNumber)
       this->m_GenerateCode();
       break;
    case mhu32_USER_INPUT_FUNC_IMPORT:
-      this->m_Import();
+      this->m_TriggerImport();
       break;
    case mhu32_USER_INPUT_FUNC_EXPORT:
       this->m_Export();
@@ -241,7 +243,7 @@ void C_SdHandlerWidget::UserInputFunc(const uint32_t ou32_FuncNumber)
       this->m_RtfExport();
       break;
    case mhu32_USER_INPUT_FUNC_TSP_IMPORT:
-      this->m_TspImport();
+      this->m_TspImport(false);
       break;
    default:
       break;
@@ -509,6 +511,7 @@ void C_SdHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou
          }
 
          this->mpc_ActNodeEdit = new C_SdNdeNodeEditWidget(ou32_Index, this->ms32_NodeEditTabIndex, this);
+
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigErrorChange, this,
                  &C_SdHandlerWidget::m_ErrorChange);
@@ -528,7 +531,6 @@ void C_SdHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou
                  &C_SdHandlerWidget::SaveAs);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties, this,
                  &C_SdHandlerWidget::m_SwitchToBusProperties);
-
          //Buttons
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
          Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
@@ -555,6 +557,7 @@ void C_SdHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou
          }
 
          this->mpc_ActBusEdit = new C_SdBueBusEditWidget(ou32_Index, this->ms32_BusEditTabIndex, this);
+
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigErrorChange, this, &C_SdHandlerWidget::m_ErrorChange);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigNameChanged, this, &C_SdHandlerWidget::SigNameChanged);
@@ -585,7 +588,6 @@ void C_SdHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou
          // not good at all...
       }
    }
-
    this->m_SetFlag(ou32_Flag);
 }
 
@@ -1051,17 +1053,85 @@ void C_SdHandlerWidget::m_Export(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create import popup
+
+   \return
+   QPointer<C_OgePopUpDialog>
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const QPointer<C_OgePopUpDialog> stw::opensyde_gui::C_SdHandlerWidget::m_CreateImportPopupDialog(void)
+{
+   //Size of the popup
+   const uint16_t u16_WIDTH = 650;
+   const uint16_t u16_HEIGHT = 350;
+
+   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
+
+   c_PopUpDialog->SetSize(QSize(u16_WIDTH, u16_HEIGHT));
+
+   return c_PopUpDialog;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call for DBC/EDS/DCF import functionality.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_Import(void) const
+void C_SdHandlerWidget::m_TriggerImport(void)
 {
-   // only available on bus edit
-   tgl_assert(this->mpc_ActBusEdit != NULL);
-   if (this->mpc_ActBusEdit != NULL)
+   if (m_CheckImportPossible())
    {
-      this->mpc_ActBusEdit->ImportMessages();
+      //Node
+      const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(mu32_Index);
+
+      tgl_assert((pc_Bus != NULL) && (mpc_ActBusEdit != NULL));
+      if ((pc_Bus != NULL) && (mpc_ActBusEdit != NULL))
+      {
+         const stw::scl::C_SclString c_BusName = pc_Bus->c_Name;
+
+         const QPointer<C_OgePopUpDialog> c_PopUpDialog = m_CreateImportPopupDialog();
+         C_SdBueImportCommMessagesWidget * const pc_ImportCommMessagesWidget = new C_SdBueImportCommMessagesWidget(
+            *c_PopUpDialog,
+            c_BusName);
+
+         C_OscCanProtocol::E_Type e_CurrentProtocolView;
+
+         //Open tab (before interacting with it!)
+         mpc_ActBusEdit->ChangeToCommMessagesTab();
+
+         e_CurrentProtocolView = mpc_ActBusEdit->GetActProtocol();
+
+         pc_ImportCommMessagesWidget->SetDefaultCommunicationProtocol(e_CurrentProtocolView);
+
+         if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+         {
+            const C_OscCanProtocol::E_Type e_SelectedCommProtocol =
+               pc_ImportCommMessagesWidget->GetSelectedCommunicationProtocol();
+            m_ContinueImporting(e_SelectedCommProtocol);
+         }
+
+         if (c_PopUpDialog != NULL)
+         {
+            c_PopUpDialog->HideOverlay();
+            c_PopUpDialog->deleteLater();
+         }
+
+         delete (pc_ImportCommMessagesWidget);
+      }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Continue Importing
+
+   Change Protocol tab view and open file explorer
+
+   \param[in]       ore_Protocol     Communication protocol defined in the combo box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_ContinueImporting(const C_OscCanProtocol::E_Type & ore_Protocol)
+{
+   m_SwitchProtocolTab(ore_Protocol);
+   m_Import();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1215,6 +1285,78 @@ C_OgeWiCustomMessage * C_SdHandlerWidget::m_ShowWarningUnstoredProjectPopupMessa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Switch communication protocol tab
+
+   \param[in]       oe_Protocol     Currently selected protocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_SwitchProtocolTab(const C_OscCanProtocol::E_Type & ore_Protocol) const
+{
+   // only available on bus edit
+   tgl_assert(this->mpc_ActBusEdit != NULL);
+
+   if (this->mpc_ActBusEdit != NULL)
+   {
+      mpc_ActBusEdit->ChangeProtocolTab(ore_Protocol);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Open file explorer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_Import()
+{
+   // only available on bus edit
+   tgl_assert(this->mpc_ActBusEdit != NULL);
+
+   if (this->mpc_ActBusEdit != NULL)
+   {
+      this->mpc_ActBusEdit->ImportMessages();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check import possible
+
+   \return
+   Flags
+
+   \retval   True    Import possible
+   \retval   False   Import impossible
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdHandlerWidget::m_CheckImportPossible()
+{
+   bool q_Retval;
+
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
+
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(
+      mu32_Index, c_NodeIndexes, c_InterfaceIndexes);
+
+   if (c_NodeIndexes.size() == 0)
+   {
+      C_OgeWiCustomMessage pc_MessageBox(this);
+      q_Retval = false;
+
+      pc_MessageBox.SetType(C_OgeWiCustomMessage::eERROR);
+
+      pc_MessageBox.SetHeading(C_GtGetText::h_GetText("Import Messages"));
+      pc_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                      "Cannot import messages without any connected nodes."));
+      pc_MessageBox.SetCustomMinHeight(230, 270);
+      pc_MessageBox.Execute();
+   }
+   else
+   {
+      q_Retval = true;
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create warning message box if unsaved project is used and calls TSP import function of node edit page
 
    \return
@@ -1224,7 +1366,7 @@ C_OgeWiCustomMessage * C_SdHandlerWidget::m_ShowWarningUnstoredProjectPopupMessa
    \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdHandlerWidget::m_TspImport()
+bool C_SdHandlerWidget::m_TspImport(const bool oq_IsNodeNew)
 {
    bool q_Chance = false;
 
@@ -1250,7 +1392,7 @@ bool C_SdHandlerWidget::m_TspImport()
       {
          if (mpc_ActNodeEdit != NULL)
          {
-            q_Chance = mpc_ActNodeEdit->AddFromTsp();
+            q_Chance = mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
          }
       }
       else
@@ -1262,10 +1404,20 @@ bool C_SdHandlerWidget::m_TspImport()
    {
       if (mpc_ActNodeEdit != NULL)
       {
-         q_Chance = mpc_ActNodeEdit->AddFromTsp();
+         q_Chance = mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
       }
    }
    return q_Chance;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set Information for new node to avoid warning message box
+ *  calls TSP import function of node edit page
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_TspImportForNewNode()
+{
+   this->m_TspImport(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

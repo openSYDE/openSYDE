@@ -76,7 +76,7 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
    mpc_MessageSyncManager(NULL),
    me_ComProtocol(C_OscCanProtocol::eLAYER2),
    mu32_SignalIndex(0U),
-   me_DataType(eTY_UNSIGNED)
+   me_DataType(C_PuiSdNodeCanUtil::eST_UNSIGNED)
 {
    // init UI
    this->mpc_Ui->setupUi(this);
@@ -144,16 +144,16 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxType->addItem("3");
    this->mpc_Ui->pc_ComboBoxType->addItem("4");
    //Ensure the indices match the text
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_UNSIGNED),
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(C_PuiSdNodeCanUtil::eST_UNSIGNED),
                                               C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eUINT8));
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_SIGNED),
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(C_PuiSdNodeCanUtil::eST_SIGNED),
                                               C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eSINT8));
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_FLOAT32),
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(C_PuiSdNodeCanUtil::eST_FLOAT32),
                                               C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eFLOAT32));
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_FLOAT64),
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(C_PuiSdNodeCanUtil::eST_FLOAT64),
                                               C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eFLOAT64));
 
@@ -439,29 +439,8 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
          this->mc_DataUiSignalCommon = *pc_UiSignalCommon;
 
          //Helper
-         switch (this->mc_DataOscSignalCommon.GetType())
-         {
-         case C_OscNodeDataPoolContent::eSINT8:
-         case C_OscNodeDataPoolContent::eSINT16:
-         case C_OscNodeDataPoolContent::eSINT32:
-         case C_OscNodeDataPoolContent::eSINT64:
-            this->me_DataType = eTY_SIGNED;
-            break;
-         case C_OscNodeDataPoolContent::eUINT8:
-         case C_OscNodeDataPoolContent::eUINT16:
-         case C_OscNodeDataPoolContent::eUINT32:
-         case C_OscNodeDataPoolContent::eUINT64:
-            this->me_DataType = eTY_UNSIGNED;
-            break;
-         case C_OscNodeDataPoolContent::eFLOAT32:
-            this->me_DataType = eTY_FLOAT32;
-            break;
-         case C_OscNodeDataPoolContent::eFLOAT64:
-            this->me_DataType = eTY_FLOAT64;
-            break;
-         default:
-            break;
-         }
+         this->me_DataType = C_PuiSdNodeCanUtil::h_GetSignalType(
+            this->mc_DataOscSignalCommon.GetType());
 
          //One time changes
          //Multiplexer (one time)
@@ -665,37 +644,6 @@ void C_SdBueSignalPropertiesWidget::m_HandleJ1939SpnChange(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt value to signal length
-
-   \param[in]      ou16_BitLength   Current bit length
-   \param[in,out]  orc_Content      Content to restrict
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16_t ou16_BitLength,
-                                                                C_OscNodeDataPoolContent & orc_Content)
-{
-   C_OscNodeDataPoolContent c_Min;
-   C_OscNodeDataPoolContent c_Max;
-
-   c_Min.SetArray(false);
-   c_Min.SetType(orc_Content.GetType());
-   C_SdNdeDpContentUtil::h_InitMinForSignal(c_Min, ou16_BitLength);
-
-   c_Max.SetArray(false);
-   c_Max.SetType(orc_Content.GetType());
-   C_SdNdeDpContentUtil::h_InitMaxForSignal(c_Max, ou16_BitLength);
-
-   if (orc_Content < c_Min)
-   {
-      orc_Content = c_Min;
-   }
-   if (orc_Content > c_Max)
-   {
-      orc_Content = c_Max;
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load generic content
 
    \param[in,out]  opc_Widget       Spin box
@@ -813,57 +761,7 @@ int32_t C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup *
 //----------------------------------------------------------------------------------------------------------------------
 C_OscNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType(void) const
 {
-   C_OscNodeDataPoolContent::E_Type e_Retval = C_OscNodeDataPoolContent::eUINT8;
-   const uint16_t u16_BitLength = this->mc_DataOscSignal.u16_ComBitLength;
-
-   switch (this->me_DataType)
-   {
-   case eTY_UNSIGNED:
-      if (u16_BitLength <= 8U)
-      {
-         e_Retval = C_OscNodeDataPoolContent::eUINT8;
-      }
-      else if ((u16_BitLength <= 16U) && (u16_BitLength > 8U))
-      {
-         e_Retval = C_OscNodeDataPoolContent::eUINT16;
-      }
-      else if ((u16_BitLength <= 32U) && (u16_BitLength > 16U))
-      {
-         e_Retval = C_OscNodeDataPoolContent::eUINT32;
-      }
-      else
-      {
-         e_Retval = C_OscNodeDataPoolContent::eUINT64;
-      }
-      break;
-   case eTY_SIGNED:
-      if (u16_BitLength <= 8U)
-      {
-         e_Retval = C_OscNodeDataPoolContent::eSINT8;
-      }
-      else if ((u16_BitLength <= 16U) && (u16_BitLength > 8U))
-      {
-         e_Retval = C_OscNodeDataPoolContent::eSINT16;
-      }
-      else if ((u16_BitLength <= 32U) && (u16_BitLength > 16U))
-      {
-         e_Retval = C_OscNodeDataPoolContent::eSINT32;
-      }
-      else
-      {
-         e_Retval = C_OscNodeDataPoolContent::eSINT64;
-      }
-      break;
-   case eTY_FLOAT32:
-      e_Retval = C_OscNodeDataPoolContent::eFLOAT32;
-      break;
-   case eTY_FLOAT64:
-      e_Retval = C_OscNodeDataPoolContent::eFLOAT64;
-      break;
-   default:
-      break;
-   }
-   return e_Retval;
+   return C_PuiSdNodeCanUtil::h_GetRequiredType(this->mc_DataOscSignal.u16_ComBitLength, this->me_DataType);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1356,7 +1254,7 @@ void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUi(const C_SdBueSignalPro
       this->mc_DataOscSignalCommon.f64_Offset = this->mpc_Ui->pc_DoubleSpinBoxOffset->value();
       break;
    case eCHA_VALUE_TYPE:
-      this->me_DataType = static_cast<E_Type>(this->mpc_Ui->pc_ComboBoxType->currentIndex());
+      this->me_DataType = static_cast<C_PuiSdNodeCanUtil::E_SignalType>(this->mpc_Ui->pc_ComboBoxType->currentIndex());
       break;
    case eCHA_LENGTH:
       this->mc_DataOscSignal.u16_ComBitLength = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxLength->value());
@@ -1624,7 +1522,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
              (this->mc_DataOscSignalCommon.f64_Offset != 0.0) ||
              (this->mc_DataOscSignalCommon.c_Unit != "") ||
              (this->mc_DataOscSignal.u16_ComBitLength > 16U) ||
-             (this->me_DataType != eTY_UNSIGNED) ||
+             (this->me_DataType != C_PuiSdNodeCanUtil::eST_UNSIGNED) ||
              (f64_CurrentInitVal != 0.0))
          {
             q_MessageAdapt = true;
@@ -1658,7 +1556,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
             this->mc_DataOscSignal.u16_ComBitLength = 16U;
          }
          //Type
-         this->me_DataType = eTY_UNSIGNED;
+         this->me_DataType = C_PuiSdNodeCanUtil::eST_UNSIGNED;
       }
       //Determine new data type
       e_NewType = this->m_GetCurrentType();
@@ -1731,8 +1629,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleMinValueRange()
    }
    else
    {
-      mh_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
-                                  this->mc_DataOscSignalCommon.c_MinValue);
+      C_PuiSdNodeCanUtil::h_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
+                                                     this->mc_DataOscSignalCommon.c_MinValue);
    }
 }
 
@@ -1749,8 +1647,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleMaxValueRange()
    }
    else
    {
-      mh_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
-                                  this->mc_DataOscSignalCommon.c_MaxValue);
+      C_PuiSdNodeCanUtil::h_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
+                                                     this->mc_DataOscSignalCommon.c_MaxValue);
    }
 }
 
@@ -1760,8 +1658,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleMaxValueRange()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleInitValueRange(void)
 {
-   mh_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
-                               this->mc_DataOscSignalCommon.c_DataSetValues[0]);
+   C_PuiSdNodeCanUtil::h_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
+                                                  this->mc_DataOscSignalCommon.c_DataSetValues[0]);
    if (this->mc_DataOscSignalCommon.c_DataSetValues[0] < this->mc_DataOscSignalCommon.c_MinValue)
    {
       this->mc_DataOscSignalCommon.c_DataSetValues[0] = this->mc_DataOscSignalCommon.c_MinValue;

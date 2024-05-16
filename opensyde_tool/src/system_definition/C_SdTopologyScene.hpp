@@ -253,9 +253,6 @@ private:
                                 const QString & orc_MainDevice) const;
 
    bool m_ActivateTspShortcut (const scl::C_SclString & orc_NodeName, const uint32_t & oru32_SubNodeIndex);
-   stw::opensyde_gui_elements::C_OgeWiCustomMessage * m_CreateTspShortcutDialog(
-      const stw::scl::C_SclString & orc_NodeName);
-
    void m_AddTspForAllSubNodes(const uint32_t & oru32_SubDevicesSize, const uint32_t & oru32_OriginalOscNodeSize,
                                const scl::C_SclString & orc_NodeName);
    bool m_ShowShortcutTspOption(const opensyde_core::C_OscDeviceDefinition * const opc_MainDevice,

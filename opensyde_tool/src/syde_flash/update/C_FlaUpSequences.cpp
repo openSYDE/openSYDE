@@ -47,6 +47,8 @@ C_FlaUpSequences::C_FlaUpSequences(void) :
    ms32_Result(C_NOACT)
 {
    mpc_Thread = new C_SyvComDriverThread(&C_FlaUpSequences::mh_ThreadFunc, this);
+
+   qRegisterMetaType<uint8_t>("uint8_t");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -212,6 +214,17 @@ int32_t C_FlaUpSequences::GetResults(int32_t & ors32_Result) const
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reports progress in percentage
+
+   \param[in]  ou8_ProgressInPercentage       Progress in percentage
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpSequences::m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage)
+{
+   Q_EMIT (this->SigReportFlashingProgress(ou8_ProgressInPercentage));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -161,6 +161,7 @@ C_SdTopologyScene::~C_SdTopologyScene()
    \param[in]  opu64_UniqueId    Optional pointer to unique ID to use for new item
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{3702}
 void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & orc_Pos,
                                 const uint64_t * const opu64_UniqueId)
 {
@@ -173,7 +174,6 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
       const uint32_t u32_SubDevicesSize = pc_MainDevice->c_SubDevices.size();
       const uint32_t u32_OriginalOscNodeSize = C_PuiSdHandler::h_GetInstance()->GetOscNodesSize();
       const bool q_TspShortcutActive = C_UsHandler::h_GetInstance()->GetTspShortcutActive();
-      bool q_UseShortcut = false;
 
       stw::opensyde_gui_logic::C_PuiSdNode c_UiNode;
       C_GiNode * pc_Item;
@@ -238,16 +238,28 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
            (pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeCan == true) ||
            (pc_MainDevice->c_SubDevices[0].q_FlashloaderStwCan == true)) && q_TspShortcutActive)
       {
-         q_UseShortcut = m_ShowShortcutTspOption(pc_MainDevice, u32_OriginalOscNodeSize, u32_SubDevicesSize);
-      }
+         const uint8_t u8_TIMER_THRESHOLD_IN_MSEC = 100;
 
-      //Selection
-      if (!q_UseShortcut)
-      {
-         m_UpdateSelection(pc_Item); //scene is available and visible. If not DON'T USE
-      }
+         QTimer::singleShot(u8_TIMER_THRESHOLD_IN_MSEC, this,
+                            [&, pc_Item, pc_MainDevice, u32_OriginalOscNodeSize, u32_SubDevicesSize, s32_Index] ()
+         {
+            C_GiNode * const pc_TimerItem = pc_Item;
+            const int32_t s32_TimerIndex = s32_Index;
 
-      Q_EMIT this->SigNodeChanged(s32_Index);
+            const bool q_UseShortcut =
+               m_ShowShortcutTspOption(pc_MainDevice, u32_OriginalOscNodeSize, u32_SubDevicesSize);
+
+            //Selection
+            if (!q_UseShortcut)
+            {
+               m_UpdateSelection(pc_TimerItem); //scene is available and visible. If not DON'T USE
+            }
+
+            Q_EMIT this->SigNodeChanged(s32_TimerIndex);
+         }
+
+                            );
+      }
    }
 }
 
@@ -1085,6 +1097,7 @@ bool C_SdTopologyScene::IsSceneRubberBandAvailable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SdTopologyScene::m_GetContextMenuManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_ContextMenuManager;
 }
 
@@ -1098,6 +1111,7 @@ C_SebBaseContextMenuManager * C_SdTopologyScene::m_GetContextMenuManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseCopyPasteManager * C_SdTopologyScene::m_GetCopyPasteManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_CopyPasteManager;
 }
 
@@ -1117,6 +1131,7 @@ const C_SebBaseCopyPasteManager * C_SdTopologyScene::m_GetCopyPasteManagerConst(
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager * C_SdTopologyScene::m_GetUndoManager(void)
 {
+   //lint -e{1536} intentional exposure of a private member to have clean interface with inheritance in mind
    return &this->mc_UndoManager;
 }
 
@@ -3939,39 +3954,6 @@ bool stw::opensyde_gui::C_SdTopologyScene::m_ActivateTspShortcut(const scl::C_Sc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Create TSP shortcut dialog
-
-   \param[in]       orc_NodeName     Node name
-
-   \return
-   C_OgeWiCustomMessage
-
-   \retval      TSP shortcut dialog
-
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OgeWiCustomMessage * C_SdTopologyScene::m_CreateTspShortcutDialog(const stw::scl::C_SclString & orc_NodeName)
-{
-   const stw::scl::C_SclString c_TitleString = orc_NodeName;
-   const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
-   const stw::scl::C_SclString c_MessageBoxText = "Do you want to import openSYDE Target Support Package file(s) to " +
-                                                  c_TitleString  + "?";
-
-   QGraphicsView * const pc_View = this->views().at(0);
-   C_OgeWiCustomMessage * const pc_MessageBox = new C_OgeWiCustomMessage(pc_View,
-                                                                         C_OgeWiCustomMessage::E_Type::eQUESTION);
-
-   pc_MessageBox->SetHeading(C_GtGetText::h_GetText(c_MessageBoxTitle.c_str()));
-   pc_MessageBox->SetDescription(C_GtGetText::h_GetText(c_MessageBoxText.c_str()));
-   pc_MessageBox->SetOkButtonText(C_GtGetText::h_GetText("Continue"));
-   pc_MessageBox->SetNoButtonText(C_GtGetText::h_GetText("Skip"));
-   pc_MessageBox->SetCustomMinHeight(180, 180);
-   pc_MessageBox->SetCustomMinWidth(650);
-
-   return pc_MessageBox;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  TSP Subnode Selection
 
    Checks for sub nodes and uses them for TSP import
@@ -4023,15 +4005,20 @@ bool C_SdTopologyScene::m_ShowShortcutTspOption(const C_OscDeviceDefinition * co
    const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
    const stw::scl::C_SclString c_MessageBoxText = "Do you want to import openSYDE Target Support Package file(s) to " +
                                                   c_TitleString  + "?";
+   const stw::scl::C_SclString c_MessageBoxDetails =
+      "With an openSYDE Target Support Package the user is able to bring "
+      "an empty node (fresh placed from toolbox) to a defined default state. "
+      "\nNode definition import could contain e.g.: Data Blocks configuration, Template programming project, "
+      "Datapools configuration,... .";
 
    QGraphicsView * const pc_View = this->views().at(0);
    C_OgeWiCustomMessage pc_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
 
    pc_MessageBox.SetHeading(C_GtGetText::h_GetText(c_MessageBoxTitle.c_str()));
    pc_MessageBox.SetDescription(C_GtGetText::h_GetText(c_MessageBoxText.c_str()));
+   pc_MessageBox.SetDetails(C_GtGetText::h_GetText(c_MessageBoxDetails.c_str()));
    pc_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
    pc_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Skip"));
-   pc_MessageBox.SetCustomMinHeight(180, 180);
    pc_MessageBox.SetCustomMinWidth(650);
 
    const C_OgeWiCustomMessage::E_Outputs e_Output = pc_MessageBox.Execute();

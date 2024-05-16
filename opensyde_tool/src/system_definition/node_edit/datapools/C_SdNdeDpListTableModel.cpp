@@ -442,114 +442,111 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
       const uint32_t u32_DataSetIndex = static_cast<uint32_t>(s32_DataSetIndex);
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         if (u32_Index < this->mc_DpListInfoAll.size())
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            if (u32_Index < this->mc_DpListInfoAll.size())
+            const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
+            switch (e_Col)
             {
-               const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
-               switch (e_Col)
+            case eINVALID:
+               //No data
+               break;
+            case eINDEX:
+               c_Retval = orc_Index.row() + 1;
+               break;
+            case eNAME:
+               c_Retval = rc_Data.c_Name;
+               break;
+            case eCOMMENT:
+               c_Retval = rc_Data.c_Comment;
+               break;
+            case eVALUE_TYPE:
+               if (os32_Role == static_cast<int32_t>(Qt::ItemDataRole::EditRole))
                {
-               case eINVALID:
-                  //No data
-                  break;
-               case eINDEX:
-                  c_Retval = orc_Index.row() + 1;
-                  break;
-               case eNAME:
-                  c_Retval = rc_Data.c_Name;
-                  break;
-               case eCOMMENT:
-                  c_Retval = rc_Data.c_Comment;
-                  break;
-               case eVALUE_TYPE:
-                  if (os32_Role == static_cast<int32_t>(Qt::ItemDataRole::EditRole))
-                  {
-                     c_Retval = rc_Data.c_ValueTypeEdit;
-                  }
-                  else
-                  {
-                     c_Retval = rc_Data.c_ValueType;
-                  }
-                  break;
-               case eARRAY_SIZE:
-                  if (os32_Role == static_cast<int32_t>(Qt::EditRole))
-                  {
-                     c_Retval = rc_Data.c_ArraySizeEdit;
-                  }
-                  else
-                  {
-                     c_Retval = rc_Data.c_ArraySize;
-                  }
-                  break;
-               case eMIN:
-                  if (os32_Role == static_cast<int32_t>(Qt::EditRole))
-                  {
-                     c_Retval = rc_Data.c_MinEdit;
-                  }
-                  else
-                  {
-                     c_Retval = rc_Data.c_Min;
-                  }
-
-                  break;
-               case eMAX:
-                  if (os32_Role == static_cast<int32_t>(Qt::EditRole))
-                  {
-                     c_Retval = rc_Data.c_MaxEdit;
-                  }
-                  else
-                  {
-                     c_Retval = rc_Data.c_Max;
-                  }
-
-                  break;
-               case eFACTOR:
-                  c_Retval = rc_Data.c_Factor;
-                  break;
-               case eOFFSET:
-                  c_Retval = rc_Data.c_Offset;
-                  break;
-               case eUNIT:
-                  c_Retval = rc_Data.c_Unit;
-                  break;
-               case eDATA_SET:
-                  if ((s32_DataSetIndex >= 0) &&
-                      (u32_DataSetIndex < rc_Data.c_DataSetData.size()))
-                  {
-                     if (os32_Role == static_cast<int32_t>(Qt::EditRole))
-                     {
-                        c_Retval = rc_Data.c_DataSetData[u32_DataSetIndex].c_DataSetEdit;
-                     }
-                     else
-                     {
-                        c_Retval = rc_Data.c_DataSetData[u32_DataSetIndex].c_DataSet;
-                     }
-                  }
-                  break;
-               case eACCESS:
-                  if (os32_Role == static_cast<int32_t>(Qt::EditRole))
-                  {
-                     c_Retval = rc_Data.c_AccessEdit;
-                  }
-                  else
-                  {
-                     c_Retval = rc_Data.c_Access;
-                  }
-                  break;
-               case eDATA_SIZE:
-                  c_Retval = rc_Data.c_DataSize;
-                  break;
-               case eADDRESS:
-                  c_Retval = rc_Data.c_Address;
-                  break;
-               case eEVENT_CALL:
-               case eAUTO_MIN_MAX:
-               case eICON:
-               case eUNKNOWN:
-               default:
-                  break;
+                  c_Retval = rc_Data.c_ValueTypeEdit;
                }
+               else
+               {
+                  c_Retval = rc_Data.c_ValueType;
+               }
+               break;
+            case eARRAY_SIZE:
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+               {
+                  c_Retval = rc_Data.c_ArraySizeEdit;
+               }
+               else
+               {
+                  c_Retval = rc_Data.c_ArraySize;
+               }
+               break;
+            case eMIN:
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+               {
+                  c_Retval = rc_Data.c_MinEdit;
+               }
+               else
+               {
+                  c_Retval = rc_Data.c_Min;
+               }
+
+               break;
+            case eMAX:
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+               {
+                  c_Retval = rc_Data.c_MaxEdit;
+               }
+               else
+               {
+                  c_Retval = rc_Data.c_Max;
+               }
+
+               break;
+            case eFACTOR:
+               c_Retval = rc_Data.c_Factor;
+               break;
+            case eOFFSET:
+               c_Retval = rc_Data.c_Offset;
+               break;
+            case eUNIT:
+               c_Retval = rc_Data.c_Unit;
+               break;
+            case eDATA_SET:
+               if ((s32_DataSetIndex >= 0) &&
+                   (u32_DataSetIndex < rc_Data.c_DataSetData.size()))
+               {
+                  if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+                  {
+                     c_Retval = rc_Data.c_DataSetData[u32_DataSetIndex].c_DataSetEdit;
+                  }
+                  else
+                  {
+                     c_Retval = rc_Data.c_DataSetData[u32_DataSetIndex].c_DataSet;
+                  }
+               }
+               break;
+            case eACCESS:
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+               {
+                  c_Retval = rc_Data.c_AccessEdit;
+               }
+               else
+               {
+                  c_Retval = rc_Data.c_Access;
+               }
+               break;
+            case eDATA_SIZE:
+               c_Retval = rc_Data.c_DataSize;
+               break;
+            case eADDRESS:
+               c_Retval = rc_Data.c_Address;
+               break;
+            case eEVENT_CALL:
+            case eAUTO_MIN_MAX:
+            case eICON:
+            case eUNKNOWN:
+            default:
+               break;
             }
          }
       }
@@ -557,15 +554,12 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
       {
          if (e_Col == eINVALID)
          {
-            if (orc_Index.row() >= 0)
+            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+            if (u32_Index < this->mc_DpListInfoAll.size())
             {
-               const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-               if (u32_Index < this->mc_DpListInfoAll.size())
-               {
-                  const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
+               const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
 
-                  c_Retval = rc_Data.c_InvalidToolTipHeading;
-               }
+               c_Retval = rc_Data.c_InvalidToolTipHeading;
             }
          }
       }
@@ -583,60 +577,54 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
       }
       else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         if (u32_Index < this->mc_DpListInfoAll.size())
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            if (u32_Index < this->mc_DpListInfoAll.size())
-            {
-               const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
+            const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
 
-               switch (e_Col) //lint !e788 //not all columns get a tooltip
+            switch (e_Col) //lint !e788 //not all columns get a tooltip
+            {
+            case eINVALID:
+               c_Retval = rc_Data.c_InvalidToolTipContent;
+               break;
+            case eCOMMENT:
+               c_Retval = rc_Data.c_Comment;
+               break;
+            case eMIN:
+               c_Retval = rc_Data.c_MinToolTipContent;
+               break;
+            case eMAX:
+               c_Retval = rc_Data.c_MaxToolTipContent;
+               break;
+            case eDATA_SET:
+               if ((s32_DataSetIndex >= 0) &&
+                   (u32_DataSetIndex < rc_Data.c_DataSetData.size()))
                {
-               case eINVALID:
-                  c_Retval = rc_Data.c_InvalidToolTipContent;
-                  break;
-               case eCOMMENT:
-                  c_Retval = rc_Data.c_Comment;
-                  break;
-               case eMIN:
-                  c_Retval = rc_Data.c_MinToolTipContent;
-                  break;
-               case eMAX:
-                  c_Retval = rc_Data.c_MaxToolTipContent;
-                  break;
-               case eDATA_SET:
-                  if ((s32_DataSetIndex >= 0) &&
-                      (u32_DataSetIndex < rc_Data.c_DataSetData.size()))
-                  {
-                     c_Retval = rc_Data.c_DataSetData[u32_DataSetIndex].c_DataSetToolTipContent;
-                  }
-                  break;
-               default:
-                  //No tool tip
-                  break;
+                  c_Retval = rc_Data.c_DataSetData[u32_DataSetIndex].c_DataSetToolTipContent;
                }
+               break;
+            default:
+               //No tool tip
+               break;
             }
          }
       }
       else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         if (u32_Index < this->mc_DpListInfoAll.size())
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            if (u32_Index < this->mc_DpListInfoAll.size())
+            const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
+            switch (e_Col) //lint !e788 //not all columns handled on purpose
             {
-               const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
-               switch (e_Col) //lint !e788 //not all columns handled on purpose
-               {
-               case eAUTO_MIN_MAX:
-                  c_Retval = rc_Data.s32_AutoMinMaxCheckState;
-                  break;
-               case eEVENT_CALL:
-                  c_Retval = rc_Data.s32_EventCallCheckState;
-                  break;
-               default:
-                  break;
-               }
+            case eAUTO_MIN_MAX:
+               c_Retval = rc_Data.s32_AutoMinMaxCheckState;
+               break;
+            case eEVENT_CALL:
+               c_Retval = rc_Data.s32_EventCallCheckState;
+               break;
+            default:
+               break;
             }
          }
       }
@@ -647,7 +635,6 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
          switch (e_Col)
          {
          case eDATA_SET:
-            if (orc_Index.row() >= 0)
             {
                const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
                if (u32_Index < this->mc_DpListInfoAll.size())
@@ -658,7 +645,6 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
             break;
          case eMIN:
          case eMAX:
-            if (orc_Index.row() >= 0)
             {
                const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
                if (u32_Index < this->mc_DpListInfoAll.size())
@@ -701,7 +687,6 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
             break;
          case eMIN:
          case eMAX:
-            if (orc_Index.row() >= 0)
             {
                const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
                if (u32_Index < this->mc_DpListInfoAll.size())
@@ -716,7 +701,6 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
             break;
          //Error
          case eNAME:
-            if (orc_Index.row() >= 0)
             {
                const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
                if (u32_Index < this->mc_DpListInfoAll.size())
@@ -726,7 +710,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
             }
             break;
          case eDATA_SET:
-            if ((orc_Index.row() >= 0) && (s32_DataSetIndex >= 0))
+            if (s32_DataSetIndex >= 0)
             {
                const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
                if (u32_Index < this->mc_DpListInfoAll.size())
@@ -765,49 +749,46 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
       }
       else if (os32_Role == ms32_USER_ROLE_ICON)
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         QStringList c_Tmp;
+         switch (e_Col)
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            QStringList c_Tmp;
-            switch (e_Col)
+         case eINVALID:
+            if (u32_Index < this->mc_DpListInfoAll.size())
             {
-            case eINVALID:
-               if (u32_Index < this->mc_DpListInfoAll.size())
-               {
-                  const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
-                  c_Tmp = rc_Data.c_InvalidIconRole;
-               }
-               break;
-            case eICON:
-               if (u32_Index < this->mc_DpListInfoAll.size())
-               {
-                  const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
-                  c_Tmp = rc_Data.c_IconIconRole;
-               }
-               break;
-            case eNAME:
-            case eINDEX:
-            case eCOMMENT:
-            case eVALUE_TYPE:
-            case eARRAY_SIZE:
-            case eAUTO_MIN_MAX:
-            case eMIN:
-            case eMAX:
-            case eFACTOR:
-            case eOFFSET:
-            case eUNIT:
-            case eDATA_SET:
-            case eACCESS:
-            case eDATA_SIZE:
-            case eADDRESS:
-            case eEVENT_CALL:
-            case eUNKNOWN:
-            default:
-               //No decoration
-               break;
+               const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
+               c_Tmp = rc_Data.c_InvalidIconRole;
             }
-            c_Retval = c_Tmp;
+            break;
+         case eICON:
+            if (u32_Index < this->mc_DpListInfoAll.size())
+            {
+               const C_DpListTableData & rc_Data = this->mc_DpListInfoAll[u32_Index];
+               c_Tmp = rc_Data.c_IconIconRole;
+            }
+            break;
+         case eNAME:
+         case eINDEX:
+         case eCOMMENT:
+         case eVALUE_TYPE:
+         case eARRAY_SIZE:
+         case eAUTO_MIN_MAX:
+         case eMIN:
+         case eMAX:
+         case eFACTOR:
+         case eOFFSET:
+         case eUNIT:
+         case eDATA_SET:
+         case eACCESS:
+         case eDATA_SIZE:
+         case eADDRESS:
+         case eEVENT_CALL:
+         case eUNKNOWN:
+         default:
+            //No decoration
+            break;
          }
+         c_Retval = c_Tmp;
       }
       else
       {
@@ -1062,7 +1043,6 @@ Qt::ItemFlags C_SdNdeDpListTableModel::flags(const QModelIndex & orc_Index) cons
       case eFACTOR:
       case eOFFSET:
       case eUNIT:
-         if (orc_Index.row() >= 0)
          {
             const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
             if (u32_Index < this->mc_DpListInfoAll.size())
@@ -1074,21 +1054,20 @@ Qt::ItemFlags C_SdNdeDpListTableModel::flags(const QModelIndex & orc_Index) cons
                   q_Edit = false;
                }
             }
-         }
 
-         if (q_Edit == true)
-         {
-            c_Retval = c_Retval | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-            //Check box
-            if (e_Col == eAUTO_MIN_MAX)
+            if (q_Edit == true)
             {
-               c_Retval = c_Retval | Qt::ItemIsUserCheckable;
+               c_Retval = c_Retval | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+               //Check box
+               if (e_Col == eAUTO_MIN_MAX)
+               {
+                  c_Retval = c_Retval | Qt::ItemIsUserCheckable;
+               }
             }
          }
          break;
       case eMIN:
       case eMAX:
-         if (orc_Index.row() >= 0)
          {
             const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
             if (u32_Index < this->mc_DpListInfoAll.size())
@@ -1101,11 +1080,11 @@ Qt::ItemFlags C_SdNdeDpListTableModel::flags(const QModelIndex & orc_Index) cons
                   q_Edit = false;
                }
             }
-         }
 
-         if (q_Edit == true)
-         {
-            c_Retval = c_Retval | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+            if (q_Edit == true)
+            {
+               c_Retval = c_Retval | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+            }
          }
          break;
       case eADDRESS:
@@ -1638,9 +1617,9 @@ bool C_SdNdeDpListTableModel::IsElementInterpretedAsString(const QModelIndex & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal model update
 
-   \param[in]  ou32_Row            Changed row
+   \param[in]  ou32_Row             Changed row
    \param[in]  ore_ChangeType       Change type
-   \param[in]  os32_DataSetIndex   Data set index
+   \param[in]  os32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::HandleDataChange(const uint32_t ou32_Row,
@@ -1680,6 +1659,8 @@ void C_SdNdeDpListTableModel::HandleDataChange(const uint32_t ou32_Row,
       s32_Column = this->EnumToColumn(C_SdNdeDpListTableModel::eARRAY_SIZE);
       q_ErrorChange = true;
       Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
+      //Size!
+      q_ReloadAll = true;
       break;
    case C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_DATA_SET:
       s32_Column = this->EnumToColumn(C_SdNdeDpListTableModel::eDATA_SET);
@@ -1705,6 +1686,8 @@ void C_SdNdeDpListTableModel::HandleDataChange(const uint32_t ou32_Row,
       s32_Column = this->EnumToColumn(C_SdNdeDpListTableModel::eVALUE_TYPE);
       q_ErrorChange = true;
       Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
+      //Size!
+      q_ReloadAll = true;
       break;
    default:
       //No handling

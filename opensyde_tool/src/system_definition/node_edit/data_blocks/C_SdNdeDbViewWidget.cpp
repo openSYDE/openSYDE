@@ -222,22 +222,25 @@ void C_SdNdeDbViewWidget::UpdateApplications(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new project action
 
+   \param[in]  oq_IsNewNode   Is Node new or not
+
    \retval   true   Cancel
    \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDbViewWidget::AddFromTsp(void)
+bool C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
 {
    bool q_Cancel = false;
    const QString c_LAST_KNOWN_TSP_PATH = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTspPath();
 
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SdNdeDbAddNewProject * const pc_Dialog = new C_SdNdeDbAddNewProject(this->mu32_NodeIndex, *c_New);
+
+   C_SdNdeDbAddNewProject * const pc_Dialog = new C_SdNdeDbAddNewProject(this->mu32_NodeIndex, *c_New,
+                                                                         oq_IsNewNode);
 
    pc_Dialog->SetTspPath(c_LAST_KNOWN_TSP_PATH);
 
    C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
-
    //Help
    //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
 
@@ -250,56 +253,83 @@ bool C_SdNdeDbViewWidget::AddFromTsp(void)
 
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
-      const QString c_HalcFileName = pc_Dialog->GetHalcDefinitionFileName();
-      C_OgeWiCustomMessage c_Message(this);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
-      QString c_Description = "";
-      if (c_HalcFileName == "")
+      if (pc_Dialog->q_IsVersion3 == false)
       {
-         c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
-                         arg(pc_Dialog->GetTspApplicationCount());
-      }
-      else
-      {
-         c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).\n"
-                                                                     "Hardware Configurator: Hardware Definition File (%2) selected."))
-                         .arg(pc_Dialog->GetTspApplicationCount()).arg(c_HalcFileName);
-      }
-      QString c_Details = "";
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.SetCustomMinWidth(650);
+         const QString c_HalcFileName = pc_Dialog->GetHalcDefinitionFileName();
+         C_OgeWiCustomMessage c_Message(this);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+         QString c_Description = "";
+         if (c_HalcFileName == "")
+         {
+            c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
+                            arg(pc_Dialog->GetTspApplicationCount());
+         }
+         else
+         {
+            c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).\n"
+                                                                        "Hardware Configurator: Hardware Definition File (%2) selected."))
+                            .arg(pc_Dialog->GetTspApplicationCount()).arg(c_HalcFileName);
+         }
+         QString c_Details = "";
+         c_Message.SetCustomMinHeight(180, 180);
+         c_Message.SetCustomMinWidth(650);
 
-      // check if there are existing datablocks
-      if ((pc_Node != NULL) && (pc_Node->c_Applications.empty() == false))
-      {
-         m_DeleteAllDatablocks(mu32_NodeIndex, pc_Node->c_Applications);
-      }
+         // check if there are existing datablocks
+         if ((pc_Node != NULL) && (pc_Node->c_Applications.empty() == false))
+         {
+            m_DeleteAllDatablocks(mu32_NodeIndex, pc_Node->c_Applications);
+         }
 
-      for (uint32_t u32_It = 0; u32_It < pc_Dialog->GetTspApplicationCount(); ++u32_It)
-      {
-         C_OscNodeApplication c_Tmp;
-         c_Tmp.e_Type = C_OscNodeApplication::ePROGRAMMABLE_APPLICATION;
-         c_Tmp.q_Active = true;
-         pc_Dialog->AddSelectedProject(u32_It, c_Tmp, c_Details);
-         m_AddApplication(c_Tmp);
+         for (uint32_t u32_It = 0; u32_It < pc_Dialog->GetTspApplicationCount(); ++u32_It)
+         {
+            C_OscNodeApplication c_Tmp;
+            c_Tmp.e_Type = C_OscNodeApplication::ePROGRAMMABLE_APPLICATION;
+            c_Tmp.q_Active = true;
+            pc_Dialog->AddSelectedProject(u32_It, c_Tmp, c_Details);
+
+            m_AddApplication(c_Tmp);
+         }
+         pc_Dialog->HandleCodeGenerationConfig();
+         // last step, import halc definition from TSP
+         AddHalcDefFromTsp(pc_Dialog);
+         // Add warnings if any
+         if (c_Details.isEmpty() == false)
+         {
+            c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
+            c_Description += C_GtGetText::h_GetText(" Some warnings occured. See details for more information.");
+            c_Message.SetCustomMinHeight(180, 300);
+            c_Message.SetDetails(c_Details);
+         }
+
+         c_Message.SetDescription(c_Description);
+         const C_OgeWiCustomMessage::E_Outputs e_Output = c_Message.Execute();
+         if (e_Output != C_OgeWiCustomMessage::eOK)
+         {
+            q_Cancel = true;
+         }
       }
-      pc_Dialog->HandleCodeGenerationConfig();
-      // last step, import halc definition from TSP
-      AddHalcDefFromTsp(pc_Dialog);
-      // Add warnings if any
-      if (c_Details.isEmpty() == false)
+      else //Version 3
       {
-         c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
-         c_Description += C_GtGetText::h_GetText(" Some warnings occured. See details for more information.");
+         C_OgeWiCustomMessage c_Message(this);
+         QString c_Description = "";
+         const QString c_Details = "";
+         pc_Dialog->ApplyV3Content();
+         this->m_UpdateTrigger();
+         c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+
+         c_Description = static_cast<QString>(C_GtGetText::h_GetText("Node definition successfully imported."));
+
+         c_Message.SetCustomMinHeight(180, 180);
+         c_Message.SetCustomMinWidth(650);
+         c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
          c_Message.SetCustomMinHeight(180, 300);
          c_Message.SetDetails(c_Details);
-      }
-
-      c_Message.SetDescription(c_Description);
-      const C_OgeWiCustomMessage::E_Outputs e_Output = c_Message.Execute();
-      if (e_Output != C_OgeWiCustomMessage::eOK)
-      {
-         q_Cancel = true;
+         c_Message.SetDescription(c_Description);
+         const C_OgeWiCustomMessage::E_Outputs e_Output = c_Message.Execute();
+         if (e_Output != C_OgeWiCustomMessage::eOK)
+         {
+            q_Cancel = true;
+         }
       }
    }
    else
@@ -389,7 +419,6 @@ void C_SdNdeDbViewWidget::AddHalcDefFromTsp(C_SdNdeDbAddNewProject * const opc_D
       }
    }
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show/hide no data blocks declared label
 */
@@ -500,6 +529,17 @@ uint32_t C_SdNdeDbViewWidget::m_AddApplication(C_OscNodeApplication & orc_Applic
       this->m_HandleCodeGenerationSettingsButtonAvailability();
    }
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update Trigger for UI pages
+
+      \param[in]  ou32_NodeIndex          Node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbViewWidget::m_UpdateTrigger()
+{
+   Q_EMIT (this->SigUpdateTrigger(this->mu32_NodeIndex));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

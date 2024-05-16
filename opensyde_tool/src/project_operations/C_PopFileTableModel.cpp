@@ -136,34 +136,31 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const int32_t 
       const C_PopFileTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
       if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
-            {
-               const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
-               const C_OscProject & rc_RecentProjects = this->mc_RecentProjects[u32_Index];
-               QFileInfo c_ProjectFileInfo;
-               QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
-               c_Font.setPixelSize(c_Font.pointSize());
+            const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
+            const C_OscProject & rc_RecentProjects = this->mc_RecentProjects[u32_Index];
+            QFileInfo c_ProjectFileInfo;
+            QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
+            c_Font.setPixelSize(c_Font.pointSize());
 
-               c_ProjectFileInfo.setFile(rc_RecentFilePaths);
-               switch (e_Col)
-               {
-               case eNAME:
-                  // Translation: %1 = sequential number, %2 = project name
-                  c_Retval = static_cast<QString>("#%1 - %2").arg(orc_Index.row() + 1).arg(
-                     c_ProjectFileInfo.completeBaseName());
-                  break;
-               case eVERSION:
-                  c_Retval = rc_RecentProjects.c_Version.c_str();
-                  break;
-               case ePATH:
-                  c_Retval = C_Uti::h_MinimizePath(static_cast<QString>(rc_RecentFilePaths), c_Font, 535, 12);
-                  break;
-               default:
-                  break;
-               }
+            c_ProjectFileInfo.setFile(rc_RecentFilePaths);
+            switch (e_Col)
+            {
+            case eNAME:
+               // Translation: %1 = sequential number, %2 = project name
+               c_Retval = static_cast<QString>("#%1 - %2").arg(orc_Index.row() + 1).arg(
+                  c_ProjectFileInfo.completeBaseName());
+               break;
+            case eVERSION:
+               c_Retval = rc_RecentProjects.c_Version.c_str();
+               break;
+            case ePATH:
+               c_Retval = C_Uti::h_MinimizePath(static_cast<QString>(rc_RecentFilePaths), c_Font, 535, 12);
+               break;
+            default:
+               break;
             }
          }
       }
@@ -210,66 +207,60 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const int32_t 
       }
       else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
-            {
-               const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
-               QFileInfo c_ProjectFileInfo;
+            const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
+            QFileInfo c_ProjectFileInfo;
 
-               c_ProjectFileInfo.setFile(rc_RecentFilePaths);
-               c_Retval = c_ProjectFileInfo.completeBaseName();
-            }
+            c_ProjectFileInfo.setFile(rc_RecentFilePaths);
+            c_Retval = c_ProjectFileInfo.completeBaseName();
          }
       }
       else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
-         if (orc_Index.row() >= 0)
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
+         if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
          {
-            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
-            if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
+            const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
+            const C_OscProject & rc_RecentProject = this->mc_RecentProjects[u32_Index];
+            QFileInfo c_ProjectFileInfo;
+            c_ProjectFileInfo.setFile(rc_RecentFilePaths);
+            QString c_TooltipContent;
+            QString c_CreationTime;
+            QString c_ModificationTime;
+            // if it's a syde_sp file we don't have access to creation and modification time
+            if (c_ProjectFileInfo.completeSuffix().compare("syde_sp") == 0)
             {
-               const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
-               const C_OscProject & rc_RecentProject = this->mc_RecentProjects[u32_Index];
-               QFileInfo c_ProjectFileInfo;
-               c_ProjectFileInfo.setFile(rc_RecentFilePaths);
-               QString c_TooltipContent;
-               QString c_CreationTime;
-               QString c_ModificationTime;
-               // if it's a syde_sp file we don't have access to creation and modification time
-               if (c_ProjectFileInfo.completeSuffix().compare("syde_sp") == 0)
-               {
-                  c_CreationTime = "N/A";
-                  c_ModificationTime = "N/A";
-               }
-               else
-               {
-                  c_CreationTime = C_OscProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str();
-                  c_ModificationTime = C_OscProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str();
-               }
-               c_TooltipContent =
-                  static_cast<QString>(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
-                                                              "Last modified: %4 (by %5) \nUsed openSYDE version: %6")).
-                  arg(rc_RecentProject.c_Version.c_str()).
-                  arg(rc_RecentProject.c_Author.c_str()).
-                  arg(c_CreationTime).
-                  arg(c_ModificationTime).
-                  arg(rc_RecentProject.c_Editor.c_str()).
-                  arg(C_Uti::h_ConvertVersionToStwStyle(rc_RecentProject.c_OpenSydeVersion.c_str()));
-               if (c_ProjectFileInfo.exists() == true)
-               {
-                  const uint64_t u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
-                  const float64_t f64_SizeFloat = std::ceil(static_cast<float64_t>(u64_SizeByte) / 1024.0);
-
-                  c_TooltipContent.append(
-                     static_cast<QString>(C_GtGetText::h_GetText("\nSize: %L1 kB")).arg(static_cast
-                                                                                        <uint64_t>(
-                                                                                           f64_SizeFloat)));
-               }
-               c_TooltipContent.append("\n\n" + rc_RecentFilePaths);
-               c_Retval = c_TooltipContent;
+               c_CreationTime = "N/A";
+               c_ModificationTime = "N/A";
             }
+            else
+            {
+               c_CreationTime = C_OscProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str();
+               c_ModificationTime = C_OscProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str();
+            }
+            c_TooltipContent =
+               static_cast<QString>(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
+                                                           "Last modified: %4 (by %5) \nUsed openSYDE version: %6")).
+               arg(rc_RecentProject.c_Version.c_str()).
+               arg(rc_RecentProject.c_Author.c_str()).
+               arg(c_CreationTime).
+               arg(c_ModificationTime).
+               arg(rc_RecentProject.c_Editor.c_str()).
+               arg(C_Uti::h_ConvertVersionToStwStyle(rc_RecentProject.c_OpenSydeVersion.c_str()));
+            if (c_ProjectFileInfo.exists() == true)
+            {
+               const uint64_t u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
+               const float64_t f64_SizeFloat = std::ceil(static_cast<float64_t>(u64_SizeByte) / 1024.0);
+
+               c_TooltipContent.append(
+                  static_cast<QString>(C_GtGetText::h_GetText("\nSize: %L1 kB")).arg(static_cast
+                                                                                     <uint64_t>(
+                                                                                        f64_SizeFloat)));
+            }
+            c_TooltipContent.append("\n\n" + rc_RecentFilePaths);
+            c_Retval = c_TooltipContent;
          }
       }
       else
