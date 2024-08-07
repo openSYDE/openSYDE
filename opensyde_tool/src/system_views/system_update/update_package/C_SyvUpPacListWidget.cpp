@@ -31,7 +31,8 @@
 #include "C_SyvUpPacConfig.hpp"
 #include "C_SyvUpPacConfigFiler.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "C_OscSuServiceUpdatePackage.hpp"
+#include "C_OscSupServiceUpdatePackageV1.hpp"
+#include "C_OscSupServiceUpdatePackageCreate.hpp"
 #include "TglFile.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_ImpUtil.hpp"
@@ -683,12 +684,28 @@ void C_SyvUpPacListWidget::ImportConfig(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates the service update package
 
-   \param[in]  oq_SaveAsFile  true: SUP shall be saved as .syde_sup
-                              false: SUP shall be saved in a simple directory
+   \param[in]  oq_SaveAsFile              true: SUP shall be saved as .syde_sup
+                                          false: SUP shall be saved in a simple directory
+   \param[in]  oq_SecureFile              true: SUP shall be encrypted
+                                          false: SUP shall be unencrypted
+   \param[in]  orc_EncryptNodes           list of all nodes contains information which node is encrypted
+                                          e.g. {0} or {0,0,0} means no encryption for all or individual nodes
+                                               {1} or {1,1,1} means encryption for all or individual nodes
+   \param[in]  orc_EncryptNodesPassword   list of all nodes contains information which node uses which password
+                                          e.g. {pwd} or {pwd1, pwd2, pwd3} for all or individual nodes
+   \param[in]  orc_AddSignatureNodes    list of all nodes contains information which node to add signature for
+                                          e.g. {0} or {0,0,0} means no signature for all or individual nodes,
+                                               {1} or {1,1,1} means add signature for all or individual nodes
+   \param[in]  orc_NodeSignaturePemFiles  list of all nodes contains information which pem file to use for which node
+                                          e.g. {pem} or {pem1, pem2, pem3} for all or individual nodes
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
+void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile, const bool oq_SecureFile,
+                                                      const std::vector<uint8_t> & orc_EncryptNodes,
+                                                      const std::vector<C_SclString> & orc_EncryptNodesPassword,
+                                                      const std::vector<uint8_t> & orc_AddSignatureNodes,
+                                                      const std::vector<C_SclString> & orc_NodeSignaturePemFiles)
 {
    const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -696,21 +713,40 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
 
    QString c_FilterName;
    QString c_DefaultFilename;
+   QString c_SelectedFilterName;
+
    if (pc_ViewData != NULL)
    {
       c_DefaultFilename = pc_ViewData->GetName().c_str();
    }
 
+   // User has the option to save the update package in the new or old version
    if (oq_SaveAsFile)
    {
+      // New version
       c_FilterName =
          static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
          " (*" +
-         static_cast<QString>(C_GtGetText::h_GetText(C_OscSuServiceUpdatePackage::
+         static_cast<QString>(C_GtGetText::h_GetText(C_OscSupServiceUpdatePackageV1::
                                                      h_GetPackageExtension().
                                                      c_str())) + ")";
-      c_DefaultFilename += "_ServiceUpdatePackage" +
-                           static_cast<QString>(C_OscSuServiceUpdatePackage::h_GetPackageExtension().c_str());
+      // Old version (called as "Version 1")
+      c_FilterName +=
+         static_cast<QString>(C_GtGetText::h_GetText(";;openSYDE Service Update Package File (Version 1)")) +
+         " (*" +
+         static_cast<QString>(C_GtGetText::h_GetText(C_OscSupServiceUpdatePackageV1::
+                                                     h_GetPackageExtension().
+                                                     c_str())) + ")";
+
+      c_DefaultFilename += C_GtGetText::h_GetText("_ServiceUpdatePackage");
+
+      // Add a suffix for secure archive file
+      if (oq_SecureFile)
+      {
+         c_DefaultFilename += C_GtGetText::h_GetText("_Secure");
+      }
+
+      c_DefaultFilename += static_cast<QString>(C_OscSupServiceUpdatePackageV1::h_GetPackageExtension().c_str());
    }
    else
    {
@@ -721,7 +757,8 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_FullPackagePath =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Directory for Service Update Package"),
-                                     c_Folder, c_FilterName, c_DefaultFilename);
+                                     c_Folder, c_FilterName, c_DefaultFilename,
+                                     QFileDialog::Options(), &c_SelectedFilterName);
 
    // check for user abort (empty string)
    if (c_FullPackagePath != "")
@@ -790,15 +827,69 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
                   c_NodeActiveFlags[u32_NodeCounter] = 0U;
                }
             }
-
-            s32_Return = C_OscSuServiceUpdatePackage::h_CreatePackage(c_FullPackagePath.toStdString().c_str(),
-                                                                      rc_SystemDefinition,
-                                                                      u32_ActiveBusIndex,
-                                                                      c_NodeActiveFlags,
-                                                                      c_NodesUpdateOrder,
-                                                                      c_ApplicationsToWrite,
-                                                                      c_Warnings,
-                                                                      c_Error, false, oq_SaveAsFile);
+            // Save package to directory
+            if (oq_SaveAsFile == false)
+            {
+               s32_Return = C_OscSupServiceUpdatePackageV1::h_CreatePackage(c_FullPackagePath.toStdString().c_str(),
+                                                                            rc_SystemDefinition,
+                                                                            u32_ActiveBusIndex,
+                                                                            c_NodeActiveFlags,
+                                                                            c_NodesUpdateOrder,
+                                                                            c_ApplicationsToWrite,
+                                                                            c_Warnings,
+                                                                            c_Error, false, oq_SaveAsFile);
+            }
+            // Save package as archive file (or secure archive file)
+            else
+            {
+               // pem files specified, it is a secure update package
+               if (oq_SecureFile == true)
+               {
+                  s32_Return = C_OscSupServiceUpdatePackageCreate::h_CreatePackageUsingPemFiles(
+                     c_FullPackagePath.toStdString().c_str(),
+                     rc_SystemDefinition,
+                     u32_ActiveBusIndex,
+                     c_NodeActiveFlags,
+                     c_NodesUpdateOrder,
+                     c_ApplicationsToWrite,
+                     c_Warnings,
+                     c_Error, "",
+                     orc_EncryptNodes,
+                     orc_EncryptNodesPassword, orc_AddSignatureNodes, orc_NodeSignaturePemFiles);
+               }
+               // if no pem files specified, it is a normal (unencrypted) update package
+               else
+               {
+                  // If user selects the older version for saving the package (Version 1)
+                  if ((c_SelectedFilterName.contains(C_GtGetText::h_GetText("Version 1"),
+                                                     Qt::CaseInsensitive)) == true)
+                  {
+                     s32_Return = C_OscSupServiceUpdatePackageV1::h_CreatePackage(
+                        c_FullPackagePath.toStdString().c_str(),
+                        rc_SystemDefinition,
+                        u32_ActiveBusIndex,
+                        c_NodeActiveFlags,
+                        c_NodesUpdateOrder,
+                        c_ApplicationsToWrite,
+                        c_Warnings,
+                        c_Error, false, oq_SaveAsFile);
+                  }
+                  else
+                  {
+                     s32_Return = C_OscSupServiceUpdatePackageCreate::h_CreatePackage(
+                        c_FullPackagePath.toStdString().c_str(),
+                        rc_SystemDefinition,
+                        u32_ActiveBusIndex,
+                        c_NodeActiveFlags,
+                        c_NodesUpdateOrder,
+                        c_ApplicationsToWrite,
+                        c_Warnings,
+                        c_Error, "",
+                        orc_EncryptNodes,
+                        orc_EncryptNodesPassword);
+                  }
+               }
+            }
          }
 
          if (s32_Return == C_NO_ERR)
@@ -808,10 +899,10 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
             c_MessageResult.SetDescription(C_GtGetText::h_GetText("Service Update Package successfully created."));
             const QString c_Details =
                static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-               arg(C_GtGetText::h_GetText("File saved at ")).
-               arg(c_FullPackagePath).
+               arg(C_GtGetText::h_GetText("Package saved at ")).
+               arg(this->mc_LastPath).
                arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-               arg(c_FullPackagePath);
+               arg(this->mc_LastPath);
             c_MessageResult.SetDetails(c_Details);
             c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
@@ -822,7 +913,7 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Service Update Package"));
             c_MessageResult.SetDescription(C_GtGetText::h_GetText(
                                               "Created Service Update Package but there are warnings.") +
-                                           c_FullPackagePath);
+                                           this->mc_LastPath);
             c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Warnings.GetText().c_str()));
             c_MessageResult.SetCustomMinHeight(250, 300);
             c_MessageResult.Execute();

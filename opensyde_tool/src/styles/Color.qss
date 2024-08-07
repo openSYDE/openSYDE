@@ -196,7 +196,10 @@ stw--opensyde_gui--C_SdNdeCoDeviceUpdateEdsDialog,
 stw--opensyde_gui--C_SdBueJ1939PgPropertiesDialog,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogDialog,
 stw--opensyde_gui--C_SdNdeDpImportRamViewReport,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
+stw--opensyde_gui--C_SyvUpPacServiceUpdatePackageDialog,
+stw--opensyde_gui--C_NagCharLengthSettingPopupDialog,
+stw--opensyde_gui--C_SyvUpPacSecureArchiveDialog
 {
 background-color: transparent;
 }
@@ -1316,7 +1319,8 @@ stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::secti
 stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Background="11"],
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:disabled,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:enabled:!checked
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:enabled:!checked,
+stw--opensyde_gui--C_SdBueImportCommMessagesWidget
 {
 background-color: rgb(237, 237, 242);
 }

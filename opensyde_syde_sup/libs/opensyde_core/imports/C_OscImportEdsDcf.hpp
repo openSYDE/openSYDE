@@ -116,7 +116,7 @@ private:
                                   const std::vector<uint32_t> & orc_Dummies, C_OscCanMessage & orc_OscMessageData,
                                   std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
                                   std::vector<uint8_t> & orc_SignalDefaultMinMaxValuesUsed, const bool oq_IsEds,
-                                  const bool oq_RestrictForCanOpenUsage,
+                                  const bool oq_RestrictForCanOpenUsage, const bool oq_ImportSrdoUseCase,
                                   std::vector<stw::scl::C_SclString> & orc_ImportMessages);
    static int32_t mh_GetIntegerValue(const stw::scl::C_SclString & orc_CoValue, const uint8_t ou8_NodeId,
                                      uint32_t & oru32_Value, bool * const opq_IncludesNodeId = NULL);

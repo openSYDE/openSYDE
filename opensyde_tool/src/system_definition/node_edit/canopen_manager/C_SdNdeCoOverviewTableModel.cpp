@@ -149,6 +149,9 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const int32_t os32_Section, con
          case eINTERFACE:
             c_Retval = C_GtGetText::h_GetText("Interface");
             break;
+         case eLINKEDTO:
+            c_Retval = C_GtGetText::h_GetText("Linked to");
+            break;
          case eNODE:
             c_Retval = C_GtGetText::h_GetText("Node");
             break;
@@ -178,6 +181,9 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const int32_t os32_Section, con
          case eINTERFACE:
             c_Retval = C_GtGetText::h_GetText("Interface");
             break;
+         case eLINKEDTO:
+            c_Retval = C_GtGetText::h_GetText("Linked to");
+            break;
          case eNODE:
             c_Retval = C_GtGetText::h_GetText("Node");
             break;
@@ -206,6 +212,9 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const int32_t os32_Section, con
             break;
          case eINTERFACE:
             c_Retval = C_GtGetText::h_GetText("Used CAN interface of CANopen manager");
+            break;
+         case eLINKEDTO:
+            c_Retval = C_GtGetText::h_GetText("Name of bus to which the node is linked to");
             break;
          case eNODE:
             c_Retval = C_GtGetText::h_GetText("Name of node in Network Topology");
@@ -292,7 +301,7 @@ int32_t C_SdNdeCoOverviewTableModel::columnCount(const QModelIndex & orc_Parent)
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      s32_Retval = 7;
+      s32_Retval = 8;
    }
    return s32_Retval;
 }
@@ -325,6 +334,9 @@ QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const 
                break;
             case eINTERFACE:
                c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_Interface;
+               break;
+            case eLINKEDTO:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_LinkedTo;
                break;
             case eNODE:
                c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_Node;
@@ -559,6 +571,18 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
          c_CoInfoManager.c_CoNodeConfig.u8_InterfaceNumber = u8_InterfaceIndex;
          c_CoInfoManager.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN,
                                                                                      u8_InterfaceIndex);
+
+         // Add linked bus info
+         QString c_LinkedBusNameMgr = C_PuiSdHandler::h_GetInstance()->GetBusNameOfConnectedDevice(
+            this->mu32_NodeIndex, u8_InterfaceIndex);
+
+         // Not linked to bus, hence display a "-".
+         if (c_LinkedBusNameMgr == C_GtGetText::h_GetText(""))
+         {
+            c_LinkedBusNameMgr = "-";
+         }
+         c_CoInfoManager.c_CoTableData.c_LinkedTo = c_LinkedBusNameMgr;
+
          //lint -e{1946} // use of functional-style cast is fine here
          c_CoInfoManager.c_CoTableData.c_Node = QString(pc_Node->c_Properties.c_Name.c_str());
          c_CoInfoManager.c_CoTableData.c_Role = "Manager";
@@ -586,6 +610,19 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
             c_CoInfoDevice.c_CoNodeConfig.u8_InterfaceNumber = u8_InterfaceIndex;
             c_CoInfoDevice.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN,
                                                                                        u8_InterfaceIndex);
+
+            // Add linked bus info
+            QString c_LinkedBusNameDevice = C_PuiSdHandler::h_GetInstance()->GetBusNameOfConnectedDevice(
+               c_IterDevices->first.u32_NodeIndex,
+               u8_InterfaceIndex);
+
+            // Not linked to bus, hence display a "-".
+            if (c_LinkedBusNameDevice == C_GtGetText::h_GetText(""))
+            {
+               c_LinkedBusNameDevice = "-";
+            }
+            c_CoInfoDevice.c_CoTableData.c_LinkedTo = c_LinkedBusNameDevice;
+
             c_CoInfoDevice.c_CoNodeConfig.c_CanInterfaceId = c_IterDevices->first;
             //lint -e{1946} // use of functional-style cast is fine here
             c_CoInfoDevice.c_CoTableData.c_Node = QString(pc_DeviceNode->c_Properties.c_Name.c_str());

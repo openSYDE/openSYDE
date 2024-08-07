@@ -298,14 +298,10 @@ void C_SdNdeNodeEditWidget::OpenDetail(const int32_t os32_MainIndex, const int32
 /*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTsp()
 
    \param[in]  oq_IsNewNode       Is Node new or not
-
-   \retval   true   Cancel
-   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeNodeEditWidget::AddFromTsp(const bool oq_IsNewNode)
+void C_SdNdeNodeEditWidget::AddFromTsp(const bool oq_IsNewNode)
 {
-   bool q_Cancel = false;
    const bool q_ADAPT_CURSOR = true; //to set Cursor to WaitCursor
 
    //Widget necessary
@@ -313,9 +309,8 @@ bool C_SdNdeNodeEditWidget::AddFromTsp(const bool oq_IsNewNode)
    tgl_assert(this->mpc_PropertiesWidget != NULL);
    if (this->mpc_PropertiesWidget != NULL)
    {
-      q_Cancel = this->mpc_PropertiesWidget->AddFromTsp(oq_IsNewNode);
+      this->mpc_PropertiesWidget->AddFromTsp(oq_IsNewNode);
    }
-   return q_Cancel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -859,6 +854,8 @@ void C_SdNdeNodeEditWidget::m_CreateCoManagerTab(const bool oq_AdaptCursor)
               &C_SdNdeNodeEditWidget::SigSwitchToBusProtocol);
       connect(this->mpc_CoManagerWidget, &C_SdNdeCoWidget::SigSwitchToBusProtocolMessage, this,
               &C_SdNdeNodeEditWidget::SigSwitchToBusProtocolMessage);
+      connect(this->mpc_CoManagerWidget, &C_SdNdeCoWidget::SigPropAndCoTabUpdateTrigger, this,
+              &C_SdNdeNodeEditWidget::m_PropAndCoTabUpdateTrigger);
 
       this->mpc_Ui->pc_TabCoManagerLayout->addWidget(this->mpc_CoManagerWidget);
       if (this->mq_SkipLoadUserSettings == false)
@@ -900,4 +897,19 @@ void C_SdNdeNodeEditWidget::m_UpdateTrigger()
    this->m_ReloadCommMessages();
    this->m_ReloadCanOpenConfig();
    this->m_ReloadHalc();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update trigger for CanOpen and Properties tab widgets
+
+   \param[in]       ou32_NodeIndex     Current node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_PropAndCoTabUpdateTrigger(const uint32_t ou32_NodeIndex)
+{
+   this->m_ReloadCanOpenConfig();
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->SetNodeIndex(ou32_NodeIndex);
+   }
 }

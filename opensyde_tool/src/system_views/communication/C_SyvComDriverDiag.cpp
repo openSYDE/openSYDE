@@ -56,6 +56,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvComDriverDiag::C_SyvComDriverDiag(const uint32_t ou32_ViewIndex) :
+   QObject(),
    C_OscComDriverProtocol(),
    mu32_ViewIndex(ou32_ViewIndex),
    mpc_CanDllDispatcher(NULL),

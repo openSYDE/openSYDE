@@ -283,7 +283,7 @@ void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
    std::vector<uint8_t> c_NodeActiveFlagsWithDeactivatedSubNodes;
    const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
       this->mu32_ViewIndex,
-      c_NodeActiveFlagsWithDeactivatedSubNodes);
+      c_NodeActiveFlagsWithDeactivatedSubNodes, false);
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if ((pc_View != NULL) &&

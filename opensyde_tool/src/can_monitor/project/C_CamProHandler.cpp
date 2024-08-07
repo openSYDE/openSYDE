@@ -600,7 +600,7 @@ void C_CamProHandler::InsertMessage(const uint32_t ou32_Index, const C_CamProMes
       //Only allow name adaptation if name is not necessary for database identification
       if (c_MessageData.c_DataBaseFilePath.IsEmpty())
       {
-         c_MessageData.c_Name = C_Uti::h_GetUniqueName(this->m_GetAllMessageNames(), c_MessageData.c_Name);
+         c_MessageData.c_Name = C_Uti::h_GetUniqueName(this->m_GetAllMessageNames(), c_MessageData.c_Name, 0UL);
       }
    }
 

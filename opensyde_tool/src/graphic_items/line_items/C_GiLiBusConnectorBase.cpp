@@ -51,6 +51,7 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64_t & oru64_Id, const 
                                                const C_GiLiBus * const opc_BusItem, const bool oq_MiddleLine,
                                                QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(NULL, oq_MiddleLine, opc_Parent),
+   C_GiBiCustomToolTip(),
    C_GiUnique(oru64_Id),
    ms32_ConnIndex(-1),
    ms32_KnownLineCount(-1),
@@ -92,6 +93,7 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64_t & oru64_Id,
                                                const C_GiLiBus * const opc_BusItem, const bool oq_MiddleLine,
                                                QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(NULL, oq_MiddleLine, opc_Parent),
+   C_GiBiCustomToolTip(),
    C_GiUnique(oru64_Id),
    ms32_ConnIndex(-1),
    ms32_KnownLineCount(-1),

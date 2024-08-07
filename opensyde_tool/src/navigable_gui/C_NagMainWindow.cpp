@@ -199,6 +199,9 @@ C_NagMainWindow::C_NagMainWindow(const uint16_t ou16_Timer) :
 
    //Time measurement log
    osc_write_log_performance_stop(u16_TimerId, "Main");
+
+   connect(this->mpc_MainWidget, &C_NagMainWidget::SigMaxCharLimitAccepted, this,
+           &C_NagMainWindow::m_CloseActiveWidget);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1384,6 +1387,19 @@ void C_NagMainWindow::m_HandleServiceMode(void) const
    this->mpc_Ui->pc_WidgetServiceModeInfo->setVisible(C_PuiSvHandler::h_GetInstance()->GetServiceModeActive());
    this->mpc_MainWidget->HandleServiceMode();
    this->mpc_Ui->pc_NaviBar->HandleServiceMode();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Close Active widget on user accepts for change in name string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::m_CloseActiveWidget()
+{
+   if (this->mpc_ActiveWidget != NULL)
+   {
+      this->m_RemoveUseCaseWidget();
+      this->mpc_Ui->pc_NaviBar->UpdateNodesAndBusesNames();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

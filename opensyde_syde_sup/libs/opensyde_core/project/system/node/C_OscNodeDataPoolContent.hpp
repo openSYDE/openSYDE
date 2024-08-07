@@ -161,6 +161,9 @@ public:
                                const bool oq_AllowSpecialHandling = false) const;
    void GetAnyValueAsFloat64(float64_t & orf64_Output, const uint32_t ou32_Index) const;
 
+   const std::vector<uint8_t> * GetDataAccessConst(stw::tgl::C_TglCriticalSection ** const oppc_CriticalSection) const;
+   std::vector<uint8_t> * GetDataAccess(stw::tgl::C_TglCriticalSection ** const oppc_CriticalSection);
+
 private:
    E_Type me_Type;               ///< Currently active type
    bool mq_Array;                ///< Flag for array (true) or single element type (false)

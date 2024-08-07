@@ -62,6 +62,7 @@ Q_SIGNALS:
    void SigBeforeOtherProjectLoad(void);
    void SigOtherProjectLoaded(const bool & orq_SwitchToLastKnownMode);
    void SigNewApplicationName(const QString & orc_Name);
+   void SigMaxCharLimitAccepted(void);
 
 protected:
    void paintEvent(QPaintEvent * const opc_Event) override;
@@ -88,6 +89,7 @@ private:
    int32_t m_LoadConcreteProject(uint16_t * const opu16_FileVersion);
    int32_t m_GetPassword(QString & orc_Password);
    void m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion);
+   void m_SetNameStringLength(void);
 
    Ui::C_NagMainWidget * mpc_Ui;
 };

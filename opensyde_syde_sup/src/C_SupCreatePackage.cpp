@@ -20,7 +20,7 @@
 #include "TglFile.hpp"
 #include "TglUtils.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "C_OscSuServiceUpdatePackage.hpp"
+#include "C_OscSupServiceUpdatePackageV1.hpp"
 #include "C_OscViewData.hpp"
 #include "C_OscSystemDefinitionFiler.hpp"
 #include "C_OscSystemFilerUtil.hpp"
@@ -75,7 +75,7 @@ C_SupCreatePackage::C_SupCreatePackage(const bool oq_Quiet, const C_SclString & 
    eERR_CREATE_VIEW_NOT_FOUND       Could not find a view with the name provided by user
    eERR_CREATE_ZIP_RD_RW            File writing problems occured on output file creation or deletion
    eERR_CREATE_ZIP_CONFIG           Configuration problems occured on update package creation
-                                     (see C_OscSuServiceUpdatePackage::h_CreatePackage for further details)
+                                     (see C_OscSupServiceUpdatePackageV1::h_CreatePackage for further details)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SydeSup::E_Result C_SupCreatePackage::Create()
@@ -182,11 +182,11 @@ C_SydeSup::E_Result C_SupCreatePackage::Create()
       }
 
       // Now we have all data collected and can create the package
-      s32_Return = C_OscSuServiceUpdatePackage::h_CreatePackage(mc_SupFilePath, c_SystemDefinition,
-                                                                c_View.GetOscPcData().GetBusIndex(),
-                                                                c_NodeActiveFlags, c_NodesUpdateOrder,
-                                                                c_ApplicationsToWrite,
-                                                                c_Warnings, c_Error, false, true, mc_TempDir);
+      s32_Return = C_OscSupServiceUpdatePackageV1::h_CreatePackage(mc_SupFilePath, c_SystemDefinition,
+                                                                   c_View.GetOscPcData().GetBusIndex(),
+                                                                   c_NodeActiveFlags, c_NodesUpdateOrder,
+                                                                   c_ApplicationsToWrite,
+                                                                   c_Warnings, c_Error, false, true, mc_TempDir);
 
       // File writing issues
       if ((s32_Return == C_RD_WR) || (s32_Return == C_RANGE) || (s32_Return == C_BUSY))

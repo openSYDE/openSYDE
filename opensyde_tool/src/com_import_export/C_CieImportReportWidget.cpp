@@ -204,7 +204,8 @@ QString C_CieImportReportWidget::h_GetInitialReportPart(
       c_CompleteLog += C_GtGetText::h_GetText("Eliminate spaces");
       c_CompleteLog += "<br/>";
       c_CompleteLog += "- ";
-      c_CompleteLog += C_GtGetText::h_GetText("Cut to 31 characters");
+      c_CompleteLog += static_cast<QString>(C_GtGetText::h_GetText("Cut to %1 (= project setting) characters")).arg(
+         C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
       c_CompleteLog += "</p>";
       if ((oq_IsCanOpenCase == true) && (c_FileInfo.completeSuffix().toLower() == "dcf"))
       {

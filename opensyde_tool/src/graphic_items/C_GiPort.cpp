@@ -42,6 +42,7 @@ using namespace stw::opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiPort::C_GiPort(QGraphicsItem * const opc_Parent) :
+   C_GiBiConnectableItem(),
    QGraphicsItem(opc_Parent),
    mc_BoundingRect(QRectF(0.0, 0.0, 40.0, 15.0)),
    ms32_RegisteredConnectors(0),

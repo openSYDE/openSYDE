@@ -85,6 +85,7 @@ private:
    QString m_LastSuffixOfFileName(const QString & orc_File) const;
 
    stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
+   bool mq_EnableSettings;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -1188,9 +1188,8 @@ void C_OscNodeCommFiler::mh_SaveSignalCanOpenPart(const C_OscCanSignal & orc_Nod
    \param[in,out]  orc_XmlParser       XML parser
 
    \return
-   STW error codes
-
-   \retval   C_NO_ERR   Detailed description
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscNodeCommFiler::mh_LoadSignalCanOpenPart(C_OscCanSignal & orc_NodeCommSignal,
@@ -1237,9 +1236,8 @@ void C_OscNodeCommFiler::mh_SaveSignalJ1939Part(const C_OscCanSignal & orc_NodeC
    \param[in,out]  orc_XmlParser       XML parser
 
    \return
-   STW error codes
-
-   \retval   C_NO_ERR   Detailed description
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscNodeCommFiler::mh_LoadSignalJ1939Part(C_OscCanSignal & orc_NodeCommSignal,

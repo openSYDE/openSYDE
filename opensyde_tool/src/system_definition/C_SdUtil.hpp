@@ -129,6 +129,8 @@ public:
                                           uint32_t & oru32_RxMessageCount, uint32_t & oru32_TxMessageCount,
                                           uint32_t * const opu32_SignalCount);
    static QString h_GetCanOpenSignalObjectIndex(const uint32_t ou32_ObjectIndex, const uint32_t ou32_ObjectSubIndex);
+   static void h_NodeIdToBeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                   QWidget * const opc_Parent);
 
 private:
    static void mh_WriteEtherCanLogMessage(const opensyde_core::C_OscNodeProperties * const opc_NodeProperties,

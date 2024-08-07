@@ -35,6 +35,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbSlider::C_PuiSvDbSlider(void) :
+   C_PuiSvDbWriteWidgetBase(),
    e_Type(C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1),
    q_ShowMinMax(true)
 {

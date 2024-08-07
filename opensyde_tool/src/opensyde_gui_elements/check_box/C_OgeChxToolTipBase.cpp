@@ -40,7 +40,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeChxToolTipBase::C_OgeChxToolTipBase(QWidget * const opc_Parent) :
-   QCheckBox(opc_Parent)
+   QCheckBox(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

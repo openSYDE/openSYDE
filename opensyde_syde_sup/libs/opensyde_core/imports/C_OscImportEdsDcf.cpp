@@ -832,14 +832,14 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
          s32_Retval = mh_ParseSignals(ou32_StartingId + ou32_ItMessage, u16_MappingOffset, ou8_NodeId,
                                       orc_CoObjects, orc_Dummies, c_Message, orc_AllInvalidMessageData.c_OscSignalData,
                                       orc_AllInvalidMessageData.c_SignalDefaultMinMaxValuesUsed,
-                                      oq_IsEds, oq_RestrictForCanOpenUsage, c_CurMessages);
+                                      oq_IsEds, oq_RestrictForCanOpenUsage, oq_ImportSrdoUseCase, c_CurMessages);
       }
       else
       {
          s32_Retval = mh_ParseSignals(ou32_StartingId + ou32_ItMessage, u16_MappingOffset, ou8_NodeId,
                                       orc_CoObjects, orc_Dummies, c_Message, orc_AllMessageData.c_OscSignalData,
                                       orc_AllMessageData.c_SignalDefaultMinMaxValuesUsed,
-                                      oq_IsEds, oq_RestrictForCanOpenUsage, c_CurMessages);
+                                      oq_IsEds, oq_RestrictForCanOpenUsage, oq_ImportSrdoUseCase, c_CurMessages);
       }
       if (s32_Retval != C_NO_ERR)
       {
@@ -1324,6 +1324,7 @@ void C_OscImportEdsDcf::mh_LoadInhibitTimeSectionCanOpen(const uint32_t ou32_Sta
                                                       or specific set values
    \param[in]      oq_IsEds                           Flag if current file is an EDS file
    \param[in]      oq_RestrictForCanOpenUsage         Restrict for can open usage
+   \param[in]      oq_ImportSrdoUseCase               Import SRDO use case
    \param[in,out]  orc_ImportMessages                 Import result messages
 
    \return
@@ -1339,6 +1340,7 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
                                            std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
                                            std::vector<uint8_t> & orc_SignalDefaultMinMaxValuesUsed,
                                            const bool oq_IsEds, const bool oq_RestrictForCanOpenUsage,
+                                           const bool oq_ImportSrdoUseCase,
                                            std::vector<C_SclString> & orc_ImportMessages)
 {
    int32_t s32_Retval = C_NO_ERR;
@@ -1347,11 +1349,8 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
    const C_OscCanOpenObject * const pc_CoMessageMappingObject =
       mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset, 0);
 
-   if (oq_RestrictForCanOpenUsage == true)
-   {
-      // In case of CANopen the DLC is adapted automatically
-      orc_OscMessageData.u16_Dlc = 0U;
-   }
+   // Adapt the DLC automatically
+   orc_OscMessageData.u16_Dlc = 0U;
 
    if (pc_CoMessageMappingObject != NULL)
    {
@@ -1368,104 +1367,108 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
             {
                //Signal pointer section
                //----------------------
-               //Skip first section because this is just the number of sub segments
-               const C_OscCanOpenObject * const pc_CoMessageMappingSubObject =
-                  mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset,
-                                 static_cast<int32_t>(u32_ItSignal + 1UL));
-
-               if (pc_CoMessageMappingSubObject != NULL)
+               //Skip every second signal for SRDOs (inverted signal)
+               if ((oq_ImportSrdoUseCase && ((u32_ItSignal % 2) == 0)) == false)
                {
-                  uint32_t u32_MappingSubIndexValue;
-                  if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageMappingSubObject, oq_IsEds), ou8_NodeId,
-                                         u32_MappingSubIndexValue) == C_NO_ERR)
+                  //Skip first section because this is just the number of sub segments
+                  const C_OscCanOpenObject * const pc_CoMessageMappingSubObject =
+                     mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset,
+                                    static_cast<int32_t>(u32_ItSignal + 1UL));
+
+                  if (pc_CoMessageMappingSubObject != NULL)
                   {
-                     bool q_Dummy = false;
-                     const uint32_t u32_CoRefId = (u32_MappingSubIndexValue & 0xFFFF0000UL) >> 16UL;
-                     //Search if this signal is a valid dummy signal
-                     for (uint32_t u32_ItDummy = 0; u32_ItDummy < orc_Dummies.size(); ++u32_ItDummy)
+                     uint32_t u32_MappingSubIndexValue;
+                     if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageMappingSubObject, oq_IsEds), ou8_NodeId,
+                                            u32_MappingSubIndexValue) == C_NO_ERR)
                      {
-                        if (u32_CoRefId == orc_Dummies[u32_ItDummy])
+                        bool q_Dummy = false;
+                        const uint32_t u32_CoRefId = (u32_MappingSubIndexValue & 0xFFFF0000UL) >> 16UL;
+                        //Search if this signal is a valid dummy signal
+                        for (uint32_t u32_ItDummy = 0; u32_ItDummy < orc_Dummies.size(); ++u32_ItDummy)
                         {
-                           q_Dummy = true;
-                           //Move start bit to expected position
-                           u32_StartBitCounter += (u32_MappingSubIndexValue & 0xFFU);
-                           break;
-                        }
-                     }
-                     //If not dummy signal check referenced CO object
-                     if (q_Dummy == false)
-                     {
-                        const uint32_t u32_CoRefIdSub = (u32_MappingSubIndexValue & 0xFF00UL) >> 8UL;
-                        const uint16_t u16_ExpectedLength = static_cast<uint16_t>(u32_MappingSubIndexValue & 0xFFUL);
-                        C_OscCanSignal c_CurSignal;
-                        C_OscNodeDataPoolListElement c_CurDataPoolSignal;
-                        bool q_DefaultMinMax = true;
-
-                        s32_Retval = C_OscImportEdsDcf::h_ParseSignalContent(orc_CoObjects, u32_CoRefId, u32_CoRefIdSub,
-                                                                             u32_StartBitCounter,
-                                                                             oq_RestrictForCanOpenUsage, oq_IsEds,
-                                                                             c_CurSignal, c_CurDataPoolSignal,
-                                                                             q_DefaultMinMax);
-                        if (u16_ExpectedLength != c_CurSignal.u16_ComBitLength)
-                        {
-                           mh_AddUserMessage(u32_CoRefId, "",
-                                             "mapping signal bit length " +
-                                             stw::scl::C_SclString::IntToStr(
-                                                u16_ExpectedLength) + " did not match to bit length from data type " +
-                                             stw::scl::C_SclString::IntToStr(
-                                                c_CurSignal.u16_ComBitLength) + ". Using bit length " +
-                                             stw::scl::C_SclString::IntToStr(c_CurSignal.u16_ComBitLength),
-                                             static_cast<int32_t>(u32_CoRefIdSub), false, &orc_ImportMessages);
-                        }
-                        u32_StartBitCounter += c_CurSignal.u16_ComBitLength;
-                        if (s32_Retval == C_NO_ERR)
-                        {
-                           //Handle index
-                           c_CurSignal.u32_ComDataElementIndex = static_cast<uint32_t>(orc_OscSignalData.size());
-                           //Add
-                           orc_OscMessageData.c_Signals.push_back(c_CurSignal);
-                           orc_OscSignalData.push_back(c_CurDataPoolSignal);
-                           orc_SignalDefaultMinMaxValuesUsed.push_back(static_cast<uint8_t>(q_DefaultMinMax));
-
-                           if (oq_RestrictForCanOpenUsage == true)
+                           if (u32_CoRefId == orc_Dummies[u32_ItDummy])
                            {
-                              // In case of CANopen the DLC is adapted automatically. Adapt to the added signals
-                              const uint16_t u16_LastBit = c_CurSignal.u16_ComBitStart +
-                                                           c_CurSignal.u16_ComBitLength;
-                              uint16_t u16_NeededBytes = u16_LastBit / 8U;
+                              q_Dummy = true;
+                              //Move start bit to expected position
+                              u32_StartBitCounter += (u32_MappingSubIndexValue & 0xFFU);
+                              break;
+                           }
+                        }
+                        //If not dummy signal check referenced CO object
+                        if (q_Dummy == false)
+                        {
+                           const uint32_t u32_CoRefIdSub = (u32_MappingSubIndexValue & 0xFF00UL) >> 8UL;
+                           const uint16_t u16_ExpectedLength = static_cast<uint16_t>(u32_MappingSubIndexValue & 0xFFUL);
+                           C_OscCanSignal c_CurSignal;
+                           C_OscNodeDataPoolListElement c_CurDataPoolSignal;
+                           bool q_DefaultMinMax = true;
 
-                              // Check for not byte aligned signals
-                              if ((u16_LastBit % 8U) != 0U)
+                           s32_Retval = C_OscImportEdsDcf::h_ParseSignalContent(orc_CoObjects, u32_CoRefId,
+                                                                                u32_CoRefIdSub,
+                                                                                u32_StartBitCounter,
+                                                                                oq_RestrictForCanOpenUsage, oq_IsEds,
+                                                                                c_CurSignal, c_CurDataPoolSignal,
+                                                                                q_DefaultMinMax);
+                           if (u16_ExpectedLength != c_CurSignal.u16_ComBitLength)
+                           {
+                              mh_AddUserMessage(u32_CoRefId, "",
+                                                "mapping signal bit length " +
+                                                stw::scl::C_SclString::IntToStr(
+                                                   u16_ExpectedLength) + " did not match to bit length from data type " +
+                                                stw::scl::C_SclString::IntToStr(
+                                                   c_CurSignal.u16_ComBitLength) + ". Using bit length " +
+                                                stw::scl::C_SclString::IntToStr(c_CurSignal.u16_ComBitLength),
+                                                static_cast<int32_t>(u32_CoRefIdSub), false, &orc_ImportMessages);
+                           }
+                           u32_StartBitCounter += c_CurSignal.u16_ComBitLength;
+                           if (s32_Retval == C_NO_ERR)
+                           {
+                              //Handle index
+                              c_CurSignal.u32_ComDataElementIndex = static_cast<uint32_t>(orc_OscSignalData.size());
+                              //Add
+                              orc_OscMessageData.c_Signals.push_back(c_CurSignal);
+                              orc_OscSignalData.push_back(c_CurDataPoolSignal);
+                              orc_SignalDefaultMinMaxValuesUsed.push_back(static_cast<uint8_t>(q_DefaultMinMax));
+
                               {
-                                 ++u16_NeededBytes;
-                              }
+                                 // Adapt the DLC automatically. Adapt to the added signals
+                                 const uint16_t u16_LastBit = c_CurSignal.u16_ComBitStart +
+                                                              c_CurSignal.u16_ComBitLength;
+                                 uint16_t u16_NeededBytes = u16_LastBit / 8U;
 
-                              if (u16_NeededBytes > orc_OscMessageData.u16_Dlc)
-                              {
-                                 orc_OscMessageData.u16_Dlc = u16_NeededBytes;
-
-                                 if (orc_OscMessageData.u16_Dlc > 8U)
+                                 // Check for not byte aligned signals
+                                 if ((u16_LastBit % 8U) != 0U)
                                  {
-                                    // 8 is maximum
-                                    orc_OscMessageData.u16_Dlc = 8U;
+                                    ++u16_NeededBytes;
+                                 }
+
+                                 if (u16_NeededBytes > orc_OscMessageData.u16_Dlc)
+                                 {
+                                    orc_OscMessageData.u16_Dlc = u16_NeededBytes;
+
+                                    if (orc_OscMessageData.u16_Dlc > 8U)
+                                    {
+                                       // 8 is maximum
+                                       orc_OscMessageData.u16_Dlc = 8U;
+                                    }
                                  }
                               }
                            }
                         }
                      }
+                     else
+                     {
+                        mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "",
+                                          "empty or not a number", static_cast<int32_t>(u32_ItSignal + 1UL), true);
+                        s32_Retval = C_CONFIG;
+                     }
                   }
                   else
                   {
-                     mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "",
-                                       "empty or not a number", static_cast<int32_t>(u32_ItSignal + 1UL), true);
+                     mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "", "does not exist",
+                                       static_cast<int32_t>(u32_ItSignal + 1UL), true);
                      s32_Retval = C_CONFIG;
                   }
-               }
-               else
-               {
-                  mh_AddUserMessage(ou32_CoMessageId + ou16_MappingOffset, "", "does not exist",
-                                    static_cast<int32_t>(u32_ItSignal + 1UL), true);
-                  s32_Retval = C_CONFIG;
                }
             }
          }

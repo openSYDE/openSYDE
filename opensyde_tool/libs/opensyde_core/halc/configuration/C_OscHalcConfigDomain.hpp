@@ -49,6 +49,8 @@ public:
                                                 std::vector<uint32_t> * const opc_StatusIndices)
    const;
    void HandleFileLoadPostProcessing(const C_OscHalcDefBase::E_SafetyMode oe_SafetyMode);
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    C_OscHalcConfigChannel c_DomainConfig;                ///< Domain specific configuration
    std::vector<C_OscHalcConfigChannel> c_ChannelConfigs; ///< Channels of domain of IO description (synced with

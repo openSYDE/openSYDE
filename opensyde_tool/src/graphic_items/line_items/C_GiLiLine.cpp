@@ -55,6 +55,7 @@ const uint8_t C_GiLiLine::mhu8_ANIMATION_STEP_COUNT = 60;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiLine::C_GiLiLine(const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
                        QGraphicsItem * const opc_Parent) :
+   C_GiBiConnectableItem(),
    QGraphicsPathItem(opc_Parent),
    mq_MiddleLine(orq_MiddleLine),
    mc_LineColor(QColor(224, 159, 90)),

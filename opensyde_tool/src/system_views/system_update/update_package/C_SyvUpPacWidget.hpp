@@ -81,7 +81,7 @@ private:
    void m_ButtonClearAll(void) const;
    void m_ButtonImport(void) const;
    void m_ButtonExport(void) const;
-   void m_ButtonCreatePackage(void) const;
+   void m_ButtonCreatePackage(void);
 
    void m_UpdateWidget(void);
    void m_FileCheckTimer(void);
@@ -90,6 +90,7 @@ private:
                                           const QStringList & orc_MissingParamFiles,
                                           const QStringList & orc_MissingFiles,
                                           const QStringList & orc_FlashwareWarningsApps);
+   bool m_ShowSecureArchiveFileDialog(QString & orc_Password, QString & orc_Path);
 
    Ui::C_SyvUpPacWidget * mpc_Ui;
    QTimer mc_Timer;

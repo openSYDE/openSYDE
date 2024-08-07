@@ -35,6 +35,7 @@ SOURCES += ../src/main.cpp \
     ../src/com_import_export/C_CieImportedMessageVectorData.cpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.cpp \
     ../src/graphic_items/system_view_items/C_GiSvSubNodeData.cpp \
+    ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.cpp \
     ../src/navigable_gui/C_NagServiceModeInfo.cpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
     ../src/navigable_gui/C_NagTopTreeModel.cpp \
@@ -111,6 +112,8 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacServiceUpdatePackageDialog.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.cpp \
     ../src/table_base/tree_base/C_TblTreMultiColumnLeafSortFilter.cpp \
     ../src/user_settings/C_UsHandler.cpp \
@@ -942,6 +945,7 @@ HEADERS  += \
     ../src/com_import_export/C_CieImportedMessageVectorData.hpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.hpp \
     ../src/graphic_items/system_view_items/C_GiSvSubNodeData.hpp \
+    ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.hpp \
     ../src/navigable_gui/C_NagServiceModeInfo.hpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.hpp \
     ../src/navigable_gui/C_NagTopTreeModel.hpp \
@@ -1018,6 +1022,8 @@ HEADERS  += \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.hpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.hpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacServiceUpdatePackageDialog.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.hpp \
     ../src/table_base/tree_base/C_TblTreMultiColumnLeafSortFilter.hpp \
     ../src/user_settings/C_UsHandler.hpp \
@@ -1814,6 +1820,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamView.hpp
 
 FORMS    += \
+    ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.ui \
     ../src/navigable_gui/C_NagServiceModeInfo.ui \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
@@ -1975,6 +1982,8 @@ FORMS    += \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacServiceUpdatePackageDialog.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.ui
 
 INCLUDEPATH += ../src \

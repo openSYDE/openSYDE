@@ -40,7 +40,7 @@ public:
    void SaveToData(void) const;
    void SelectName(void) const;
    void ShowApplication(const uint32_t ou32_ApplicationIndex) const;
-   bool AddFromTsp(const bool oq_IsNewNode);
+   void AddFromTsp(const bool oq_IsNewNode);
    void SaveUserSettings(void);
    void LoadUserSettings(void);
 

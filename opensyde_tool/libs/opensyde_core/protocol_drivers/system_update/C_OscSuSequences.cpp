@@ -1481,7 +1481,7 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
 
          if (s32_Return == C_NO_ERR)
          {
-            const std::vector<uint8_t> c_PubKeyDecoded = c_PemFile.GetKeyInfo().GetPubKeyTextDecoded();
+            const std::vector<uint8_t> c_PubKeyDecoded = c_PemFile.GetKeyInfo().GetX509CertificateData();
             std::vector<uint8_t> c_PubKeyModulus;
             std::vector<uint8_t> c_PubKeyExponent;
 
@@ -1520,7 +1520,7 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
 
             if (s32_Return == C_NO_ERR)
             {
-               const std::vector<uint8_t> c_KeySerialNumber = c_PemFile.GetKeyInfo().GetPubKeySerialNumber();
+               const std::vector<uint8_t> c_KeySerialNumber = c_PemFile.GetKeyInfo().GetCertificateSerialNumber();
                uint8_t u8_NrCode;
 
                s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityKey(this->mc_CurrentNode, c_PubKeyModulus,

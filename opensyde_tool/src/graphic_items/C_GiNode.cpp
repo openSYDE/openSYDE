@@ -93,6 +93,7 @@ C_GiNode::C_GiNode(const int32_t & ors32_Index, const uint64_t & oru64_Id, const
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiRectBaseGroup(ors32_Index, C_PuiSdDataElement::eNODE, oru64_Id, mhf64_MIN_WIDTH_NODE,
                      mhf64_MIN_HEIGHT_NODE, mf64_ACTION_POINT_OFFSET_NODE, false, opc_Parent),
+   C_GiBiCustomToolTip(),
    mq_ErrorIconHovered(false),
    mq_Valid(true),
    mq_DrawWhiteFilter(false),
@@ -1076,6 +1077,27 @@ QString C_GiNode::GetText(void) const
    if (pc_Node != NULL)
    {
       c_Name = C_PuiSdUtil::h_GetNodeBaseNameOrName(this->ms32_Index);
+   }
+
+   return c_Name;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get first selectable full name
+
+   \return
+   First selectable full name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_GiNode::GetFirstSelectableFullName() const
+{
+   QString c_Name = "Node";
+
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ms32_Index);
+
+   if (pc_Node != NULL)
+   {
+      c_Name = pc_Node->c_Properties.c_Name.c_str();
    }
 
    return c_Name;

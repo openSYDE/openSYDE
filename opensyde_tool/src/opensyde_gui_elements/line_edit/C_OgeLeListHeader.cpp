@@ -15,11 +15,13 @@
 #include "precomp_headers.hpp"
 
 #include "C_OgeLeListHeader.hpp"
-#include "constants.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -141,12 +143,15 @@ void C_OgeLeListHeader::m_UpdateText(void)
 {
    if (this->hasFocus() == false)
    {
-      this->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT + 10); // " (1234567)" should definitely be enough
+      this->setMaxLength(static_cast<int32_t>(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()) + 10); // " (1234567)"
+                                                                                                             // should
+                                                                                                             // definitely
+      // be enough
       this->setText(static_cast<QString>("%1 (%2)").arg(this->mc_Name).arg(this->mu32_Counter));
    }
    else
    {
-      this->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+      this->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
       this->setText(this->mc_Name);
    }
 }

@@ -105,6 +105,7 @@ private:
                                      const uint32_t ou32_SelectedIndex);
    void m_HandleDuplicateSysViewRequest(const uint32_t ou32_Index);
    void m_HandleServiceMode(void) const;
+   void m_CloseActiveWidget();
 
    Ui::C_NagMainWindow * mpc_Ui;
 

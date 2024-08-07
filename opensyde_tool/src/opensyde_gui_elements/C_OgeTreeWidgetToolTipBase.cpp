@@ -42,7 +42,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolTipBase::C_OgeTreeWidgetToolTipBase(QWidget * const opc_Parent) :
-   QTreeWidget(opc_Parent)
+   QTreeWidget(opc_Parent),
+   C_OgeTreeToolTipBase()
 {
    this->setMouseTracking(true);
 }

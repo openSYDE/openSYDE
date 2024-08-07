@@ -50,6 +50,9 @@ const float64_t C_GiLiLineGroup::mhf64_MAX_DIST_TO_ALIGN = 10.0;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
                                  QGraphicsItem * const opc_Parent) :
+   C_GiBiConnectableItem(),
+   C_GiBiCustomMouseItem(),
+   C_GiBiBase(),
    QGraphicsItemGroup(opc_Parent),
    mpc_LinePath(new C_GiLiLine(NULL, orq_MiddleLine, opc_Parent)),
    //lint -e{1938}  static const is guaranteed preinitialized before main

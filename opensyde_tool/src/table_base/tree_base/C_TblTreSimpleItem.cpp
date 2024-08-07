@@ -169,7 +169,7 @@ int32_t C_TblTreSimpleItem::h_GetIndex(const std::vector<C_TblTreSimpleItem *> &
       const std::vector<C_TblTreSimpleItem *>::const_iterator c_It = std::find_if(
          orc_Vector.begin(),
          orc_Vector.end(),
-         [&] (const std::vector<C_TblTreSimpleItem *>::value_type & orc_Test)
+         [&] (const std::vector<C_TblTreSimpleItem *>::value_type & orc_Test) -> bool
       {
          return orc_Test == opc_Item;
       }

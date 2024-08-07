@@ -15,16 +15,15 @@
 #include <limits>
 #include <QPainter>
 #include "stwtypes.hpp"
-#include "constants.hpp"
 #include "C_SdNdeDpListDataSetDelegate.hpp"
 #include "C_OgeTedTable.hpp"
 #include "C_OgeLeTable.hpp"
 #include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
-using namespace stw::opensyde_gui;
 using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -85,7 +84,7 @@ QWidget * C_SdNdeDpListDataSetDelegate::createEditor(QWidget * const opc_Parent,
       case C_SdNdeDpListDataSetModel::E_Rows::eNAME:
          pc_LineEdit = new C_OgeLeTable(opc_Parent);
          //Ui restriction
-         pc_LineEdit->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+         pc_LineEdit->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
          pc_Retval = pc_LineEdit;
          connect(pc_LineEdit, &C_OgeLeTable::textChanged, this, &C_SdNdeDpListDataSetDelegate::m_OnNameChange);
          break;

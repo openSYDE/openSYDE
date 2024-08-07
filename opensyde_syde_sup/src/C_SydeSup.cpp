@@ -22,7 +22,8 @@
 #include "stwerrors.hpp"
 #include "C_SclString.hpp"
 #include "C_SydeSup.hpp"
-#include "C_OscSuServiceUpdatePackage.hpp"
+#include "C_OscSupServiceUpdatePackageV1.hpp"
+#include "C_OscSupServiceUpdatePackageLoad.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "TglTime.hpp"
 #include "TglFile.hpp"
@@ -172,6 +173,12 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          "systemview",        required_argument,   NULL,    'w'
       },
       {
+         "pemfile",           required_argument,   NULL,    'k'
+      },
+      {
+         "password",          required_argument,   NULL,    'x'
+      },
+      {
          NULL,                0,                   NULL,    0
       }
    };
@@ -179,7 +186,7 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
    do
    {
       int32_t s32_Index;
-      s32_Result = getopt_long(os32_Argc, oppcn_Argv, "hmvqnp:o:i:z:l:c:s:w:d:", &ac_Options[0], &s32_Index);
+      s32_Result = getopt_long(os32_Argc, oppcn_Argv, "hmvqnp:o:i:z:l:c:s:w:d:k:x:", &ac_Options[0], &s32_Index);
       if (s32_Result != -1)
       {
          switch (s32_Result)
@@ -227,6 +234,12 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          case 'w':
             mc_ViewName = optarg;
             break;
+         case 'k':
+            mc_PubKeyPemPath = optarg;
+            break;
+         case 'x':
+            mc_Password = optarg;
+            break;
          case '?': //parser reports error (missing parameter option)
             q_ParseError = true;
             break;
@@ -272,6 +285,15 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          // logging not yet set up -> print directly to console
          this->m_PrintVersion(c_Version, c_BinaryHash, !mq_Quiet);
          std::cout << "Error: Invalid or missing command line parameters, try -h." << &std::endl;
+         e_Return = eERR_PARSE_COMMAND_LINE;
+      }
+      else if ((mc_PubKeyPemPath == "") && (mc_Password != ""))
+      {
+         // logging not yet set up -> print directly to console
+         this->m_PrintVersion(c_Version, c_BinaryHash, !mq_Quiet);
+         std::cout <<
+            "Error: Parameter \"-x\" is optional and only allowed in combination with a given pem file (\"-k\")" <<
+            &std::endl;
          e_Return = eERR_PARSE_COMMAND_LINE;
       }
       else
@@ -419,7 +441,7 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
    std::vector<C_OscSuSequences::C_DoFlash> c_ApplicationsToWrite;
 
    //if file extension is not empty we can assume it's a file and we further need to check whether the extension
-   //matches, otherwise it's mc_SUPFilePath is a directory
+   //matches, otherwise mc_SUPFilePath is a directory
    if ((TglExtractFileExtension(this->mc_SupFilePath) != "") &&
        (TglExtractFileExtension(this->mc_SupFilePath) == ".syde_sup"))
    {
@@ -435,17 +457,42 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
       //no file extension -> plain directory -> nothing to here: q_PackageIsZip still false
    }
 
+   //We don't really check for weird cmd line parameter combinations/different file version/etc right after tool start.
+   //The Core engine decides if everything the user gave the tool is valid. So we just pass everything
+   //we got from the user into the "ProcessPackage" function below.
    if (e_Result == eOK)
    {
-      // unpack Service Update Package which was created with openSYDE (also checks if paths are valid)
-      s32_Return = C_OscSuServiceUpdatePackage::h_ProcessPackage(mc_SupFilePath, mc_UnzipPath,
-                                                                 c_SystemDefinition, u32_ActiveBusIndex,
-                                                                 c_ActiveNodes, c_NodesUpdateOrder,
-                                                                 c_ApplicationsToWrite,
-                                                                 c_WarningMessages, c_ErrorMessage, q_PackageIsZip);
+      //see documentation of h_ProcessPackageUsingPemFiles for more information about the following variables
+      //nodes that are encrypted with a password and shall be decrypted
+      std::vector<uint8_t> c_DecryptNodes;
+      //passwords for the nodes which shall be decrypted
+      std::vector<C_SclString> c_PasswordsForDecryption;
+      //pem files for the nodes which signatures shall be checked
+      std::vector<C_SclString> c_PemFilesForNodes;
+
+      //we only support "one pem rules them all" at the moment. Thus only one pem goes into the vector.
+      //Later on there might be a "one pem/node" approach.
+      c_PemFilesForNodes.push_back(mc_PubKeyPemPath);
+
+      //we only support "all nodes are encrypted" at the moment.
+      //Thus one "1" in c_DecryptNodes means "decrypt all nodes"
+      c_DecryptNodes.push_back(1U);
+
+      //the engine below will handle if an empty password was given
+      c_PasswordsForDecryption.push_back(mc_Password);
+
+      s32_Return = C_OscSupServiceUpdatePackageLoad::h_ProcessPackageUsingPemFiles(mc_SupFilePath, mc_UnzipPath,
+                                                                                   c_SystemDefinition,
+                                                                                   u32_ActiveBusIndex,
+                                                                                   c_ActiveNodes, c_NodesUpdateOrder,
+                                                                                   c_ApplicationsToWrite,
+                                                                                   c_WarningMessages, c_ErrorMessage,
+                                                                                   q_PackageIsZip, c_DecryptNodes,
+                                                                                   c_PasswordsForDecryption,
+                                                                                   c_PemFilesForNodes);
 
       // report success or translate errors
-      switch (s32_Return) // here s32_Return is result of h_UnpackPackage
+      switch (s32_Return) // here s32_Return is result of h_ProcessPackageUsingPemFiles
       {
       case C_NO_ERR:
          if (q_PackageIsZip)
@@ -473,10 +520,18 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
          e_Result = eERR_PACKAGE_CORE_C_NOACT;
          break;
       case C_CONFIG:
-         e_Result = eERR_PACKAGE_NOT_FOUND;
+         //C_CONFIG can mean a lot of things through all the layers so we log the additional error message
+         e_Result = eERR_PACKAGE_INVALID;
+         h_WriteLog("Process Package", c_ErrorMessage, true);
          break;
       case C_DEFAULT:
          e_Result = eERR_PACKAGE_FILES_MISSING;
+         break;
+      case C_CHECKSUM:
+         //can mean that the password is not correct or that the list of nodes to be decrypted/signature-checked does
+         //not match with system definition, thus additional logging.
+         e_Result = eERR_SEC_PAC_DECRYPTING;
+         h_WriteLog("Process Package", c_ErrorMessage, true);
          break;
       default:
          e_Result = eERR_UNKNOWN;
@@ -678,7 +733,7 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
    eERR_CREATE_VIEW_NOT_FOUND       Could not find a view with the name provided by user
    eERR_CREATE_ZIP_RD_RW            File writing problems occured on output file creation or deletion
    eERR_CREATE_ZIP_CONFIG           Configuration problems occured on update package creation
-                                     (see C_OscSuServiceUpdatePackage::h_CreatePackage for further details)
+                                     (see C_OscSupServiceUpdatePackageV1::h_CreatePackage for further details)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SydeSup::E_Result C_SydeSup::CreatePackage(void)
@@ -777,7 +832,7 @@ C_SydeSup::E_Result C_SydeSup::m_InitOptionalParameters(void)
          // default location for updating is Service Update Package file path "converted" to directory
          mc_UnzipPath = TglChangeFileExtension(mc_SupFilePath, ""); // note: unzipping checks if this location is valid
       }
-      // default location for package creation mode is handled by C_OscSuServiceUpdatePackage::h_CreatePackage
+      // default location for package creation mode is handled by C_OscSupServiceUpdatePackageV1::h_CreatePackage
    }
    else if (TglDirectoryExists(mc_UnzipPath) == true)
    {
@@ -787,7 +842,7 @@ C_SydeSup::E_Result C_SydeSup::m_InitOptionalParameters(void)
          mc_UnzipPath = TglFileIncludeTrailingDelimiter(mc_UnzipPath) +
                         TglChangeFileExtension(TglExtractFileName(mc_SupFilePath), "");
       }
-      // sub directory for package creation mode is handled by C_OscSuServiceUpdatePackage::h_CreatePackage
+      // sub directory for package creation mode is handled by C_OscSupServiceUpdatePackageV1::h_CreatePackage
    }
    else
    {
@@ -873,10 +928,13 @@ void C_SydeSup::m_PrintInformation(const bool oq_Detailed) const
       c_PathDelimiter.c_str() << "openSYDE" << c_PathDelimiter.c_str() << "devices" << c_PathDelimiter.c_str() <<
       "devices.ini\n"
       "-w     --systemview        Name of view in openSYDE project                <none>          -w ViewCAN1\n"
+      "-k     --publickey         Path to pem file with public key                <none>          -k public_crt.pem\n"
+      "-x     --password          Password for the encrypted Update Package       <none>          -x unh4ckab1e\n"
       "The package file parameter \"-p\" is mandatory, all others are optional.\n"
       "If in update mode the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n"
-      "In createpackage mode the parameters opensydeproject, systemview and devicedefinition are mandatory." <<
-      &std::endl;
+      "In createpackage mode the parameters opensydeproject, systemview and devicedefinition are mandatory.\n"
+      "If a Secure Update Package shall be loaded the parameter \"-k\" is mandatory."
+      "The parameter \"-x\" for a password is not allowed without the parameter \"-k\"." << &std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -958,7 +1016,7 @@ void C_SydeSup::m_PrintStringFromError(const E_Result & ore_Result) const
       // Invalid or missing command line parameters.
       break;
 
-   // results from h_UnpackPackage (comment is corresponding core return value)
+   // results from C_OscSupServiceUpdatePackageV1::h_ProcessPackage (comment is corresponding core return value)
    case eERR_PACKAGE_ERASE_TARG_PATH: //C_BUSY
       c_Activity = "Unzip Package";
       c_Error = "Could not erase preexisting target path (note: can result in partially erased target path).";
@@ -982,7 +1040,7 @@ void C_SydeSup::m_PrintStringFromError(const E_Result & ore_Result) const
       c_Error =
          "Error code of a called core function (should not occur for valid and compatible Service Update Package).";
       break;
-   case eERR_PACKAGE_NOT_FOUND: //C_CONFIG
+   case eERR_PACKAGE_INVALID: //C_CONFIG
       c_Activity = "Unzip Package";
       c_Error = "Either could not find Service Update Package or System Definition content is invalid or incomplete.";
       break;
@@ -993,6 +1051,20 @@ void C_SydeSup::m_PrintStringFromError(const E_Result & ore_Result) const
    case eERR_PACKAGE_FILES_MISSING: //C_DEFAULT
       c_Activity = "Unzip Package";
       c_Error = "Service Update Package misses mandatory files. See manual to learn about mandatory files.";
+      break;
+
+   // results from C_OscSupServiceUpdatePackageLoad::h_ProcessPackage (comment is corresponding core return value)
+   case eERR_SEC_PAC_NO_ZIP:
+      c_Activity = "Unzip Secure Package";
+      c_Error = "Tried to open a Secure Update Package from an unpacked folder / directory.";
+      break;
+   case eERR_SEC_PAC_INVALID_PACKAGE:
+      c_Activity = "Unzip Secure Package";
+      c_Error = "Secure Update Package must only contain signed \"*.syde_suc\" packages";
+      break;
+   case eERR_SEC_PAC_DECRYPTING:
+      c_Activity = "Unzip Secure Package";
+      c_Error = "Error while decrypting Secure Update Package. See log for details.";
       break;
 
    // result from check if driver exists

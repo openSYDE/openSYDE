@@ -73,8 +73,6 @@ C_SdBueImportCommMessagesWidget::C_SdBueImportCommMessagesWidget(C_OgePopUpDialo
    this->mpc_Ui->comboBox->setCurrentIndex(u8_DEFAULT_COMBOBOX_ENTRY);
 
    this->mpc_Ui->pc_PushButtonOk->setFocus();
-
-   m_SetBackgroundColor(mc_STYLE_GUIDE_COLOR_11);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -211,21 +209,4 @@ void C_SdBueImportCommMessagesWidget::m_OkClicked(void)
 void C_SdBueImportCommMessagesWidget::m_CancelClicked(void)
 {
    mrc_ParentDialog.reject();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set background color
-
-   \param[in]       orc_BackgroundColor     New background color
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueImportCommMessagesWidget::m_SetBackgroundColor(const QColor & orc_BackgroundColor)
-{
-   const bool q_AUTO_FILL_BACKGROUND = true;
-   const QPalette::ColorRole e_COLOR_ROLE = QPalette::Window;
-   QPalette c_Palette = QPalette();
-
-   c_Palette.setColor(e_COLOR_ROLE, orc_BackgroundColor);
-   this->setAutoFillBackground(q_AUTO_FILL_BACKGROUND);
-   this->setPalette(c_Palette);
 }

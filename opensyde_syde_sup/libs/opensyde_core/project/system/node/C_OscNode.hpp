@@ -79,6 +79,7 @@ public:
 
    void CalcHash(uint32_t & oru32_HashValue) const;
 
+   std::vector<C_OscNodeApplication> GetHexApplications(void) const;
    int32_t GetDataPoolIndex(const C_OscNodeDataPool::E_Type oe_DataPoolType,
                             const uint32_t ou32_DataPoolTypeIndex) const;
    int32_t GetDataPoolTypeIndex(const uint32_t ou32_DataPoolIndex) const;
@@ -136,6 +137,9 @@ public:
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
+   uint32_t CountAllLocalMessages(void) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    C_OscNodeDataPoolListElement * GetDataPoolListElement(const uint32_t ou32_DataPoolIndex,
                                                          const uint32_t ou32_ListIndex,

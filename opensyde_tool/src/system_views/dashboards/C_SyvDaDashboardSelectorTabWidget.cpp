@@ -327,6 +327,9 @@ void C_SyvDaDashboardSelectorTabWidget::Save(void)
       if (pc_WidgetRef != NULL)
       {
          pc_WidgetRef->Save();
+         //Tab index
+         C_PuiSvHandler::h_GetInstance()->SetDashboardTabIndex(this->mu32_ViewIndex,
+                                                               pc_WidgetRef->GetDashboardIndex(), s32_ItTab);
       }
    }
    //Tear off
@@ -1571,9 +1574,6 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
                //User settings
                C_UsHandler::h_GetInstance()->SetProjSvDashboardMainTab(pc_View->GetName().c_str(),
                                                                        pc_Dashboard->GetName());
-               //Data
-               C_PuiSvHandler::h_GetInstance()->SetDashboardTabIndex(this->mu32_ViewIndex,
-                                                                     pc_Widget->GetDashboardIndex(), s32_Counter);
             }
          }
       }

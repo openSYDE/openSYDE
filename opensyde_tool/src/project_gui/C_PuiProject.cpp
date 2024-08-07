@@ -773,15 +773,20 @@ int32_t C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, con
 
    if (s32_Retval == C_NO_ERR)
    {
-      std::vector<C_SclString> c_AllFiles;
+      std::vector<C_SclString> c_AllFilesAbsolute;
 
-      C_Uti::h_GetAllFilePathsInFolder(c_TemporaryPath, c_AllFiles);
+      C_Uti::h_GetAllFilePathsInFolder(c_TemporaryPath, c_AllFilesAbsolute);
+      {
+         std::set<C_SclString> c_AllFilesRelative;
+         C_OscZipFile::h_AppendFilesRelative(c_AllFilesRelative, c_AllFilesAbsolute,
+                                             c_TemporaryPath.toStdString().c_str());
 
-      // Create the encrypted zip file
-      s32_Retval = C_OscAesFile::h_CreateEncryptedZipFile(c_TemporaryPath.toStdString().c_str(),
-                                                          c_AllFiles,
-                                                          orc_FilePath.toStdString().c_str(),
-                                                          orc_Password.toStdString().c_str(), &c_ErrorString);
+         // Create the encrypted zip file
+         s32_Retval = C_OscAesFile::h_CreateEncryptedZipFile(c_TemporaryPath.toStdString().c_str(),
+                                                             c_AllFilesRelative,
+                                                             orc_FilePath.toStdString().c_str(),
+                                                             orc_Password.toStdString().c_str(), &c_ErrorString);
+      }
    }
 
    //erase temporary folder:

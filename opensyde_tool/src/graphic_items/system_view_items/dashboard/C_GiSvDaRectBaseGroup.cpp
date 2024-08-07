@@ -104,6 +104,7 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32_t & oru32_ViewIndex, c
                        opc_Parent, orc_PosOffset),
    C_PuiSvDbDataElementHandler(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, ore_Type,
                                ou32_MaximumDataElements, oq_ReadItem),
+   C_GiBiCustomToolTip(),
    me_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
    mq_AutoWriteOnConnect(false),
    me_WriteMode(C_PuiSvDbWriteWidgetBase::eWM_MANUAL),

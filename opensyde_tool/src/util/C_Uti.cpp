@@ -945,6 +945,7 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
 
    \param[in]  orc_ExistingStrings  Existing item names
    \param[in]  orc_ProposedName     Proposal for item name
+   \param[in]  ou32_MaxCharLimit    Max char limit
    \param[in]  orc_SkipName         Optional name to block any adaptations for
 
    \return
@@ -953,6 +954,7 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 stw::scl::C_SclString C_Uti::h_GetUniqueName(const std::map<C_SclString, bool> & orc_ExistingStrings,
                                              const stw::scl::C_SclString & orc_ProposedName,
+                                             const uint32_t ou32_MaxCharLimit,
                                              const stw::scl::C_SclString & orc_SkipName)
 {
    C_SclString c_Retval = orc_ProposedName;
@@ -962,42 +964,37 @@ stw::scl::C_SclString C_Uti::h_GetUniqueName(const std::map<C_SclString, bool> &
 
    std::map<C_SclString, bool>::const_iterator c_ItString;
 
+   //Apply restriction
+   if ((ou32_MaxCharLimit > 0UL) && (c_Retval.Length() > ou32_MaxCharLimit))
+   {
+      c_Retval = c_Retval.SubString(1UL, ou32_MaxCharLimit);
+   }
+
    do
    {
       q_Conflict = false;
       c_ItString = orc_ExistingStrings.find(c_Retval);
       if (c_ItString != orc_ExistingStrings.end())
       {
-         const C_SclString & rc_ConflictingValue = c_ItString->first;
-         //Search for the SkipName if the skip name is a valid string
-         const uint32_t u32_Pos = orc_SkipName.IsEmpty() ? 0UL : rc_ConflictingValue.LastPos(orc_SkipName);
          q_Conflict = true;
-         if (u32_Pos == 0UL)
-         {
-            //Continue examining the complete string
-            h_GetNumberAtStringEnd(rc_ConflictingValue, c_BaseStr, s32_MaxDeviation);
-         }
-         else
-         {
-            //Hint: SubString and LastPos start counting at 1
-            const uint32_t u32_ZeroBasedpos = u32_Pos - 1UL;
-            //Extract the part of the string that may be adapted
-            const C_SclString c_StringAfterSkip = rc_ConflictingValue.SubString(
-               (u32_ZeroBasedpos + orc_SkipName.Length()) + 1UL,
-               (rc_ConflictingValue.Length() - orc_SkipName.Length()) - u32_ZeroBasedpos);
-            const C_SclString c_SkippedPart =
-               rc_ConflictingValue.SubString(1UL, u32_ZeroBasedpos + orc_SkipName.Length());
-            //Search remaining part for any number
-            h_GetNumberAtStringEnd(c_StringAfterSkip, c_BaseStr, s32_MaxDeviation);
-            //Add skipped part to base string again
-            c_BaseStr = c_SkippedPart + c_BaseStr;
-         }
+         mh_GetBaseNameAndCurrentConflictNumberFromString(c_ItString->first, orc_SkipName, c_BaseStr, s32_MaxDeviation);
          //Do not use 0 and 1 for name adaptation
          if (s32_MaxDeviation <= 0)
          {
             s32_MaxDeviation = 1;
          }
-         c_Retval = c_BaseStr + '_' + C_SclString::IntToStr(s32_MaxDeviation + static_cast<int32_t>(1));
+         {
+            const C_SclString c_Appendix = '_' + C_SclString::IntToStr(s32_MaxDeviation + static_cast<int32_t>(1));
+            c_Retval = c_BaseStr + c_Appendix;
+            if ((ou32_MaxCharLimit > 0UL) && (c_Retval.Length() > ou32_MaxCharLimit))
+            {
+               const uint32_t u32_ReqLength = c_Appendix.Length();
+               if (u32_ReqLength < ou32_MaxCharLimit)
+               {
+                  c_Retval = c_BaseStr.SubString(1UL, ou32_MaxCharLimit - c_Appendix.Length()) + c_Appendix;
+               }
+            }
+         }
       }
    }
    while (q_Conflict == true);
@@ -1017,7 +1014,8 @@ stw::scl::C_SclString C_Uti::h_GetUniqueName(const std::map<C_SclString, bool> &
 QString C_Uti::h_GetUniqueNameQt(const std::map<C_SclString, bool> & orc_ExistingStrings,
                                  const QString & orc_ProposedName)
 {
-   const C_SclString c_Result = C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str());
+   const C_SclString c_Result =
+      C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str(), 0UL);
 
    return c_Result.c_str();
 }
@@ -1350,4 +1348,42 @@ void C_Uti::h_SortIndicesAscendingAndSync<uint32_t>(std::vector<uint32_t> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 C_Uti::C_Uti(void)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get base name and current conflict number from string
+
+   \param[in]   orc_ConflictingValue   Conflicting value
+   \param[in]   orc_SkipName           Optional name to block any adaptations for
+   \param[out]  orc_CutString          String without number
+   \param[out]  ors32_Number           Number at end (else -1)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_Uti::mh_GetBaseNameAndCurrentConflictNumberFromString(const C_SclString & orc_ConflictingValue,
+                                                             const stw::scl::C_SclString & orc_SkipName,
+                                                             C_SclString & orc_CutString, int32_t & ors32_Number)
+{
+   //Search for the SkipName if the skip name is a valid string
+   const uint32_t u32_Pos = orc_SkipName.IsEmpty() ? 0UL : orc_ConflictingValue.LastPos(orc_SkipName);
+
+   if (u32_Pos == 0UL)
+   {
+      //Continue examining the complete string
+      h_GetNumberAtStringEnd(orc_ConflictingValue, orc_CutString, ors32_Number);
+   }
+   else
+   {
+      //Hint: SubString and LastPos start counting at 1
+      const uint32_t u32_ZeroBasedpos = u32_Pos - 1UL;
+      //Extract the part of the string that may be adapted
+      const C_SclString c_StringAfterSkip = orc_ConflictingValue.SubString(
+         (u32_ZeroBasedpos + orc_SkipName.Length()) + 1UL,
+         (orc_ConflictingValue.Length() - orc_SkipName.Length()) - u32_ZeroBasedpos);
+      const C_SclString c_SkippedPart =
+         orc_ConflictingValue.SubString(1UL, u32_ZeroBasedpos + orc_SkipName.Length());
+      //Search remaining part for any number
+      h_GetNumberAtStringEnd(c_StringAfterSkip, orc_CutString, ors32_Number);
+      //Add skipped part to base string again
+      orc_CutString = c_SkippedPart + orc_CutString;
+   }
 }

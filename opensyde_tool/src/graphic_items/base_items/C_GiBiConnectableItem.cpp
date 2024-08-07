@@ -38,7 +38,8 @@ using namespace stw::opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiConnectableItem::C_GiBiConnectableItem()
+C_GiBiConnectableItem::C_GiBiConnectableItem() :
+   QObject()
 {
 }
 

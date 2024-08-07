@@ -36,6 +36,7 @@ using namespace stw::opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManTopologyBusConnectorReconnectManager::C_SdManTopologyBusConnectorReconnectManager() :
+   QObject(),
    mpc_BusConnector(NULL),
    mpc_StartingNode(NULL),
    mpc_StartingBus(NULL),
@@ -52,7 +53,7 @@ C_SdManTopologyBusConnectorReconnectManager::C_SdManTopologyBusConnectorReconnec
 /*! \brief   Start connect mode and save all relevant data
 
    \param[in,out]  opc_BusConnector    Bus connector which has started the reconnect mode
-   \param[in]      ore_ConnectState    Conect state of bus connector
+   \param[in]      ore_ConnectState    Connect state of bus connector
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::StartReconnectMode(C_GiLiBusConnector * const opc_BusConnector,
@@ -143,7 +144,7 @@ bool C_SdManTopologyBusConnectorReconnectManager::Active(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Final step of reconnection when all events should have occured
+/*! \brief   Final step of reconnection when all events should have occurred
 
    This function expects to have all information necessary to either fully do or undo the reconnection step
 */

@@ -43,6 +43,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiInfo::C_GiInfo(const QRectF & orc_Rect, QGraphicsItem * const opc_Parent) :
+   QObject(),
    QGraphicsRectItem(orc_Rect, opc_Parent),
    mc_Text(""),
    mc_BackgroundColor(Qt::transparent),

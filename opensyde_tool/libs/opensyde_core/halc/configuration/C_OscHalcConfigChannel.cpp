@@ -114,3 +114,20 @@ void C_OscHalcConfigChannel::HandleFileLoadPostProcessing(const C_OscHalcDefBase
       //Nothing to do
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in]      orc_Type               Type
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscHalcConfigChannel::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                                    const stw::scl::C_SclString & orc_Type,
+                                                    std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit, orc_Type,
+                                                                             this->c_Name,
+                                                                             opc_ChangedItems);
+}

@@ -435,6 +435,7 @@ QString C_OgeWiUtil::h_GetOpenFileName(QWidget * const opc_Parent, const QString
    \param[in]      orc_Filter             QFileDialog filter
    \param[in]      orc_DefaultFileName    QFileDialog default file name
    \param[in]      orc_Option             QFileDialog option
+   \param[in,out]  opc_SelectedFilter     The file filter selected by user
 
    \return
    file name for saving (empty if aborted)
@@ -442,10 +443,11 @@ QString C_OgeWiUtil::h_GetOpenFileName(QWidget * const opc_Parent, const QString
 //----------------------------------------------------------------------------------------------------------------------
 QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
                                        const QString & orc_StartingFolder, const QString & orc_Filter,
-                                       const QString & orc_DefaultFileName, const QFileDialog::Options & orc_Option)
+                                       const QString & orc_DefaultFileName, const QFileDialog::Options & orc_Option,
+                                       QString * const opc_SelectedFilter)
 {
    return mh_GetFileName(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter, orc_DefaultFileName, "",
-                         QFileDialog::AcceptSave, orc_Option);
+                         QFileDialog::AcceptSave, orc_Option, opc_SelectedFilter);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -522,6 +524,7 @@ int32_t C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QStrin
    \param[in]      orc_DefaultSuffix      Default suffix
    \param[in]      ore_SaveOrOpen         Save or open
    \param[in]      orc_Option             QFileDialog option
+   \param[in,out]  opc_SelectedFilter     The file filter selected by user
 
    \return
    Get save file name (empty if aborted)
@@ -531,7 +534,7 @@ QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & 
                                     const QString & orc_StartingFolder, const QString & orc_Filter,
                                     const QString & orc_DefaultFileName, const QString & orc_DefaultSuffix,
                                     const QFileDialog::AcceptMode & ore_SaveOrOpen,
-                                    const QFileDialog::Options & orc_Option)
+                                    const QFileDialog::Options & orc_Option, QString * const opc_SelectedFilter)
 {
    QString c_Retval = "";
    bool q_Stop = false;
@@ -556,6 +559,10 @@ QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & 
             if (C_OscUtils::h_CheckValidFilePath(c_FullFilePath.toStdString().c_str()) == true)
             {
                c_Retval = c_FullFilePath;
+               if (opc_SelectedFilter != NULL)
+               {
+                  *opc_SelectedFilter = c_FileDialog.selectedNameFilter();
+               }
                q_Stop = true;
             }
             else

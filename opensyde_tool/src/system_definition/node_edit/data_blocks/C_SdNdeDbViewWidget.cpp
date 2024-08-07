@@ -223,14 +223,10 @@ void C_SdNdeDbViewWidget::UpdateApplications(void) const
 /*! \brief   Add new project action
 
    \param[in]  oq_IsNewNode   Is Node new or not
-
-   \retval   true   Cancel
-   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
+void C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
 {
-   bool q_Cancel = false;
    const QString c_LAST_KNOWN_TSP_PATH = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTspPath();
 
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
@@ -302,11 +298,7 @@ bool C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
          }
 
          c_Message.SetDescription(c_Description);
-         const C_OgeWiCustomMessage::E_Outputs e_Output = c_Message.Execute();
-         if (e_Output != C_OgeWiCustomMessage::eOK)
-         {
-            q_Cancel = true;
-         }
+         c_Message.Execute();
       }
       else //Version 3
       {
@@ -325,16 +317,8 @@ bool C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
          c_Message.SetCustomMinHeight(180, 300);
          c_Message.SetDetails(c_Details);
          c_Message.SetDescription(c_Description);
-         const C_OgeWiCustomMessage::E_Outputs e_Output = c_Message.Execute();
-         if (e_Output != C_OgeWiCustomMessage::eOK)
-         {
-            q_Cancel = true;
-         }
+         c_Message.Execute();
       }
-   }
-   else
-   {
-      q_Cancel = true;
    }
 
    if (c_New != NULL)
@@ -343,7 +327,6 @@ bool C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
       c_New->HideOverlay();
       c_New->deleteLater();
    }
-   return q_Cancel;
 } //lint !e593  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------

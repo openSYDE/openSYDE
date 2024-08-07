@@ -41,6 +41,7 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
+   QObject(),
    mpc_ActiveItem(NULL)
 {
    // add all actions

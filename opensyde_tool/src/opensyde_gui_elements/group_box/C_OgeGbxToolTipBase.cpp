@@ -40,7 +40,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeGbxToolTipBase::C_OgeGbxToolTipBase(QWidget * const opc_Parent) :
-   QGroupBox(opc_Parent)
+   QGroupBox(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

@@ -40,7 +40,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTedToolTipBase::C_OgeTedToolTipBase(QWidget * const opc_Parent) :
-   C_OgeTedContextMenuBase(opc_Parent)
+   C_OgeTedContextMenuBase(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

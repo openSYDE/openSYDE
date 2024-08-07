@@ -39,6 +39,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaContextMenuManager::C_SyvDaContextMenuManager() :
+   C_SebBaseContextMenuManager(),
    mq_SpecificActionsAvailable(true),
    mq_FurtherActionsWillBeAdded(false)
 {

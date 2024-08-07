@@ -60,9 +60,11 @@ using namespace stw::tgl;
 C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueBusEditPropertiesWidget),
-   mu32_BusIndex(0)
+   mu32_BusIndex(0),
+   mu32_CurrentCanFdComboBoxIndex(0)
 {
    bool q_UsableForRoutingDisabled;
+   bool q_EnableCanFd;
 
    // init UI
    mpc_Ui->setupUi(this);
@@ -73,6 +75,9 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
    this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
                                                            C_GtGetText::h_GetText(""),
                                                            C_NagToolTip::eDEFAULT);
+   this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                C_GtGetText::h_GetText(""),
+                                                                C_NagToolTip::eDEFAULT);
 
    InitStaticNames();
 
@@ -82,11 +87,21 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
    this->mpc_Ui->pc_HorizontalLayoutBusId->setAlignment(this->mpc_Ui->pc_SpinBoxBusId, Qt::AlignLeft);
 
    //Name restriction
-   this->mpc_Ui->pc_LineEditBusName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+   this->mpc_Ui->pc_LineEditBusName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
 
    // connects
    connect(this->mpc_Ui->pc_LineEditBusName, &QLineEdit::textChanged, this,
            &C_SdBueBusEditPropertiesWidget::m_CheckBusName);
+
+   // Enable/Disable CAN FD
+   q_EnableCanFd = (this->mpc_Ui->pc_CheckBoxEnableCANFD->isChecked() == false);
+   this->m_UpdateEnableCanFd(q_EnableCanFd);
+
+   this->mpc_Ui->pc_LabelCANFD->setVisible(false);
+   this->mpc_Ui->frame->setVisible(false);
+   this->mpc_Ui->pc_CheckBoxEnableCANFD->setVisible(false);
+   this->mpc_Ui->pc_LabelCANFDBitRate->setVisible(false);
+   this->mpc_Ui->pc_ComboBoxCANFDBitRate->setVisible(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,18 +126,24 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelConfiguration->setText(C_GtGetText::h_GetText("Configuration"));
    this->mpc_Ui->pc_LabelBusId->setText(C_GtGetText::h_GetText("Bus ID"));
    this->mpc_Ui->pc_LabelBitRate->setText(C_GtGetText::h_GetText("Bitrate"));
+   //CAN FD
+   this->mpc_Ui->pc_LabelCANFD->setText(C_GtGetText::h_GetText("CAN FD"));
+   this->mpc_Ui->pc_CheckBoxEnableCANFD->setText(C_GtGetText::h_GetText("Enable CAN FD Option"));
+   this->mpc_Ui->pc_LabelCANFDBitRate->setText(C_GtGetText::h_GetText("CAN FD Bitrate"));
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
    //Tool tips
-   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Symbolic bus name. Unique within Network Topology.\n"
-                                                        "\nC naming conventions must be followed:"
-                                                        "\n - must not be empty"
-                                                        "\n - must not start with digits"
-                                                        "\n - only alphanumeric characters and \"_\""
-                                                        "\n - should not be longer than 31 characters"));
+   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                        "Name"),
+                                                     static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "Symbolic bus name. Unique within Network Topology.\n"
+                                                                             "\nC naming conventions must be followed:"
+                                                                             "\n - must not be empty"
+                                                                             "\n - must not start with digits"
+                                                                             "\n - only alphanumeric characters and \"_\""
+                                                                             "\n - should not be longer than %1 (= project setting) characters")).arg(
+                                                        C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this bus."));
    this->mpc_Ui->pc_LabelBusId->SetToolTipInformation(C_GtGetText::h_GetText("Bus ID"),
@@ -139,6 +160,11 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
                                                                "Bus ID is not relevant when the option "
                                                                "\"Usable for Routing\" is disabled. \nUniqueness check "
                                                                "is also disabled in this state."));
+   this->mpc_Ui->pc_LabelCANFDBitRate->SetToolTipInformation(C_GtGetText::h_GetText("CAN FD Bitrate"),
+                                                             C_GtGetText::h_GetText("CAN FD bus bitrate"));
+   this->mpc_Ui->pc_CheckBoxEnableCANFD->SetToolTipInformation(C_GtGetText::h_GetText("Usable for Enabling CAN FD"),
+                                                               C_GtGetText::h_GetText(
+                                                                  "If disabled, the bus is no more support CAN FD."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,6 +229,20 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
                  &C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed);
       disconnect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::toggled, this,
                  &C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged);
+      if (this->mpc_Ui->pc_CheckBoxEnableCANFD->isVisible())
+      {
+         disconnect(this->mpc_Ui->pc_ComboBoxCANFDBitRate, static_cast<void (QComboBox::*)(
+                                                                          int32_t)>(&C_OgeCbxText::currentIndexChanged),
+                    this,
+                    &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
+         disconnect(this->mpc_Ui->pc_ComboBoxCANFDBitRate, &C_OgeCbxText::SigErrorFixed, this,
+                    &C_SdBueBusEditPropertiesWidget::m_CanFdBitrateFixed);
+         disconnect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::stateChanged, this,
+                    &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
+         disconnect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::toggled, this,
+                    &C_SdBueBusEditPropertiesWidget::m_HandleEnableCanFdChange);
+      }
+      //lint -e{929} Cast required to avoid ambiguous signal of qt interface
 
       //name
       this->mpc_Ui->pc_LineEditBusName->setText(pc_Bus->c_Name.c_str());
@@ -219,15 +259,23 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
          std::vector<uint32_t> c_ConnectedNodes;
          std::vector<uint32_t> c_ConnectedInterfaces;
          std::vector<uint32_t> c_SupportedBitrates;
+         std::vector<uint32_t> c_SupportedCanFdBitrates;
          uint32_t u32_BitrateCounter;
          const uint32_t u32_CurrentSetBitrate = static_cast<uint32_t>(pc_Bus->u64_BitRate / 1000ULL);
          const QString c_CurrentSetBitrate = this->m_GetComboBoxString(u32_CurrentSetBitrate);
          bool q_CurrentSetBitrateFound = false;
+         const uint32_t u32_CurrentSetCanFdBitrate = static_cast<uint32_t>(pc_Bus->u64_CanFdBitRate / 1000ULL);
+         const QString c_CurrentSetCanFdBitrate = this->m_GetComboBoxString(u32_CurrentSetCanFdBitrate);
 
          C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
                                                                                             c_ConnectedNodes,
                                                                                             c_ConnectedInterfaces);
          C_PuiSdHandler::h_GetInstance()->GetSupportedCanBitrates(c_ConnectedNodes, c_SupportedBitrates);
+         C_PuiSdHandler::h_GetInstance()->GetSupportedCanFdBitrates(c_ConnectedNodes, c_SupportedCanFdBitrates);
+
+         const bool q_IsCanFdSupported = C_PuiSdHandler::h_GetInstance()->NodeSupportsCanFd(c_ConnectedNodes,
+                                                                                            c_ConnectedInterfaces);
+         const bool q_UseCanFd = (q_IsCanFdSupported && pc_Bus->q_UseCanFd);
 
          //Fill combo box
          for (u32_BitrateCounter = 0U; u32_BitrateCounter < c_SupportedBitrates.size(); ++u32_BitrateCounter)
@@ -275,9 +323,75 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
             }
             this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
          }
+         this->mpc_Ui->pc_CheckBoxEnableCANFD->setChecked(q_UseCanFd);
+         this->m_UpdateEnableCanFd(q_UseCanFd);
+
+         //Fill CAN FD combo box
+         if (this->mpc_Ui->pc_CheckBoxEnableCANFD->isVisible())
+         {
+            bool q_CurrentSetCanFdBitrateFound = false;
+            for (u32_BitrateCounter = 0U; u32_BitrateCounter < c_SupportedCanFdBitrates.size(); ++u32_BitrateCounter)
+            {
+               this->mpc_Ui->pc_ComboBoxCANFDBitRate->addItem(this->m_GetComboBoxString(c_SupportedCanFdBitrates[
+                                                                                           u32_BitrateCounter]));
+               if (c_SupportedCanFdBitrates[u32_BitrateCounter] == u32_CurrentSetCanFdBitrate)
+               {
+                  q_CurrentSetCanFdBitrateFound = true;
+               }
+            }
+            if (q_CurrentSetCanFdBitrateFound == true)
+            {
+               this->mpc_Ui->pc_ComboBoxCANFDBitRate->setCurrentText(c_CurrentSetCanFdBitrate);
+               mu32_CurrentCanFdComboBoxIndex = this->mpc_Ui->pc_ComboBoxCANFDBitRate->currentIndex();
+            }
+            else
+            {
+               // Error case
+               this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetTemporaryText(c_CurrentSetCanFdBitrate, true);
+            }
+            if (q_CurrentSetCanFdBitrateFound == true)
+            {
+               this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                            C_GtGetText::h_GetText(""),
+                                                                            C_NagToolTip::eDEFAULT);
+            }
+            else
+            {
+               if (q_UseCanFd)
+               {
+                  QString c_Content;
+                  const QString c_Heading = C_GtGetText::h_GetText(
+                     "Selected bitrate not supported by following connected nodes:");
+                  std::vector<QString> c_InvalidNodesForCanFdBitRate;
+                  C_PuiSdHandler::h_GetInstance()->CheckBusConflictDetailed(this->mu32_BusIndex, NULL, NULL, NULL,
+                                                                            &c_InvalidNodesForCanFdBitRate, NULL);
+                  for (uint32_t u32_ItNode = 0UL; (u32_ItNode < c_InvalidNodesForCanFdBitRate.size()) &&
+                       (u32_ItNode < mu32_TOOL_TIP_MAXIMUM_ITEMS); ++u32_ItNode)
+                  {
+                     c_Content += "- " + c_InvalidNodesForCanFdBitRate[u32_ItNode] + "\n";
+                  }
+                  if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidNodesForCanFdBitRate.size())
+                  {
+                     c_Content += static_cast<QString>("+%1\n").arg(
+                        static_cast<uint32_t>(c_InvalidNodesForCanFdBitRate.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  }
+                  this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetToolTipInformation(c_Heading, c_Content,
+                                                                               C_NagToolTip::eERROR);
+               }
+            }
+            if (!q_UseCanFd)
+            {
+               this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetTemporaryText(" ", false);
+            }
+         }
 
          this->mpc_Ui->pc_ComboBoxBitRate->setVisible(true);
          this->mpc_Ui->pc_LabelBitRate->setVisible(true);
+         if (this->mpc_Ui->pc_CheckBoxEnableCANFD->isVisible())
+         {
+            this->mpc_Ui->pc_ComboBoxCANFDBitRate->setVisible(true);
+            this->mpc_Ui->pc_LabelCANFDBitRate->setVisible(true);
+         }
       }
       else
       {
@@ -287,6 +401,15 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
 
          this->mpc_Ui->pc_ComboBoxBitRate->setVisible(false);
          this->mpc_Ui->pc_LabelBitRate->setVisible(false);
+
+         if (this->mpc_Ui->pc_CheckBoxEnableCANFD->isVisible())
+         {
+            this->mpc_Ui->pc_ComboBoxCANFDBitRate->addItem(this->m_GetComboBoxString(1000));
+            this->mpc_Ui->pc_ComboBoxCANFDBitRate->setCurrentIndex(0);
+
+            this->mpc_Ui->pc_ComboBoxCANFDBitRate->setVisible(false);
+            this->mpc_Ui->pc_LabelCANFDBitRate->setVisible(false);
+         }
       }
 
       //Picture / text
@@ -299,7 +422,6 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
       {
          this->mpc_Ui->pc_LabBusImage->SetSvg("://images/system_definition/BusEdit/ImageBusEth.svg");
       }
-
       // Usable for Routing
       this->mpc_Ui->pc_CheckBoxUsableForRouting->setChecked(pc_Bus->q_UseableForRouting);
       this->m_UpdateUsableForRoutingUi(!pc_Bus->q_UseableForRouting);
@@ -323,6 +445,18 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
               &C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed);
       connect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::toggled, this,
               &C_SdBueBusEditPropertiesWidget::m_HandleUsableForRoutingEnableChanged);
+      if (this->mpc_Ui->pc_CheckBoxEnableCANFD->isVisible())
+      {
+         connect(this->mpc_Ui->pc_ComboBoxCANFDBitRate, static_cast<void (QComboBox::*)(
+                                                                       int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
+                 &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
+         connect(this->mpc_Ui->pc_ComboBoxCANFDBitRate, &C_OgeCbxText::SigErrorFixed, this,
+                 &C_SdBueBusEditPropertiesWidget::m_CanFdBitrateFixed);
+         connect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::stateChanged, this,
+                 &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
+         connect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::toggled, this,
+                 &C_SdBueBusEditPropertiesWidget::m_HandleEnableCanFdChange);
+      }
    }
 }
 
@@ -332,6 +466,17 @@ void C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed(void) const
    this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
                                                            C_GtGetText::h_GetText(""),
                                                            C_NagToolTip::eDEFAULT);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  CANFD bitrate fixed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditPropertiesWidget::m_CanFdBitrateFixed() const
+{
+   this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                C_GtGetText::h_GetText(""),
+                                                                C_NagToolTip::eDEFAULT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -407,6 +552,48 @@ bool C_SdBueBusEditPropertiesWidget::m_ConfirmDisableRouting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update the GUI when the user modifies the "Enable CAN FD"
+
+   \param[in]       oq_Enabled     True / False
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditPropertiesWidget::m_UpdateEnableCanFd(const bool oq_Enabled)
+{
+   // CAN FD Bitrate is modified accordingly
+   this->mpc_Ui->pc_ComboBoxCANFDBitRate->setEnabled(oq_Enabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save data after change in Enable CAN FD Checkbox
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange()
+{
+   SaveToData();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle "Enable CAN FD" state of the bus
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditPropertiesWidget::m_HandleEnableCanFdChange()
+{
+   const bool q_IsEnabled = this->mpc_Ui->pc_CheckBoxEnableCANFD->isChecked();
+
+   if (q_IsEnabled)
+   {
+      this->mpc_Ui->pc_ComboBoxCANFDBitRate->setCurrentIndex(mu32_CurrentCanFdComboBoxIndex);
+      this->mpc_Ui->pc_ComboBoxCANFDBitRate->setEnabled(true);
+   }
+   else
+   {
+      mu32_CurrentCanFdComboBoxIndex = this->mpc_Ui->pc_ComboBoxCANFDBitRate->currentIndex();
+      this->mpc_Ui->pc_ComboBoxCANFDBitRate->SetTemporaryText(" ", false);
+      this->mpc_Ui->pc_ComboBoxCANFDBitRate->setEnabled(q_IsEnabled);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save ui data to bus
 
    Is called from outside
@@ -453,15 +640,25 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
             static_cast<uint64_t>(this->m_GetBitrateFromComboBoxString(this->mpc_Ui->pc_ComboBoxBitRate->currentText()))
             *
             1000ULL;
+         // CAN FD Bitrate is shown as kbit/s
+         c_NewBus.u64_CanFdBitRate =
+            static_cast<uint64_t>(this->m_GetBitrateFromComboBoxString(this->mpc_Ui->pc_ComboBoxCANFDBitRate->
+                                                                       currentText()))
+            *
+            1000ULL;
       }
       else
       {
          // As dummy
          c_NewBus.u64_BitRate = 1000000ULL;
+         c_NewBus.u64_CanFdBitRate = 1000000ULL;
       }
 
       // Usable for Routing
       c_NewBus.q_UseableForRouting = this->mpc_Ui->pc_CheckBoxUsableForRouting->isChecked();
+
+      // Enable/Disable CAN FD
+      c_NewBus.q_UseCanFd = this->mpc_Ui->pc_CheckBoxEnableCANFD->isChecked();
 
       //save new bus
       C_PuiSdHandler::h_GetInstance()->SetOscBus(this->mu32_BusIndex, c_NewBus);

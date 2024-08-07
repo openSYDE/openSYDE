@@ -165,16 +165,19 @@ public:
                                    uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsySetBitrate(const C_OscProtocolDriverOsyNode & orc_ServerId, const uint8_t ou8_ChannelIndex,
                              const uint32_t ou32_Bitrate, uint8_t * const opu8_NrCode = NULL) const;
-   int32_t SendOsySetIpAddressForChannel(C_OscProtocolDriverOsy & orc_Protocol, const uint8_t ou8_ChannelIndex,
-                                         const uint8_t (&orau8_IpAddress)[4], const uint8_t (&orau8_NetMask)[4],
-                                         const uint8_t (&orau8_DefaultGateway)[4], uint8_t * const opu8_NrCode = NULL);
+   static int32_t h_SendOsySetIpAddressForChannel(C_OscProtocolDriverOsy & orc_Protocol, const uint8_t ou8_ChannelIndex,
+                                                  const uint8_t (&orau8_IpAddress)[4],
+                                                  const uint8_t (&orau8_NetMask)[4],
+                                                  const uint8_t (&orau8_DefaultGateway)[4],
+                                                  uint8_t * const opu8_NrCode = NULL);
    int32_t SendOsySetIpAddressForChannel(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                          const uint8_t ou8_ChannelIndex, const uint8_t (&orau8_IpAddress)[4],
                                          const uint8_t (&orau8_NetMask)[4], const uint8_t (&orau8_DefaultGateway)[4],
                                          uint8_t * const opu8_NrCode = NULL);
-   int32_t SendOsySetNodeIdForChannel(C_OscProtocolDriverOsy & orc_Protocol, const uint8_t ou8_ChannelType,
-                                      const uint8_t ou8_ChannelIndex, const C_OscProtocolDriverOsyNode & orc_NewNodeId,
-                                      uint8_t * const opu8_NrCode = NULL);
+   static int32_t h_SendOsySetNodeIdForChannel(C_OscProtocolDriverOsy & orc_Protocol, const uint8_t ou8_ChannelType,
+                                               const uint8_t ou8_ChannelIndex,
+                                               const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+                                               uint8_t * const opu8_NrCode = NULL);
    int32_t SendOsySetNodeIdForChannel(const C_OscProtocolDriverOsyNode & orc_ServerId, const uint8_t ou8_ChannelType,
                                       const uint8_t ou8_ChannelIndex, const C_OscProtocolDriverOsyNode & orc_NewNodeId,
                                       uint8_t * const opu8_NrCode = NULL);

@@ -156,7 +156,8 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeViewToolTipBase::C_OgeTreeViewToolTipBase(QWidget * const opc_Parent) :
-   QTreeView(opc_Parent)
+   QTreeView(opc_Parent),
+   C_OgeTreeToolTipBase()
 {
    this->setMouseTracking(true);
 }

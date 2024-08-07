@@ -43,7 +43,9 @@ using namespace stw::opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiInteractionPoint::C_GiLiInteractionPoint(const int32_t & ors32_PointIndex, QGraphicsItem * const opc_Parent) :
+   QObject(),
    C_GiPointInteraction(opc_Parent),
+   C_GiBiCustomMouseItem(),
    ms32_PointIndex(ors32_PointIndex)
 {
    this->setFlag(ItemIsMovable);

@@ -413,13 +413,11 @@ void C_SdNdeCoManagerIntfWidget::m_HandleSameAsOpensydeNodeIdState(void) const
    {
       //get current node ID of node interface
       const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
-
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
          const C_OscNodeComInterfaceSettings * const pc_ComInterface = pc_Node->c_Properties.GetComInterface(
             C_OscSystemBus::eCAN, this->mu8_InterfaceId);
-
          tgl_assert(pc_ComInterface != NULL);
          if (pc_ComInterface != NULL)
          {

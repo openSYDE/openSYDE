@@ -154,6 +154,7 @@ void C_SebUtil::h_AddLineOffset(C_PuiBsLineBase & orc_LineBase, const QPointF & 
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SebUtil::C_SebUtil()
+C_SebUtil::C_SebUtil() :
+   QObject()
 {
 }

@@ -16,24 +16,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,1">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>3</number>
-   </property>
-   <property name="rightMargin">
-    <number>20</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -128,6 +113,9 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,1">
          <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -343,6 +331,22 @@ p, li { white-space: pre-wrap; }
            <property name="verticalSpacing">
             <number>10</number>
            </property>
+           <item row="2" column="1">
+            <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxBitRate">
+             <property name="minimumSize">
+              <size>
+               <width>160</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>160</width>
+               <height>30</height>
+              </size>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0" colspan="3">
             <widget class="stw::opensyde_gui_elements::C_OgeChxPropertiesSmall" name="pc_CheckBoxUsableForRouting">
              <property name="maximumSize">
@@ -353,25 +357,6 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="text">
               <string>Usable for Routing</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelBusId">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>31</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>31</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Bus ID</string>
              </property>
             </widget>
            </item>
@@ -391,22 +376,6 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="text">
               <string>Bitrate</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxBitRate">
-             <property name="minimumSize">
-              <size>
-               <width>160</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>160</width>
-               <height>30</height>
-              </size>
              </property>
             </widget>
            </item>
@@ -456,6 +425,25 @@ p, li { white-space: pre-wrap; }
              </item>
             </layout>
            </item>
+           <item row="1" column="0">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelBusId">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>31</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>31</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Bus ID</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="2">
             <spacer name="horizontalSpacer_19">
              <property name="orientation">
@@ -482,7 +470,7 @@ p, li { white-space: pre-wrap; }
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>10</height>
+             <height>13</height>
             </size>
            </property>
           </spacer>
@@ -630,12 +618,151 @@ p, li { white-space: pre-wrap; }
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>40</height>
+             <height>13</height>
             </size>
            </property>
           </spacer>
          </item>
         </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelCANFD">
+         <property name="text">
+          <string>CAN FD</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>1</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="pc_gridLayoutCANFD">
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="horizontalSpacing">
+        <number>25</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>10</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCANFDBitRate">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>CAN FD BitRate</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxCANFDBitRate">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>160</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="3">
+        <widget class="stw::opensyde_gui_elements::C_OgeChxPropertiesSmall" name="pc_CheckBoxEnableCANFD">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Enable CAN FD</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>

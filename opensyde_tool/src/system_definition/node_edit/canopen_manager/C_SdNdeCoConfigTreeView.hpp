@@ -75,6 +75,8 @@ Q_SIGNALS:
    void SigCommDatapoolsChanged(void);
    void SigOpenOverview(void) const;
    void SigErrorChange(void) const;
+   void SigNodeIdToBeChanged(uint32_t ou32_NodeIndex);
+   void SigNodeIdToBeChangedWithInterfaceIndex(uint32_t ou32_NodeIndex, uint32_t ou32_InterfaceIndex);
 
 protected:
    void selectionChanged(const QItemSelection & orc_SelectedItems, const QItemSelection & orc_DeselectedItems) override;

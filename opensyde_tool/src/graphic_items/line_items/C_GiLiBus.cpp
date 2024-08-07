@@ -56,6 +56,7 @@ C_GiLiBus::C_GiLiBus(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                      QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(opc_Points, orq_MiddleLine, opc_Parent),
    C_PuiSdDataElement(ors32_Index, C_PuiSdDataElement::eBUS),
+   C_GiBiCustomToolTip(),
    C_GiUnique(oru64_Id),
    mpc_TextElementName(opc_TextElementName)
 {

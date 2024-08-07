@@ -51,6 +51,7 @@ private:
 
    Ui::C_SdBueBusEditPropertiesWidget * mpc_Ui;
    uint32_t mu32_BusIndex;
+   uint32_t mu32_CurrentCanFdComboBoxIndex;
 
    QString m_GetComboBoxString(const uint32_t ou32_Bitrate) const;
    uint32_t m_GetBitrateFromComboBoxString(const QString & orc_Entry) const;
@@ -63,9 +64,13 @@ private:
    void m_RegisterIdChange(void);
    void m_LoadFromData(void);
    void m_CanBitrateFixed(void) const;
+   void m_CanFdBitrateFixed(void) const;
    void m_HandleUsableForRoutingEnableChanged();
    void m_UpdateUsableForRoutingUi(const bool oq_Enabled);
    bool m_ConfirmDisableRouting();
+   void m_UpdateEnableCanFd(const bool oq_Enabled);
+   void m_RegisterCanFdChange(void);
+   void m_HandleEnableCanFdChange(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

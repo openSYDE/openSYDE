@@ -47,6 +47,7 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableDelegate::C_SyvDaPeUpdateModeTableDelegate(const uint32_t ou32_ViewIndex) :
+   QStyledItemDelegate(),
    mu32_ViewIndex(ou32_ViewIndex)
 {
 }

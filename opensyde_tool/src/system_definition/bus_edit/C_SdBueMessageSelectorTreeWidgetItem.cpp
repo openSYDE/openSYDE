@@ -36,6 +36,7 @@ using namespace stw::opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorTreeWidgetItem::C_SdBueMessageSelectorTreeWidgetItem(const bool & orq_IsMessage) :
+   QObject(),
    QTreeWidgetItem(),
    mq_IsMessage(orq_IsMessage),
    mq_HasError(false),

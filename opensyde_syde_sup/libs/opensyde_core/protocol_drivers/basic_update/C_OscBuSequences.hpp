@@ -38,7 +38,11 @@ public:
                       const uint32_t ou32_TransferDataTimeout);
    int32_t ResetSystem(void);
 
+   static int32_t h_ReadHexFile(const stw::scl::C_SclString & orc_HexFilePath, C_OscHexFile & orc_HexFile,
+                                uint32_t & oru32_SignatureBlockAddress);
+
 protected:
+   virtual void m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage);
    virtual void m_ReportProgress(const int32_t os32_Result, const stw::scl::C_SclString & orc_Information);
    virtual void m_ReportFlashloaderInformationRead(const stw::scl::C_SclString & orc_DeviceName,
                                                    const C_OscComFlashloaderInformation & orc_Information);
@@ -50,9 +54,6 @@ private:
    stw::opensyde_core::C_OscProtocolDriverOsy mc_OsyProtocol;
 
    int32_t ms32_CanBitrate; // CAN bitrate in kBit/s
-
-   static int32_t mh_ReadHexFile(const stw::scl::C_SclString & orc_HexFilePath, C_OscHexFile & orc_HexFile,
-                                 uint32_t & oru32_SignatureBlockAddress);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -605,6 +605,34 @@ bool C_OscCanMessageContainer::CheckMinSignalError() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscCanMessageContainer::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                                      std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItTxMsg = 0UL; u32_ItTxMsg < this->c_TxMessages.size(); ++u32_ItTxMsg)
+   {
+      C_OscCanMessage & rc_TxMsg = this->c_TxMessages[u32_ItTxMsg];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "tx-message-name",
+                                                                                rc_TxMsg.c_Name,
+                                                                                opc_ChangedItems);
+   }
+   for (uint32_t u32_ItRxMsg = 0UL; u32_ItRxMsg < this->c_RxMessages.size(); ++u32_ItRxMsg)
+   {
+      C_OscCanMessage & rc_RxMsg = this->c_RxMessages[u32_ItRxMsg];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "rx-message-name",
+                                                                                rc_RxMsg.c_Name,
+                                                                                opc_ChangedItems);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check min signal error per vector
 
    \param[in]  orc_Messages   Messages

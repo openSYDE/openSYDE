@@ -1075,8 +1075,10 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
       //Remove multiplex information
       if (orc_Signal.e_MultiplexerType != C_OscCanSignal::eMUX_DEFAULT)
       {
-         c_Info.append(C_GtGetText::h_GetText("Multiplex information removed from signal because this is not supported "
-                                              "in ECeS/ECoS protocols."));
+         c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                               "Multiplex information removed from signal \"%1\" because this is not supported "
+                                               "in ECeS/ECoS protocols.")).arg(orc_SignalListElement
+                                                                               .c_Name.c_str()));
          orc_Signal.e_MultiplexerType = C_OscCanSignal::eMUX_DEFAULT;
          orc_Signal.u16_MultiplexValue = 0U;
       }
@@ -1086,9 +1088,10 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
       {
          if (orc_Signal.u16_ComBitStart >= mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX)
          {
-            c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
-                                                                      "of reserved bytes in ECeS protocol.")).
-                          arg(orc_Signal.u16_ComBitStart));
+            c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                  "Start bit of signal \"%1\" set from %2 to 0 because "
+                                                  "of reserved bytes in ECeS protocol.")).
+                          arg(orc_SignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitStart));
             orc_Signal.u16_ComBitStart = 0;
          }
       }
@@ -1096,41 +1099,54 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
 
    if (orc_Signal.u16_ComBitStart >= mu16_SIGNAL_BIT_MAX)
    {
-      c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
+      c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal \"%1\" set from %2 to 0 because "
                                                                 "of CAN message limits.")).
-                    arg(orc_Signal.u16_ComBitStart));
+                    arg(orc_SignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitStart));
       orc_Signal.u16_ComBitStart = 0;
    }
 
    if (orc_Signal.u16_ComBitLength > mu16_SIGNAL_BIT_MAX)
    {
-      c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Bit length of signal set from %1 to %2 because "
+      c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Bit length of signal \"%1\" set from %2 to %3 because "
                                                                 "of CAN message limits.")).
-                    arg(orc_Signal.u16_ComBitLength).arg(mu16_SIGNAL_BIT_MAX));
+                    arg(orc_SignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitLength).arg(mu16_SIGNAL_BIT_MAX));
       orc_Signal.u16_ComBitLength = mu16_SIGNAL_BIT_MAX;
    }
 
    if (oe_Type == C_OscCanProtocol::eJ1939)
    {
-      // J1939 supports only Intel byte order
-      orc_Signal.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
+      const QString c_PrevType = C_SdNdeDpUtil::h_ConvertContentTypeToString(orc_SignalListElement.GetType());
+      bool q_TypeChanged = false;
+      if (orc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_MOTOROLA)
+      {
+         c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                               "Byte order of signal \"%1\" set from motorola to intel because "
+                                               "of j1939 protocol restrictions.")).arg(
+                          orc_SignalListElement.c_Name.c_str()));
+         // J1939 supports only Intel byte order
+         orc_Signal.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
+      }
 
       // Only unsigned allowed
       // But keep the size of the element
       switch (orc_SignalListElement.GetType())
       {
       case C_OscNodeDataPoolContent::eSINT8:
+         q_TypeChanged = true;
          orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT8);
          break;
       case C_OscNodeDataPoolContent::eSINT16:
+         q_TypeChanged = true;
          orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT16);
          break;
       case C_OscNodeDataPoolContent::eSINT32:
       case C_OscNodeDataPoolContent::eFLOAT32:
+         q_TypeChanged = true;
          orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT32);
          break;
       case C_OscNodeDataPoolContent::eSINT64:
       case C_OscNodeDataPoolContent::eFLOAT64:
+         q_TypeChanged = true;
          orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT64);
          break;
       case C_OscNodeDataPoolContent::eUINT8:  // Nothing to do for unsigned
@@ -1139,6 +1155,15 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
       case C_OscNodeDataPoolContent::eUINT64: // Nothing to do for unsigned
       default:
          break;
+      }
+      if (q_TypeChanged)
+      {
+         c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                               "Data type of signal \"%1\" set from %2 to %3 because "
+                                               "of j1939 protocol restrictions.")).
+                       arg(orc_SignalListElement.c_Name.c_str()).arg(c_PrevType).arg(C_SdNdeDpUtil::
+                                                                                     h_ConvertContentTypeToString(
+                                                                                        orc_SignalListElement.GetType())));
       }
    }
 
@@ -2546,6 +2571,68 @@ QString C_SdUtil::h_GetCanOpenSignalObjectIndex(const uint32_t ou32_ObjectIndex,
    const QString c_Retval = static_cast<QString>("%1sub%2").arg(c_ObjectIndexString).arg(c_ObjectSubIndexString);
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Node change on user request
+
+   \param[in] ou32_NodeIndex         index of selected node
+   \param[in] ou32_InterfaceIndex    index of interface for selected node
+   \param[in] opc_Parent             Parent for message box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::h_NodeIdToBeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                   QWidget * const opc_Parent)
+{
+   C_OscNode * const pc_CurrentNode = C_PuiSdHandler::h_GetInstance()->GetOscNode(ou32_NodeIndex);
+
+   tgl_assert(pc_CurrentNode != NULL);
+
+   if (pc_CurrentNode != NULL)
+   {
+      const C_OscNodeComInterfaceSettings * const pc_ComInterface = pc_CurrentNode->c_Properties.GetComInterface(
+         C_OscSystemBus::E_Type::eCAN, static_cast<uint8_t>(ou32_InterfaceIndex));
+      tgl_assert(pc_ComInterface != NULL);
+      if (pc_ComInterface != NULL)
+      {
+         if (pc_ComInterface->u8_NodeId == 0)
+         {
+            const std::vector<uint32_t> c_UsedProperties = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(
+               pc_ComInterface->u32_BusIndex, -1, -1);
+            C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
+            const uint32_t u32_NewNodeId = C_SdUtil::h_GetNextFreeNodeProperty(
+               pc_CurrentNode->c_Properties.c_ComInterfaces,
+               c_UsedProperties,
+               -1,
+               true);
+            QString c_Details;
+            c_Details.append(static_cast<QString>(
+                                "Node : %1\nInterface : %2\nCurrent Node ID : %3\nNext valid Node ID : %4").arg(
+                                pc_CurrentNode->c_Properties.c_Name.c_str()).arg(C_PuiSdUtil::h_GetInterfaceName(
+                                                                                    pc_ComInterface->e_InterfaceType,
+                                                                                    static_cast<uint8_t>(
+                                                                                       ou32_InterfaceIndex))).arg(
+                                pc_ComInterface->u8_NodeId).arg(u32_NewNodeId));
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("New Node ID"));
+            c_MessageBox.SetDescription(static_cast<QString>(
+                                           "Node ID 0 is not supported by CANopen protocol. "
+                                           "Do you want to change the Node ID to the next valid %1 "
+                                           "and continue?").arg(u32_NewNodeId));
+            c_MessageBox.SetDetails(c_Details);
+            c_MessageBox.SetOkButtonText("Continue");
+            c_MessageBox.SetNoButtonText("Cancel");
+            c_MessageBox.SetCustomMinHeight(220, 350);
+
+            if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
+            {
+               C_OscNodeProperties c_CurrentNodeProperties = pc_CurrentNode->c_Properties;
+               c_CurrentNodeProperties.c_ComInterfaces.at(ou32_InterfaceIndex).u8_NodeId =
+                  static_cast<uint8_t>(u32_NewNodeId);
+               C_PuiSdHandler::h_GetInstance()->SetOscNodeProperties(ou32_NodeIndex, c_CurrentNodeProperties);
+            }
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

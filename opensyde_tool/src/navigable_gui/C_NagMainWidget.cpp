@@ -39,6 +39,7 @@
 #include "C_GiSyColorSelectWidget.hpp"
 #include "C_PopCreateServiceProjDialogWidget.hpp"
 #include "C_PopPasswordDialogWidget.hpp"
+#include "C_NagCharLengthSettingPopupDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -94,6 +95,8 @@ C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_LineEditVersion, &C_OgeLeDark::editingFinished, this, &C_NagMainWidget::m_OnEditFinished);
    connect(this->mpc_Ui->pc_BtnClear, &C_OgePubIconOnly::clicked, this, &C_NagMainWidget::m_OnClear);
    connect(this->mpc_Ui->pc_TableView, &C_PopFileTableView::clicked, this, &C_NagMainWidget::m_OnIndexClicked);
+   connect(this->mpc_Ui->pc_BtnNameMaxCharLengthSettings, &QPushButton::clicked, this,
+           &C_NagMainWidget::m_SetNameStringLength);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -206,6 +209,14 @@ void C_NagMainWidget::InitText(void) const
                                                    C_GtGetText::h_GetText(
                                                       "Edit version of your project. \nThis version "
                                                       "number gets saved on next project save."));
+
+   //NameMaxCharLengthSettings
+   this->mpc_Ui->pc_BtnNameMaxCharLengthSettings->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                           "Global Project Settings"),
+                                                                        C_GtGetText::h_GetText(
+                                                                           "In Global Project Settings define global "
+                                                                           "project settings like maximum length of the "
+                                                                           "openSYDE element names.)"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -466,6 +477,7 @@ void C_NagMainWidget::HandleServiceMode(void) const
    this->mpc_Ui->pc_BtnEdit->setEnabled(!q_ServiceMode);
    this->mpc_Ui->pc_BtnCreateServiceProj->setEnabled(!q_ServiceMode);
    this->mpc_Ui->pc_BtnSaveProjAs->setEnabled(!q_ServiceMode);
+   this->mpc_Ui->pc_BtnNameMaxCharLengthSettings->setEnabled(!q_ServiceMode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -541,6 +553,13 @@ void C_NagMainWidget::m_InitIcons(void) const
    // clear button
    this->mpc_Ui->pc_BtnClear->setIcon(QIcon("://images/main_page_and_navi_bar/Icon_clear_table.svg"));
    this->mpc_Ui->pc_BtnClear->setIconSize(mc_ICON_SIZE_24);
+
+   //NameMaxCharLengthSettings button
+   this->mpc_Ui->pc_BtnNameMaxCharLengthSettings->setIconSize(mc_ICON_SIZE_24);
+   this->mpc_Ui->pc_BtnNameMaxCharLengthSettings->SetCustomIcons("://images/main_page_and_navi_bar/GlobalSettings.svg",
+                                                                 "",
+                                                                 "",
+                                                                 "://images/main_page_and_navi_bar/GlobalSettingsDisabled.svg");
 
    // settings (no icon -> less padding on right side)
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BtnAbout, "NoIcon", true);
@@ -982,3 +1001,28 @@ void C_NagMainWidget::m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion)
    }
    Q_EMIT (this->SigOtherProjectLoaded(false));
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get Maximum char length for the name from user and set it
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::m_SetNameStringLength()
+{
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+
+   C_NagCharLengthSettingPopupDialog * const pc_Dialog = new C_NagCharLengthSettingPopupDialog(*c_New);
+
+   c_New->SetSize(QSize(890, 400));
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      if (pc_Dialog->ApplyMaxCharLimitSettings())
+      {
+         Q_EMIT SigMaxCharLimitAccepted();
+      }
+   }
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+      c_New->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management

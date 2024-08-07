@@ -42,7 +42,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubColor::C_OgePubColor(QWidget * const opc_Parent) :
-   QPushButton(opc_Parent)
+   QPushButton(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

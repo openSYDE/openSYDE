@@ -34,7 +34,9 @@ using namespace stw::opensyde_gui_logic;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_TblTreMultiColumnLeafSortFilter::C_TblTreMultiColumnLeafSortFilter()
+C_TblTreMultiColumnLeafSortFilter::C_TblTreMultiColumnLeafSortFilter() :
+   C_TblTreDataElementSortFilter()
+
 {
 }
 

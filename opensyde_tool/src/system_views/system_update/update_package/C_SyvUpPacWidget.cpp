@@ -12,17 +12,22 @@
 #include "ui_C_SyvUpPacWidget.h"
 
 #include "stwerrors.hpp"
+#include "constants.hpp"
 
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_GtGetText.hpp"
-#include "constants.hpp"
 #include "C_PuiSvHandler.hpp"
+#include "C_SyvUpPacServiceUpdatePackageDialog.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SyvUpPacSecureArchiveDialog.hpp"
+#include "C_SclString.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -379,45 +384,118 @@ void C_SyvUpPacWidget::m_ButtonExport(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::m_ButtonCreatePackage(void) const
+void C_SyvUpPacWidget::m_ButtonCreatePackage(void)
 {
    bool q_SaveAsFile = true;
-   bool q_Continue = true;
+   bool q_Continue = false;
+   bool q_SecureFile = false;
 
-   C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_ListWidget, C_OgeWiCustomMessage::E_Type::eQUESTION);
+   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
+   C_SyvUpPacServiceUpdatePackageDialog * const pc_ServiceUpdatePackageDialog =
+      new C_SyvUpPacServiceUpdatePackageDialog(*c_PopUpDialog);
 
-   c_Message.SetHeading(C_GtGetText::h_GetText("Save Service Update Package"));
-   c_Message.SetDescription(C_GtGetText::h_GetText(
-                               "Do you want to save your Service Update Package as .syde_sup archive file or un-zipped to a directory?"));
-   c_Message.SetOkButtonText(C_GtGetText::h_GetText("Archive"));
-   c_Message.SetNoButtonText(C_GtGetText::h_GetText("Directory"));
-   c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-   c_Message.SetDetails(
-      "Saving to a directory means, that all files which are part of the Service Update Package are not zipped into a .syde_sup file.");
-   c_Message.SetCustomMinHeight(200, 250);
+   //Resize
+   c_PopUpDialog->SetSize(QSize(700, 400));
 
-   switch (c_Message.Execute())
+   Q_UNUSED(pc_ServiceUpdatePackageDialog)
+
+   // "Continue" clicked
+   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
-   case C_OgeWiCustomMessage::eOK:
-      q_SaveAsFile = true;
       q_Continue = true;
-      break;
-   case C_OgeWiCustomMessage::eNO:
-      q_SaveAsFile = false;
-      q_Continue = true;
-      break;
-   case C_OgeWiCustomMessage::eCANCEL:
+      const C_SyvUpPacServiceUpdatePackageDialog::E_PackageType e_Type =
+         pc_ServiceUpdatePackageDialog->GetSelectedOption();
+      switch (e_Type)
+      {
+      case C_SyvUpPacServiceUpdatePackageDialog::eDIRECTORY:
+         q_SaveAsFile = false;
+         break;
+      case C_SyvUpPacServiceUpdatePackageDialog::eSECURE_ARCHIVE:
+         q_SaveAsFile = true;
+         q_SecureFile = true;
+         break;
+      case C_SyvUpPacServiceUpdatePackageDialog::eARCHIVE:
+      default:
+         q_SaveAsFile = true;
+         break;
+      }
+   }
+   else // "Cancel" clicked
+   {
       q_Continue = false;
-      break;
-   default:
-      break;
    }
 
    if (q_Continue)
    {
-      this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile);
+      // Secure archive file
+      if (q_SecureFile == true)
+      {
+         QString c_Password = "";
+         QString c_PrivateKeyPath = "";
+
+         if ((this->m_ShowSecureArchiveFileDialog(c_Password, c_PrivateKeyPath)) == true)
+         {
+            // 1 indicates secure archive file for secure update.
+            // 0 Indicates normal archive file.
+            const std::vector<uint8_t> c_EncryptNodes = {q_SecureFile};
+            const std::vector<C_SclString> c_EncryptNodesPassword = {c_Password.toStdString()};
+            const std::vector<C_SclString> c_PemFilePath = {c_PrivateKeyPath.toStdString()};
+
+            this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile, q_SecureFile, c_EncryptNodes,
+                                                                    c_EncryptNodesPassword, c_EncryptNodes,
+                                                                    c_PemFilePath);
+         }
+      }
+      // Archive file / Directory
+      else
+      {
+         this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile, q_SecureFile);
+      }
    }
-}
+
+   if (c_PopUpDialog != NULL)
+   {
+      c_PopUpDialog->HideOverlay();
+      c_PopUpDialog->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_ServiceUpdatePackageDialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+
+/*! \brief   Shows dialog for creating secure file archive (syde_sup)
+   \return
+    true   Create the secure archive file package
+    false  Otherwise
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpPacWidget::m_ShowSecureArchiveFileDialog(QString & orc_Password, QString & orc_Path)
+{
+   bool q_Return = false;
+   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
+   C_SyvUpPacSecureArchiveDialog * const pc_SecureArchiveDialog =
+      new C_SyvUpPacSecureArchiveDialog(*c_PopUpDialog);
+
+   //Resize
+   c_PopUpDialog->SetSize(QSize(850, 380));
+
+   Q_UNUSED(pc_SecureArchiveDialog)
+
+   // "Create" clicked
+   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      orc_Password = pc_SecureArchiveDialog->GetPassword();
+      orc_Path = pc_SecureArchiveDialog->GetPrivateKeyPath();
+      q_Return = true;
+   }
+
+   if (c_PopUpDialog != NULL)
+   {
+      c_PopUpDialog->HideOverlay();
+      c_PopUpDialog->deleteLater();
+   }
+
+   return q_Return;
+} //lint !e429  //no memory leak because of the parent of pc_ServiceUpdatePackageDialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacWidget::m_UpdateWidget(void)

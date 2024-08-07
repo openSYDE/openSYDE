@@ -47,6 +47,8 @@ public:
    const stw::opensyde_core::C_OscCanOpenManagerDeviceInfo * GetCanOpenManagerDeviceForAnyManager(
       const uint32_t ou32_ManagerNodeIndex, const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceId) const;
 
+   const QString GetBusNameOfConnectedDevice(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber) const;
+
    //CANOpen setter
    int32_t SetCanOpenManagerCommonProperties(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber,
                                              const bool oq_UseOpenSydeNodeId, const uint8_t ou8_NodeIdValue,

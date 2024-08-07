@@ -47,6 +47,7 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSliToolTipBase::C_OgeSliToolTipBase(QWidget * const opc_Parent) :
    QSlider(opc_Parent),
+   C_OgeToolTipBase(),
    mf64_ToolTipSliderRangeOffset(0.0),
    mf64_ToolTipSliderRangeValueFactor(1.0),
    mf64_ToolTipValueOffset(0.0),

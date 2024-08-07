@@ -389,6 +389,38 @@ void C_OscNodeDataPoolList::CheckErrorDataSetValue(const uint32_t & oru32_Elemen
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNodeDataPoolList::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                                   std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                             "node-datapool-list-name",
+                                                                             this->c_Name,
+                                                                             opc_ChangedItems);
+   for (uint32_t u32_ItEl = 0UL; u32_ItEl < this->c_Elements.size(); ++u32_ItEl)
+   {
+      C_OscNodeDataPoolListElement & rc_El = this->c_Elements[u32_ItEl];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "node-datapool-list-element-name",
+                                                                                rc_El.c_Name,
+                                                                                opc_ChangedItems);
+   }
+   for (uint32_t u32_ItDataset = 0UL; u32_ItDataset < this->c_DataSets.size(); ++u32_ItDataset)
+   {
+      C_OscNodeDataPoolDataSet & rc_Dataset = this->c_DataSets[u32_ItDataset];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "node-datapool-list-datset-name",
+                                                                                rc_Dataset.c_Name,
+                                                                                opc_ChangedItems);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set CRC from big endian BLOB
 
    Convert BLOB to CRC.

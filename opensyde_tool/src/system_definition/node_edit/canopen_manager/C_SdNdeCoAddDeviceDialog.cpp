@@ -168,7 +168,6 @@ int32_t C_SdNdeCoAddDeviceDialog::GetNodeSelection(uint32_t & oru32_NodeIndex, u
          s32_Return = C_NO_ERR;
       }
    }
-
    return s32_Return;
 }
 

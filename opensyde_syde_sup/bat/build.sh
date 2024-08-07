@@ -5,6 +5,9 @@
 
 build_only_lint_config=false
 
+# exit with error code if a command fails
+set -e
+
 while getopts ':l' flag; do
  case "$flag" in
     l)
@@ -28,7 +31,7 @@ cd ../temp
 # this step is always needed
 echo "run cmake with toolchain file for 64bit compilation"
 
-cmake ../pjt -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_ubuntu.cmake 
+cmake ../pjt -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_ubuntu.cmake 
 
 # only build the whole thing if no flag was given
 if [ "$build_only_lint_config" = false ] ; then

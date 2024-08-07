@@ -56,6 +56,7 @@ using namespace stw::opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpSequences::C_SyvUpSequences(void) :
+   QObject(),
    C_OscSuSequences(),
    mpc_CanDllDispatcher(NULL),
    mpc_EthernetDispatcher(NULL),

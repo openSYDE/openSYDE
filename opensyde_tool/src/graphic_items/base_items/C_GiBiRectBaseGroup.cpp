@@ -75,7 +75,10 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64_t & oru64_Id, const float6
                                          const float64_t of64_MinHeight, const float64_t of64_ActionPointOffset,
                                          const bool oq_KeepAspectRatio, QGraphicsItem * const opc_Parent,
                                          const QPointF & orc_PosOffset) :
+   C_GiBiConnectableItem(),
    C_GiUnique(oru64_Id),
+   C_GiBiCustomMouseItem(),
+   C_GiBiBase(),
    QGraphicsItemGroup(opc_Parent),
    mq_ResizingActive(false),
    ms32_ActiveResizeMode(ms32_INDEX_ELEMENT_MAX),

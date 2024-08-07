@@ -361,6 +361,24 @@ C_OscNodeDataPoolListElement * C_OscCanProtocol::GetComListElement(C_OscNodeData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscCanProtocol::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                              std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItMessageContain = 0UL; u32_ItMessageContain < this->c_ComMessages.size();
+        ++u32_ItMessageContain)
+   {
+      C_OscCanMessageContainer & rc_MessageContain = this->c_ComMessages[u32_ItMessageContain];
+      rc_MessageContain.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if communication list is of tx type
 
    \param[in]  orc_List    list to check

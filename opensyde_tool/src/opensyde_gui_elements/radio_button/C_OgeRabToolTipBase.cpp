@@ -40,7 +40,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeRabToolTipBase::C_OgeRabToolTipBase(QWidget * const opc_Parent) :
-   QRadioButton(opc_Parent)
+   QRadioButton(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

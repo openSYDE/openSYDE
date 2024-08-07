@@ -18,6 +18,7 @@
 #include "C_Uti.hpp"
 #include "C_PuiSdUtil.hpp"
 #include "C_OscLoggingHandler.hpp"
+#include "C_PuiSdHandler.hpp"
 
 #include "C_SdNdeDpImportRamViewReport.hpp"
 #include "ui_C_SdNdeDpImportRamViewReport.h"
@@ -212,7 +213,8 @@ void C_SdNdeDpImportRamViewReport::m_FillReport(const QString & orc_ProjectPath,
    c_Text += C_GtGetText::h_GetText("Eliminate spaces");
    c_Text += "<br/>";
    c_Text += "- ";
-   c_Text += C_GtGetText::h_GetText("Cut to 31 characters");
+   c_Text += static_cast<QString>(C_GtGetText::h_GetText("Cut to %1 (= project setting) characters")).arg(
+      C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
    c_Text += "</p>";
    if (orc_ImportInformation.GetCount() > 0)
    {

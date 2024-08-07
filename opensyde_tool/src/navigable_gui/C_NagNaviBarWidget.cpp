@@ -617,7 +617,6 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
          u32_ParentNodeCounter++;
       }
    }
-
    //Update node count
    this->mpc_Ui->pc_LabelNodes->setText(
       static_cast<QString>(C_GtGetText::h_GetText("Nodes (%1)")).arg(u32_ParentNodeCounter));
@@ -638,7 +637,6 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
 void C_NagNaviBarWidget::m_NodeChanged(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_TreeViewNodes->UpdateItem(ou32_NodeIndex, C_PuiSdUtil::h_GetNodeBaseNameOrName(ou32_NodeIndex));
-
    //Trigger error check
    m_UpdateNodeErrors();
 }
@@ -967,6 +965,16 @@ void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, cons
    {
       //No error handling necessary
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update Nodes and Buses names
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagNaviBarWidget::UpdateNodesAndBusesNames()
+{
+   this->m_NodesChanged();
+   this->m_BussesChanged();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

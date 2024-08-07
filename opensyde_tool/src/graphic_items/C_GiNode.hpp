@@ -52,6 +52,7 @@ public:
    int32_t type() const override;
 
    QString GetText(void) const;
+   QString GetFirstSelectableFullName(void) const;
 
    void AddConnection(C_GiLiBusConnector * const opc_Connection);
    void AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,

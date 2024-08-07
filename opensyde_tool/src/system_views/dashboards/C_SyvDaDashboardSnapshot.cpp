@@ -34,7 +34,8 @@ using namespace stw::opensyde_gui_logic;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardSnapshot::C_SyvDaDashboardSnapshot(void)
+C_SyvDaDashboardSnapshot::C_SyvDaDashboardSnapshot(void) :
+   C_PuiSvDashboard()
 {
 }
 

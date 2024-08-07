@@ -41,7 +41,8 @@ using namespace stw::opensyde_gui_logic;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbParam::C_PuiSvDbParam(void)
+C_PuiSvDbParam::C_PuiSvDbParam(void) :
+   C_PuiSvDbWidgetBase()
 {
 }
 

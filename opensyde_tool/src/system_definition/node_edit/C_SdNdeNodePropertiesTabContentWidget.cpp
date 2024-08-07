@@ -138,16 +138,11 @@ void C_SdNdeNodePropertiesTabContentWidget::ShowApplication(const uint32_t ou32_
 /*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTsp()
 
    \param[in]  oq_IsNewNode   Is Node new or not
-
-   \retval   true   Cancel
-   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeNodePropertiesTabContentWidget::AddFromTsp(const bool oq_IsNewNode)
+void C_SdNdeNodePropertiesTabContentWidget::AddFromTsp(const bool oq_IsNewNode)
 {
-   const bool q_Cancel = this->mpc_Ui->pc_WidgetApplications->AddFromTsp(oq_IsNewNode);
-
-   return q_Cancel;
+   this->mpc_Ui->pc_WidgetApplications->AddFromTsp(oq_IsNewNode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

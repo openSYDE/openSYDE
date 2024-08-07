@@ -43,7 +43,9 @@ using namespace stw::opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiLineConnection::C_GiLiLineConnection(const int32_t & ors32_LineIndex, QGraphicsItem * const opc_Parent) :
+   C_GiBiConnectableItem(),
    C_GiLiSimpleLine(opc_Parent),
+   C_GiBiCustomMouseItem(),
    ms32_LineIndex(ors32_LineIndex),
    mf64_InteractionWidth(0.0)
 {

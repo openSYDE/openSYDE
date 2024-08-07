@@ -12,6 +12,7 @@
 #define C_OSCSYSTEMDEFINITION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <list>
 #include <vector>
 #include "C_OscNode.hpp"
 #include "C_OscNodeSquad.hpp"
@@ -21,6 +22,7 @@
 #include "C_SclString.hpp"
 #include "C_OscDeviceManager.hpp"
 #include "C_OscCanProtocol.hpp"
+#include "C_OscSystemNameMaxCharLimitChangeReportItem.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -71,6 +73,9 @@ public:
    int32_t CheckMessageMatch(const C_OscCanMessageIdentificationIndices & orc_MessageId1,
                              const C_OscCanMessageIdentificationIndices & orc_MessageId2, bool & orq_IsMatch,
                              const bool oq_IgnoreMessageDirection = false) const;
+   void GetNameMaxCharLimitAffectedItems(const uint32_t ou32_NameMaxCharLimit,
+                                         std::list<C_OscSystemNameMaxCharLimitChangeReportItem> & orc_ChangedItems);
+   void ApplyNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit);
    void GetNodeIndexesOfBus(const uint32_t ou32_BusIndex, std::vector<uint32_t> & orc_NodeIndexes,
                             std::vector<uint32_t> & orc_InterfaceIndexes) const;
    void GetNodeAndComDpIndexesOfBus(const uint32_t ou32_BusIndex, std::vector<uint32_t> & orc_NodeIndexes,
@@ -95,6 +100,7 @@ public:
    std::vector<C_OscNode> c_Nodes;           ///< all nodes that are part of this system definition
    std::vector<C_OscNodeSquad> c_NodeSquads; ///< all multi CPU based devices with sub nodes of this system definition
    std::vector<C_OscSystemBus> c_Buses;      ///< all buses that are part of this system definition
+   uint32_t u32_NameMaxCharLimit;            ///< global limit for naming length checks
 
 private:
    uint32_t m_GetDataPoolHash(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex) const;
@@ -105,6 +111,10 @@ private:
                                       std::vector<uint32_t> & orc_NodeIndexes,
                                       std::vector<uint32_t> & orc_InterfaceIndexes,
                                       std::vector<uint32_t> * const opc_DatapoolIndexes) const;
+   void m_HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                 std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
+   void m_HandleNameMaxCharLimitNodeName(const uint32_t ou32_NodeIndex, const uint32_t ou32_NameMaxCharLimit,
+                                         std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

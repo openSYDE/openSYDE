@@ -81,7 +81,7 @@ private:
    void m_TriggerImport(void);
    void m_ContinueImporting(const opensyde_core::C_OscCanProtocol::E_Type & ore_Protocol);
    void m_RtfExport(void);
-   bool m_TspImport(const bool oq_IsNodeNew);
+   void m_TspImport(const bool oq_IsNodeNew);
    void m_TspImportForNewNode();
    void m_GenerateHalcDatapools(void) const;
    opensyde_gui_elements::C_OgeWiCustomMessage * m_ShowWarningUnstoredProjectPopupMessage();

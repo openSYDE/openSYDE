@@ -46,7 +46,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxToolTipBase::C_OgeCbxToolTipBase(QWidget * const opc_Parent) :
-   QComboBox(opc_Parent)
+   QComboBox(opc_Parent),
+   C_OgeToolTipBase()
 {
    // Deactivate custom context menu of scroll bar
    this->view()->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);

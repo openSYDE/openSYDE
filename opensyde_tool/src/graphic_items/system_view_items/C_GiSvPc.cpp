@@ -70,6 +70,7 @@ const float64_t C_GiSvPc::mhf64_INIT_SIZE_OF_PC = 150.0;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvPc::C_GiSvPc(const uint64_t ou64_UniqueId, const uint32_t ou32_ViewIndex) :
    C_GiImageGroupWithoutData(ou64_UniqueId, "", true),
+   C_GiBiCustomToolTip(),
    C_PuiSvDbDataElement(ou32_ViewIndex, 0, 0, C_PuiSvDbDataElement::eUNKNOWN),
    mq_Connected(false)
 {

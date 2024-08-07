@@ -42,8 +42,8 @@ using namespace stw::opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiTemporaryLine::C_GiLiTemporaryLine(QGraphicsItem * const opc_Parent) :
-   QGraphicsLineItem(
-      opc_Parent)
+   QObject(),
+   QGraphicsLineItem(opc_Parent)
 {
    QPen c_Pen = this->pen();
 

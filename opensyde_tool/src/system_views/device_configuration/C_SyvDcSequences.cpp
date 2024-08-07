@@ -89,6 +89,7 @@ C_SyvDcDeviceConfiguation & C_SyvDcDeviceConfiguation::operator =(const C_SyvDcD
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcSequences::C_SyvDcSequences(void) :
+   QObject(),
    C_OscComSequencesBase(false, false),
    mpc_CanDllDispatcher(NULL),
    mpc_EthernetDispatcher(NULL),

@@ -324,11 +324,11 @@ int32_t C_OscAesFile::h_DecryptFile(const C_SclString & orc_Key, const C_SclStri
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create a zip file will all files of a folder and encrypts it with AES
 
-   \param[in]  orc_FolderPathToZip  Base folder to pack into zip package
-   \param[in]  orc_FilesToZip       All files which will be part of the package
-   \param[in]  orc_PathForZipFile   File path for generated zip file
-   \param[in]  orc_Key              Key for AES encryption (In case of an empty key, the file will not be encrypted)
-   \param[out] opc_ErrorMessage     Optional string for error messages
+   \param[in]   orc_FolderPathToZip    Base folder to pack into zip package
+   \param[in]   orc_SupFiles           relative file paths for zip archive (files to add to archive)
+   \param[in]   orc_PathForZipFile     File path for generated zip file
+   \param[in]   orc_Key                Key for AES encryption (In case of an empty key, the file will not be encrypted)
+   \param[out]  opc_ErrorMessage       Optional string for error messages
 
    \return
    C_NO_ERR    Encrypted zip file generated
@@ -341,19 +341,16 @@ int32_t C_OscAesFile::h_DecryptFile(const C_SclString & orc_Key, const C_SclStri
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscAesFile::h_CreateEncryptedZipFile(const C_SclString & orc_FolderPathToZip,
-                                               const std::vector<C_SclString> & orc_FilesToZip,
+                                               const std::set<C_SclString> & orc_SupFiles,
                                                const C_SclString & orc_PathForZipFile, const C_SclString & orc_Key,
                                                C_SclString * const opc_ErrorMessage)
 {
    int32_t s32_Return;
 
-   std::set<C_SclString> c_SupFiles;
    const C_SclString c_ZipFileTmp = orc_PathForZipFile + static_cast<C_SclString>("_tmp");
    C_SclString c_ErrorText;
 
-   C_OscZipFile::h_AppendFilesRelative(c_SupFiles, orc_FilesToZip, orc_FolderPathToZip);
-
-   s32_Return = C_OscZipFile::h_CreateZipFile(orc_FolderPathToZip, c_SupFiles, c_ZipFileTmp, &c_ErrorText);
+   s32_Return = C_OscZipFile::h_CreateZipFile(orc_FolderPathToZip, orc_SupFiles, c_ZipFileTmp, &c_ErrorText);
 
    if (s32_Return == C_NO_ERR)
    {

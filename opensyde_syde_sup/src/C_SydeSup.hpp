@@ -49,13 +49,13 @@ public:
       eERR_PACKAGE_CORE_C_OVERFLOW     = 22,
       eERR_PACKAGE_UNZIP               = 23,
       eERR_PACKAGE_CORE_C_NOACT        = 24,
-      eERR_PACKAGE_NOT_FOUND           = 25,
+      eERR_PACKAGE_INVALID             = 25,
       eERR_PACKAGE_WRONG_EXTENSION     = 26,
       eERR_PACKAGE_FILES_MISSING       = 27,
 
-      eERR_CAN_IF_NOT_FOUND            = 30,
-      eERR_CAN_IF_LOAD_FAILED          = 31,
-      eERR_ETH_IF_LOAD_FAILED          = 32,
+      eERR_SEC_PAC_NO_ZIP              = 30,
+      eERR_SEC_PAC_INVALID_PACKAGE     = 31,
+      eERR_SEC_PAC_DECRYPTING          = 32,
 
       eERR_SEQUENCE_ROUTING            = 40,
       eERR_SEQUENCE_UNKNOWN_CONFIG     = 41,
@@ -87,6 +87,10 @@ public:
       eERR_CREATE_VIEW_NOT_FOUND       = 81,
       eERR_CREATE_ZIP_RD_RW            = 82,
       eERR_CREATE_ZIP_CONFIG           = 83,
+
+      eERR_CAN_IF_NOT_FOUND            = 90,
+      eERR_CAN_IF_LOAD_FAILED          = 91,
+      eERR_ETH_IF_LOAD_FAILED          = 92,
 
       eOK                              = 0,
       eERR_UNKNOWN                     = 100
@@ -122,6 +126,8 @@ protected:
    stw::scl::C_SclString mc_OsyProjectPath;
    stw::scl::C_SclString mc_ViewName;
    stw::scl::C_SclString mc_DeviceDefPath;
+   stw::scl::C_SclString mc_PubKeyPemPath; //path to pem file with public key in case of secure update package
+   stw::scl::C_SclString mc_Password; //optional password if the secure update package is also encrypted
 
    C_SydeSup::E_Result m_InitOptionalParameters(void);
 

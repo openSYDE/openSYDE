@@ -729,7 +729,9 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
       // ask user
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
       c_Message.SetHeading(C_GtGetText::h_GetText("Relative Path"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Do you want to save the selected path relative or absolute?"));
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                       "Do you want to save the selected path (%1) relative or absolute?")).arg(
+                                  c_PathAbsolute));
       c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
                            arg(c_PathRelative).arg(c_PathAbsolute));
       c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));

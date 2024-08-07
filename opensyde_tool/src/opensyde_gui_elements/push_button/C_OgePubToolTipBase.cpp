@@ -39,7 +39,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubToolTipBase::C_OgePubToolTipBase(QWidget * const opc_Parent) :
-   QPushButton(opc_Parent)
+   QPushButton(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

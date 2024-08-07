@@ -1624,7 +1624,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
-   Public key modulus is a byte array with a length of 128 Bytes.
+   Public key modulus is a byte array with a length of 128 Bytes (high byte first).
    Public key exponent is a byte array with a length of 1 to 4 Bytes containing the exponent (high byte first).
    Serial number is a byte array with maximum length of 20 Bytes.
 
@@ -4886,8 +4886,8 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
       //worst case protocol overhead:
       //1 byte service ID
       //1 byte FormatIdentifier
-      //4 bytes address
-      //4 bytes size
+      //1..4 bytes address
+      //1..4 bytes size
       const uint32_t u32_BLOCK_SIZE = (C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10U);
 
       //split up into smaller blocks:
@@ -5008,8 +5008,8 @@ int32_t C_OscProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32_t ou32_Memo
       //worst case protocol overhead:
       //1 byte service ID
       //1 byte FormatIdentifier
-      //4 bytes address
-      //4 bytes size
+      //1..4 bytes address
+      //1..4 bytes size
       const uint32_t u32_BlockSize = static_cast<uint32_t>(mu16_MaxServiceSize) - 10U;
 
       //split up into smaller blocks:

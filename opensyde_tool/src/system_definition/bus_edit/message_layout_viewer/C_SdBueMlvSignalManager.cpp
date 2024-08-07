@@ -54,6 +54,7 @@ C_SdBueMlvSignalManager::C_SdBueMlvSignalManager(C_PuiSdNodeCanMessageSyncManage
                                                  const uint16_t ou16_MaximumCountBits, const float64_t of64_Space,
                                                  QObject * const opc_Parent) :
    QObject(opc_Parent),
+   C_GiBiCustomToolTip(),
    mpc_MessageSyncManager(opc_SyncManager),
    mc_MessageId(orc_MessageId),
    mu16_MaximumCountBits(ou16_MaximumCountBits),

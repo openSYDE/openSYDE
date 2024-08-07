@@ -251,15 +251,17 @@ bool C_PuiSvHandler::GetServiceModeActive(void) const
 
    But at least one sub node of a squad must be active. If this is not the case, the sub nodes will remain as active
 
-   \param[in]       ou32_ViewIndex    View index
-   \param[out]      orc_ActiveFlags   Adapted node active flags if return value equals C_NO_ERR
+   \param[in]   ou32_ViewIndex            View index
+   \param[out]  orc_ActiveFlags           Adapted node active flags if return value equals C_NO_ERR
+   \param[in]   oq_IncludeRoutingResults  Include routing results
 
    \retval   C_NO_ERR   Operation success
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32_ViewIndex,
-                                                             std::vector<uint8_t> & orc_ActiveFlags)
+                                                             std::vector<uint8_t> & orc_ActiveFlags,
+                                                             const bool oq_IncludeRoutingResults)
 {
    int32_t s32_Return = C_RANGE;
 
@@ -268,9 +270,10 @@ int32_t C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       const uint32_t u32_Hash = this->GetViewHash(ou32_ViewIndex);
-      const QMap<uint32_t,
+      const QPair<uint32_t, bool> c_HashRef(u32_Hash, oq_IncludeRoutingResults);
+      const QMap<QPair<uint32_t, bool>,
                  std::vector<uint8_t> >::const_iterator c_It =
-         this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.find(u32_Hash);
+         this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.find(c_HashRef);
 
       s32_Return = C_NO_ERR;
 
@@ -335,8 +338,12 @@ int32_t C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32
                            const C_SyvRoRouteCalculation c_RouteCalcCheck(
                               ou32_ViewIndex, u32_NodeIndex,
                               stw::opensyde_core::C_OscRoutingCalculation::eROUTING_CHECK);
+                           const C_OscRoutingRoute * const pc_BestRoute = c_RouteCalcCheck.GetBestRoute();
 
-                           if (c_RouteCalcCheck.GetState() == C_NO_ERR)
+                           if ((c_RouteCalcCheck.GetState() == C_NO_ERR) &&
+                               (oq_IncludeRoutingResults ||
+                                ((pc_BestRoute != NULL) &&
+                                 (pc_BestRoute->c_VecRoutePoints.size() == 0))))
                            {
                               // Valid route found
                               c_SubNodeActiveFlags[u32_SubNodeCounter] = 1U;
@@ -365,7 +372,7 @@ int32_t C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32
          while (pc_Squad != NULL);
 
          //Store results
-         this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.insert(u32_Hash, orc_ActiveFlags);
+         this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.insert(c_HashRef, orc_ActiveFlags);
       }
       else
       {

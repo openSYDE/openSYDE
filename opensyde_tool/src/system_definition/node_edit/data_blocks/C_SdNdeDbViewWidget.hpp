@@ -45,7 +45,7 @@ public:
    void ShowApplication(const uint32_t ou32_ApplicationIndex) const;
    void AddApp(void);
    void UpdateApplications(void) const;
-   bool AddFromTsp(const bool oq_IsNewNode);
+   void AddFromTsp(const bool oq_IsNewNode);
    void AddHalcDefFromTsp(stw::opensyde_gui::C_SdNdeDbAddNewProject * const opc_Dialog);
 
    //The signals keyword is necessary for Qt signal slot functionality

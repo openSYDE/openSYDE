@@ -155,7 +155,7 @@ int32_t C_CieImportDbc::h_ImportNetwork(const C_SclString & orc_File,
             if (oq_AddUnmappedMessages == true)
             {
                const auto c_DbcMessage = find_if(
-                  c_DbcNetwork.messages.begin(), c_DbcNetwork.messages.end(), [c_Iter] (auto & orc_Message)
+                  c_DbcNetwork.messages.begin(), c_DbcNetwork.messages.end(), [c_Iter] (auto & orc_Message) -> bool
                {
                   return orc_Message.second.name.compare(*c_Iter) == 0;
                }

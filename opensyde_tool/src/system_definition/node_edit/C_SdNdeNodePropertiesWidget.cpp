@@ -28,7 +28,6 @@
 #include "C_SdUtil.hpp"
 #include "C_OscNodeProperties.hpp"
 #include "C_OgeChxTristateTransparentError.hpp"
-#include "constants.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_OgeChxTristate.hpp"
 #include "C_OscNodeComInterfaceSettings.hpp"
@@ -187,7 +186,7 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
                                                                                    eDIAGNOSTIC), 150);
 
    //Name restriction
-   this->mpc_Ui->pc_LineEditNodeName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+   this->mpc_Ui->pc_LineEditNodeName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
 
    // connects
    connect(this->mpc_Ui->pc_LineEditNodeName, &QLineEdit::textChanged, this,
@@ -286,14 +285,16 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabSubNodeTitle->SetToolTipInformation(C_GtGetText::h_GetText("Sub-Node"),
                                                            C_GtGetText::h_GetText("Name of the Sub-Node."));
 
-   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Symbolic node name. Unique within Network Topology.\n"
-                                                        "\nFollowing C naming conventions are required:"
-                                                        "\n - must not be empty"
-                                                        "\n - must not start with digits"
-                                                        "\n - only alphanumeric characters and \"_\""
-                                                        "\n - should not be longer than 31 characters"));
+   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                        "Name"),
+                                                     static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "Symbolic node name. Unique within Network Topology.\n"
+                                                                             "\nFollowing C naming conventions are required:"
+                                                                             "\n - must not be empty"
+                                                                             "\n - must not start with digits"
+                                                                             "\n - only alphanumeric characters and \"_\""
+                                                                             "\n - should not be longer than %1 (= project setting) characters")).arg(
+                                                        C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
 
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this node."));
@@ -695,7 +696,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
 
                this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, s32_COL_NODE_ID)->setFlags(
                   Qt::ItemIsEnabled | Qt::ItemIsEditable);
-
                /**********************************************************************************************************/
                //IP Address
                this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, s32_COL_IP_ADDRESS,
@@ -1335,7 +1335,6 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
       hq_InProgress = false; //lint !e838 its static and could be used on strange second call
    }
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check com interface id
 

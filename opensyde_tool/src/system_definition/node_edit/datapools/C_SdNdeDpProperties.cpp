@@ -99,7 +99,15 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
    this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(32768);
 
    //Ui restriction
-   this->mpc_Ui->pc_LineEditDatapoolName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+   if ((this->mpc_OscDataPool->e_Type == C_OscNodeDataPool::eHALC) ||
+       (this->mpc_OscDataPool->e_Type == C_OscNodeDataPool::eHALC_NVM))
+   {
+      this->mpc_Ui->pc_LineEditDatapoolName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+   }
+   else
+   {
+      this->mpc_Ui->pc_LineEditDatapoolName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
+   }
 
    // register the widget for showing
    this->mpc_ParentDialog->SetWidget(this);
@@ -387,14 +395,16 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelCrcVersion->setText(C_GtGetText::h_GetText("CRC Version"));
 
    //Tool tips
-   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Symbolic Datapool name. Unique within a node."
-                                                        "\nFollowing C naming conventions are required:"
-                                                        "\n - must not be empty"
-                                                        "\n - must not start with digits"
-                                                        "\n - only alphanumeric characters and \"_\""
-                                                        "\n - should not be longer than 31 characters"));
+   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                        "Name"),
+                                                     static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "Symbolic Datapool name. Unique within a node."
+                                                                             "\nFollowing C naming conventions are required:"
+                                                                             "\n - must not be empty"
+                                                                             "\n - must not start with digits"
+                                                                             "\n - only alphanumeric characters and \"_\""
+                                                                             "\n - should not be longer than %1 (= project setting) characters")).arg(
+                                                        C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
 
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this Datapool."));

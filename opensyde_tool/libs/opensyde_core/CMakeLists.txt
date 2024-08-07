@@ -212,17 +212,19 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/magician/C_OscHalcMagicianUtil.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/C_OscProject.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/C_OscProjectFiler.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceDefinitionFiler.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceDefinitionFilerV1.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceDefinition.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSubDeviceDefinition.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceGroup.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceManager.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemBus.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemBusFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemDefinition.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemDefinitionFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemNameMaxCharLimitChangeReportItem.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemFilerUtil.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscDeviceDefinition.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscDeviceDefinitionFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscDeviceDefinitionFilerV1.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscSupportedCanInterfaceFeatures.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscSubDeviceDefinition.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package/C_OscTargetSupportPackage.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package/C_OscTargetSupportPackageFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package/C_OscTargetSupportPackageV2.cpp
@@ -304,17 +306,19 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/magician/C_OscHalcMagicianUtil.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/C_OscProject.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/C_OscProjectFiler.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceDefinition.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSubDeviceDefinition.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceDefinitionFiler.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceDefinitionFilerV1.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceGroup.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscDeviceManager.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemBus.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemBusFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemDefinition.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemDefinitionFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemNameMaxCharLimitChangeReportItem.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/C_OscSystemFilerUtil.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscDeviceDefinition.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscDeviceDefinitionFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscDeviceDefinitionFilerV1.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscSupportedCanInterfaceFeatures.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition/C_OscSubDeviceDefinition.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package/C_OscTargetSupportPackage.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package/C_OscTargetSupportPackageFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package/C_OscTargetSupportPackageV2.hpp
@@ -378,6 +382,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/magician
       ${CMAKE_CURRENT_SOURCE_DIR}/project
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/device_definition
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can
@@ -457,13 +462,24 @@ else()
    set(OPENSYDE_CORE_PROTOCOL_DRIVERS_SYSTEM_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequences.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageV1.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageCreate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageLoad.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupSignatureFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinition.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinitionFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinition.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinitionFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealer.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvm.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvmSafe.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPem.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemKeyInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemBase.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemDatabase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemKeyInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemSecUpdate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdsa.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityRsa.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComDriverBase.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComDriverFlash.cpp
@@ -475,13 +491,24 @@ else()
 
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequences.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageV1.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageCreate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageLoad.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupSignatureFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinition.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinitionFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinition.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinitionFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealer.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvm.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvmSafe.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPem.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemKeyInfo.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemBase.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemDatabase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemKeyInfo.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemSecUpdate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdsa.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityRsa.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComDriverBase.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComDriverFlash.hpp
@@ -499,6 +526,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/cmonprotocol
    )

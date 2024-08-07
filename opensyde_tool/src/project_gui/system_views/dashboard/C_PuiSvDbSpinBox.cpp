@@ -35,6 +35,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbSpinBox::C_PuiSvDbSpinBox(void) :
+   C_PuiSvDbWriteWidgetBase(),
    e_Type(eTYPE1),
    q_ShowUnit(false)
 {

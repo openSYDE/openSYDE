@@ -79,6 +79,7 @@ Q_SIGNALS:
    void SigSelectManager(const QModelIndex & orc_ManagerIndex) const;
    void SigManagerUnchecked(const QModelIndex & orc_ManagerIndex) const;
    void SigDeviceRemoved(void) const;
+   void SigNodeIdToBeChanged(uint32_t ou32_NodeIndex);
 
 private:
    QWidget * const mpc_Parent;

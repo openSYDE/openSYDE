@@ -1358,18 +1358,10 @@ bool C_SdHandlerWidget::m_CheckImportPossible()
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create warning message box if unsaved project is used and calls TSP import function of node edit page
-
-   \return
-   bool
-
-   \retval   true   Cancel
-   \retval   false   No cancel
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdHandlerWidget::m_TspImport(const bool oq_IsNodeNew)
+void C_SdHandlerWidget::m_TspImport(const bool oq_IsNodeNew)
 {
-   bool q_Chance = false;
-
    if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
    {
       C_OgeWiCustomMessage pc_MessageBox(this);
@@ -1392,22 +1384,17 @@ bool C_SdHandlerWidget::m_TspImport(const bool oq_IsNodeNew)
       {
          if (mpc_ActNodeEdit != NULL)
          {
-            q_Chance = mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
+            mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
          }
-      }
-      else
-      {
-         q_Chance = true;
       }
    }
    else
    {
       if (mpc_ActNodeEdit != NULL)
       {
-         q_Chance = mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
+         mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
       }
    }
-   return q_Chance;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

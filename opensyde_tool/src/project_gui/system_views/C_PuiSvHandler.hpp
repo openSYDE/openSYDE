@@ -43,7 +43,8 @@ public:
    uint32_t GetViewCount(void) const;
    const std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> & GetLastKnownHalcCrcs(void) const;
    bool GetServiceModeActive(void) const;
-   int32_t GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32_ViewIndex, std::vector<uint8_t> & orc_ActiveFlags);
+   int32_t GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32_ViewIndex, std::vector<uint8_t> & orc_ActiveFlags,
+                                                const bool oq_IncludeRoutingResults = true);
 
    //Set
    void SetServiceModeActive(const bool oq_NewValue);
@@ -346,7 +347,7 @@ private:
    };
 
    QMap<uint32_t, C_PuiSvViewErrorDetails> mc_PreviousErrorCheckResults;
-   QMap<uint32_t, std::vector<uint8_t> > mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults;
+   QMap<QPair<uint32_t, bool>, std::vector<uint8_t> > mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

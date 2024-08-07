@@ -68,7 +68,7 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    this->InitStaticNames();
 
    // name length restriction
-   this->mpc_Ui->pc_LeName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+   this->mpc_Ui->pc_LeName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
 
    // set color
    this->mpc_Ui->pc_LabChannelTitle->SetBackgroundColor(0);
@@ -139,12 +139,13 @@ void C_SdNdeHalcChannelWidget::InitStaticNames(void) const
    // tool tips
    this->mpc_Ui->pc_LabName->
    SetToolTipInformation(C_GtGetText::h_GetText("Name"),
-                         C_GtGetText::h_GetText("Symbolic channel name. Unique within node.\n"
-                                                "Following C naming conventions are required:"
-                                                "\n - must not be empty"
-                                                "\n - must not start with digits"
-                                                "\n - only alphanumeric characters and \"_\""
-                                                "\n - should not be longer than 31 characters"));
+                         static_cast<QString>(C_GtGetText::h_GetText("Symbolic channel name. Unique within node.\n"
+                                                                     "Following C naming conventions are required:"
+                                                                     "\n - must not be empty"
+                                                                     "\n - must not start with digits"
+                                                                     "\n - only alphanumeric characters and \"_\""
+                                                                     "\n - should not be longer than %1 (= project setting) characters")).arg(
+                            C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
    this->mpc_Ui->pc_LabChannelTitle->
    SetToolTipInformation(C_GtGetText::h_GetText("Channel"),
                          C_GtGetText::h_GetText("Channel ID from hardware description."));

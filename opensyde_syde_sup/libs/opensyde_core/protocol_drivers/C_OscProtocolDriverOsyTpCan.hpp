@@ -86,8 +86,10 @@ private:
    static const uint16_t mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_LAST  = 0x0224U;
    static const uint8_t mhu8_BC_OSY_NR_SI = 0x7FU;
 
-   ///timeout when waiting for flow control; lower but more realistic than the 1s specified in 15765
-   static const uint16_t mhu16_NBS_TIMEOUTS_MS = 100U;
+   ///timeout when waiting for flow control; 1000ms specified in 15765
+   ///for a local connection 1000ms sounds a lot but there might be more complex scenarios
+   /// e.g. with routing over multiple hops
+   static const uint16_t mhu16_NBS_TIMEOUTS_MS = 1000U;
 
    stw::can::C_CanDispatcher * mpc_CanDispatcher; ///< CAN dispatcher to use for communication
    uint16_t mu16_DispatcherClientHandle;          ///< our handle for dispatcher interaction

@@ -98,7 +98,7 @@ Q_SIGNALS:
                       const bool oq_ChangeUseCase = false);
    void SigNodeDeleted(const uint32_t ou32_Index);
    void SigBusDeleted(const uint32_t ou32_Index);
-   bool SigOpenTsp(const scl::C_SclString & orc_NodeName);
+   bool SigOpenTsp(void);
    void SigErrorChange(void);
 
 protected:
@@ -255,8 +255,8 @@ private:
    bool m_ActivateTspShortcut (const scl::C_SclString & orc_NodeName, const uint32_t & oru32_SubNodeIndex);
    void m_AddTspForAllSubNodes(const uint32_t & oru32_SubDevicesSize, const uint32_t & oru32_OriginalOscNodeSize,
                                const scl::C_SclString & orc_NodeName);
-   bool m_ShowShortcutTspOption(const opensyde_core::C_OscDeviceDefinition * const opc_MainDevice,
-                                const uint32_t & oru32_OriginalOscNodeSize, const uint32_t & oru32_SubDevicesSize);
+   bool m_ShowShortcutTspOption(const QString & orc_NodeName, const uint32_t & oru32_OriginalOscNodeSize,
+                                const uint32_t & oru32_SubDevicesSize);
 
    C_GiSvgGraphicsItem * mpc_EmptyConnectItem;
    C_GiNode * mpc_NodeConnectItem;

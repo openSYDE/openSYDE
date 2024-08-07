@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "C_OscCanMessage.hpp"
+#include "C_OscSystemNameMaxCharLimitChangeReportItem.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -51,6 +52,8 @@ public:
    bool ContainsAtLeastOneMessage(void) const;
    bool ContainsAtLeastOneActiveMessage(void) const;
    bool CheckMinSignalError(void) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    std::vector<C_OscCanMessage> c_TxMessages; ///< Transmitted message types
    std::vector<C_OscCanMessage> c_RxMessages; ///< Received message types

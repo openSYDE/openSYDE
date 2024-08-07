@@ -368,6 +368,48 @@ const C_OscCanOpenManagerDeviceInfo * C_PuiSdHandlerCanOpenLogic::GetCanOpenMana
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get the bus name to which the node is connected
+
+   \param[in]       ou32_NodeIndex        Node index
+   \param[out]      ou8_InterfaceNumber   Interface number
+
+   \return
+   Name of the bus if connected
+   empty string otherwise
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const QString C_PuiSdHandlerCanOpenLogic::GetBusNameOfConnectedDevice(const uint32_t ou32_NodeIndex,
+                                                                      const uint8_t ou8_InterfaceNumber) const
+{
+   uint32_t u32_InterfaceIndex = 0;
+   QString c_BusName = "";
+
+   // Convert the interface number to the interface index in the "Com interfaces" list in node properties
+   if (TranslateCanInterfaceNumberToIndex(ou32_NodeIndex, ou8_InterfaceNumber, u32_InterfaceIndex) == C_NO_ERR)
+   {
+      const C_OscNode * const pc_Node = this->GetOscNodeConst(ou32_NodeIndex);
+
+      const C_OscNodeComInterfaceSettings & rc_Interface =
+         pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceIndex];
+
+      if (rc_Interface.GetBusConnected() == true)
+      {
+         const C_OscSystemBus * const pc_Bus =
+            GetOscBus(rc_Interface.u32_BusIndex);
+
+         //get bus name
+         if (pc_Bus != NULL)
+         {
+            c_BusName = pc_Bus->c_Name.c_str();
+         }
+      }
+   }
+
+   return c_BusName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set CANopen manager common properties
 
    \param[in]  ou32_NodeIndex                Node index

@@ -15,7 +15,6 @@
 #include <limits>
 #include <QPainter>
 #include "stwtypes.hpp"
-#include "constants.hpp"
 #include "C_SdNdeDpListTableDelegate.hpp"
 #include "C_OgeTedTable.hpp"
 #include "C_OgeLeTable.hpp"
@@ -27,6 +26,7 @@
 #include "C_OgeWiUtil.hpp"
 #include "C_TblTreDelegateUtil.hpp"
 #include "C_SdNdeDpContentUtil.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_logic;
@@ -115,7 +115,7 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
       case C_SdNdeDpListTableModel::eNAME:
          pc_LineEdit = new C_OgeLeTable(opc_Parent);
          //Ui restriction
-         pc_LineEdit->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+         pc_LineEdit->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
          pc_Retval = pc_LineEdit;
          break;
       case C_SdNdeDpListTableModel::eCOMMENT:

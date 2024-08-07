@@ -1654,12 +1654,12 @@ int32_t C_OscComDriverFlash::SendOsySetBitrate(const C_OscProtocolDriverOsyNode 
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsySetIpAddressForChannel(C_OscProtocolDriverOsy & orc_Protocol,
-                                                           const uint8_t ou8_ChannelIndex,
-                                                           const uint8_t (&orau8_IpAddress)[4],
-                                                           const uint8_t (&orau8_NetMask)[4],
-                                                           const uint8_t (&orau8_DefaultGateway)[4],
-                                                           uint8_t * const opu8_NrCode)
+int32_t C_OscComDriverFlash::h_SendOsySetIpAddressForChannel(C_OscProtocolDriverOsy & orc_Protocol,
+                                                             const uint8_t ou8_ChannelIndex,
+                                                             const uint8_t (&orau8_IpAddress)[4],
+                                                             const uint8_t (&orau8_NetMask)[4],
+                                                             const uint8_t (&orau8_DefaultGateway)[4],
+                                                             uint8_t * const opu8_NrCode)
 {
    return orc_Protocol.OsySetIpAddressForChannel(1U, ou8_ChannelIndex, orau8_IpAddress, orau8_NetMask,
                                                  orau8_DefaultGateway, opu8_NrCode);
@@ -1727,10 +1727,10 @@ int32_t C_OscComDriverFlash::SendOsySetIpAddressForChannel(const C_OscProtocolDr
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsySetNodeIdForChannel(C_OscProtocolDriverOsy & orc_Protocol,
-                                                        const uint8_t ou8_ChannelType, const uint8_t ou8_ChannelIndex,
-                                                        const C_OscProtocolDriverOsyNode & orc_NewNodeId,
-                                                        uint8_t * const opu8_NrCode)
+int32_t C_OscComDriverFlash::h_SendOsySetNodeIdForChannel(C_OscProtocolDriverOsy & orc_Protocol,
+                                                          const uint8_t ou8_ChannelType, const uint8_t ou8_ChannelIndex,
+                                                          const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+                                                          uint8_t * const opu8_NrCode)
 {
    return orc_Protocol.OsySetNodeIdForChannel(ou8_ChannelType, ou8_ChannelIndex,
                                               orc_NewNodeId, opu8_NrCode);

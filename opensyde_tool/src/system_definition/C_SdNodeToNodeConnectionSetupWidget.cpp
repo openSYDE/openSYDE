@@ -126,6 +126,17 @@ void C_SdNodeToNodeConnectionSetupWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelBusName->setText(C_GtGetText::h_GetText("Name"));
    this->mpc_Ui->pc_RadioButtonCreateNew->setText(C_GtGetText::h_GetText("Create New Bus"));
    this->mpc_Ui->pc_RadioButtonSelectExisting->setText(C_GtGetText::h_GetText("Select Existing Bus"));
+   //Tool tips
+   this->mpc_Ui->pc_LabelBusName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                           "Name"),
+                                                        static_cast<QString>(C_GtGetText::h_GetText(
+                                                                                "Symbolic bus name. Unique within Network Topology.\n"
+                                                                                "\nC naming conventions must be followed:"
+                                                                                "\n - must not be empty"
+                                                                                "\n - must not start with digits"
+                                                                                "\n - only alphanumeric characters and \"_\""
+                                                                                "\n - should not be longer than %1 (= project setting) characters")).arg(
+                                                           C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -322,6 +333,9 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
       stw::opensyde_core::C_OscSystemBus::E_Type e_NewBusRestrictedType;
       stw::opensyde_core::C_OscSystemBus::E_Type e_ExistingBusRestrictedType;
 
+      //Apply restriction
+      this->mpc_Ui->pc_LineEditBusName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
+
       this->m_CheckTypeRestrictions(q_NewBusPossible,  q_NewBusRestricted, e_NewBusRestrictedType, q_ExistingBusExists,
                                     q_ExistingBusRestricted,
                                     e_ExistingBusRestrictedType);
@@ -344,7 +358,9 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
             //Init name
             this->mpc_Ui->pc_LineEditBusName->setText(C_Uti::h_GetUniqueName(C_PuiSdHandler::h_GetInstance()->
                                                                              GetExistingBusNames(),
-                                                                             c_OscBus.c_Name).c_str());
+                                                                             c_OscBus.c_Name,
+                                                                             C_PuiSdHandler::h_GetInstance()->
+                                                                             GetNameMaxCharLimit()).c_str());
          }
          else
          {

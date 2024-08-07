@@ -687,5 +687,7 @@
         <file>images/system_views/dashboards/tab_chart/IconExportCSV.svg</file>
         <file>images/system_views/dashboards/tab_chart/IconExportCSVDark.svg</file>
         <file>images/system_views/dashboards/tab_chart/IconExportCSVDisabled.svg</file>
+        <file>images/main_page_and_navi_bar/GlobalSettings.svg</file>
+        <file>images/main_page_and_navi_bar/GlobalSettingsDisabled.svg</file>
     </qresource>
 </RCC>

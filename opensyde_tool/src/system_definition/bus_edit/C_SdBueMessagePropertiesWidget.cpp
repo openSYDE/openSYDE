@@ -28,12 +28,12 @@
 #include "C_PuiSdHandler.hpp"
 #include "TglUtils.hpp"
 #include "ui_C_SdBueMessagePropertiesWidget.h"
-#include "constants.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_SdUtil.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_OgePopUpDialog.hpp"
 #include "C_SdBueJ1939PgPropertiesDialog.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -136,7 +136,7 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    InitStaticNames();
 
    //Ui restriction
-   this->mpc_Ui->pc_LineEditName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+   this->mpc_Ui->pc_LineEditName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
    this->mpc_Ui->pc_LabelCriticalMessage->setWordWrap(true);
 
    //Remove debug string
@@ -271,14 +271,16 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonJ1939OpenDialog->setText(C_GtGetText::h_GetText(""));
 
    //Tool tips
-   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Symbolic message name. Unique within a bus."
-                                                        "\nFollowing C naming conventions are required:"
-                                                        "\n - must not be empty"
-                                                        "\n - must not start with digits"
-                                                        "\n - only alphanumeric characters and \"_\""
-                                                        "\n - should not be longer than 31 characters"));
+   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                        "Name"),
+                                                     static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "Symbolic message name. Unique within a bus."
+                                                                             "\nFollowing C naming conventions are required:"
+                                                                             "\n - must not be empty"
+                                                                             "\n - must not start with digits"
+                                                                             "\n - only alphanumeric characters and \"_\""
+                                                                             "\n - should not be longer than %1 (= project setting) characters")).arg(
+                                                        C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this message."));
 

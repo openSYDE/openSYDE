@@ -61,6 +61,7 @@ Q_SIGNALS:
    void SigSwitchToBusProtocolMessage(const uint32_t ou32_Index, const QString & orc_BusName,
                                       const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId)
    const;
+   void SigPropAndCoTabUpdateTrigger(uint32_t ou32_NodeIndex);
 
 protected:
    void showEvent(QShowEvent * const opc_Event) override;
@@ -68,6 +69,7 @@ protected:
 private:
    Ui::C_SdNdeCoWidget * mpc_Ui;
    uint32_t mu32_NodeIndex;
+   uint8_t mu8_InterfaceNumber;
 
    //Avoid call
    C_SdNdeCoWidget(const C_SdNdeCoWidget &);
@@ -79,6 +81,8 @@ private:
                            const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceNodeId,
                            const uint32_t ou32_UseCaseIndex);
    void m_OnLinkSwitchToManager(const QString & orc_Link) const;
+   void m_NodeIdToBeChanged(const uint32_t ou32_NodeIndex);
+   void m_NodeIdToBeChangedWithInterfaceIndex(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

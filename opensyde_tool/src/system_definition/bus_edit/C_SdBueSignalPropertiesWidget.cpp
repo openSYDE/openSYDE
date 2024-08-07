@@ -20,7 +20,6 @@
 
 #include "TglUtils.hpp"
 #include "C_SdUtil.hpp"
-#include "constants.hpp"
 #include "stwerrors.hpp"
 #include "C_OscUtils.hpp"
 #include "C_GtGetText.hpp"
@@ -191,11 +190,13 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
                                                 "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
 
    //name
-   c_InfoText =  C_GtGetText::h_GetText("Symbolic signal name. Unique within a message."
-                                        "\nC naming conventions must be followed:"
-                                        "\n - must not be empty"
-                                        "\n - only alphanumeric characters and \"_\""
-                                        "\n - should not be longer than 31 characters");
+   c_InfoText =  static_cast<QString>(C_GtGetText::h_GetText("Symbolic signal name. Unique within a message."
+                                                             "\nC naming conventions must be followed:"
+                                                             "\n - must not be empty"
+                                                             "\n - only alphanumeric characters and \"_\""
+                                                             "\n - should not be longer than %1 (= project setting) characters"))
+                .arg(
+      C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"), c_InfoText);
 
    //comment
@@ -1741,7 +1742,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change
    {
    case eCHA_NAME:
       //Restrictions
-      this->mpc_Ui->pc_LineEditName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
+      this->mpc_Ui->pc_LineEditName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
       //Value
       this->mpc_Ui->pc_LineEditName->setText(this->mc_DataOscSignalCommon.c_Name.c_str());
       break;

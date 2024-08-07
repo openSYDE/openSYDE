@@ -30,8 +30,7 @@ public:
    C_OscSecurityPemDatabase();
 
    uint32_t GetSizeOfDatabase(void) const;
-   const C_OscSecurityPemKeyInfo * GetPemFileBySerialNumber(const std::vector<uint8_t> & orc_SerialNumber)
-   const;
+   const C_OscSecurityPemKeyInfo * GetPemFileBySerialNumber(const std::vector<uint8_t> & orc_SerialNumber) const;
    const C_OscSecurityPemKeyInfo * GetLevel7PemInformation(void) const;
 
    int32_t AddLevel7PemFile(const std::string & orc_Path);

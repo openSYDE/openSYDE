@@ -161,7 +161,6 @@ C_SdTopologyScene::~C_SdTopologyScene()
    \param[in]  opu64_UniqueId    Optional pointer to unique ID to use for new item
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{3702}
 void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & orc_Pos,
                                 const uint64_t * const opu64_UniqueId)
 {
@@ -239,15 +238,23 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
            (pc_MainDevice->c_SubDevices[0].q_FlashloaderStwCan == true)) && q_TspShortcutActive)
       {
          const uint8_t u8_TIMER_THRESHOLD_IN_MSEC = 100;
+         QString c_NodeName = pc_MainDevice->GetDisplayName().c_str();
+         const stw::opensyde_core::C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
+            s32_Index);
+         if (pc_OscNode != NULL)
+         {
+            c_NodeName = pc_OscNode->c_Properties.c_Name.c_str();
+         }
 
          QTimer::singleShot(u8_TIMER_THRESHOLD_IN_MSEC, this,
-                            [&, pc_Item, pc_MainDevice, u32_OriginalOscNodeSize, u32_SubDevicesSize, s32_Index] ()
+                            [this, pc_Item, c_NodeName, u32_OriginalOscNodeSize, u32_SubDevicesSize,
+                             s32_Index] ()
          {
             C_GiNode * const pc_TimerItem = pc_Item;
             const int32_t s32_TimerIndex = s32_Index;
 
             const bool q_UseShortcut =
-               m_ShowShortcutTspOption(pc_MainDevice, u32_OriginalOscNodeSize, u32_SubDevicesSize);
+               m_ShowShortcutTspOption(c_NodeName, u32_OriginalOscNodeSize, u32_SubDevicesSize);
 
             //Selection
             if (!q_UseShortcut)
@@ -2282,7 +2289,8 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
          if (pc_Node->GetIndex() >= 0)
          {
             Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT,
-                                       static_cast<uint32_t>(pc_Node->GetIndex()), pc_Node->GetText(), "", u32_Flag);
+                                       static_cast<uint32_t>(pc_Node->GetIndex()),
+                                       pc_Node->GetFirstSelectableFullName(), "", u32_Flag);
          }
       }
    }
@@ -3948,7 +3956,7 @@ bool stw::opensyde_gui::C_SdTopologyScene::m_ActivateTspShortcut(const scl::C_Sc
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, oru32_SubNodeIndex,
                               c_SUB_NODE_TITLE,  "", u32_FLAG);
 
-   const bool q_Cancel = Q_EMIT (SigOpenTsp(orc_NodeName));
+   const bool q_Cancel = Q_EMIT (SigOpenTsp());
 
    return q_Cancel;
 }
@@ -3985,23 +3993,22 @@ void C_SdTopologyScene::m_AddTspForAllSubNodes(const uint32_t & oru32_SubDevices
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Show TSP shortcut option
-kv
-   \param[in]      opc_MainDevice              main osc device
-   \param[in]      u32_OriginalOscNodeSize     Original OSC Node size
-   \param[in]      u32_SubDevicesSize          SubDevices size
+
+   \param[in]  orc_NodeName               Node name
+   \param[in]  oru32_OriginalOscNodeSize  Original OSC node size
+   \param[in]  oru32_SubDevicesSize       Sub devices size
 
    \retval true     Use TSP Shortcut assistance
    \retval false    Not use TSP shortcut assistance
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdTopologyScene::m_ShowShortcutTspOption(const C_OscDeviceDefinition * const opc_MainDevice,
+bool C_SdTopologyScene::m_ShowShortcutTspOption(const QString & orc_NodeName,
                                                 const uint32_t & oru32_OriginalOscNodeSize,
                                                 const uint32_t & oru32_SubDevicesSize)
 {
    bool q_UseShortcut = false;
-   const stw::scl::C_SclString c_NodeName = opc_MainDevice->c_DeviceName;
 
-   const stw::scl::C_SclString c_TitleString = c_NodeName;
+   const stw::scl::C_SclString c_TitleString = orc_NodeName.toStdString().c_str();
    const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
    const stw::scl::C_SclString c_MessageBoxText = "Do you want to import openSYDE Target Support Package file(s) to " +
                                                   c_TitleString  + "?";
@@ -4026,7 +4033,7 @@ bool C_SdTopologyScene::m_ShowShortcutTspOption(const C_OscDeviceDefinition * co
    if (e_Output == C_OgeWiCustomMessage::eOK)
    {
       q_UseShortcut = true;
-      m_AddTspForAllSubNodes(oru32_SubDevicesSize, oru32_OriginalOscNodeSize, c_NodeName);
+      m_AddTspForAllSubNodes(oru32_SubDevicesSize, oru32_OriginalOscNodeSize, orc_NodeName.toStdString().c_str());
    }
 
    return q_UseShortcut;

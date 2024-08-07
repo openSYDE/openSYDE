@@ -47,7 +47,8 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_FlaUpListWidget::C_FlaUpListWidget(QWidget * const opc_Parent) :
    QListWidget(opc_Parent),
-   mpc_ContextMenu(NULL)
+   mpc_ContextMenu(NULL),
+   mq_EnableSettings(true)
 {
    this->setFrameShape(QFrame::NoFrame);
    this->m_LoadLastKnownHexFilePaths();
@@ -430,6 +431,7 @@ bool C_FlaUpListWidget::AreAllFilesValid(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListWidget::EnableSettings(const bool oq_Enabled)
 {
+   this->mq_EnableSettings = oq_Enabled;
    for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       QListWidgetItem * const pc_CurrentItem = this->item(s32_It);
@@ -478,7 +480,7 @@ void C_FlaUpListWidget::DragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    const QMimeData * const pc_MimeData = opc_Event->mimeData();
 
-   if (pc_MimeData->hasUrls())
+   if ((this->mq_EnableSettings == true) && pc_MimeData->hasUrls())
    {
       const QList<QUrl> c_Urls = pc_MimeData->urls();
       for (int32_t s32_It = 0; s32_It < c_Urls.size(); ++s32_It)
@@ -971,7 +973,9 @@ bool C_FlaUpListWidget::m_AskUserToSaveRelativePath(const QString & orc_Path, co
    C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative);
 
    c_Message.SetHeading(C_GtGetText::h_GetText("Relative Path"));
-   c_Message.SetDescription(C_GtGetText::h_GetText("Do you want to save the selected path relative or absolute?"));
+   c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                    "Do you want to save the selected path (%1) relative or absolute?")).arg(
+                               c_PathAbsolute));
    c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
                         arg(c_PathRelative).arg(c_PathAbsolute));
    c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));

@@ -1568,7 +1568,7 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
                      c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
 
                      //get private key from PEM file
-                     c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
+                     c_PrivKey = pc_PemKeyInfo->GetPrivateKey();
 
                      //calculate RSA signature with private key and random value from server (u64_Seed)
                      s32_Return = C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);

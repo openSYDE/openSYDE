@@ -18,15 +18,17 @@
 #include "C_Uti.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_SdUtil.hpp"
-
+#include "C_PuiSdUtil.hpp"
 #include "C_CieDcfEdsImportNodeSelectWidget.hpp"
 #include "ui_C_CieDcfEdsImportNodeSelectWidget.h"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -152,7 +154,6 @@ int32_t C_CieDcfEdsImportNodeSelectWidget::GetNodeSelection(uint32_t & oru32_Nod
          s32_Return = C_NO_ERR;
       }
    }
-
    return s32_Return;
 }
 
@@ -229,4 +230,17 @@ void C_CieDcfEdsImportNodeSelectWidget::m_FillUpComboBox(const uint32_t ou32_Bus
    {
       this->mpc_Ui->pc_CbxNode->addItem(*c_NodeIt);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Node change on user request
+
+   \param[in] ou32_NodeIndex         index of selected node
+   \param[in] ou32_InterfaceIndex    index of interface for selected node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieDcfEdsImportNodeSelectWidget::NodeIdToBeChanged(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_InterfaceIndex)
+{
+   C_SdUtil::h_NodeIdToBeChanged(ou32_NodeIndex, ou32_InterfaceIndex, this);
 }

@@ -57,7 +57,7 @@ public:
    static QString h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
                                     const QString & orc_StartingFolder, const QString & orc_Filter,
                                     const QString & orc_DefaultFileName,
-                                    const QFileDialog::Options & orc_Option = QFileDialog::Options());
+                                    const QFileDialog::Options & orc_Option = QFileDialog::Options(), QString * const opc_SelectedFilter = NULL);
    static void h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths);
    static int32_t h_AskOverwriteFile(QWidget * const opc_Parent, const QString & orc_FilePath);
 
@@ -66,7 +66,7 @@ private:
                                  const QString & orc_StartingFolder, const QString & orc_Filter,
                                  const QString & orc_DefaultFileName, const QString & orc_DefaultSuffix,
                                  const QFileDialog::AcceptMode & ore_SaveOrOpen,
-                                 const QFileDialog::Options & orc_Option);
+                                 const QFileDialog::Options & orc_Option, QString * const opc_SelectedFilter = NULL);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -21,12 +21,16 @@
 #include "C_SdNdeCoWidget.hpp"
 #include "ui_C_SdNdeCoWidget.h"
 #include "C_OscNode.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,7 +55,9 @@ using namespace stw::opensyde_gui_logic;
 C_SdNdeCoWidget::C_SdNdeCoWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeCoWidget),
-   mu32_NodeIndex(0UL)
+   mu32_NodeIndex(0UL),
+   mu8_InterfaceNumber(0)
+
 {
    this->mpc_Ui->setupUi(this);
 
@@ -110,6 +116,10 @@ C_SdNdeCoWidget::C_SdNdeCoWidget(QWidget * const opc_Parent) :
    // For rechecking the errors in tree
    connect(this, &C_SdNdeCoWidget::SigErrorChange,
            this->mpc_Ui->pc_CoConfigTree, &C_SdNdeCoConfigTreeView::CheckError);
+   connect(this->mpc_Ui->pc_CoConfigTree, &C_SdNdeCoConfigTreeView::SigNodeIdToBeChanged,
+           this, &C_SdNdeCoWidget::m_NodeIdToBeChanged);
+   connect(this->mpc_Ui->pc_CoConfigTree, &C_SdNdeCoConfigTreeView::SigNodeIdToBeChangedWithInterfaceIndex,
+           this, &C_SdNdeCoWidget::m_NodeIdToBeChangedWithInterfaceIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -329,6 +339,7 @@ void C_SdNdeCoWidget::m_OnOverviewClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoWidget::m_OnInterfaceSelected(const uint8_t ou8_InterfaceNumber)
 {
+   this->mu8_InterfaceNumber = ou8_InterfaceNumber;
    this->mpc_Ui->pc_OverviewWidget->setVisible(false);
    this->mpc_Ui->pc_PubOverview->setChecked(false);
    //set Node Index and Interface ID
@@ -384,4 +395,29 @@ void C_SdNdeCoWidget::m_OnLinkSwitchToManager(const QString & orc_Link) const
                                                         this->mu32_NodeIndex));
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Node change on user request
+
+    \param[in]       ou32_NodeIndex     Current node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoWidget::m_NodeIdToBeChanged(const uint32_t ou32_NodeIndex)
+{
+   this->m_NodeIdToBeChangedWithInterfaceIndex(ou32_NodeIndex, this->mu8_InterfaceNumber);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Node Id change from Add CanOpen device
+
+    \param[in]       ou32_NodeIndex          Current node index
+    \param[in]       ou32_InterfaceIndex     Current node interface index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoWidget::m_NodeIdToBeChangedWithInterfaceIndex(const uint32_t ou32_NodeIndex,
+                                                            const uint32_t ou32_InterfaceIndex)
+{
+   C_SdUtil::h_NodeIdToBeChanged(ou32_NodeIndex, ou32_InterfaceIndex, this);
+   Q_EMIT (this->SigPropAndCoTabUpdateTrigger(ou32_NodeIndex));
 }

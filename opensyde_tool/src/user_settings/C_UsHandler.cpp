@@ -713,6 +713,19 @@ QString C_UsHandler::GetLastKnownCsvExportPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known private key path (PEM file for secure update)
+
+   \return
+   Last known private key path
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownPrivateKeyPath() const
+{
+   return this->mc_LastKnownPrivateKeyPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last known import path
 
    \return
@@ -1370,6 +1383,17 @@ void C_UsHandler::SetLastKnownJ1939CatalogPath(const QString & orc_NewPath)
 void C_UsHandler::SetLastKnownCsvExportPath(const QString & orc_NewPath)
 {
    this->mc_LastKnownServiceProjectPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known private key file path (PEM file for secure update)
+
+   \param[in]  orc_NewPath    PEM file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownPrivateKeyPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownPrivateKeyPath = orc_NewPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

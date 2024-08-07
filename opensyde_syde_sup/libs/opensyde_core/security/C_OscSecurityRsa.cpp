@@ -13,8 +13,10 @@
 #include "precomp_headers.hpp"
 
 #include <cstring>
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
+
+#include "openssl/x509.h"
+#include "openssl/rsa.h"
+#include "openssl/pem.h"
 
 #include "stwerrors.hpp"
 #include "C_OscSecurityRsa.hpp"
@@ -47,6 +49,14 @@ C_OscSecurityRsa::C_OscSecurityRsa()
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sign signature
+
+   Formats:
+   Key:
+   * binary in PKCS#8 format
+   Message:
+   * stream of binary data
+   EncryptedMessage:
+   * <TBC>
 
    \param[in]      orc_PrivateKey         Private key in PKCS#8 format
    \param[in]      orc_Message            Message
@@ -111,6 +121,16 @@ int32_t C_OscSecurityRsa::h_SignSignature(const std::vector<uint8_t> & orc_Priva
 /*! \brief  Verify signature
 
    Checks whether an encrypted messages, decrypted with a public key matches an expected message.
+
+   Formats:
+   Key:
+   * is expected to be provided in X.509 format.
+   * When looking at a .PEM file:
+   ** effectively everything between the "BEGIN CERTIFICATE" and "END CERTIFICATE" lines converted from base64 to binary.
+   Message:
+   * stream of binary data
+   Encrypted message:
+   * <tbd>
 
    \param[in]   orc_PublicKey          Public key in X509 format
    \param[in]   orc_Message            Expected message

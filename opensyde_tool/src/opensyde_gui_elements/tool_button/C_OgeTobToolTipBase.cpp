@@ -39,7 +39,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTobToolTipBase::C_OgeTobToolTipBase(QWidget * const opc_Parent) :
-   QToolButton(opc_Parent)
+   QToolButton(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

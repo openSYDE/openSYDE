@@ -138,6 +138,8 @@ public:
    bool IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
    uint32_t CountAllLocalMessages(void) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    C_OscNodeDataPoolListElement * GetDataPoolListElement(const uint32_t ou32_DataPoolIndex,
                                                          const uint32_t ou32_ListIndex,

@@ -52,6 +52,7 @@ const float64_t C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_CLICK_OFFSET = 8.0;
 C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
                                            const QColor & orc_ResizeItemColor, const QString & orc_Name,
                                            const float64_t of64_Space, QGraphicsItem * const opc_Parent) :
+   QObject(),
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(orc_BackgroundColor, orc_FontColor, mc_STYLE_GUIDE_FONT_REGULAR_16, orc_Name, true, opc_Parent),
    mu16_ByteRow(0U),

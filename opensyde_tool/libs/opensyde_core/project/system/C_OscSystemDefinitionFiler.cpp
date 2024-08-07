@@ -647,6 +647,10 @@ int32_t C_OscSystemDefinitionFiler::h_LoadSystemDefinition(C_OscSystemDefinition
          if (q_UseV3Filer)
          {
             //Completely rely on V3 loader
+            if (s32_Retval == C_NO_ERR)
+            {
+               s32_Retval = mh_LoadSystemDefinitionProperties(orc_SystemDefinition, orc_XmlParser);
+            }
             //Groups
             orc_SystemDefinition.c_NodeSquads.clear();
             if (s32_Retval == C_NO_ERR)
@@ -736,6 +740,7 @@ int32_t C_OscSystemDefinitionFiler::h_SaveSystemDefinition(const C_OscSystemDefi
    orc_XmlParser.SetNodeContent(C_SclString::IntToStr(hu16_FILE_VERSION_LATEST));
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
+   mh_SaveSystemDefinitionProperties(orc_SystemDefinition, orc_XmlParser);
    C_OscNodeSquadFiler::h_SaveNodeGroups(orc_SystemDefinition.c_NodeSquads, orc_XmlParser);
    //Node
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("nodes") == "nodes");
@@ -800,4 +805,51 @@ std::map<uint32_t, C_SclString> C_OscSystemDefinitionFiler::mh_MapNodeIndicesToN
       c_Retval[u32_It] = rc_Node.c_Properties.c_Name;
    }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load system definition properties
+
+   \param[in,out]  orc_SystemDefinition   System definition
+   \param[in,out]  orc_XmlParser          Xml parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    system definition content is invalid or incomplete
+               device definition could not be loaded
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscSystemDefinitionFiler::mh_LoadSystemDefinitionProperties(C_OscSystemDefinition & orc_SystemDefinition,
+                                                                      C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.SelectNodeChild("properties") == "properties")
+   {
+      s32_Retval = orc_XmlParser.GetAttributeUint32Error("name-max-char-limit",
+                                                         orc_SystemDefinition.u32_NameMaxCharLimit);
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
+   }
+   else
+   {
+      orc_SystemDefinition.u32_NameMaxCharLimit = 31UL;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save system definition properties
+
+   \param[in]      orc_SystemDefinition   System definition
+   \param[in,out]  orc_XmlParser          Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemDefinitionFiler::mh_SaveSystemDefinitionProperties(const C_OscSystemDefinition & orc_SystemDefinition,
+                                                                   C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.CreateAndSelectNodeChild("properties");
+   orc_XmlParser.SetAttributeUint32("name-max-char-limit", orc_SystemDefinition.u32_NameMaxCharLimit);
+   //Return
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
 }

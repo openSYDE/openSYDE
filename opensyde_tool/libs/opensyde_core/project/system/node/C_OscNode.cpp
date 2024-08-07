@@ -2253,6 +2253,37 @@ uint32_t C_OscNode::CountAllLocalMessages(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNode::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                       std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItDp = 0UL; u32_ItDp < this->c_DataPools.size(); ++u32_ItDp)
+   {
+      C_OscNodeDataPool & rc_Dp = this->c_DataPools[u32_ItDp];
+      rc_Dp.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < this->c_ComProtocols.size(); ++u32_ItProt)
+   {
+      C_OscCanProtocol & rc_Prot = this->c_ComProtocols[u32_ItProt];
+      rc_Prot.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   this->c_HalcConfig.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   for (uint32_t u32_ItDatablock = 0UL; u32_ItDatablock < this->c_Applications.size(); ++u32_ItDatablock)
+   {
+      C_OscNodeApplication & rc_Datablock = this->c_Applications[u32_ItDatablock];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "node-datablock-name",
+                                                                                rc_Datablock.c_Name,
+                                                                                opc_ChangedItems);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Utility: get specific data pool element
 
    Returns pointer to specific data pool element.

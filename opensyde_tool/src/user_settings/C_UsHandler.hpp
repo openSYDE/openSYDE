@@ -96,6 +96,7 @@ public:
    QString GetLastKnownRamViewProjectPath(void) const;
    QString GetLastKnownJ1939CatalogPath(void) const;
    QString GetLastKnownCsvExportPath(void) const;
+   QString GetLastKnownPrivateKeyPath(void) const;
    C_UsNode GetProjSdNode(const QString & orc_NodeName) const;
    C_UsCommunication GetProjSdBus(const QString & orc_BusName) const;
    C_UsSystemView GetProjSvSetupView(const QString & orc_ViewName) const;
@@ -157,6 +158,7 @@ public:
    void SetLastKnownRamViewProjectPath(const QString & orc_NewPath);
    void SetLastKnownJ1939CatalogPath(const QString & orc_NewPath);
    void SetLastKnownCsvExportPath(const QString & orc_NewPath);
+   void SetLastKnownPrivateKeyPath(const QString & orc_NewPath);
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
    void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
                                       const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol);
@@ -313,18 +315,20 @@ private:
    QString mc_LastKnownRamViewProjectPath;               ///< History of last known RAMView project import path
    QString mc_LastKnownJ1939CatalogPath;                 ///< History of last known J1939 catalog import path
    QString mc_LastKnownCsvExportPath;                    ///< History of last known CSV export path
-   QMap<QString, C_UsSystemView> mc_ProjSvSetupView;     ///< History of last known view user settings
-   QMap<QString, C_UsNode> mc_ProjSdNode;                ///< History of last known node user settings
-   QMap<QString, C_UsCommunication> mc_ProjSdBus;        ///< History of last known bus user settings
-   int32_t ms32_SysDefSubMode;                           ///< History of last known system definition sub mode
-   uint32_t mu32_SysDefIndex;                            ///< History of last known system definition index
-   uint32_t mu32_SysDefFlag;                             ///< History of last known system definition flag
-   int32_t ms32_SysViewSubMode;                          ///< History of last known system view sub mode
-   uint32_t mu32_SysViewIndex;                           ///< History of last known system view index
-   uint32_t mu32_SysViewFlag;                            ///< History of last known system view flag
-   int32_t ms32_SysDefNodeEditTabIndex;                  ///< History of last known tab index in node edit
-   int32_t ms32_SysDefBusEditTabIndex;                   ///< History of last known tab index in bus edit
-   int32_t ms32_ScreenshotGifSucessTimeout;              ///< Screenshot GIF Play timer
+   QString mc_LastKnownPrivateKeyPath;                   ///< History of last known private key path (PEM file for
+   ///< secure update)
+   QMap<QString, C_UsSystemView> mc_ProjSvSetupView; ///< History of last known view user settings
+   QMap<QString, C_UsNode> mc_ProjSdNode;            ///< History of last known node user settings
+   QMap<QString, C_UsCommunication> mc_ProjSdBus;    ///< History of last known bus user settings
+   int32_t ms32_SysDefSubMode;                       ///< History of last known system definition sub mode
+   uint32_t mu32_SysDefIndex;                        ///< History of last known system definition index
+   uint32_t mu32_SysDefFlag;                         ///< History of last known system definition flag
+   int32_t ms32_SysViewSubMode;                      ///< History of last known system view sub mode
+   uint32_t mu32_SysViewIndex;                       ///< History of last known system view index
+   uint32_t mu32_SysViewFlag;                        ///< History of last known system view flag
+   int32_t ms32_SysDefNodeEditTabIndex;              ///< History of last known tab index in node edit
+   int32_t ms32_SysDefBusEditTabIndex;               ///< History of last known tab index in bus edit
+   int32_t ms32_ScreenshotGifSucessTimeout;          ///< Screenshot GIF Play timer
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -38,7 +38,6 @@
 #include "C_OscNode.hpp"
 #include "C_CieExportDbc.hpp"
 #include "C_CieExportReportWidget.hpp"
-#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -310,9 +309,9 @@ void C_CieUtil::h_AdaptName(C_SclString & orc_Name, C_SclString & orc_Comment, c
    c_NewName.ReplaceAll(" ", "");
 
    //cut string:
-   if (c_NewName.Length() > ms32_C_ITEM_MAX_CHAR_COUNT)
+   if (c_NewName.Length() > C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit())
    {
-      c_NewName.Delete(ms32_C_ITEM_MAX_CHAR_COUNT + 1, c_NewName.Length());
+      c_NewName.Delete(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit() + 1, c_NewName.Length());
    }
 
    if ((orc_Name == c_NewName) && (oq_AlwaysAppendNameInComment == false))
@@ -572,9 +571,9 @@ QString C_CieUtil::h_GetMessageName(const C_OscNode & orc_Node, const bool oq_Is
    {
       c_Nodename = orc_Node.c_Properties.c_Name;
    }
-   if (c_Nodename.Length() > 24)
+   if (c_Nodename.Length() > (C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit() - 7UL))
    {
-      c_Nodename = c_Nodename.SubString(1, 24);
+      c_Nodename = c_Nodename.SubString(1, C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit() - 7UL);
    }
    if (oe_ProtocolType == C_OscCanProtocol::eCAN_OPEN)
    {
@@ -806,6 +805,7 @@ int32_t C_CieUtil::mh_ImportDcfEdsFile(const uint32_t ou32_BusIndex, const C_Osc
       uint32_t u32_NodeIndex = 0;
       uint32_t u32_InterfaceIndex = 0;
       tgl_assert(pc_DialogNodeSelection->GetNodeSelection(u32_NodeIndex, u32_InterfaceIndex) == C_NO_ERR);
+      pc_DialogNodeSelection->NodeIdToBeChanged(u32_NodeIndex, u32_InterfaceIndex);
       const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
 
       // add to output to forward information about which nodes should get active

@@ -43,6 +43,7 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeListWidgetToolTipBase::C_OgeListWidgetToolTipBase(QWidget * const opc_Parent) :
    QListWidget(opc_Parent),
+   C_OgeToolTipBase(),
    ms32_HoveredRow(-1),
    ms32_HoveredCol(-1)
 {

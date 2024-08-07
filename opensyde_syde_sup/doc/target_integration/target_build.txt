@@ -7,12 +7,10 @@ Linux based target with socket CAN
 ==================================
 Prerequisites:
 - Linux-based target with socket CAN
-- 32-bit compiler (64-bit compiling is not supported by opensyde core)
 - toolchain file that specifies the compiler
 
 Rebuild the project in analogy to Ubuntu build (see build.txt).
 Check your build as described in target_verify.txt.
-
 
 Other targets
 =============
@@ -44,5 +42,4 @@ are required:
 How these components interact can be seen on the graphic 
 next to this .txt file.
 
-Build your project with a 32-bit compiler.
 Check your build as described in target_verify.txt.

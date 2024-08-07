@@ -142,6 +142,8 @@ C_SdNdeCoConfigTreeView::C_SdNdeCoConfigTreeView(QWidget * const opc_Parent) :
            &C_SdNdeCoConfigTreeView::m_HandleDeviceRemoved);
 
    connect(this, &C_SdNdeCoConfigTreeView::expanded, this, &C_SdNdeCoConfigTreeView::m_OnExpanded);
+   connect(&this->mc_Model, &C_SdNdeCoConfigTreeModel::SigNodeIdToBeChanged, this,
+           &C_SdNdeCoConfigTreeView::SigNodeIdToBeChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -786,7 +788,6 @@ void C_SdNdeCoConfigTreeView::m_OnAddDevice(void)
       C_SdNdeCoAddDeviceDialog * const pc_AddDialog = new C_SdNdeCoAddDeviceDialog(*c_PopUp,
                                                                                    this->mu32_NodeIndex,
                                                                                    u8_InterfaceNumber);
-
       //Resize
       const QSize c_SIZE(1200, 829);
       c_PopUp->SetSize(c_SIZE);
@@ -820,6 +821,7 @@ void C_SdNdeCoConfigTreeView::m_OnAddDevice(void)
          }
          else
          {
+            Q_EMIT this->SigNodeIdToBeChangedWithInterfaceIndex(u32_NodeIndex, u32_InterfaceIndex);
             this->m_OnAddDeviceReport(u32_NodeIndex, u32_InterfaceIndex, u8_InterfaceNumber, c_EdsPath);
          }
       }

@@ -7,7 +7,7 @@ project("console_system_updater_sydesup")
 include(lint_config.cmake)
 
 if (NOT WIN32)
-   #dynamic link
+   #link OpenSSL statically
    set(OPENSSL_USE_STATIC_LIBS TRUE) 
    find_package(OpenSSL REQUIRED)
 endif()
@@ -22,7 +22,7 @@ set(SYDESUP_COMMON_INCLUDE_DIRECTORIES
 if (WIN32)
    set(SYDESUP_COMMON_INCLUDE_DIRECTORIES
       ${SYDESUP_COMMON_INCLUDE_DIRECTORIES}
-      #/libs/openssl/include needen only on windows
+      #/libs/openssl/include needed only on Windows
      ${PROJECT_ROOT}/libs/openssl/openssl/include
       )
 endif()

@@ -395,6 +395,7 @@ void C_PuiSdHandlerData::Clear(const bool oq_TriggerSyncSignals)
 {
    this->mc_UiBuses.clear();
    this->mc_UiNodes.clear();
+   this->mc_CoreDefinition.u32_NameMaxCharLimit = ms32_C_ITEM_MAX_CHAR_COUNT;
    this->mc_CoreDefinition.c_NodeSquads.clear();
    this->mc_CoreDefinition.c_Buses.clear();
    this->mc_CoreDefinition.c_Nodes.clear();

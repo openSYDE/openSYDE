@@ -645,13 +645,32 @@ void C_SdNdeCoConfigTreeModel::m_InitInterfaceNodeContent(const C_OscNodeComInte
                                                           const bool oq_ContainsChildren,
                                                           C_TblTreeModelCheckableItem & orc_InterfaceEntry) const
 {
-   orc_InterfaceEntry.c_Name = static_cast<QString>(C_GtGetText::h_GetText("%1 - CANopen Manager")).arg(C_PuiSdUtil::h_GetInterfaceName(
-                                                                                                           orc_Interface
-                                                                                                           .
-                                                                                                           e_InterfaceType,
-                                                                                                           orc_Interface
-                                                                                                           .
-                                                                                                           u8_InterfaceNumber));
+   // Default - not connected to any bus
+   QString c_DisplayName = C_GtGetText::h_GetText("%1 (not connected) - CANopen Manager");
+
+   // Add linked bus info if connected
+   if (orc_Interface.GetBusConnected() == true)
+   {
+      const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(orc_Interface.u32_BusIndex);
+      QString c_BusName;
+
+      //get bus name
+      if (pc_Bus != NULL)
+      {
+         c_BusName = pc_Bus->c_Name.c_str();
+         c_DisplayName = C_GtGetText::h_GetText("%1 (linked to ") + c_BusName + C_GtGetText::h_GetText(
+            ") - CANopen Manager");
+      }
+   }
+
+   orc_InterfaceEntry.c_Name = static_cast<QString>(c_DisplayName).arg(C_PuiSdUtil::h_GetInterfaceName(
+                                                                          orc_Interface
+                                                                          .
+                                                                          e_InterfaceType,
+                                                                          orc_Interface
+                                                                          .
+                                                                          u8_InterfaceNumber));
+
    orc_InterfaceEntry.q_CheckBoxVisible = true;
    if (oq_ContainsChildren)
    {
@@ -907,6 +926,7 @@ bool C_SdNdeCoConfigTreeModel::m_CheckInterface(const QModelIndex & orc_Index,
          this->m_HandleCheckInterfaceAction(orc_Index, orc_InterfaceItem);
 
          Q_EMIT (this->SigSelectManager(orc_Index));
+         Q_EMIT (this->SigNodeIdToBeChanged(this->mu32_NodeIndex));
       }
       else
       {

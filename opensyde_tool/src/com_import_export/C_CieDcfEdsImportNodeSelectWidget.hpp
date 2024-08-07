@@ -42,6 +42,7 @@ public:
    void InitStaticNames(void);
 
    int32_t GetNodeSelection(uint32_t & oru32_NodeIndex, uint32_t & oru32_InterfaceIndex) const;
+   void NodeIdToBeChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex);
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;

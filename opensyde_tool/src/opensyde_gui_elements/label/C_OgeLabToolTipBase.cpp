@@ -40,7 +40,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLabToolTipBase::C_OgeLabToolTipBase(QWidget * const opc_Parent) :
-   QLabel(opc_Parent)
+   QLabel(opc_Parent),
+   C_OgeToolTipBase()
 {
 }
 

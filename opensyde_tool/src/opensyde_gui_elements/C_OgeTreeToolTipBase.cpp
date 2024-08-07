@@ -39,6 +39,7 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeToolTipBase::C_OgeTreeToolTipBase(void) :
+   C_OgeToolTipBase(),
    ms32_HoveredNumberOfParents(-1),
    ms32_HoveredRow(-1),
    ms32_HoveredCol(-1),

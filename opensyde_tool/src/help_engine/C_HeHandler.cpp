@@ -189,6 +189,10 @@ C_HeHandler::~C_HeHandler()
 //----------------------------------------------------------------------------------------------------------------------
 void C_HeHandler::m_InitSpecialHelpPages(void)
 {
+   //Main Page
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_NagCharLengthSettingPopupDialog",
+                                      "Global Project Settings");
+
    //System Definition
 
    //Network Topology

@@ -301,12 +301,13 @@ QVariant C_SdNdeDpListTableModel::headerData(const int32_t os32_Section, const Q
             c_Retval = "Type of data element";
             break;
          case eNAME:
-            c_Retval =  C_GtGetText::h_GetText(
-               "Symbolic data element name. Unique within a Datapool list."
-               "\nFollowing C naming conventions are required:"
-               "\n - must not be empty"
-               "\n - only alphanumeric characters and \"_\""
-               "\n - should not be longer than 31 characters");
+            c_Retval =  static_cast<QString>(C_GtGetText::h_GetText(
+                                                "Symbolic data element name. Unique within a Datapool list."
+                                                "\nFollowing C naming conventions are required:"
+                                                "\n - must not be empty"
+                                                "\n - only alphanumeric characters and \"_\""
+                                                "\n - should not be longer than %1 (= project setting) characters")).arg(
+               C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
             break;
          case eCOMMENT:
             c_Retval = C_GtGetText::h_GetText("Comment for this data element.");

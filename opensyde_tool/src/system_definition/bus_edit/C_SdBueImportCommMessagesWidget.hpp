@@ -80,7 +80,6 @@ private:
    void m_AddPrototcolsToCombobox();
    void m_OkClicked(void);
    void m_CancelClicked(void);
-   void m_SetBackgroundColor(const QColor & orc_BackgroundColor);
 
    /*************Variables*****************/
    Ui::C_SdImportCommMessagesWidget * mpc_Ui;

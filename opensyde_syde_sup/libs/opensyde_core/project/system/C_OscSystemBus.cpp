@@ -42,6 +42,8 @@ C_OscSystemBus::C_OscSystemBus(void) :
    c_Name("NewBus"),
    c_Comment(""),
    u64_BitRate(125000ULL),
+   q_UseCanFd(false),
+   u64_CanFdBitRate(1000000ULL),
    u8_BusId(0),
    u16_RxTimeoutOffsetMs(0),
    q_UseableForRouting(true)
@@ -73,6 +75,8 @@ void C_OscSystemBus::CalcHash(uint32_t & oru32_HashValue) const
    C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
    C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    C_SclChecksums::CalcCRC32(&this->u64_BitRate, sizeof(this->u64_BitRate), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_UseCanFd, sizeof(this->q_UseCanFd), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u64_CanFdBitRate, sizeof(this->u64_CanFdBitRate), oru32_HashValue);
    C_SclChecksums::CalcCRC32(&this->u8_BusId, sizeof(this->u8_BusId), oru32_HashValue);
    C_SclChecksums::CalcCRC32(&this->u16_RxTimeoutOffsetMs, sizeof(this->u16_RxTimeoutOffsetMs), oru32_HashValue);
    C_SclChecksums::CalcCRC32(&this->q_UseableForRouting, sizeof(this->q_UseableForRouting), oru32_HashValue);

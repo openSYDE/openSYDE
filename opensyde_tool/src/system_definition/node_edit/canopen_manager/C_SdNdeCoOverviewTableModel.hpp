@@ -33,6 +33,7 @@ public:
    {
       eINDEX = 0,
       eINTERFACE,
+      eLINKEDTO,
       eNODE,
       eROLE,
       eCANOPENNODEID,
@@ -68,6 +69,7 @@ private:
    {
    public:
       QString c_Interface;
+      QString c_LinkedTo;
       QString c_Node;
       QString c_Role;
       QString c_CanOpenId;

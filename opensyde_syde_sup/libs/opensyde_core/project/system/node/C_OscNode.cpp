@@ -858,6 +858,31 @@ void C_OscNode::CalcHash(uint32_t & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all HEX applications
+
+   This returns a vector of all applications that are not of type ePARAMETER_SET_HALC, i.e. those that on system
+   commissioning side are handled as HEX files.
+
+   \return
+   Vector of HEX applications (i.e. all but parameter set applications)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OscNodeApplication> C_OscNode::GetHexApplications(void) const
+{
+   std::vector<C_OscNodeApplication> c_HexApps;
+
+   for (uint32_t u32_Index = 0U; u32_Index < this->c_Applications.size(); ++u32_Index)
+   {
+      if (this->c_Applications[u32_Index].e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
+      {
+         c_HexApps.push_back(this->c_Applications[u32_Index]);
+      }
+   }
+
+   return c_HexApps;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get datapool index by type specific datapool index
 
    \param[in]  oe_DataPoolType         Type of datapool
@@ -2200,6 +2225,61 @@ void C_OscNode::RecalculateAddress(void)
          rc_DataPool.RecalculateAddress();
          u32_Offset += rc_DataPool.u32_NvmSize;
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Count all local messages
+
+   \return
+   Total number of local messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t C_OscNode::CountAllLocalMessages(void) const
+{
+   uint32_t u32_MessageCount = 0UL;
+
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < this->c_ComProtocols.size(); ++u32_ItProt)
+   {
+      const C_OscCanProtocol & rc_Prot = this->c_ComProtocols[u32_ItProt];
+      for (uint32_t u32_ItCont = 0UL; u32_ItCont < rc_Prot.c_ComMessages.size(); ++u32_ItCont)
+      {
+         const C_OscCanMessageContainer & rc_Cont = rc_Prot.c_ComMessages[u32_ItCont];
+         u32_MessageCount += static_cast<uint32_t>(rc_Cont.c_RxMessages.size());
+         u32_MessageCount += static_cast<uint32_t>(rc_Cont.c_TxMessages.size());
+      }
+   }
+   return u32_MessageCount;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNode::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                       std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItDp = 0UL; u32_ItDp < this->c_DataPools.size(); ++u32_ItDp)
+   {
+      C_OscNodeDataPool & rc_Dp = this->c_DataPools[u32_ItDp];
+      rc_Dp.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < this->c_ComProtocols.size(); ++u32_ItProt)
+   {
+      C_OscCanProtocol & rc_Prot = this->c_ComProtocols[u32_ItProt];
+      rc_Prot.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   this->c_HalcConfig.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   for (uint32_t u32_ItDatablock = 0UL; u32_ItDatablock < this->c_Applications.size(); ++u32_ItDatablock)
+   {
+      C_OscNodeApplication & rc_Datablock = this->c_Applications[u32_ItDatablock];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "node-datablock-name",
+                                                                                rc_Datablock.c_Name,
+                                                                                opc_ChangedItems);
    }
 }
 
