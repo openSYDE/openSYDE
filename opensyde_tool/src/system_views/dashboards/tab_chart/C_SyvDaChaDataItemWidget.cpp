@@ -109,7 +109,7 @@ C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32_t ou32_ViewIndex
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaChaDataItemWidget::~C_SyvDaChaDataItemWidget()
+C_SyvDaChaDataItemWidget::~C_SyvDaChaDataItemWidget() noexcept
 {
    delete mpc_Ui;
 }

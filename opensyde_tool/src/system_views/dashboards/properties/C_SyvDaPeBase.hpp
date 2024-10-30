@@ -48,7 +48,7 @@ public:
                           const bool oq_ReadElement, const bool oq_DarkMode,
                           const bool oq_ShowWidgetSpecificPart = true, const bool oq_AllowChangeOfDataElement = true,
                           const QString & orc_DisplayName = "");
-   ~C_SyvDaPeBase(void) override;
+   ~C_SyvDaPeBase(void) noexcept override;
 
    void InitStaticNames(void);
    void SetWidget(QWidget * const opc_Widget);

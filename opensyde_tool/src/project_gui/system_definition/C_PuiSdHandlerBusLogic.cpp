@@ -2060,8 +2060,8 @@ int32_t C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OscCanMessageIdentifica
          C_OscNodeDataPoolListElementId c_Id;
          if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, u32_ItSig, c_Id) == C_NO_ERR)
          {
-            Q_EMIT (this->SigSyncNodeDataPoolListElementAdded(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                              c_Id.u32_ListIndex, c_Id.u32_ElementIndex));
+            m_HandleSyncNodeDataPoolListElementAdded(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                     c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
          }
       }
       if (s32_Retval == C_NO_ERR)
@@ -2101,8 +2101,8 @@ int32_t C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OscCanMessageIdentifica
             C_OscNodeDataPoolListElementId c_Id;
             if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, u32_ItSig - 1UL, c_Id) == C_NO_ERR)
             {
-               Q_EMIT (this->SigSyncNodeDataPoolListElementAboutToBeDeleted(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                                            c_Id.u32_ListIndex, c_Id.u32_ElementIndex));
+               m_HandleSyncNodeDataPoolListElementAboutToBeDeleted(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                                   c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
             }
          }
       }
@@ -2196,8 +2196,8 @@ int32_t C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OscCanMessageIdentificat
       //Signal new signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
       {
-         Q_EMIT (this->SigSyncNodeDataPoolListElementAdded(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                           c_Id.u32_ListIndex, c_Id.u32_ElementIndex));
+         m_HandleSyncNodeDataPoolListElementAdded(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                  c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
       }
       if (s32_Retval == C_NO_ERR)
       {
@@ -2343,8 +2343,8 @@ int32_t C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OscCanMessageIdentificat
       //Signal deleted signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
       {
-         Q_EMIT this->SigSyncNodeDataPoolListElementAboutToBeDeleted(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                                     c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
+         m_HandleSyncNodeDataPoolListElementAboutToBeDeleted(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                             c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
       }
 
       s32_Retval = rc_OscNode.DeleteSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,

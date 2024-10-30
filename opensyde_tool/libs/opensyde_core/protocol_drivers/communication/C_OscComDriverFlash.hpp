@@ -189,6 +189,9 @@ public:
    int32_t SendOsyReadCertificateSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                               std::vector<uint8_t> & orc_SerialNumber,
                                               uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyReadCertificateSerialNumberL7(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                std::vector<uint8_t> & orc_SerialNumber,
+                                                uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyWriteSecurityKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                    const std::vector<uint8_t> & orc_PublicKeyModulus,
                                    const std::vector<uint8_t> & orc_PublicKeyExponent,

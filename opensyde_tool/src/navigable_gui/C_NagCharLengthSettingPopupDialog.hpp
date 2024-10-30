@@ -54,6 +54,7 @@ private:
    void m_ValueChanged(void);
    bool m_AskUserForModifyName(
       std::list<stw::opensyde_core::C_OscSystemNameMaxCharLimitChangeReportItem> orc_ChangedItems);
+   void m_ShowUnUsedFiles(void);
 
    //Avoid call
    C_NagCharLengthSettingPopupDialog(const C_NagCharLengthSettingPopupDialog &);

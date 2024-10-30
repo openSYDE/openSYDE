@@ -108,27 +108,42 @@ void C_TblTreDataElementView::InitSd(const uint32_t ou32_NodeIndex, const int32_
    \param[in] oq_ShowNvmLists           Optional flag to only show NVM LISTs
    \param[in] opc_AlreasyUsedElements   Optional pointer to vector with already used elements. All added elements
                                         will be marked as used an will be disabled. Usable for Datapool element mode
+   \param[in] oq_UseInSysViews          If the view is used within system views/commissioning  or not.
+                                        Default value is true, false otherwise
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSv(const uint32_t ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                      const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
                                      const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
-                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                     const bool oq_UseInSysViews)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
-   if (oq_ShowNvmLists == true)
+   // if the view is used in a context other than system views
+   if (oq_UseInSysViews == false)
    {
-      this->me_Mode = C_TblTreDataElementModel::eNVM_LIST;
-      this->mc_Model.InitSv(this->mu32_ViewIndex, C_TblTreDataElementModel::eNVM_LIST, oq_ShowOnlyWriteElements,
-                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
-                            opc_AlreasyUsedElements);
+      this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
+      this->mc_Model.InitSdDatapoolElements(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
+                                            oq_Show64BitValues,
+                                            opc_AlreasyUsedElements);
    }
    else
    {
-      this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
-      this->mc_Model.InitSv(this->mu32_ViewIndex, C_TblTreDataElementModel::eDATAPOOL_ELEMENT, oq_ShowOnlyWriteElements,
-                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
-                            opc_AlreasyUsedElements);
+      if (oq_ShowNvmLists == true)
+      {
+         this->me_Mode = C_TblTreDataElementModel::eNVM_LIST;
+         this->mc_Model.InitSv(this->mu32_ViewIndex, C_TblTreDataElementModel::eNVM_LIST, oq_ShowOnlyWriteElements,
+                               oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
+                               opc_AlreasyUsedElements);
+      }
+      else
+      {
+         this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
+         this->mc_Model.InitSv(this->mu32_ViewIndex, C_TblTreDataElementModel::eDATAPOOL_ELEMENT,
+                               oq_ShowOnlyWriteElements,
+                               oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
+                               opc_AlreasyUsedElements);
+      }
    }
    m_RestoreExpandedIndices();
 }

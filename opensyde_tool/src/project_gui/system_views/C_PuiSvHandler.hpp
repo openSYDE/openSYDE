@@ -16,7 +16,7 @@
 #include <QObject>
 #include "C_OscNode.hpp"
 #include "C_PuiSvData.hpp"
-#include "C_PuiSvLastKnownHalElementId.hpp"
+#include "C_PuiSdLastKnownHalElementId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -35,21 +35,21 @@ class C_PuiSvHandler :
 public:
    //File
    int32_t LoadFromFile(const QString & orc_Path);
-   int32_t SaveToFile(const QString & orc_Path, const bool oq_UseDeprecatedV1Format);
+   int32_t SaveToFile(const QString & orc_Path, const bool oq_UseDeprecatedV1Format,
+                      const bool oq_UpdateInternalState = true);
    bool HasHashChanged(void) const;
 
    //Get
    const C_PuiSvData * GetView(const uint32_t ou32_Index) const;
    uint32_t GetViewCount(void) const;
-   const std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> & GetLastKnownHalcCrcs(void) const;
+   const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                  C_PuiSdLastKnownHalElementId> & GetLastKnownHalcCrcs(void) const;
    bool GetServiceModeActive(void) const;
    int32_t GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32_ViewIndex, std::vector<uint8_t> & orc_ActiveFlags,
                                                 const bool oq_IncludeRoutingResults = true);
 
    //Set
    void SetServiceModeActive(const bool oq_NewValue);
-   void SetLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                            C_PuiSvLastKnownHalElementId> & orc_Value);
    int32_t SetViewName(const uint32_t ou32_Index, const QString & orc_Name);
    int32_t SetViewNodeCheckedState(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex, const bool oq_Checked);
    int32_t SetViewPcBox(const uint32_t ou32_Index, const C_PuiBsBox & orc_Box);
@@ -228,8 +228,8 @@ protected:
    std::vector<C_PuiSvData> mc_Views;
 
    int32_t m_LoadFromFile(const QString & orc_Path, const std::vector<stw::opensyde_core::C_OscNode> & orc_OscNodes);
-   void m_AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
-                              const C_PuiSvLastKnownHalElementId & orc_Crc);
+   void m_AddLastKnownHalcCrc(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id,
+                              const C_PuiSdLastKnownHalElementId & orc_Crc);
 
    //Avoid call (protected access for test)
    explicit C_PuiSvHandler(QObject * const opc_Parent = NULL);
@@ -322,7 +322,8 @@ private:
    uint32_t mu32_PreviousSystemDefintionHash;
 
    bool mq_IsServiceModeActive;
-   std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> mc_LastKnownHalcCrcs;
+   std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+            C_PuiSdLastKnownHalElementId> mc_LastKnownHalcCrcs;
 
    class C_PuiSvViewErrorDetails
    {

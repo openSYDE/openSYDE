@@ -26,6 +26,7 @@
 #include "C_PuiBsLineArrow.hpp"
 #include "C_PuiSdSharedDatapools.hpp"
 #include "C_OscSystemDefinition.hpp"
+#include "C_PuiSdLastKnownHalElementId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -132,14 +133,23 @@ public:
                                         stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveBusTextElements(const std::vector<C_PuiSdTextElementBus> & orc_BusTextElements,
                                      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static int32_t h_LoadLastKnownHalcCrcs(std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                                                   C_PuiSdLastKnownHalElementId> & orc_Crcs,
+                                          stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static void h_SaveLastKnownHalcCrcs(const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                                                      C_PuiSdLastKnownHalElementId> & orc_Crcs,
+                                       stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
 
    //Complete
    static int32_t h_SaveSystemDefinitionUiFile(const QString & orc_FilePath,
-                                               const stw::opensyde_core::C_OscSystemDefinition & orc_OscSystemDefinition, const std::vector<C_PuiSdNode> & orc_UiNodes, const std::vector<C_PuiSdBus> & orc_UiBuses, const std::vector<C_PuiSdTextElementBus> & orc_BusTextElements, const stw::opensyde_gui_logic::C_PuiBsElements & orc_Elements);
+                                               const stw::opensyde_core::C_OscSystemDefinition & orc_OscSystemDefinition, const std::vector<C_PuiSdNode> & orc_UiNodes, const std::vector<C_PuiSdBus> & orc_UiBuses, const std::vector<C_PuiSdTextElementBus> & orc_BusTextElements, const stw::opensyde_gui_logic::C_PuiBsElements & orc_Elements, const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                                                                                                                                                                                                                                                                                                                                                                   C_PuiSdLastKnownHalElementId> & orc_LastKnownHalcCrcs);
    static int32_t h_LoadSystemDefinitionUiFile(const QString & orc_FilePath, std::vector<C_PuiSdNode> & orc_UiNodes,
                                                std::vector<C_PuiSdBus> & orc_UiBuses,
                                                std::vector<C_PuiSdTextElementBus> & orc_BusTextElements,
-                                               stw::opensyde_gui_logic::C_PuiBsElements & orc_Elements);
+                                               stw::opensyde_gui_logic::C_PuiBsElements & orc_Elements,
+                                               std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                                                        C_PuiSdLastKnownHalElementId> & orc_LastKnownHalcCrcs);
 
    //File names
    static QString h_GetNodeUiFileName(void);

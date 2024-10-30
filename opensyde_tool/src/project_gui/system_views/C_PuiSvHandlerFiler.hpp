@@ -19,7 +19,6 @@
 #include "C_PuiSvData.hpp"
 #include "C_OscXmlParser.hpp"
 #include "C_PuiSvDbWidgetBase.hpp"
-#include "C_PuiSvLastKnownHalElementId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -46,12 +45,6 @@ public:
    static void h_SaveReadRails(const QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId,
                                           C_PuiSvReadDataConfiguration> & orc_Rails,
                                stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static int32_t h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                   C_PuiSvLastKnownHalElementId> & orc_Crcs,
-                                          stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static void h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                      C_PuiSvLastKnownHalElementId> & orc_Crcs,
-                                       stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static QString h_GetViewFileName(const QString & orc_ViewName);
 
 private:

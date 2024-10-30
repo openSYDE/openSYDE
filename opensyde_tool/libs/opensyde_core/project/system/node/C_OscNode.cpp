@@ -77,6 +77,12 @@ void C_OscNode::Initialize(void)
    c_ComProtocols.resize(0);
    c_HalcConfig.Clear();
    c_CanOpenManagers.clear();
+   //Add one default item
+   c_DataLoggerJobs.clear();
+   if (C_OscDataLoggerJob::hq_AllowDataloggerFeature)
+   {
+      c_DataLoggerJobs.resize(1);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -854,6 +860,11 @@ void C_OscNode::CalcHash(uint32_t & oru32_HashValue) const
       const uint8_t u8_Value = c_It->first;
       stw::scl::C_SclChecksums::CalcCRC32(&u8_Value, sizeof(u8_Value), oru32_HashValue);
       c_It->second.CalcHash(oru32_HashValue);
+   }
+
+   for (u32_Counter = 0U; u32_Counter < this->c_DataLoggerJobs.size(); ++u32_Counter)
+   {
+      this->c_DataLoggerJobs[u32_Counter].CalcHash(oru32_HashValue);
    }
 }
 

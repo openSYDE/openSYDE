@@ -1864,6 +1864,42 @@ int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumber(const C_OscProto
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reads the certificate serial number for security access level 7
+
+   Serial number is a byte array with maximum length of 20 Bytes.
+
+   \param[in]  orc_ServerId          Server id for communication
+   \param[out] orc_SerialNumber      read certificate serial number
+   \param[out] opu8_NrCode           if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR   Certificate serial number was read successfully
+   C_RANGE    openSYDE protocol not found
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumberL7(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                  std::vector<uint8_t> & orc_SerialNumber,
+                                                                  uint8_t * const opu8_NrCode) const
+{
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyReadCertificateSerialNumberL7(orc_SerialNumber, opu8_NrCode);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Writes the public security key with its certificate serial number
 
    Public key modulus is a byte array with a length of 128 Bytes.

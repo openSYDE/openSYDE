@@ -112,12 +112,14 @@ void C_SdBueUnoSignalAddCommand::SetInitialData(const std::vector<C_OscCanSignal
          {
             //Reinitialize index as current index is not related to data handling
             this->mc_Signal[u32_ItStep].u32_ComDataElementIndex = u32_ItStep;
-            if (this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size())
+            if ((this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size()) &&
+                (this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_UiSignalCommon.size()))
             {
                // Adapt do safety protocol restrictions
                C_SdUtil::h_AdaptSignalToProtocolType(
                   this->mc_Signal[u32_ItStep],
                   this->mc_OscSignalCommon[this->mc_Signal[u32_ItStep].u32_ComDataElementIndex],
+                  this->mc_UiSignalCommon[this->mc_Signal[u32_ItStep].u32_ComDataElementIndex],
                   orc_ProtocolType[u32_ItStep], NULL);
             }
          }

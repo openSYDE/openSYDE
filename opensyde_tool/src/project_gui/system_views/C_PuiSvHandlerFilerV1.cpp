@@ -56,8 +56,8 @@ C_PuiSvHandlerFilerV1::C_PuiSvHandlerFilerV1(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load system views
 
-   \param[in,out] orc_Views     System view elements (Cleared if necessary)
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "opensyde-system-views" element
+   \param[in,out]  orc_Views        System view elements (Cleared if necessary)
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "opensyde-system-views" element
 
    \return
    C_NO_ERR    information loaded
@@ -102,7 +102,7 @@ int32_t C_PuiSvHandlerFilerV1::h_LoadViews(std::vector<C_PuiSvData> & orc_Views,
       if (u32_ExpectedSize != orc_Views.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected view count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected view count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_Views.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }

@@ -183,6 +183,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
                   $${PWD}/project/system/node \
                   $${PWD}/project/system/node/can \
                   $${PWD}/project/system/node/can/can_open \
+                  $${PWD}/project/system/node/data_logger \
                   $${PWD}/project/system/target_support_package \
                   $${PWD}/project/view
 
@@ -244,6 +245,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/C_OscCanProtocol.cpp \
        $${PWD}/project/system/node/can/C_OscCanSignal.cpp \
        $${PWD}/project/system/node/can/C_OscCanUtil.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJob.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp \
        $${PWD}/project/system/node/C_OscNode.cpp \
        $${PWD}/project/system/node/C_OscNodeSquad.cpp \
        $${PWD}/project/system/node/C_OscNodeSquadFiler.cpp \
@@ -258,6 +263,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OscNodeDataPoolList.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElement.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElementId.cpp \
+       $${PWD}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListId.cpp \
        $${PWD}/project/system/node/C_OscNodeFiler.cpp \
        $${PWD}/project/system/node/C_OscNodeOpenSydeServerSettings.cpp \
@@ -348,6 +354,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OscNodeDataPoolList.hpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElement.hpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElementId.hpp \
+       $${PWD}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.hpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListId.hpp \
        $${PWD}/project/system/node/C_OscNodeFiler.hpp \
        $${PWD}/project/system/node/C_OscNodeOpenSydeServerSettings.hpp \
@@ -365,6 +372,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.hpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.hpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJob.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.hpp \
        $${PWD}/project/view/C_OscViewData.hpp \
        $${PWD}/project/view/C_OscViewPc.hpp \
        $${PWD}/project/view/C_OscViewNodeUpdate.hpp \

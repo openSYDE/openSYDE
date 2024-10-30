@@ -16,6 +16,7 @@
 #include "C_PuiSvDbSlider.hpp"
 #include "C_OscNodeDataPoolContent.hpp"
 #include "C_PuiSvDbDataElementDisplayFormatterConfig.hpp"
+#include "C_OgeLabDashboardDefault.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -41,7 +42,7 @@ public:
 
    void SetCurrentStyle(const stw::opensyde_gui_logic::C_PuiSvDbSlider::E_Style oe_Style, const bool oq_IsDark) const;
    void SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type) const;
-   void AdjustFontToSize(void) const;
+   void AdjustFontToSize(void);
    void SetMinMax(const int32_t os32_MinValue, const QString & orc_MinString, const int32_t os32_MaxValue,
                   const QString & orc_MaxString);
    void SetShowMinMax(const bool oq_Value);
@@ -66,12 +67,21 @@ protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;
 
 private:
+   /*------ Functions -----------------------------------------------------------------------------------------------*/
+   void m_SetLabelSize(opensyde_gui_elements::C_OgeLabDashboardDefault * const opc_Label,
+                       const uint32_t & oru32_LabelFontSize, const uint32_t ou32_MinimumFontSize = 10);
+   void m_SetLabelFontSize(opensyde_gui_elements::C_OgeLabDashboardDefault * const opc_Label,
+                           const uint32_t & oru32_LabelFontSize, QFont & orc_Font, const QString & orc_Text);
+   void m_UpdateLabels(void) const;
+   QFontMetrics m_GetNewLabelFontMetrics(opensyde_gui_elements::C_OgeLabDashboardDefault * const opc_Label,
+                                         QFont & orc_Font, const uint32_t & oru32_NewFontSize);
+
+   /*------ Variables -----------------------------------------------------------------------------------------------*/
    Ui::C_SyvDaItDashboardSliderWidget * mpc_Ui;
    QString mc_Min;
    QString mc_Max;
    bool mq_ShowMinMax;
 
-   void m_UpdateLabels(void) const;
    //Avoid call
    C_SyvDaItDashboardSliderWidget(const C_SyvDaItDashboardSliderWidget &);
    C_SyvDaItDashboardSliderWidget & operator =(const C_SyvDaItDashboardSliderWidget &) &;

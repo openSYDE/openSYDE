@@ -17,11 +17,7 @@
 #include "ui_C_SdNdeIpAddressConfigurationWidget.h"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_OgeWiUtil.hpp"
-// QLineEdit is multiple times included with the following include, but cannot do anything else then suppress lint
-// warning
-//lint -save -e451
 #include "C_OgeLeIpAddress.hpp"
-//lint -restore
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;

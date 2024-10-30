@@ -29,7 +29,7 @@ class C_PuiSvDbNodeDataElementConfig
 {
 public:
    C_PuiSvDbNodeDataElementConfig(void);
-   virtual ~C_PuiSvDbNodeDataElementConfig(void);
+   virtual ~C_PuiSvDbNodeDataElementConfig(void) noexcept;
 
    virtual void CalcHash(uint32_t & oru32_HashValue) const;
 

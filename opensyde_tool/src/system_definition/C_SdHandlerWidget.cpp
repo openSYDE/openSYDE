@@ -953,36 +953,44 @@ void C_SdHandlerWidget::m_Export(void)
                   std::vector<C_OscCanMessage>::const_iterator c_TxIter;
                   for (c_TxIter = c_TxMsgs.begin(); c_TxIter != c_TxMsgs.end(); ++c_TxIter)
                   {
-                     C_CieConverter::C_CieNodeMessage c_CurrentMessage;
-                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(this->mu32_Index, e_ComType,
-                                                                                        *c_TxIter, c_CurrentMessage,
-                                                                                        c_Warnings);
-                     c_CurrentCieNode.c_TxMessages.push_back(c_CurrentMessage);
-                     // for counting messages and signals
-                     const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_TxIter->u32_CanId);
-                     if (c_Iter == c_CanMessageIds.end())
+                     if ((e_ComType == C_OscCanProtocol::eCAN_OPEN) && (!c_TxIter->q_CanOpenManagerMessageActive))
                      {
-                        c_CanMessageIdsWithExtended.emplace(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
-                                                                                    c_TxIter->q_IsExtended));
-                        c_CanMessageIds.insert(c_TxIter->u32_CanId);
-                        // count signals
-                        u32_NumOfInputSignals += c_TxIter->c_Signals.size();
+                        //Skip inactive message
                      }
                      else
                      {
-                        const std::set<C_OscCanMessageUniqueId>::const_iterator c_IterWithExtended =
-                           c_CanMessageIdsWithExtended.find(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
-                                                                                    c_TxIter
-                                                                                    ->q_IsExtended));
-                        if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
+                        C_CieConverter::C_CieNodeMessage c_CurrentMessage;
+                        s32_Error += C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(this->mu32_Index, e_ComType,
+                                                                                           *c_TxIter, c_CurrentMessage,
+                                                                                           c_Warnings);
+                        c_CurrentCieNode.c_TxMessages.push_back(c_CurrentMessage);
+                        // for counting messages and signals
+                        const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_TxIter->u32_CanId);
+                        if (c_Iter == c_CanMessageIds.end())
                         {
-                           const stw::scl::C_SclString c_Message = "Can't export message \"" +
-                                                                   c_TxIter->c_Name + "\" in bus \"" +
-                                                                   stw::scl::C_SclString::IntToStr(this->mu32_Index) +
-                                                                   "\" because message ID is not unique.";
-                           c_Warnings.Append(c_Message);
-                           osc_write_log_warning("DBC Export", c_Message);
-                           s32_Error += C_WARN;
+                           c_CanMessageIdsWithExtended.emplace(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
+                                                                                       c_TxIter->q_IsExtended));
+                           c_CanMessageIds.insert(c_TxIter->u32_CanId);
+                           // count signals
+                           u32_NumOfInputSignals += c_TxIter->c_Signals.size();
+                        }
+                        else
+                        {
+                           const std::set<C_OscCanMessageUniqueId>::const_iterator c_IterWithExtended =
+                              c_CanMessageIdsWithExtended.find(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
+                                                                                       c_TxIter
+                                                                                       ->q_IsExtended));
+                           if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
+                           {
+                              const stw::scl::C_SclString c_Message = "Can't export message \"" +
+                                                                      c_TxIter->c_Name + "\" in bus \"" +
+                                                                      stw::scl::C_SclString::IntToStr(this->mu32_Index)
+                                                                      +
+                                                                      "\" because message ID is not unique.";
+                              c_Warnings.Append(c_Message);
+                              osc_write_log_warning("DBC Export", c_Message);
+                              s32_Error += C_WARN;
+                           }
                         }
                      }
                   }
@@ -992,36 +1000,44 @@ void C_SdHandlerWidget::m_Export(void)
                   std::vector<C_OscCanMessage>::const_iterator c_RxIter;
                   for (c_RxIter = rc_RxMsgs.begin(); c_RxIter != rc_RxMsgs.end(); ++c_RxIter)
                   {
-                     C_CieConverter::C_CieNodeMessage c_CurrentMessage;
-                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(this->mu32_Index, e_ComType,
-                                                                                        *c_RxIter, c_CurrentMessage,
-                                                                                        c_Warnings);
-                     c_CurrentCieNode.c_RxMessages.push_back(c_CurrentMessage);
-                     // for counting messages and signals
-                     const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_RxIter->u32_CanId);
-                     if (c_Iter == c_CanMessageIds.end())
+                     if ((e_ComType == C_OscCanProtocol::eCAN_OPEN) && (!c_RxIter->q_CanOpenManagerMessageActive))
                      {
-                        c_CanMessageIdsWithExtended.emplace(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
-                                                                                    c_RxIter->q_IsExtended));
-                        c_CanMessageIds.insert(c_RxIter->u32_CanId);
-                        // count signals
-                        u32_NumOfInputSignals += c_RxIter->c_Signals.size();
+                        //Skip inactive message
                      }
                      else
                      {
-                        const std::set<C_OscCanMessageUniqueId>::const_iterator c_IterWithExtended =
-                           c_CanMessageIdsWithExtended.find(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
-                                                                                    c_RxIter
-                                                                                    ->q_IsExtended));
-                        if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
+                        C_CieConverter::C_CieNodeMessage c_CurrentMessage;
+                        s32_Error += C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(this->mu32_Index, e_ComType,
+                                                                                           *c_RxIter, c_CurrentMessage,
+                                                                                           c_Warnings);
+                        c_CurrentCieNode.c_RxMessages.push_back(c_CurrentMessage);
+                        // for counting messages and signals
+                        const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_RxIter->u32_CanId);
+                        if (c_Iter == c_CanMessageIds.end())
                         {
-                           const stw::scl::C_SclString c_Message = "Can't export message \"" +
-                                                                   c_RxIter->c_Name + "\" in bus \"" +
-                                                                   stw::scl::C_SclString::IntToStr(this->mu32_Index) +
-                                                                   "\" because message ID is not unique. Message is ignored.";
-                           c_Warnings.Append(c_Message);
-                           osc_write_log_warning("DBC Export", c_Message);
-                           s32_Error += C_WARN;
+                           c_CanMessageIdsWithExtended.emplace(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
+                                                                                       c_RxIter->q_IsExtended));
+                           c_CanMessageIds.insert(c_RxIter->u32_CanId);
+                           // count signals
+                           u32_NumOfInputSignals += c_RxIter->c_Signals.size();
+                        }
+                        else
+                        {
+                           const std::set<C_OscCanMessageUniqueId>::const_iterator c_IterWithExtended =
+                              c_CanMessageIdsWithExtended.find(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
+                                                                                       c_RxIter
+                                                                                       ->q_IsExtended));
+                           if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
+                           {
+                              const stw::scl::C_SclString c_Message = "Can't export message \"" +
+                                                                      c_RxIter->c_Name + "\" in bus \"" +
+                                                                      stw::scl::C_SclString::IntToStr(this->mu32_Index)
+                                                                      +
+                                                                      "\" because message ID is not unique. Message is ignored.";
+                              c_Warnings.Append(c_Message);
+                              osc_write_log_warning("DBC Export", c_Message);
+                              s32_Error += C_WARN;
+                           }
                         }
                      }
                   }

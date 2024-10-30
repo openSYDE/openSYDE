@@ -16,6 +16,7 @@
 #include "C_SyvDaItUtil.hpp"
 #include "C_SyvDaItDashboardSliderWidget.hpp"
 #include "ui_C_SyvDaItDashboardSliderWidget.h"
+#include "C_OgeLabDashboardDefault.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -113,24 +114,24 @@ const
 /*! \brief   Adjust font to current size
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
+void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void)
 {
-   const int32_t s32_MARGINS = 2 * 6;
-   const int32_t s32_AdaptedWidth = this->width() - s32_MARGINS;
-   const float32_t f32_WidthLabels = static_cast<float32_t>(s32_AdaptedWidth) * (2.0F / ((25.0F * 2.0F) / 3.0F));
-   const int32_t s32_WidthLabels = static_cast<int32_t>(f32_WidthLabels);
+   // Constants
+   const int32_t s32_WidgetHeight = this->height();
+   const float32_t f32_FONT_MODIFIER = 0.3F;
+
+   const float32_t f32_MaxLabelFontSize = static_cast<float32_t>(s32_WidgetHeight) * f32_FONT_MODIFIER;
+   const float32_t f32_MinLabelFontSize = static_cast<float32_t>(s32_WidgetHeight) * f32_FONT_MODIFIER;
+
+   const uint32_t u32_MaxLabelFontSize = static_cast<uint32_t>(f32_MaxLabelFontSize);
+   const uint32_t u32_MinLabelFontSize = static_cast<uint32_t>(f32_MinLabelFontSize);
+
+   m_SetLabelSize(this->mpc_Ui->pc_LabelMin, u32_MaxLabelFontSize);
+   m_SetLabelSize(this->mpc_Ui->pc_LabelMax, u32_MinLabelFontSize);
 
    //Manual resize
    this->mpc_Ui->pc_HorizontalSlider->setFixedHeight(this->height());
-   this->mpc_Ui->pc_LabelMin->setFixedSize(s32_WidthLabels, this->height());
-   this->mpc_Ui->pc_LabelMax->setFixedSize(s32_WidthLabels, this->height());
-
    this->mpc_Ui->pc_HorizontalSlider->HandleResize();
-   this->mpc_Ui->pc_LabelMin->AdjustFontToSize();
-   this->mpc_Ui->pc_LabelMax->AdjustFontToSize();
-
-   //Sync font
-   C_SyvDaItUtil::h_SyncFontSize(this->mpc_Ui->pc_LabelMin, this->mpc_Ui->pc_LabelMax);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -260,7 +261,70 @@ void C_SyvDaItDashboardSliderWidget::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set the pixel size of the label.
 
+   This also includes setting the width of the label and the height
+
+   \param[in]   opc_Label              Label that will be modified
+   \param[in]   oru32_LabelFontSize    Label font size
+   \param[in]   ou32_MinimumFontSize   Minimum font size (default value is 15)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItDashboardSliderWidget::m_SetLabelSize(opensyde_gui_elements::C_OgeLabDashboardDefault * const opc_Label,
+                                                    const uint32_t & oru32_LabelFontSize,
+                                                    const uint32_t ou32_MinimumFontSize)
+{
+   // Constants
+   const QString c_Text = opc_Label->text();
+
+   // Font variables
+   QFont c_Font = opc_Label->font();
+
+   //Check if font size is too small
+   const uint32_t u32_LabelFontSize = (ou32_MinimumFontSize >= oru32_LabelFontSize) ?
+                                      (ou32_MinimumFontSize) :
+                                      (oru32_LabelFontSize);
+
+   // set font size if needed
+   if (static_cast<uint32_t>(c_Font.pixelSize()) != u32_LabelFontSize)
+   {
+      m_SetLabelFontSize(opc_Label, u32_LabelFontSize, c_Font, c_Text);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set label font size
+
+   \param[in]       opc_Label              Label that will be modified
+   \param[in]       oru32_LabelFontSize      New label font size
+   \param[in]       orc_Font                 Font to set the QFontMetrics and with that set the font size
+   \param[in]       orc_Text                 Text that is necessary to calculate the font size by width and height of
+                                             the text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItDashboardSliderWidget::m_SetLabelFontSize(
+   opensyde_gui_elements::C_OgeLabDashboardDefault * const opc_Label, const uint32_t & oru32_LabelFontSize,
+   QFont & orc_Font, const QString & orc_Text)
+{
+   // Constants
+   const int32_t s32_WidgetHeight = this->height();
+
+   // Font variables
+   uint32_t u32_LabelWidth;
+
+   const QFontMetrics c_TextFontMetric = m_GetNewLabelFontMetrics(opc_Label, orc_Font, oru32_LabelFontSize);
+
+   // set label width
+   u32_LabelWidth = c_TextFontMetric.horizontalAdvance(orc_Text);
+
+   // set label pixel size
+   opc_Label->setFixedSize(static_cast<int32_t>(u32_LabelWidth), s32_WidgetHeight);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update the labels according to users preferences in visible min and max value.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::m_UpdateLabels(void) const
 {
    if (this->mq_ShowMinMax == true)
@@ -273,4 +337,32 @@ void C_SyvDaItDashboardSliderWidget::m_UpdateLabels(void) const
       this->mpc_Ui->pc_LabelMax->setText("");
       this->mpc_Ui->pc_LabelMin->setText("");
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set new font metrics
+
+   \param[in]       opc_Label                Label that will be modified
+   \param[in]       oru32_LabelFontSize      New label font size
+   \param[in]       orc_Font                 Font to set the QFontMetrics and with that set the font size
+
+   \return
+   QFontMetrics
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QFontMetrics C_SyvDaItDashboardSliderWidget::m_GetNewLabelFontMetrics(
+   stw::opensyde_gui_elements::C_OgeLabDashboardDefault * const opc_Label, QFont & orc_Font,
+   const uint32_t & oru32_NewFontSize)
+{
+   QFontMetrics c_TextFontMetric(orc_Font);
+
+   if (oru32_NewFontSize != static_cast<uint32_t>(orc_Font.pixelSize()))
+   {
+      orc_Font.setPointSize(oru32_NewFontSize);
+      opc_Label->setFont(orc_Font);
+
+      c_TextFontMetric = QFontMetrics(orc_Font);
+   }
+
+   return c_TextFontMetric;
 }

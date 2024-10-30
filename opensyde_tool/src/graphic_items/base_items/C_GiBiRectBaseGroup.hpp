@@ -117,7 +117,7 @@ private:
    QSizeF mc_LastKnownSize;
    bool mq_BlockMoveAndResize;
 
-   const bool mq_KeepAspectRatio;
+   bool mq_KeepAspectRatio;
    const float64_t mf64_ActionPointOffset;
    const float64_t mf64_MinWidth;
    const float64_t mf64_MinHeight;

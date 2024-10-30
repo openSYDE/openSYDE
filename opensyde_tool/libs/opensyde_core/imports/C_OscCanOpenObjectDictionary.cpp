@@ -352,8 +352,9 @@ int32_t C_OscCanOpenObjectDictionary::m_GetObjectDescription(const uint16_t ou16
          }
          catch (...)
          {
-            mc_LastError.PrintFormatted("File contains non-numeric SubNumber for object %04X.%02X !", ou16_Index,
-                                        ou8_SubIndex);
+            mc_LastError.PrintFormatted("File contains non-numeric SubNumber for object %04X.%02X !",
+                                        static_cast<uint32_t>(ou16_Index),
+                                        static_cast<uint32_t>(ou8_SubIndex));
             s32_Return = C_CONFIG;
          }
       }
@@ -374,8 +375,9 @@ int32_t C_OscCanOpenObjectDictionary::m_GetObjectDescription(const uint16_t ou16
          }
          catch (...)
          {
-            mc_LastError.PrintFormatted("File contains non-numeric DataType for object %04X.%02X !", ou16_Index,
-                                        ou8_SubIndex);
+            mc_LastError.PrintFormatted("File contains non-numeric DataType for object %04X.%02X !",
+                                        static_cast<uint32_t>(ou16_Index),
+                                        static_cast<uint32_t>(ou8_SubIndex));
             s32_Return = C_CONFIG;
          }
       }
@@ -413,18 +415,19 @@ int32_t C_OscCanOpenObjectDictionary::m_GetObjectDescription(const uint16_t ou16
             {
                orc_Object.q_IsMappableIntoPdo = false;
                mc_LastError.PrintFormatted(
-                  "Invalid boolean value \"%s\" found in entry "
-                  "\"PDOMapping\" for object %04X.%02X !", orc_SectionValues.Values(
-                     "PDOMapping").c_str(), ou16_Index,
-                  ou8_SubIndex);
+                  "Invalid boolean value \"%s\" found in entry \"PDOMapping\" for object %04X.%02X !",
+                  orc_SectionValues.Values("PDOMapping").c_str(),
+                  static_cast<uint32_t>(ou16_Index),
+                  static_cast<uint32_t>(ou8_SubIndex));
                s32_Return = C_CONFIG;
             }
          }
          catch (...)
          {
-            mc_LastError.PrintFormatted("Could not parse entry \"PDOMapping\" value \"%s\" for object %04X.%02X !", orc_SectionValues.Values(
-                                           "PDOMapping").c_str(), ou16_Index,
-                                        ou8_SubIndex);
+            mc_LastError.PrintFormatted("Could not parse entry \"PDOMapping\" value \"%s\" for object %04X.%02X !",
+                                        orc_SectionValues.Values("PDOMapping").c_str(),
+                                        static_cast<uint32_t>(ou16_Index),
+                                        static_cast<uint32_t>(ou8_SubIndex));
             s32_Return = C_CONFIG;
          }
       }

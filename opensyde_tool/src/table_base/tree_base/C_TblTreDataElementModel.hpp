@@ -51,6 +51,10 @@ public:
    void InitSv(const uint32_t ou32_ViewIndex, const E_Mode oe_Mode, const bool oq_ShowOnlyWriteElements,
                const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
                const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
+   void InitSdDatapoolElements(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
+                               const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                               const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
+
    std::vector<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetDataElements(
       const QModelIndex & orc_Index)
    const;
@@ -102,7 +106,8 @@ private:
    void m_InitDatapoolElements(const uint32_t ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
                                const bool oq_Show64BitValues,
-                               const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
+                               const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                               const bool oq_IsModelUsedInSysViews = true);
    static void mh_InitDatapoolElementsHalc(C_TblTreItem * const opc_DpItem, bool & orq_HalcValid,
                                            const stw::opensyde_core::C_OscNode & orc_Node,
                                            const stw::opensyde_core::C_OscNodeDataPool & orc_Dp,

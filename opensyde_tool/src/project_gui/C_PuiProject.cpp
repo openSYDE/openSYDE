@@ -606,6 +606,25 @@ void C_PuiProject::h_AdaptProjectPathToSystemDefinition(const QString & orc_Proj
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project
+
+   \param[in]  orc_FilePath                  File path
+   \param[in]  oq_UseDeprecatedFileFormatV2  Flag to enable saving using the deprecated V2 file format
+
+   \return
+   C_NO_ERR   data saved
+   C_RD_WR    problems accessing file system (could not erase pre-existing file before saving;
+               no write access to file)
+   C_RANGE    Path is empty
+   C_NOACT    Could not create project directory
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiProject::SaveAsWithoutInternalChange(const QString & orc_FilePath, const bool oq_UseDeprecatedFileFormatV2)
+{
+   return this->m_SaveAs(orc_FilePath, true, oq_UseDeprecatedFileFormatV2, false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value of the project file
 
    Start value is 0xFFFFFFFF
@@ -639,96 +658,7 @@ uint32_t C_PuiProject::m_CalcHashProject(void) const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiProject::m_Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
 {
-   int32_t s32_Retval;
-   const QFileInfo c_File(mc_Path);
-   const QDir c_Directory(c_File.absolutePath());
-
-   if (c_Directory.mkpath(".") == true)
-   {
-      C_PuiProject::h_HandlePendingEvents();
-      s32_Retval = C_OscProjectFiler::h_Save(*this,
-                                             mc_Path.toStdString().c_str(),
-                                             stw::opensyde_gui_logic::C_Uti::h_GetApplicationVersion(
-                                                false).toStdString().c_str());
-      if (s32_Retval == C_NO_ERR)
-      {
-         // save system definition only if it has changed
-         if ((C_PuiSdHandler::h_GetInstance()->HasHashChanged() == true) || (oq_ForceSaveAll == true))
-         {
-            QString c_SystemDefintionPath;
-            //Each format uses different folders!
-            if (oq_UseDeprecatedFileFormatV2)
-            {
-               mh_AdaptProjectPathToSystemDefinitionV2(mc_Path, c_SystemDefintionPath);
-            }
-            else
-            {
-               h_AdaptProjectPathToSystemDefinition(mc_Path, c_SystemDefintionPath);
-            }
-            {
-               const QFileInfo c_RefFile(c_SystemDefintionPath);
-               const QDir c_Dir = c_RefFile.dir();
-               //Create path (if necessary)
-               if ((c_Dir.mkdir(".") == true) || (c_Dir.exists() == true))
-               {
-                  s32_Retval =
-                     C_PuiSdHandler::h_GetInstance()->SaveToFile(
-                        c_SystemDefintionPath.toStdString().c_str(), oq_UseDeprecatedFileFormatV2);
-               }
-               else
-               {
-                  s32_Retval = C_RD_WR;
-               }
-            }
-         }
-
-         if (s32_Retval == C_NO_ERR)
-         {
-            // save system views only if it has changed
-            if ((C_PuiSvHandler::h_GetInstance()->HasHashChanged() == true) || (oq_ForceSaveAll == true))
-            {
-               QString c_SystemViewsPath;
-               //Each format uses different folders!
-               if (oq_UseDeprecatedFileFormatV2)
-               {
-                  mh_AdaptProjectPathToSystemViewsV1(mc_Path, c_SystemViewsPath);
-               }
-               else
-               {
-                  mh_AdaptProjectPathToSystemViews(mc_Path, c_SystemViewsPath);
-               }
-               {
-                  const QFileInfo c_RefFile(c_SystemViewsPath);
-                  const QDir c_Dir = c_RefFile.dir();
-                  //Create path (if necessary)
-                  if ((c_Dir.mkdir(".") == true) || (c_Dir.exists() == true))
-                  {
-                     s32_Retval = C_PuiSvHandler::h_GetInstance()->SaveToFile(
-                        c_SystemViewsPath.toStdString().c_str(), oq_UseDeprecatedFileFormatV2);
-                  }
-                  else
-                  {
-                     s32_Retval = C_RD_WR;
-                  }
-               }
-            }
-         }
-      }
-      if (s32_Retval == C_NO_ERR)
-      {
-         //Only update hash in non deprecated mode
-         if (oq_UseDeprecatedFileFormatV2 == false)
-         {
-            //calculate the hash value and save it for comparing
-            this->mu32_CalculatedProjectHash = this->m_CalcHashProject();
-         }
-      }
-   }
-   else
-   {
-      s32_Retval = C_NOACT;
-   }
-   return s32_Retval;
+   return this->m_SaveAs(this->mc_Path, oq_ForceSaveAll, oq_UseDeprecatedFileFormatV2, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -736,8 +666,8 @@ int32_t C_PuiProject::m_Save(const bool oq_ForceSaveAll, const bool oq_UseDeprec
 
    This function does not change the current opened project
 
-   \param[in]       orc_FilePath     Path to save the service mode project
-   \param[in]       orc_Password     Used password for service project encryption
+   \param[in]  orc_FilePath   Path to save the service mode project
+   \param[in]  orc_Password   Used password for service project encryption
 
    \retval   C_NO_ERR   Service project save with no problems
    \retval   C_RANGE    The view configuration is invalid
@@ -959,6 +889,118 @@ bool C_PuiProject::m_IsServiceModeProject(void) const
    }
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project
+
+   \param[in]  orc_FilePath                  File path
+   \param[in]  oq_ForceSaveAll               Optional flag if all files should be saved
+   \param[in]  oq_UseDeprecatedFileFormatV2  Flag to enable saving using the deprecated V2 file format
+   \param[in]  oq_UpdateInternalState        Allow update of internal state (only if no export or similar action)
+
+   \return
+   C_NO_ERR   data saved
+   C_RD_WR    problems accessing file system (could not erase pre-existing file before saving;
+               no write access to file)
+   C_RANGE    Path is empty
+   C_NOACT    Could not create project directory
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiProject::m_SaveAs(const QString & orc_FilePath, const bool oq_ForceSaveAll,
+                               const bool oq_UseDeprecatedFileFormatV2, const bool oq_UpdateInternalState)
+{
+   int32_t s32_Retval;
+   const QFileInfo c_File(orc_FilePath);
+   const QDir c_Directory(c_File.absolutePath());
+
+   if (c_Directory.mkpath(".") == true)
+   {
+      C_PuiProject::h_HandlePendingEvents();
+      s32_Retval = C_OscProjectFiler::h_Save(*this,
+                                             orc_FilePath.toStdString().c_str(),
+                                             stw::opensyde_gui_logic::C_Uti::h_GetApplicationVersion(
+                                                false).toStdString().c_str());
+      if (s32_Retval == C_NO_ERR)
+      {
+         // save system definition only if it has changed
+         if ((C_PuiSdHandler::h_GetInstance()->HasHashChanged() == true) || (oq_ForceSaveAll == true))
+         {
+            QString c_SystemDefintionPath;
+            //Each format uses different folders!
+            if (oq_UseDeprecatedFileFormatV2)
+            {
+               mh_AdaptProjectPathToSystemDefinitionV2(orc_FilePath, c_SystemDefintionPath);
+            }
+            else
+            {
+               h_AdaptProjectPathToSystemDefinition(orc_FilePath, c_SystemDefintionPath);
+            }
+            {
+               const QFileInfo c_RefFile(c_SystemDefintionPath);
+               const QDir c_Dir = c_RefFile.dir();
+               //Create path (if necessary)
+               if ((c_Dir.mkdir(".") == true) || (c_Dir.exists() == true))
+               {
+                  s32_Retval =
+                     C_PuiSdHandler::h_GetInstance()->SaveToFile(
+                        c_SystemDefintionPath.toStdString().c_str(), oq_UseDeprecatedFileFormatV2,
+                        oq_UpdateInternalState);
+               }
+               else
+               {
+                  s32_Retval = C_RD_WR;
+               }
+            }
+         }
+
+         if (s32_Retval == C_NO_ERR)
+         {
+            // save system views only if it has changed
+            if ((C_PuiSvHandler::h_GetInstance()->HasHashChanged() == true) || (oq_ForceSaveAll == true))
+            {
+               QString c_SystemViewsPath;
+               //Each format uses different folders!
+               if (oq_UseDeprecatedFileFormatV2)
+               {
+                  mh_AdaptProjectPathToSystemViewsV1(orc_FilePath, c_SystemViewsPath);
+               }
+               else
+               {
+                  mh_AdaptProjectPathToSystemViews(orc_FilePath, c_SystemViewsPath);
+               }
+               {
+                  const QFileInfo c_RefFile(c_SystemViewsPath);
+                  const QDir c_Dir = c_RefFile.dir();
+                  //Create path (if necessary)
+                  if ((c_Dir.mkdir(".") == true) || (c_Dir.exists() == true))
+                  {
+                     s32_Retval = C_PuiSvHandler::h_GetInstance()->SaveToFile(
+                        c_SystemViewsPath.toStdString().c_str(), oq_UseDeprecatedFileFormatV2, oq_UpdateInternalState);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RD_WR;
+                  }
+               }
+            }
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Only update hash in non deprecated mode
+         if ((oq_UseDeprecatedFileFormatV2 == false) && (oq_UpdateInternalState == true))
+         {
+            //calculate the hash value and save it for comparing
+            this->mu32_CalculatedProjectHash = this->m_CalcHashProject();
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_NOACT;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

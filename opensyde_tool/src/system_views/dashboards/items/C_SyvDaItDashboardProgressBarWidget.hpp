@@ -18,6 +18,7 @@
 #include "stwtypes.hpp"
 #include "C_OgeLabDashboardDefault.hpp"
 #include "C_PuiSvDbProgressBar.hpp"
+#include "C_OgeDashboardProgressBar.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -59,26 +60,23 @@ protected:
    void paintEvent(QPaintEvent * const opc_Event) override;
 
 private:
-   Ui::C_SyvDaItDashboardProgressBarWidget * mpc_Ui;
-   stw::opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type me_Type;
-   stw::opensyde_gui_logic::C_PuiSvDbProgressBar::E_Alignment me_Alignment;
-
    //Avoid call
    C_SyvDaItDashboardProgressBarWidget(const C_SyvDaItDashboardProgressBarWidget &);
    C_SyvDaItDashboardProgressBarWidget & operator =(const C_SyvDaItDashboardProgressBarWidget &) &;
 
-   static void mh_DrawArrow(QPainter & orc_Painter, const QPointF & orc_P1, const QPointF & orc_P2,
-                            const QPointF & orc_P3, const QPen & orc_Pen);
-   static QPolygonF mh_GetOuterRect(const QPointF & orc_P1, const QPointF & orc_P2, const QPointF & orc_PointOpposite,
-                                    const float64_t of64_Width);
-   static QRectF mh_GetCircle(const QPointF & orc_P1, const float64_t of64_Width);
-   static void mh_SetArc(QPainterPath & orc_Path, const QPointF & orc_PointCenter, const QPointF & orc_P2,
-                         const QPointF & orc_P3, const float64_t of64_Radius);
-   static float64_t mh_GetArc(const QPointF & orc_V1, const QPointF & orc_V2);
+   void m_SetStyle(QPainter & orc_Painter, QPen & orc_Pen) const;
+   void m_SetBarMargins(void);
 
-   void m_SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont, QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
-                        QPen & orc_ValuePen) const;
-   void m_SetBarMargins();
+   //-------Set Styling-------------------------------------------------------------------------------------------------
+   void m_SetDarkModeStyle(QPainter & orc_Painter, QPen & orc_Pen) const;
+   void m_SetBrightModeStyle(QPainter & orc_Painter, QPen & orc_Pen) const;
+   void m_SetMinimumProgressbarSize(void);
+
+   //-------Variables---------------------------------------------------------------------------------------------------
+   Ui::C_SyvDaItDashboardProgressBarWidget * mpc_Ui;
+   stw::opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type me_Type;
+   stw::opensyde_gui_logic::C_PuiSvDbProgressBar::E_Alignment me_Alignment;
+
    QString mc_Value;
    QString mc_MinValue;
    QString mc_MaxValue;
@@ -86,11 +84,14 @@ private:
    stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style me_Style;
    bool mq_ShowMinMax;
    bool mq_DarkMode;
-   float32_t mf32_BarMarginTop;    // To Size the Progress Bar dependent on this->rect()
-   float32_t mf32_BarMarginBottom; // To Size the Progress Bar dependent on this->rect()
-   float32_t mf32_BarMarginLeft;   // To Size the Progress Bar dependent on this->rect()
-   float32_t mf32_BarMarginRight;  // To Size the Progress Bar dependent on this->rect()
    int32_t ms32_Transparency;
+
+   //-------Constants---------------------------------------------------------------------------------------------------
+   const float32_t mf32_MinimumFontSize = 15.0F;
+   const float32_t mf32_BorderOffset = 5.0F;
+
+   const float32_t mf32_ArrowOffset = 10.0F;
+   const QString mc_ArrowSpacerString = "8";
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

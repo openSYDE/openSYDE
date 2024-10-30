@@ -64,7 +64,8 @@ border: 1px solid;
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator
 {
 width: 15px;
 height: 15px;
@@ -102,7 +103,8 @@ stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator
 {
 border: none;
 }
@@ -165,7 +167,8 @@ stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:enabled:checked,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:checked,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:checked,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:enabled::checked
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:enabled::checked,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:enabled::checked
 {
 image: url(://images/CheckBoxActiveWithoutBackground.svg);
 }
@@ -180,7 +183,8 @@ stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator:indeterminate,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:indeterminate,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:indeterminate,
 stw--opensyde_gui--C_SdNdeCoConfigTreeWidget::indicator:indeterminate,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:indeterminate
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:indeterminate,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:indeterminate
 {
 image: url(://images/CheckBoxIndeterminate.svg);
 }
@@ -201,7 +205,8 @@ stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled:checked,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:disabled:checked,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:disabled:checked,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:disabled:checked,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:disabled:checked
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:disabled:checked,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:disabled:checked
 {
 image: url(://images/CheckBoxActiveDisabledWithoutBackground.svg);
 }

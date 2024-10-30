@@ -106,19 +106,22 @@ void C_SyvUpPacSecureArchiveDialog::InitStaticNames() const
 
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("Create"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
-   this->mpc_Ui->pc_LabPrivateKey->setText(C_GtGetText::h_GetText("Private Signature Key"));
-   this->mpc_Ui->pc_LabPassword->setText(C_GtGetText::h_GetText("Password"));
+   this->mpc_Ui->pc_LabPrivateKey->setText(C_GtGetText::h_GetText("Signature Private Key"));
+   this->mpc_Ui->pc_LabPassword->setText(C_GtGetText::h_GetText("Encryption Password"));
 
    // Tooltips
-   this->mpc_Ui->pc_LabPassword->SetToolTipInformation(C_GtGetText::h_GetText("Password (optional)"),
+   this->mpc_Ui->pc_LabPassword->SetToolTipInformation(C_GtGetText::h_GetText("Encryption Password (optional)"),
                                                        C_GtGetText::h_GetText(
-                                                          "Private key will be encrypted if password is given."));
-   this->mpc_Ui->pc_LabPrivateKey->SetToolTipInformation(C_GtGetText::h_GetText("Private key path"),
+                                                          "Flashware will be encrypted if password is given."));
+
+   this->mpc_Ui->pc_LabPrivateKey->SetToolTipInformation(C_GtGetText::h_GetText("Signature Private Key"),
                                                          C_GtGetText::h_GetText(
                                                             "Full path to private key file (*.pem)."));
+
    this->mpc_Ui->pc_PubTogglePwd->SetToolTipInformation(C_GtGetText::h_GetText("Show/Hide Password"),
                                                         C_GtGetText::h_GetText(
                                                            "Shows/hides password when pressed down."));
+
    this->mpc_Ui->pc_PubPrivateKeyPath->SetToolTipInformation(C_GtGetText::h_GetText("Browse"),
                                                              C_GtGetText::h_GetText(
                                                                 "Browse for path to private key(pem) file."));

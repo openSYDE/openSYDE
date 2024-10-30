@@ -74,7 +74,8 @@ const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS(
    "stw--opensyde_gui_elements--C_OgeDarkScrollArea",
    "stw--opensyde_gui_logic--C_PopFileTableView",
    "stw--opensyde_gui_elements--C_OgeSaNaviBar",
-   "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget"
+   "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget",
+   "stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_AREA_PROPERTIES(
@@ -177,7 +178,8 @@ const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
    "stw--opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
    "stw--opensyde_gui--C_SyvDcExistingNodeList QScrollBar",
    "stw--opensyde_gui--C_SyvDcConnectedNodeList QScrollBar",
-   "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar"
+   "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QScrollBar"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT(

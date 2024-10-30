@@ -497,6 +497,40 @@ QString C_PuiSdUtil::h_GetNamespace(const C_OscNodeDataPoolListElementId & orc_I
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get namespace for ID
+
+   \param[in]  orc_Id   ID
+
+   \return
+   Namespace
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSdUtil::h_GetNamespaceDatapoolElement(const C_OscNodeDataPoolListElementOptArrayId & orc_Id)
+{
+   QString c_Retval;
+
+   const C_PuiSvDbNodeDataPoolListElementId c_Id(orc_Id, C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+
+   C_OscNodeDataPool::E_Type e_Type;
+   if ((C_PuiSdHandler::h_GetInstance()->GetDataPoolType(orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex,
+                                                         e_Type) == C_NO_ERR) &&
+       ((e_Type == C_OscNodeDataPool::eHALC) || (e_Type == C_OscNodeDataPool::eHALC_NVM)))
+   {
+      c_Retval = C_PuiSdUtil::h_GetHalcNamespace(c_Id);
+   }
+   else
+   {
+      c_Retval = C_PuiSdUtil::h_GetNamespace(orc_Id);
+      if (orc_Id.GetUseArrayElementIndex())
+      {
+         //Append array element index
+         c_Retval += static_cast<QString>(C_GtGetText::h_GetText("[%1]")).arg(orc_Id.GetArrayElementIndex());
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get namespace for signal ID
 
    \param[in]  orc_Id   Signal ID

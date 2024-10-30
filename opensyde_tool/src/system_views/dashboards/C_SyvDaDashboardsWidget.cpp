@@ -28,6 +28,7 @@
 #include "C_SyvDaDashboardToolbox.hpp"
 #include "C_SyvDaPeUpdateModeConfiguration.hpp"
 #include "C_OgeWiCustomMessage.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -1144,11 +1145,21 @@ void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const int32_t os32_Result
 
       //Restore cursor before error message
       QApplication::restoreOverrideCursor();
+      QString c_MessageDetails = orc_MessageDetails;
+      c_MessageDetails.replace("\n", "<br>");
+      if (!c_MessageDetails.contains("For more information see"))
+      {
+         c_MessageDetails += C_GtGetText::h_GetText("<br>For more information see ");
+         c_MessageDetails += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                              C_OscLoggingHandler::h_GetCompleteLogFileLocation().
+                                              c_str());
+         c_MessageDetails += C_GtGetText::h_GetText(".");
+      }
 
       // Show the message box only when all communication relevant functions closing in m_CloseOsyDriver are finished
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard connect"));
       c_MessageBox.SetDescription(orc_Message);
-      c_MessageBox.SetDetails(orc_MessageDetails);
+      c_MessageBox.SetDetails(c_MessageDetails);
       c_MessageBox.SetCustomMinHeight(220, 400);
       c_MessageBox.SetCustomMinWidth(650);
       c_MessageBox.Execute();

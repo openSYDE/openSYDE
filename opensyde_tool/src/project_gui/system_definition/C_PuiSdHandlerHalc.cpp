@@ -1823,7 +1823,7 @@ int32_t C_PuiSdHandlerHalc::HalcGenerateDatapools(const uint32_t ou32_NodeIndex)
          }
 
          //Trigger sync
-         Q_EMIT (this->SigSyncNodeHalc(ou32_NodeIndex));
+         m_HandleSyncNodeHalc(ou32_NodeIndex);
       }
       else
       {
@@ -1875,7 +1875,7 @@ int32_t C_PuiSdHandlerHalc::HalcRemoveDatapools(const uint32_t ou32_NodeIndex, c
 
       if (oq_SuppressSyncSignal == false)
       {
-         Q_EMIT (this->SigSyncNodeHalc(ou32_NodeIndex));
+         m_HandleSyncNodeHalc(ou32_NodeIndex);
       }
    }
    else

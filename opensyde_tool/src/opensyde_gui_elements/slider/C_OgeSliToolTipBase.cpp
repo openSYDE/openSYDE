@@ -202,8 +202,13 @@ void C_OgeSliToolTipBase::m_MoveToolTip(void)
    if (this->m_GetToolTip() != NULL)
    {
       QPoint c_ToolTipPos;
-      c_ToolTipPos.setX(QStyle::sliderPositionFromValue(this->minimum(), this->maximum(), this->value(),
-                                                        this->width() - 12)); // 2x border width + 2x margin
+
+      const int32_t s32_SliderXposition = QStyle::sliderPositionFromValue(this->minimum(),
+                                                                          this->maximum(),
+                                                                          this->value(),
+                                                                          this->width());
+      c_ToolTipPos.setX(s32_SliderXposition);
+
       c_ToolTipPos.setY(ms32_ToolTipCoordVertical);
       this->m_GetToolTip()->DoMove(this->mapToGlobal(c_ToolTipPos));
    }

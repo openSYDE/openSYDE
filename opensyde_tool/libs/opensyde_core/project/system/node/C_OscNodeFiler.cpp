@@ -22,6 +22,7 @@
 #include "C_OscNodeDataPoolFiler.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscHalcConfigFiler.hpp"
+#include "C_OscDataLoggerJobFiler.hpp"
 #include "C_OscCanOpenManagerFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -182,6 +183,10 @@ int32_t C_OscNodeFiler::h_LoadNode(C_OscNode & orc_Node, C_OscXmlParserBase & or
                      //Return
                      tgl_assert(orc_XmlParser.SelectNodeParent() == "node"); //back up to node
                      s32_Retval = mh_LoadCanOpenManagers(orc_Node.c_CanOpenManagers, orc_XmlParser, orc_BasePath);
+                     if (s32_Retval == C_NO_ERR)
+                     {
+                        s32_Retval = mh_LoadDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath);
+                     }
                   }
                }
                else
@@ -290,6 +295,10 @@ int32_t C_OscNodeFiler::h_SaveNode(const C_OscNode & orc_Node, C_OscXmlParserBas
       s32_Retval = mh_SaveCanOpenManagers(orc_Node.c_CanOpenManagers, orc_XmlParser, orc_BasePath, opc_CreatedFiles,
                                           orc_NodeIndicesToNameMap);
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath, opc_CreatedFiles);
+   }
    return s32_Retval;
 }
 
@@ -370,8 +379,8 @@ int32_t C_OscNodeFiler::h_LoadNodeComProtocols(std::vector<C_OscCanProtocol> & o
       if (u32_ExpectedSize != orc_NodeComProtocols.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComProtocols.size());
+         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComProtocols.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -1242,8 +1251,9 @@ int32_t C_OscNodeFiler::mh_LoadApplications(std::vector<C_OscNodeApplication> & 
                      if (u32_ExpectedOutputfileNumber != c_CurApplication.c_ResultPaths.size())
                      {
                         C_SclString c_Tmp;
-                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %i, got %i",
-                                             u32_ExpectedOutputfileNumber, c_CurApplication.c_ResultPaths.size());
+                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %u, got %u",
+                                             u32_ExpectedOutputfileNumber,
+                                             static_cast<uint32_t>(c_CurApplication.c_ResultPaths.size()));
                         osc_write_log_warning("Load file", c_Tmp.c_str());
                      }
                   }
@@ -1279,8 +1289,8 @@ int32_t C_OscNodeFiler::mh_LoadApplications(std::vector<C_OscNodeApplication> & 
          if (u32_ExpectedSize != orc_NodeApplications.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected application count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_NodeApplications.size());
+            c_Tmp.PrintFormatted("Unexpected application count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_NodeApplications.size()));
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
@@ -1417,8 +1427,8 @@ int32_t C_OscNodeFiler::mh_LoadDataPools(C_OscNode & orc_Node, C_OscXmlParserBas
             if (u32_ExpectedSize != orc_Node.c_DataPools.size())
             {
                C_SclString c_Tmp;
-               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %i, got %i", u32_ExpectedSize,
-                                    orc_Node.c_DataPools.size());
+               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %u, got %u", u32_ExpectedSize,
+                                    static_cast<uint32_t>(orc_Node.c_DataPools.size()));
                osc_write_log_warning("Load file", c_Tmp.c_str());
             }
          }
@@ -1675,6 +1685,110 @@ int32_t C_OscNodeFiler::mh_SaveCanOpenManagers(const std::map<uint8_t, C_OscCanO
          //Save datapool file
          s32_Retval = C_OscCanOpenManagerFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath,
                                                            opc_CreatedFiles, orc_NodeIndicesToNameMap);
+         //Set file reference
+         orc_XmlParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load data loggers
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_LoadDataLoggers(std::vector<C_OscDataLoggerJob> & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.clear();
+   if (orc_XmlParser.SelectNodeChild("data-loggers-file") == "data-loggers-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OscDataLoggerJobFiler::h_LoadData(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         s32_Retval =
+            C_OscDataLoggerJobFiler::h_LoadFile(orc_Config,
+                                                C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                     orc_XmlParser.
+                                                                                     GetNodeContent()));
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+   else
+   {
+      //Ignore
+      if (C_OscDataLoggerJob::hq_AllowDataloggerFeature)
+      {
+         //Default entry necessary
+         orc_Config.resize(1);
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save data loggers
+
+   \param[in]      orc_Config          Config
+   \param[in,out]  orc_XmlParser       XML parser
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Created files
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob> & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath,
+                                           std::vector<C_SclString> * const opc_CreatedFiles)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_Config.size() > 0)
+   {
+      orc_XmlParser.CreateAndSelectNodeChild("data-loggers-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         C_OscDataLoggerJobFiler::h_SaveData(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         // const C_SclString c_FileName = C_OscNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SclString c_FileName = "data_loggers.xml";
+         const C_SclString c_CombinedFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval = C_OscDataLoggerJobFiler::h_SaveFile(orc_Config, c_CombinedFileName);
          //Set file reference
          orc_XmlParser.SetNodeContent(c_FileName);
          //Store if necessary

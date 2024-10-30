@@ -62,6 +62,7 @@ public:
    int32_t GetSdNodeEditSplitterHorizontal(void) const;
    int32_t GetSdNodeEditHalcSplitterHorizontal(void) const;
    int32_t GetSdNodeEditCoManagerSplitterHorizontal(void) const;
+   int32_t GetSdNodeEditDataLoggerSplitterHorizontal(void) const;
    int32_t GetSdBusEditTreeSplitterHorizontal(void) const;
    int32_t GetSdBusEditTreeSplitterHorizontal2(void) const;
    int32_t GetSdBusEditLayoutSplitterHorizontal(void) const;
@@ -124,6 +125,7 @@ public:
    void SetSdNodeEditSplitterHorizontal(const int32_t os32_Value);
    void SetSdNodeEditHalcSplitterHorizontal(const int32_t os32_Value);
    void SetSdNodeEditCoManagerSplitterHorizontal(const int32_t os32_Value);
+   void SetSdNodeEditDataLoggerSplitterHorizontal(const int32_t os32_Value);
    void SetSdBusEditTreeSplitterHorizontal(const int32_t os32_Value);
    void SetSdBusEditTreeSplitterHorizontal2(const int32_t os32_Value);
    void SetSdBusEditLayoutSplitterHorizontal(const int32_t os32_Value);
@@ -288,6 +290,8 @@ private:
    // value
    int32_t ms32_SdNodEditHalcSplitterHorizontal;      ///< History of last known halc splitter position x value
    int32_t ms32_SdNodEditCoManagerSplitterHorizontal; ///< History of last known CANopen Manager splitter position
+   // x value
+   int32_t ms32_SdNodeEditDataLoggerSplitterHorizontal; ///< History of last known data logger splitter position
    // x value
    int32_t ms32_SdBusEditTreeSplitterHorizontal; ///< History of last known bus edit tree splitter
    // position x value

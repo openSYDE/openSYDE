@@ -40,7 +40,7 @@ public:
                const std::vector<uint32_t> & orc_UsedDataPoolIndicesIndex);
    void InitSv(const uint32_t ou32_ViewIndex, const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
-               const std::vector<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
+               const std::vector<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews = true);
    void Search(const QString & orc_Text);
    void SetViewIndex(const uint32_t ou32_ViewIndex);
    void SwitchMode(const stw::opensyde_gui_logic::C_TblTreDataElementModel::E_Mode & ore_Mode,

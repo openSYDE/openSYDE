@@ -60,6 +60,7 @@ public:
 
    virtual void UpdateBitrate(const int32_t os32_Bitrate);
 
+   virtual void ClearRxMessages(void);
    virtual void DistributeMessages(void);
    virtual void SendCanMessageQueued(const stw::can::T_STWCAN_Msg_TX & orc_Msg);
    int32_t SendCanMessageDirect(stw::can::T_STWCAN_Msg_TX & orc_Msg);

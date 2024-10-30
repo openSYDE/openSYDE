@@ -26,6 +26,7 @@
 #include "C_PuiSvDbNodeDataPoolListElementId.hpp"
 #include "C_OscCanMessageIdentificationIndices.hpp"
 #include "C_PuiSdNodeInterfaceAutomaticProperties.hpp"
+#include "C_OscNodeDataPoolListElementOptArrayId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -59,6 +60,8 @@ public:
    static uint32_t h_GetDefaultMessageCycleTime(void);
    static uint32_t h_GetMessageAutoTimeoutTime(const uint32_t ou32_CycleTime);
    static QString h_GetNamespace(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id);
+   static QString h_GetNamespaceDatapoolElement(
+      const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id);
    static QString h_GetSignalNamespace(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id);
    static QString h_GetHalcNamespace(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    static QString h_GetSubNodeDeviceName(const uint32_t ou32_NodeIndex);

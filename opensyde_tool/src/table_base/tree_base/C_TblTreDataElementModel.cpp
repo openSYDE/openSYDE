@@ -396,6 +396,43 @@ void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mod
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize tree structure
+
+   \param[in]  oq_ShowOnlyWriteElements   Optional flag to show only writable elements
+   \param[in]  oq_ShowArrayElements       Optional flag to hide all array elements (if false)
+   \param[in]  oq_ShowArrayIndexElements  Optional flag to hide all array index elements (if false)
+   \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
+   \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
+                                          will be marked as used an will be disabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreDataElementModel::InitSdDatapoolElements(const bool oq_ShowOnlyWriteElements,
+                                                      const bool oq_ShowArrayElements,
+                                                      const bool oq_ShowArrayIndexElements,
+                                                      const bool oq_Show64BitValues,
+                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+{
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
+   const std::vector<uint32_t> c_Hashes = C_TblTreDataElementModel::mh_GetViewSdHash(0U);
+
+   this->beginResetModel();
+   //Clear
+   CleanUpLastModel();
+   this->mpc_InvisibleRootItem = new C_TblTreItem();
+   m_InitDatapoolElements(0U, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                          oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements, false);
+   //Clean up (old values probably not necessary in future);
+   mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDe);
+   //Directly store the model (after filling it-> for sync managers)
+   C_TblTreDataElementModel::mhc_ViewSetupsDe.insert(
+      c_Hashes,
+      static_cast<C_TblTreDataElementModel::C_TblTreDataElementModelState>(this->mpc_InvisibleRootItem));
+   this->endResetModel();
+
+   osc_write_log_performance_stop(u16_TimerId, "Setup sd datapool element tree");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data elements
 
    \param[in]  orc_Index   Index
@@ -780,6 +817,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
    \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
    \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
                                           will be marked as used an will be disabled
+   \param[in]  oq_IsModelUsedInSysViews   True if the model is used for a view in system views, false otherwise
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIndex,
@@ -787,12 +825,20 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                                       const bool oq_ShowArrayElements,
                                                       const bool oq_ShowArrayIndexElements,
                                                       const bool oq_Show64BitValues,
-                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                      const bool oq_IsModelUsedInSysViews)
 {
    std::vector<uint8_t> c_NodeActiveFlags;
    const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
       ou32_ViewIndex,
       c_NodeActiveFlags);
+
+   // Model used in a different context than system views e.g. system definition
+   if (oq_IsModelUsedInSysViews == false)
+   {
+      //lint -e522 //false positive; call to std::fill has side effects
+      std::fill(c_NodeActiveFlags.begin(), c_NodeActiveFlags.end(), 1U);
+   }
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -808,9 +854,18 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
       //Nodes
       this->mpc_InvisibleRootItem->ReserveChildrenSpace(u32_NodeSize);
       tgl_assert(c_NodeActiveFlags.size() == u32_NodeSize);
+
       for (uint32_t u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
-         if ((c_NodeActiveFlags[u32_ItNode] == 1U) && (mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
+         bool q_Check = mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode);
+
+         // Model used in a different context than system views e.g. system definition
+         if (oq_IsModelUsedInSysViews == false)
+         {
+            q_Check = true;
+         }
+
+         if ((c_NodeActiveFlags[u32_ItNode] == 1U) && (q_Check == true))
          {
             C_TblTreItem * const pc_NodeItem = new C_TblTreItem();
             const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ItNode);
@@ -1479,7 +1534,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
          C_PuiSvDbNodeDataPoolListElementId c_Id(ou32_NodeIndex, ou32_DpIndex, ou32_ListIndex, oru32_Counter,
                                                  C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
                                                  ou32_RelevantChannelNumber != 1UL, ou32_ChannelArrayIndex, true);
-         c_Id.SetHalChannelName(orc_HalChannelOrDomainName);
+         c_Id.SetHalChannelName(orc_HalChannelOrDomainName.toStdString());
          C_TblTreDataElementModel::mh_AddHalcTreeItem(pc_ListItem,
                                                       C_OscHalcMagicianUtil::h_GetChanNumVariableName(
                                                          orc_DomainSingularName).c_str(), c_Id, ou32_RelevantChannelNumber != 1UL,
@@ -1498,7 +1553,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
          C_PuiSvDbNodeDataPoolListElementId c_Id(ou32_NodeIndex, ou32_DpIndex, ou32_ListIndex, oru32_Counter,
                                                  C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
                                                  ou32_RelevantChannelNumber != 1UL, ou32_ChannelArrayIndex, true);
-         c_Id.SetHalChannelName(orc_HalChannelOrDomainName);
+         c_Id.SetHalChannelName(orc_HalChannelOrDomainName.toStdString());
          C_TblTreDataElementModel::mh_AddHalcTreeItem(pc_ListItem,
                                                       C_OscHalcMagicianUtil::h_GetSafetyFlagVariableName(
                                                          orc_DomainSingularName).c_str(), c_Id, ou32_RelevantChannelNumber != 1UL,
@@ -1517,7 +1572,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
          C_PuiSvDbNodeDataPoolListElementId c_Id(ou32_NodeIndex, ou32_DpIndex, ou32_ListIndex, oru32_Counter,
                                                  C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
                                                  ou32_RelevantChannelNumber != 1UL, ou32_ChannelArrayIndex, true);
-         c_Id.SetHalChannelName(orc_HalChannelOrDomainName);
+         c_Id.SetHalChannelName(orc_HalChannelOrDomainName.toStdString());
          C_TblTreDataElementModel::mh_AddHalcTreeItem(pc_ListItem,
                                                       C_OscHalcMagicianUtil::h_GetUseCaseVariableName(
                                                          orc_DomainSingularName).c_str(), c_Id, ou32_RelevantChannelNumber != 1UL,
@@ -1669,7 +1724,7 @@ void C_TblTreDataElementModel::mh_AddHalcItem(C_TblTreItem * const opc_BaseItem,
                                            C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
                                            ou32_RelevantChannelNumber != 1UL, ou32_ChannelArrayIndex, true);
 
-   c_Id.SetHalChannelName(orc_HalChannelOrDomainName);
+   c_Id.SetHalChannelName(orc_HalChannelOrDomainName.toStdString());
 
    C_TblTreDataElementModel::mh_AddHalcTreeItem(opc_BaseItem, orc_HalcItem.c_Display.c_str(), c_Id,
                                                 ou32_RelevantChannelNumber != 1UL,

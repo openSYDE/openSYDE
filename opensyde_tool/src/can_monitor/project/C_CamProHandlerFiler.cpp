@@ -211,7 +211,7 @@ int32_t C_CamProHandlerFiler::h_LoadMessages(std::vector<C_CamProMessageData> & 
       if (u32_ExpectedSize != orc_Messages.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected messages count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected messages count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_Messages.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -652,7 +652,7 @@ int32_t C_CamProHandlerFiler::h_LoadFilters(std::vector<C_CamProFilterData> & or
       if (u32_ExpectedSize != orc_Filters.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected filters count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected filters count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_Filters.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -748,7 +748,7 @@ int32_t C_CamProHandlerFiler::h_LoadFilter(C_CamProFilterData & orc_Filter, C_Os
       if (u32_ExpectedSize != static_cast<uint32_t>(orc_Filter.c_FilterItems.size()))
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected filter items count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected filter items count, expected: %u, got %i", u32_ExpectedSize,
                               orc_Filter.c_FilterItems.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -915,7 +915,7 @@ int32_t C_CamProHandlerFiler::h_LoadDatabases(std::vector<C_CamProDatabaseData> 
       if (u32_ExpectedSize != orc_Databases.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected databases count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected databases count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_Databases.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }

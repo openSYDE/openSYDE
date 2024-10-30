@@ -1264,7 +1264,7 @@ int32_t C_OscDataDealerNvmSafe::NvmSafeReadFileWithCrc(const C_SclString & orc_P
       {
          C_SclString c_Error;
          c_Error.PrintFormatted(
-            "File \"%s\"  Expected: contains parameters for one device  Found: contains parameters for %d devices\n",
+            "File \"%s\"  Expected: contains parameters for one device  Found: contains parameters for %u devices\n",
             orc_Path.c_str(), this->mc_ImageFileHandler.GetNumberOfNodes());
          this->mc_ImageFileHandler.ClearContent();
          s32_Retval = C_CONFIG;

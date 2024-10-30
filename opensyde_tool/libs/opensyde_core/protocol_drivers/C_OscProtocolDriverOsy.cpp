@@ -1620,6 +1620,56 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadCertificateSerialNumberL7 service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+   Serial number is a byte array with maximum length of 20 Bytes.
+
+   \param[out] orc_SerialNumber             read certificate serial number
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumberL7(std::vector<uint8_t> & orc_SerialNumber,
+                                                                 uint8_t * const opu8_NrCode)
+{
+   int32_t s32_Return;
+
+   uint8_t u8_NrErrorCode = 0U;
+
+   orc_SerialNumber.clear();
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER_L7, 1U, false, orc_SerialNumber,
+                                       u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      if (orc_SerialNumber.size() > 20)
+      {
+         orc_SerialNumber.clear();
+         s32_Return = C_RANGE;
+      }
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::CertificateSerialNumberL7", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   WriteSecurityKey service implementation
 
    Send request and wait for response.
@@ -2334,8 +2384,9 @@ int32_t C_OscProtocolDriverOsy::OsyWriteDataPoolData(const uint8_t ou8_DataPoolI
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("WriteDataPoolData(Client indexes: Datapool: %d, List: %d, Element: %d, Size: %d)",
-                                 ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, orc_DataToWrite.size());
+      c_ErrorText.PrintFormatted("WriteDataPoolData(Client indexes: Datapool: %d, List: %d, Element: %d, Size: %u)",
+                                 ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex,
+                                 static_cast<uint32_t>(orc_DataToWrite.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
    return s32_Return;
@@ -4466,7 +4517,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("RequestDownload(Address: 0x%08X, Size: 0x%08X, MaxBlockLength: %d)",
+      c_ErrorText.PrintFormatted("RequestDownload(Address: 0x%08X, Size: 0x%08X, MaxBlockLength: %u)",
                                  ou32_StartAddress,
                                  ou32_Size, oru32_MaxBlockLength);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
@@ -4584,7 +4635,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestFileTransfer(const C_SclString & orc_F
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("RequestFileTransfer(Path: %s, Size: %d, MaxBlockLength: %d)", orc_FilePath.c_str(),
+      c_ErrorText.PrintFormatted("RequestFileTransfer(Path: %s, Size: %u, MaxBlockLength: %u)", orc_FilePath.c_str(),
                                  ou32_FileSize, oru32_MaxBlockLength);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
@@ -4668,7 +4719,8 @@ int32_t C_OscProtocolDriverOsy::OsyTransferData(const uint8_t ou8_BlockSequenceC
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("TransferData(Sequence: %d, Size: %d)", ou8_BlockSequenceCounter, orc_Data.size());
+      c_ErrorText.PrintFormatted("TransferData(Sequence: %d, Size: %u)", ou8_BlockSequenceCounter,
+                                 static_cast<uint32_t>(orc_Data.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -4961,7 +5013,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
    {
       C_SclString c_ErrorText;
       c_ErrorText.PrintFormatted("ReadMemoryByAddress(Address: 0x%08X, Size: 0x%08X)", ou32_MemoryAddress,
-                                 orc_DataRecord.size());
+                                 static_cast<uint32_t>(orc_DataRecord.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -5096,7 +5148,7 @@ int32_t C_OscProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32_t ou32_Memo
    {
       C_SclString c_ErrorText;
       c_ErrorText.PrintFormatted("WriteMemoryByAddress(Address: 0x%08X, Size: 0x%08X)", ou32_MemoryAddress,
-                                 orc_DataRecord.size());
+                                 static_cast<uint32_t>(orc_DataRecord.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -5304,7 +5356,7 @@ int32_t C_OscProtocolDriverOsy::OsyEcuReset(const uint8_t ou8_ResetType)
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("EcuReset(Type: %d, List: %d)", ou8_ResetType);
+      c_ErrorText.PrintFormatted("EcuReset(Type: %d)", ou8_ResetType);
       m_LogServiceError(c_ErrorText, s32_Return, 0);
    }
    return s32_Return;
@@ -5428,7 +5480,7 @@ int32_t C_OscProtocolDriverOsy::OsySetBitrate(const uint8_t ou8_ChannelType, con
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("RoutineControl::SetBitrate(Type: %d, Index: %d, Bitrate: %d)",
+      c_ErrorText.PrintFormatted("RoutineControl::SetBitrate(Type: %d, Index: %d, Bitrate: %u)",
                                  ou8_ChannelType, ou8_ChannelIndex, ou32_Bitrate);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }

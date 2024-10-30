@@ -13,10 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
-// QLineEdit is multiple times included, but cannot do anything else then suppress lint warning
-//lint -save -e451
 #include <QLineEdit>
-//lint -restore
 #include <QRegExpValidator>
 #include "stwtypes.hpp"
 #include "C_OgePopUpDialog.hpp"

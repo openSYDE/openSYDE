@@ -310,6 +310,18 @@ int32_t C_UsHandler::GetSdNodeEditCoManagerSplitterHorizontal(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get data logger screen splitter x position value
+
+   \return
+   Current data logger screen splitter x position value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_UsHandler::GetSdNodeEditDataLoggerSplitterHorizontal() const
+{
+   return this->ms32_SdNodeEditDataLoggerSplitterHorizontal;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get bus edit tree splitter x position value
 
    \return
@@ -1060,6 +1072,17 @@ void C_UsHandler::SetSdNodeEditHalcSplitterHorizontal(const int32_t os32_Value)
 void C_UsHandler::SetSdNodeEditCoManagerSplitterHorizontal(const int32_t os32_Value)
 {
    this->ms32_SdNodEditCoManagerSplitterHorizontal = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node edit data logger screen splitter x position value
+
+   \param[in]  os32_Value  New splitter position x value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetSdNodeEditDataLoggerSplitterHorizontal(const int32_t os32_Value)
+{
+   this->ms32_SdNodeEditDataLoggerSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2724,6 +2747,7 @@ C_UsHandler::C_UsHandler(void) :
    ms32_SdNodeEditSplitterHorizontal(1000),
    ms32_SdNodEditHalcSplitterHorizontal(400),
    ms32_SdNodEditCoManagerSplitterHorizontal(400),
+   ms32_SdNodeEditDataLoggerSplitterHorizontal(400),
    ms32_SdBusEditTreeSplitterHorizontal(0),
    ms32_SdBusEditLayoutSplitterHorizontal(0)
 {

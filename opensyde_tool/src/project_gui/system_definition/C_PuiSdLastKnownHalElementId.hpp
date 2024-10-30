@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_PUISVLASTKNOWNHALELEMENTID_HPP
-#define C_PUISVLASTKNOWNHALELEMENTID_HPP
+#ifndef C_PUISDLASTKNOWNHALELEMENTID_HPP
+#define C_PUISDLASTKNOWNHALELEMENTID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -22,12 +22,12 @@ namespace opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_PuiSvLastKnownHalElementId
+class C_PuiSdLastKnownHalElementId
 {
 public:
-   C_PuiSvLastKnownHalElementId();
-   C_PuiSvLastKnownHalElementId(const uint32_t ou32_Crc, const QString & orc_HalDpName);
-   virtual ~C_PuiSvLastKnownHalElementId();
+   C_PuiSdLastKnownHalElementId();
+   C_PuiSdLastKnownHalElementId(const uint32_t ou32_Crc, const QString & orc_HalDpName);
+   virtual ~C_PuiSdLastKnownHalElementId();
 
    virtual void CalcHash(uint32_t & oru32_HashValue) const;
 

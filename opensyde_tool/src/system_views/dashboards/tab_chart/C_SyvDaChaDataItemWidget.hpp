@@ -45,7 +45,7 @@ public:
    };
 
    explicit C_SyvDaChaDataItemWidget(const uint32_t ou32_ViewIndex, QWidget * const opc_Parent = NULL);
-   ~C_SyvDaChaDataItemWidget() override;
+   ~C_SyvDaChaDataItemWidget() noexcept override;
 
    void InitWidget(const uint32_t ou32_DataPoolElementConfigIndex,
                    const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,

@@ -32,6 +32,7 @@
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_SdNdeDpUtil.hpp"
 #include "C_OscLoggingHandler.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 #include "C_SdBueUnoBusProtNodeConnectCommand.hpp"
 #include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.hpp"
 #include "C_SdBueUnoBusProtNodeDisconnectCommand.hpp"
@@ -914,18 +915,19 @@ std::vector<std::vector<uint8_t> > C_SdUtil::h_GetAllUsedIpAddressesForBus(const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt message to protocol restrictions
 
-   \param[in,out]  orc_Message               Message to adapt
-   \param[in,out]  opc_UiMessage             Optional Ui Message to adapt
-   \param[in,out]  orc_SignalListElements    Datapool list elements for signals
-   \param[in]      oe_Type                   Protocol type
-   \param[in,out]  opc_AdaptationInfos       Optional report about adaptations
-   \param[in]      oq_IncludeSignalUpdate    Flag to control signal update
+   \param[in,out]  orc_Message                  Message to adapt
+   \param[in,out]  opc_UiMessage                Optional Ui Message to adapt
+   \param[in,out]  orc_OscSignalListElements    Core datapool list elements for signals
+   \param[in]      orc_UiSignalListElements     Ui datapool list elements for signals
+   \param[in]      oe_Type                      Protocol type
+   \param[in,out]  opc_AdaptationInfos          Optional report about adaptations
+   \param[in]      oq_IncludeSignalUpdate       Flag to control signal update
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_PuiSdNodeCanMessage * const opc_UiMessage,
-                                            std::vector<C_OscNodeDataPoolListElement> & orc_SignalListElements,
-                                            const C_OscCanProtocol::E_Type oe_Type,
-                                            QStringList * const opc_AdaptationInfos, const bool oq_IncludeSignalUpdate)
+                                            std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalListElements,
+                                            const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalListElements, const C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos,
+                                            const bool oq_IncludeSignalUpdate)
 {
    QStringList c_Info;
 
@@ -1037,12 +1039,17 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
       for (std::vector<C_OscCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
            c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
       {
-         tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size());
-         if (c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size())
+         tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_OscSignalListElements.size());
+         if (c_SignalIt->u32_ComDataElementIndex < orc_OscSignalListElements.size())
          {
-            h_AdaptSignalToProtocolType(*c_SignalIt,
-                                        orc_SignalListElements[c_SignalIt->u32_ComDataElementIndex],
-                                        oe_Type, &c_Info);
+            tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_UiSignalListElements.size());
+            if (c_SignalIt->u32_ComDataElementIndex < orc_UiSignalListElements.size())
+            {
+               h_AdaptSignalToProtocolType(*c_SignalIt,
+                                           orc_OscSignalListElements[c_SignalIt->u32_ComDataElementIndex],
+                                           orc_UiSignalListElements[c_SignalIt->u32_ComDataElementIndex],
+                                           oe_Type, &c_Info);
+            }
          }
       }
    }
@@ -1057,14 +1064,16 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt signal to protocol restrictions
 
-   \param[in,out]  orc_Signal             Signal to adapt
-   \param[in,out]  orc_SignalListElement  Signal list element to adapt
-   \param[in]      oe_Type                Protocol type
-   \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
+   \param[in,out]  orc_Signal                Signal to adapt
+   \param[in,out]  orc_OscSignalListElement  Core signal list element to adapt
+   \param[in,out]  orc_UiSignalListElement   Ui signal list element to adapt
+   \param[in]      oe_Type                   Protocol type
+   \param[in,out]  opc_AdaptationInfos       Optional report about adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
-                                           C_OscNodeDataPoolListElement & orc_SignalListElement,
+                                           C_OscNodeDataPoolListElement & orc_OscSignalListElement,
+                                           const C_PuiSdNodeDataPoolListElement & orc_UiSignalListElement,
                                            const C_OscCanProtocol::E_Type oe_Type,
                                            QStringList * const opc_AdaptationInfos)
 {
@@ -1077,7 +1086,7 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
       {
          c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
                                                "Multiplex information removed from signal \"%1\" because this is not supported "
-                                               "in ECeS/ECoS protocols.")).arg(orc_SignalListElement
+                                               "in ECeS/ECoS protocols.")).arg(orc_OscSignalListElement
                                                                                .c_Name.c_str()));
          orc_Signal.e_MultiplexerType = C_OscCanSignal::eMUX_DEFAULT;
          orc_Signal.u16_MultiplexValue = 0U;
@@ -1091,7 +1100,7 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
             c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
                                                   "Start bit of signal \"%1\" set from %2 to 0 because "
                                                   "of reserved bytes in ECeS protocol.")).
-                          arg(orc_SignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitStart));
+                          arg(orc_OscSignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitStart));
             orc_Signal.u16_ComBitStart = 0;
          }
       }
@@ -1101,7 +1110,7 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
    {
       c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal \"%1\" set from %2 to 0 because "
                                                                 "of CAN message limits.")).
-                    arg(orc_SignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitStart));
+                    arg(orc_OscSignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitStart));
       orc_Signal.u16_ComBitStart = 0;
    }
 
@@ -1109,45 +1118,54 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
    {
       c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Bit length of signal \"%1\" set from %2 to %3 because "
                                                                 "of CAN message limits.")).
-                    arg(orc_SignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitLength).arg(mu16_SIGNAL_BIT_MAX));
+                    arg(orc_OscSignalListElement.c_Name.c_str()).arg(orc_Signal.u16_ComBitLength).arg(
+                       mu16_SIGNAL_BIT_MAX));
       orc_Signal.u16_ComBitLength = mu16_SIGNAL_BIT_MAX;
    }
 
    if (oe_Type == C_OscCanProtocol::eJ1939)
    {
-      const QString c_PrevType = C_SdNdeDpUtil::h_ConvertContentTypeToString(orc_SignalListElement.GetType());
+      const QString c_PrevType = C_SdNdeDpUtil::h_ConvertContentTypeToString(orc_OscSignalListElement.GetType());
       bool q_TypeChanged = false;
       if (orc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_MOTOROLA)
       {
          c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
                                                "Byte order of signal \"%1\" set from motorola to intel because "
                                                "of j1939 protocol restrictions.")).arg(
-                          orc_SignalListElement.c_Name.c_str()));
+                          orc_OscSignalListElement.c_Name.c_str()));
          // J1939 supports only Intel byte order
          orc_Signal.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
       }
 
       // Only unsigned allowed
       // But keep the size of the element
-      switch (orc_SignalListElement.GetType())
+      switch (orc_OscSignalListElement.GetType())
       {
       case C_OscNodeDataPoolContent::eSINT8:
          q_TypeChanged = true;
-         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT8);
+         //Needs to be done before type change
+         C_SdUtil::mh_AdaptSignalToUnsignedType(orc_OscSignalListElement, c_Info);
+         orc_OscSignalListElement.SetType(C_OscNodeDataPoolContent::eUINT8);
          break;
       case C_OscNodeDataPoolContent::eSINT16:
          q_TypeChanged = true;
-         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT16);
+         //Needs to be done before type change
+         C_SdUtil::mh_AdaptSignalToUnsignedType(orc_OscSignalListElement, c_Info);
+         orc_OscSignalListElement.SetType(C_OscNodeDataPoolContent::eUINT16);
          break;
       case C_OscNodeDataPoolContent::eSINT32:
       case C_OscNodeDataPoolContent::eFLOAT32:
          q_TypeChanged = true;
-         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT32);
+         //Needs to be done before type change
+         C_SdUtil::mh_AdaptSignalToUnsignedType(orc_OscSignalListElement, c_Info);
+         orc_OscSignalListElement.SetType(C_OscNodeDataPoolContent::eUINT32);
          break;
       case C_OscNodeDataPoolContent::eSINT64:
       case C_OscNodeDataPoolContent::eFLOAT64:
          q_TypeChanged = true;
-         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT64);
+         //Needs to be done before type change
+         C_SdUtil::mh_AdaptSignalToUnsignedType(orc_OscSignalListElement, c_Info);
+         orc_OscSignalListElement.SetType(C_OscNodeDataPoolContent::eUINT64);
          break;
       case C_OscNodeDataPoolContent::eUINT8:  // Nothing to do for unsigned
       case C_OscNodeDataPoolContent::eUINT16: // Nothing to do for unsigned
@@ -1161,9 +1179,17 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
          c_Info.append(static_cast<QString>(C_GtGetText::h_GetText(
                                                "Data type of signal \"%1\" set from %2 to %3 because "
                                                "of j1939 protocol restrictions.")).
-                       arg(orc_SignalListElement.c_Name.c_str()).arg(c_PrevType).arg(C_SdNdeDpUtil::
-                                                                                     h_ConvertContentTypeToString(
-                                                                                        orc_SignalListElement.GetType())));
+                       arg(orc_OscSignalListElement.c_Name.c_str()).arg(c_PrevType).arg(C_SdNdeDpUtil::
+                                                                                        h_ConvertContentTypeToString(
+                                                                                           orc_OscSignalListElement.
+                                                                                           GetType())));
+         //Recalculate min max due to increased range
+         if (orc_UiSignalListElement.q_AutoMinMaxActive)
+         {
+            C_SdUtil::mh_AdaptSignalMaxToUnsignedType(orc_OscSignalListElement.c_MaxValue, c_Info,
+                                                      orc_Signal.u16_ComBitLength,
+                                                      orc_OscSignalListElement.c_Name.c_str());
+         }
       }
    }
 
@@ -2670,5 +2696,92 @@ void C_SdUtil::mh_WriteEtherCanLogMessage(const C_OscNodeProperties * const opc_
             opc_NodeProperties->GetCanInterfaces().size());
 
       osc_write_log_warning(c_Activity, c_Message);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt signal to unsigned type
+
+   \param[in,out]  orc_SignalListElement  Signal list element to adapt
+   \param[in,out]  orc_AdaptationInfos    Optional report about adaptations
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::mh_AdaptSignalToUnsignedType(C_OscNodeDataPoolListElement & orc_SignalListElement,
+                                            QStringList & orc_AdaptationInfos)
+{
+   C_SdUtil::mh_AdaptDataElementToUnsignedType(orc_SignalListElement.c_MinValue, orc_AdaptationInfos, "Min value",
+                                               orc_SignalListElement.c_Name.c_str());
+   C_SdUtil::mh_AdaptDataElementToUnsignedType(orc_SignalListElement.c_MaxValue, orc_AdaptationInfos, "Max value",
+                                               orc_SignalListElement.c_Name.c_str());
+   tgl_assert(orc_SignalListElement.c_DataSetValues.size() > 0UL);
+   if (orc_SignalListElement.c_DataSetValues.size() > 0UL)
+   {
+      C_SdUtil::mh_AdaptDataElementToUnsignedType(orc_SignalListElement.c_DataSetValues[0], orc_AdaptationInfos,
+                                                  "Init value", orc_SignalListElement.c_Name.c_str());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt signal max to unsigned type
+
+   \param[in,out]  orc_Content            Content
+   \param[in,out]  orc_AdaptationInfos    Optional report about adaptations
+   \param[in]      ou16_BitLength         Bit length
+   \param[in]      orc_SignalName         Signal name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::mh_AdaptSignalMaxToUnsignedType(C_OscNodeDataPoolContent & orc_Content,
+                                               QStringList & orc_AdaptationInfos, const uint16_t ou16_BitLength,
+                                               const QString & orc_SignalName)
+{
+   C_OscNodeDataPoolContent c_Max;
+
+   c_Max.SetArray(false);
+   c_Max.SetType(orc_Content.GetType());
+   C_SdNdeDpContentUtil::h_InitMaxForSignal(c_Max, ou16_BitLength);
+
+   if (orc_Content != c_Max)
+   {
+      float64_t f64_MaxValPrev;
+      float64_t f64_MaxValNew;
+
+      tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Content, f64_MaxValPrev,
+                                                           0UL) == C_NO_ERR);
+
+      tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(c_Max, f64_MaxValNew,
+                                                           0UL) == C_NO_ERR);
+      orc_Content = c_Max;
+      orc_AdaptationInfos.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                         "Max value of signal \"%1\" set from %2 to %3 because "
+                                                         "of change to unsigned type and auto min max setting.")).arg(
+                                    orc_SignalName).
+                                 arg(f64_MaxValPrev).arg(f64_MaxValNew));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt data element to unsigned type
+
+   \param[in,out]  orc_Content            Content
+   \param[in,out]  orc_AdaptationInfos    Optional report about adaptations
+   \param[in]      orc_ContentType        Content type
+   \param[in]      orc_SignalName         Signal name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::mh_AdaptDataElementToUnsignedType(C_OscNodeDataPoolContent & orc_Content,
+                                                 QStringList & orc_AdaptationInfos, const QString & orc_ContentType,
+                                                 const QString & orc_SignalName)
+{
+   float64_t f64_MinVal;
+
+   tgl_assert(C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Content, f64_MinVal,
+                                                        0UL) == C_NO_ERR);
+   if (f64_MinVal < 0.0)
+   {
+      C_OscNodeDataPoolContentUtil::h_SetValueInContent(0.0, orc_Content);
+      orc_AdaptationInfos.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                         "%1 of signal \"%2\" set from %3 to 0 because "
+                                                         "of change to unsigned type.")).arg(orc_ContentType).
+                                 arg(orc_SignalName).arg(f64_MinVal));
    }
 }

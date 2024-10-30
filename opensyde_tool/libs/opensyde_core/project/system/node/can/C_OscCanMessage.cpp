@@ -408,9 +408,9 @@ void C_OscCanMessage::CheckErrorSignalDetailed(const C_OscNodeDataPoolList * con
                for (std::set<uint16_t>::const_iterator c_ItPosition = c_SetPositions.begin();
                     c_ItPosition != c_SetPositions.end(); ++c_ItPosition)
                {
-                  const uint16_t u16_MaxPosition = static_cast<uint16_t>
-                                                   (((this->u16_Dlc - ou32_CanMessageValidSignalsDlcOffset) * 8U) - 1U);
-                  if ((*c_ItPosition) > u16_MaxPosition)
+                  const uint16_t u16_OneOverMaxPosition = static_cast<uint16_t>
+                                                          ((this->u16_Dlc - ou32_CanMessageValidSignalsDlcOffset) * 8U);
+                  if ((*c_ItPosition) >= u16_OneOverMaxPosition)
                   {
                      *opq_BorderConflict = true;
                      break;

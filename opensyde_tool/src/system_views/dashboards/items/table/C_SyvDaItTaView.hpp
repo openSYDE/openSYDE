@@ -36,7 +36,7 @@ class C_SyvDaItTaView :
 public:
    C_SyvDaItTaView(stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_Data = NULL,
                    QWidget * const opc_Parent = NULL);
-   ~C_SyvDaItTaView(void) override;
+   ~C_SyvDaItTaView(void) noexcept override;
 
    void UpdateStaticValues(void);
    void UpdateValue(void);

@@ -49,7 +49,7 @@ C_PuiSvDbNodeDataElementConfig::C_PuiSvDbNodeDataElementConfig(void) :
    clean up ...
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbNodeDataElementConfig::~C_PuiSvDbNodeDataElementConfig(void)
+C_PuiSvDbNodeDataElementConfig::~C_PuiSvDbNodeDataElementConfig(void) noexcept
 {
 }
 
@@ -58,7 +58,7 @@ C_PuiSvDbNodeDataElementConfig::~C_PuiSvDbNodeDataElementConfig(void)
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbNodeDataElementConfig::CalcHash(uint32_t & oru32_HashValue) const

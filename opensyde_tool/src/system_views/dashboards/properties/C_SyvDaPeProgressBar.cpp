@@ -18,6 +18,7 @@
 
 #include "C_GiSvDaProgressBarBase.hpp"
 #include "C_GtGetText.hpp"
+#include "C_GiProgressBarUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -163,7 +164,7 @@ C_PuiSvDbProgressBar::E_Type C_SyvDaPeProgressBar::GetType(void) const
 /*! \brief   Get alignment
 
    \return
-   Current alginment
+   C_PuiSvDbProgressBar::E_Alignment - Current alignment
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
@@ -294,15 +295,24 @@ void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const int32_t os32_Type) cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::m_UpdatePreview(void)
 {
-   C_GiSvDaProgressBarBase * const pc_Item = new C_GiSvDaProgressBarBase(0UL, 0UL, -1L, 0ULL, NULL);
-   const QSizeF c_ITEM_SIZE(240.0, 100.0);
-   //Do not use view center
-   const QPointF c_ITEM_POS(6.0, 30.0);
+   // Constants
+   const float32_t f32_SCENE_WIDTH = 260.0F;
+   const float32_t f32_SCENE_HEIGHT = 160.0F;
+   const QSizeF c_SCENE_SIZE(f32_SCENE_WIDTH, f32_SCENE_HEIGHT);
+   const int32_t s32_DEFAULT_VALUE = 50;
 
-   pc_Item->ApplySizeChange(c_ITEM_POS, c_ITEM_SIZE);
+   C_GiSvDaProgressBarBase * const pc_Item = new C_GiSvDaProgressBarBase(0UL, 0UL, -1L, 0ULL, NULL);
+
+   QSizeF c_ItemSize;
+   QPointF c_ItemPosition;
+
+   m_GetProgressBarPreviewSizeLocation(c_SCENE_SIZE, &c_ItemSize,
+                                       &c_ItemPosition);
+
+   pc_Item->SetValuePe(s32_DEFAULT_VALUE);
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateTypePe(this->GetType(), this->GetAlignment(), this->GetShowMinMax());
-   pc_Item->SetValuePe(50);
+   pc_Item->ApplySizeChange(c_ItemPosition, c_ItemSize);
 
    // clear old scene
    this->mrc_ParentDialog.GetPreviewScene()->clear();
@@ -311,3 +321,140 @@ void C_SyvDaPeProgressBar::m_UpdatePreview(void)
    this->mrc_ParentDialog.GetPreviewScene()->addItem(pc_Item);
    this->mrc_ParentDialog.GetPreviewScene()->clearSelection();
 } //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get type 1, 2, or 3 progress bar preview size and position
+
+   Therefore, the type (eTYPE_1, eTYPE_2, eTYPE_3) and the alignment (C_PuiSvDbProgressBar::eTOP,
+   C_PuiSvDbProgressBar::eBOTTOM, C_PuiSvDbProgressBar::eLEFT, C_PuiSvDbProgressBar::eRIGHT) has to
+   be set correctly
+
+   \param[in]       orc_SceneSize               Scene size of the preview scene
+   \param[in,out]   opf32_ProgressBarRecSize    Size of the progress bar preview in scene
+   \param[in,out]   opf32_ProgressBarPosition   Position of the progress bar preview in scene
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeProgressBar::m_GetProgressBarPreviewSizeLocation(const QSizeF & orc_SceneSize,
+                                                               QSizeF * const opc_ProgressBarRecSize,
+                                                               QPointF * const opc_ProgressBarPosition)
+{
+   //Constants
+   const bool q_ShowMinMax = GetShowMinMax();
+   const C_PuiSvDbProgressBar::E_Type e_ProgressBarType = this->GetType();
+
+   const C_PuiSvDbProgressBar::E_Alignment e_ProgressBarAlignment = this->GetAlignment();
+   const QPoint c_ZERO_POSITION = QPoint(0, 0);
+
+   //Variables
+   uint32_t u32_TemporaryRectangularWidth;
+   uint32_t u32_TemporaryRectangularHeight;
+
+   float32_t f32_ProgressBarXposition = .0F;
+   float32_t f32_ProgressBarYposition = .0F;
+
+   QMarginsF c_Margins;
+   QRect c_Rectangular;
+
+   if (e_ProgressBarType == C_PuiSvDbProgressBar::E_Type::eTYPE_1)
+   {
+      //Constants
+      const QString c_MinimumValue = "0";
+      const QString c_MaximumValue = "100";
+      const QString c_Unit = "";
+      const float32_t f32_ARROW_OFFSET = 15.0F;
+
+      u32_TemporaryRectangularWidth = 200;
+      u32_TemporaryRectangularHeight = 50;
+
+      c_Rectangular = QRect(c_ZERO_POSITION.x(),
+                            c_ZERO_POSITION.y(),
+                            u32_TemporaryRectangularWidth,
+                            u32_TemporaryRectangularHeight);
+
+      c_Margins = C_GiProgressBarUtil::h_GetType1Margins(c_Rectangular, q_ShowMinMax,
+                                                         c_MaximumValue,
+                                                         c_MinimumValue,
+                                                         c_Unit,
+                                                         e_ProgressBarAlignment,
+                                                         mf32_MinimumFontSize,
+                                                         f32_ARROW_OFFSET);
+   }
+   else
+   {
+      u32_TemporaryRectangularWidth = 125;
+      u32_TemporaryRectangularHeight = 115;
+
+      c_Rectangular = QRect(c_ZERO_POSITION.x(),
+                            c_ZERO_POSITION.y(),
+                            u32_TemporaryRectangularWidth,
+                            u32_TemporaryRectangularHeight);
+
+      if (e_ProgressBarType == C_PuiSvDbProgressBar::E_Type::eTYPE_2)
+      {
+         c_Margins = C_GiProgressBarUtil::h_GetType2Margins(c_Rectangular,
+                                                            q_ShowMinMax,
+                                                            e_ProgressBarAlignment,
+                                                            mf32_MinimumFontSize);
+      }
+      else
+      {
+         c_Margins = C_GiProgressBarUtil::h_GetType3Margins(c_Rectangular,
+                                                            q_ShowMinMax,
+                                                            e_ProgressBarAlignment,
+                                                            mf32_MinimumFontSize);
+      }
+   }
+
+   const float32_t f32_ProgressBarHeight = static_cast<float32_t>(c_Rectangular.height()) -
+                                           (static_cast<float32_t>(c_Margins.bottom()) +
+                                            static_cast<float32_t>(c_Margins.top()));
+   const float32_t f32_ProgressBarWidth = static_cast<float32_t>(c_Rectangular.width()) -
+                                          (static_cast<float32_t>(c_Margins.left()) +
+                                           static_cast<float32_t>(c_Margins.right()));
+   const QSizeF c_ProgressBarSize(f32_ProgressBarWidth, f32_ProgressBarHeight);
+
+   if (e_ProgressBarAlignment == C_PuiSvDbProgressBar::eTOP)
+   {
+      f32_ProgressBarXposition = (static_cast<float32_t>(orc_SceneSize.width()) / mf32_HalfModifier) -
+                                 (static_cast<float32_t>(c_ProgressBarSize.width()) / mf32_HalfModifier);
+      f32_ProgressBarYposition = ((static_cast<float32_t>(orc_SceneSize.height()) / mf32_HalfModifier) -
+                                  (static_cast<float32_t>(c_ProgressBarSize.height()) / mf32_HalfModifier)) -
+                                 static_cast<float32_t>(c_Margins.top());
+   }
+   else if (e_ProgressBarAlignment == C_PuiSvDbProgressBar::eBOTTOM)
+   {
+      f32_ProgressBarXposition = (static_cast<float32_t>(orc_SceneSize.width()) / mf32_HalfModifier) -
+                                 (static_cast<float32_t>(c_ProgressBarSize.width()) / mf32_HalfModifier);
+      f32_ProgressBarYposition = (static_cast<float32_t>(orc_SceneSize.height()) / mf32_HalfModifier) -
+                                 (static_cast<float32_t>(c_ProgressBarSize.height()) / mf32_HalfModifier);
+   }
+   else if (e_ProgressBarAlignment == C_PuiSvDbProgressBar::eLEFT)
+   {
+      f32_ProgressBarXposition = ((static_cast<float32_t>(orc_SceneSize.width()) / mf32_HalfModifier) -
+                                  (static_cast<float32_t>(c_ProgressBarSize.width()) / mf32_HalfModifier)) -
+                                 static_cast<float32_t>(c_Margins.left());
+      f32_ProgressBarYposition = ((static_cast<float32_t>(orc_SceneSize.height()) / mf32_HalfModifier) -
+                                  (static_cast<float32_t>(c_ProgressBarSize.height()) / mf32_HalfModifier)) -
+                                 static_cast<float32_t>(c_Margins.top());
+   }
+   else if (e_ProgressBarAlignment == C_PuiSvDbProgressBar::eRIGHT)
+   {
+      f32_ProgressBarXposition = (static_cast<float32_t>(orc_SceneSize.width()) / mf32_HalfModifier) -
+                                 (static_cast<float32_t>(c_ProgressBarSize.width()) / mf32_HalfModifier);
+      f32_ProgressBarYposition = ((static_cast<float32_t>(orc_SceneSize.height()) / mf32_HalfModifier) -
+                                  (static_cast<float32_t>(c_ProgressBarSize.height()) / mf32_HalfModifier)) -
+                                 static_cast<float32_t>(c_Margins.top());
+   }
+   else
+   {
+      //nothing else to do
+   }
+
+   // Set final values
+   opc_ProgressBarRecSize->setWidth(static_cast<float32_t>(u32_TemporaryRectangularWidth));
+   opc_ProgressBarRecSize->setHeight(static_cast<float32_t>(u32_TemporaryRectangularHeight));
+
+   opc_ProgressBarPosition->setX(f32_ProgressBarXposition);
+   opc_ProgressBarPosition->setY(f32_ProgressBarYposition);
+}

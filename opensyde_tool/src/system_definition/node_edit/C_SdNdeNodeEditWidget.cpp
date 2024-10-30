@@ -37,6 +37,7 @@ const int32_t C_SdNdeNodeEditWidget::hs32_TAB_INDEX_DATA_POOL = 1;
 const int32_t C_SdNdeNodeEditWidget::hs32_TAB_INDEX_COMM = 2;
 const int32_t C_SdNdeNodeEditWidget::hs32_TAB_INDEX_CO_MANAGER = 3;
 const int32_t C_SdNdeNodeEditWidget::hs32_TAB_INDEX_HALC = 4;
+const int32_t C_SdNdeNodeEditWidget::hs32_TAB_INDEX_DATA_LOGGER = 5;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -54,7 +55,7 @@ const int32_t C_SdNdeNodeEditWidget::hs32_TAB_INDEX_HALC = 4;
    Set up GUI with all elements.
 
    \param[in]      ou32_NodeIndex   Node index
-   \param[in]      os32_TabIndex     Tab index to show
+   \param[in]      os32_TabIndex    Tab index to show
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,8 +70,11 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32_t ou32_NodeIndex, cons
    mpc_DataPoolEditWidget(NULL),
    mpc_ComIfDescriptionWidget(NULL),
    mpc_HalWidget(NULL),
-   mpc_CoManagerWidget(NULL)
+   mpc_CoManagerWidget(NULL),
+   mpc_DataLoggerWidget(NULL)
 {
+   int32_t s32_RestoredTabIndex = os32_TabIndex;
+
    mpc_Ui->setupUi(this);
 
    InitStaticNames();
@@ -81,9 +85,12 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32_t ou32_NodeIndex, cons
    connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw::opensyde_gui_elements::C_OgeTawPageNavi::tabBarClicked,
            this, &C_SdNdeNodeEditWidget::m_TabClicked);
 
+   m_HandleVisibleTabs();
+   m_FixInitialTabIndex(s32_RestoredTabIndex);
+
    // show the initial tab
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(os32_TabIndex);
-   m_CurrentTabChanged(os32_TabIndex);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(s32_RestoredTabIndex);
+   m_CurrentTabChanged(s32_RestoredTabIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,6 +119,7 @@ void C_SdNdeNodeEditWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hs32_TAB_INDEX_COMM, C_GtGetText::h_GetText("COMM Messages"));
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hs32_TAB_INDEX_CO_MANAGER, C_GtGetText::h_GetText("CANopen Manager"));
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hs32_TAB_INDEX_HALC, C_GtGetText::h_GetText("Hardware Configurator"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hs32_TAB_INDEX_DATA_LOGGER, C_GtGetText::h_GetText("Data Logger"));
 
    //Tool tips
 }
@@ -360,11 +368,14 @@ void C_SdNdeNodeEditWidget::hideEvent(QHideEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
 {
+   int32_t s32_RestoredTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex();
+
    if (this->mpc_PropertiesWidget != NULL)
    {
       this->mpc_PropertiesWidget->LoadUserSettings();
    }
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
+   m_FixInitialTabIndex(s32_RestoredTabIndex);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(s32_RestoredTabIndex);
 
    if (this->mpc_HalWidget != NULL)
    {
@@ -377,6 +388,10 @@ void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
    if (this->mpc_CoManagerWidget != NULL)
    {
       this->mpc_CoManagerWidget->LoadUserSettings();
+   }
+   if (this->mpc_DataLoggerWidget != NULL)
+   {
+      this->mpc_DataLoggerWidget->LoadUserSettings();
    }
 }
 
@@ -402,6 +417,10 @@ void C_SdNdeNodeEditWidget::m_SaveUserSettings() const
    if (this->mpc_CoManagerWidget != NULL)
    {
       this->mpc_CoManagerWidget->SaveUserSettings();
+   }
+   if (this->mpc_DataLoggerWidget != NULL)
+   {
+      this->mpc_DataLoggerWidget->SaveUserSettings();
    }
 }
 
@@ -566,6 +585,10 @@ void C_SdNdeNodeEditWidget::m_CreateTabWidgetsAlways(const int32_t os32_Index, c
    else if (os32_Index == hs32_TAB_INDEX_CO_MANAGER)
    {
       m_CreateCoManagerTab(oq_AdaptCursor);
+   }
+   else if (os32_Index == hs32_TAB_INDEX_DATA_LOGGER)
+   {
+      m_CreateDataLoggerTab(oq_AdaptCursor);
    }
    else
    {
@@ -870,6 +893,38 @@ void C_SdNdeNodeEditWidget::m_CreateCoManagerTab(const bool oq_AdaptCursor)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create data logger tab content
+
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreateDataLoggerTab(const bool oq_AdaptCursor)
+{
+   if (this->mpc_DataLoggerWidget == NULL)
+   {
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_StartWaitingCursor();
+      }
+      this->mpc_DataLoggerWidget = new C_SdNdeDalTabContentWidget();
+      this->mpc_DataLoggerWidget->SetNode(this->mu32_NodeIndex);
+
+      connect(mpc_DataLoggerWidget, &C_SdNdeDalTabContentWidget::SigErrorChange, this,
+              &C_SdNdeNodeEditWidget::SigErrorChange);
+
+      this->mpc_Ui->pc_TabDataLoggerLayout->addWidget(this->mpc_DataLoggerWidget);
+      if (this->mq_SkipLoadUserSettings == false)
+      {
+         this->mpc_DataLoggerWidget->LoadUserSettings();
+      }
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Start waiting cursor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -902,7 +957,7 @@ void C_SdNdeNodeEditWidget::m_UpdateTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update trigger for CanOpen and Properties tab widgets
 
-   \param[in]       ou32_NodeIndex     Current node index
+   \param[in]  ou32_NodeIndex    Current node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_PropAndCoTabUpdateTrigger(const uint32_t ou32_NodeIndex)
@@ -911,5 +966,42 @@ void C_SdNdeNodeEditWidget::m_PropAndCoTabUpdateTrigger(const uint32_t ou32_Node
    if (this->mpc_PropertiesWidget != NULL)
    {
       this->mpc_PropertiesWidget->SetNodeIndex(ou32_NodeIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle visible tabs
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_HandleVisibleTabs(void)
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   bool q_DataLoggerVisible = false;
+
+   if (pc_Node != NULL)
+   {
+      if (((pc_Node->pc_DeviceDefinition != NULL) &&
+           (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size())) &&
+          (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased))
+      {
+         q_DataLoggerVisible = true;
+      }
+   }
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabVisible(C_SdNdeNodeEditWidget::hs32_TAB_INDEX_DATA_LOGGER,
+                                                     q_DataLoggerVisible &&
+                                                     C_OscDataLoggerJob::hq_AllowDataloggerFeature);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fix initial tab index
+
+   \param[in,out]  ors32_TabIndex   Tab index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_FixInitialTabIndex(int32_t & ors32_TabIndex) const
+{
+   if (this->mpc_Ui->pc_TabWidgetPageNavi->isTabVisible(ors32_TabIndex) == false)
+   {
+      ors32_TabIndex = C_SdNdeNodeEditWidget::hs32_TAB_INDEX_PROPERTIES;
    }
 }

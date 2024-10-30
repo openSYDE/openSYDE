@@ -84,6 +84,11 @@ private:
                                          std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
                                          const std::map<uint32_t,
                                                         stw::scl::C_SclString> & orc_NodeIndicesToNameMap);
+   static int32_t mh_LoadDataLoggers(std::vector<C_OscDataLoggerJob> & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                     const stw::scl::C_SclString & orc_BasePath);
+   static int32_t mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob> & orc_Config,
+                                     C_OscXmlParserBase & orc_XmlParser, const stw::scl::C_SclString & orc_BasePath,
+                                     std::vector<stw::scl::C_SclString> * const opc_CreatedFiles);
    static stw::scl::C_SclString mh_DiagnosticServerToString(const C_OscNodeProperties::E_DiagnosticServerProtocol &
                                                             ore_DiagnosticProtocol);
    static int32_t mh_StringToDiagnosticServer(const stw::scl::C_SclString & orc_String,

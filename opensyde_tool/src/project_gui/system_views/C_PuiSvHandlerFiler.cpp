@@ -119,7 +119,7 @@ int32_t C_PuiSvHandlerFiler::h_LoadViews(std::vector<C_PuiSvData> & orc_Views,
          if (u32_ExpectedSize != orc_Views.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected view count, expected: %i, got %i", u32_ExpectedSize,
+            c_Tmp.PrintFormatted("Unexpected view count, expected: %u, got %zu", u32_ExpectedSize,
                                  orc_Views.size());
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
@@ -286,101 +286,6 @@ void C_PuiSvHandlerFiler::h_SaveReadRails(const QMap<C_OscNodeDataPoolListElemen
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "rail-assignments");
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load last known halc crcs
-
-   \param[in,out]  orc_Crcs         Crcs
-   \param[in,out]  orc_XmlParser    XML parser
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                              C_PuiSvLastKnownHalElementId> & orc_Crcs,
-                                                     C_OscXmlParserBase & orc_XmlParser)
-{
-   int32_t s32_Retval = C_NO_ERR;
-
-   orc_Crcs.clear();
-   if (orc_XmlParser.SelectNodeChild("last-known-halc-crcs") == "last-known-halc-crcs")
-   {
-      C_SclString c_CurrentNode = orc_XmlParser.SelectNodeChild("last-known-halc-crc");
-
-      if (c_CurrentNode == "last-known-halc-crc")
-      {
-         do
-         {
-            C_PuiSvDbNodeDataPoolListElementId c_Id;
-            C_PuiSvDashboardFiler::h_LoadUiIndex(c_Id, orc_XmlParser);
-            if (orc_XmlParser.AttributeExists("crc"))
-            {
-               const uint32_t u32_Crc = orc_XmlParser.GetAttributeUint32("crc");
-               QString c_DpName;
-               if (orc_XmlParser.SelectNodeChild("hal-data-pool-name") == "hal-data-pool-name")
-               {
-                  c_DpName = orc_XmlParser.GetNodeContent().c_str();
-                  //Return
-                  tgl_assert(orc_XmlParser.SelectNodeParent() == "last-known-halc-crc");
-               }
-               else
-               {
-                  const C_OscNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
-                     c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex);
-                  if (pc_Dp != NULL)
-                  {
-                     c_DpName = pc_Dp->c_Name.c_str();
-                  }
-               }
-               //Insert
-               orc_Crcs[c_Id] = C_PuiSvLastKnownHalElementId(u32_Crc, c_DpName);
-            }
-            else
-            {
-               s32_Retval = C_CONFIG;
-            }
-            //Next
-            c_CurrentNode = orc_XmlParser.SelectNodeNext("last-known-halc-crc");
-         }
-         while ((c_CurrentNode == "last-known-halc-crc") && (s32_Retval == C_NO_ERR));
-         //Return
-         tgl_assert(orc_XmlParser.SelectNodeParent() == "last-known-halc-crcs");
-      }
-      //Return
-      tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-views");
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Save last known halc crcs
-
-   \param[in]      orc_Crcs         Crcs
-   \param[in,out]  orc_XmlParser    XML parser
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                                 C_PuiSvLastKnownHalElementId> & orc_Crcs,
-                                                  C_OscXmlParserBase & orc_XmlParser)
-{
-   orc_XmlParser.CreateAndSelectNodeChild("last-known-halc-crcs");
-   for (std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId>::const_iterator c_It =
-           orc_Crcs.begin();
-        c_It != orc_Crcs.end(); ++c_It)
-   {
-      orc_XmlParser.CreateAndSelectNodeChild("last-known-halc-crc");
-      C_PuiSvDashboardFiler::h_SaveUiIndex(c_It->first, orc_XmlParser);
-      orc_XmlParser.SetAttributeUint32("crc", c_It->second.u32_Crc);
-      orc_XmlParser.CreateNodeChild("hal-data-pool-name", c_It->second.c_HalDpName.toStdString().c_str());
-
-      //Return
-      tgl_assert(orc_XmlParser.SelectNodeParent() == "last-known-halc-crcs");
-   }
-   //Return
-   tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-views");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

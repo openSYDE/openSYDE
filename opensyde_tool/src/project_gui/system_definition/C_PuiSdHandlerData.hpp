@@ -19,6 +19,7 @@
 #include "C_OscSystemDefinition.hpp"
 #include "C_PuiSdSharedDatapools.hpp"
 #include "C_SdTopologyDataSnapshot.hpp"
+#include "C_PuiSdLastKnownHalElementId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -36,7 +37,8 @@ class C_PuiSdHandlerData :
 
 public:
    int32_t LoadFromFile(const stw::scl::C_SclString & orc_Path, uint16_t * const opu16_FileVersion);
-   int32_t SaveToFile(const stw::scl::C_SclString & orc_Path, const bool oq_UseDeprecatedFileFormatV2);
+   int32_t SaveToFile(const stw::scl::C_SclString & orc_Path, const bool oq_UseDeprecatedFileFormatV2,
+                      const bool oq_UpdateInternalState = true);
    bool HasHashChanged(void) const;
    uint32_t CalcHashSystemDefinition(void) const;
    virtual void Clear(const bool oq_TriggerSyncSignals);
@@ -59,6 +61,8 @@ protected:
    ///< core arrays)
 
    C_PuiSdSharedDatapools mc_SharedDatapools; ///< UI information for shared datapools
+   std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+            C_PuiSdLastKnownHalElementId> mc_LastKnownHalcCrcs; ///< HAL data element info
    uint32_t mu32_CalculatedHashSystemDefinition;
 
    C_PuiSdHandlerData(QObject * const opc_Parent = NULL);
@@ -67,7 +71,35 @@ protected:
    uint32_t m_GetHashNode(const uint32_t ou32_NodeIndex) const;
    uint32_t m_GetHashBus(const uint32_t ou32_BusIndex) const;
    virtual void m_HandleSyncNodeAdded(const uint32_t ou32_Index);
+   virtual void m_HandleSyncNodeHalc(const uint32_t ou32_Index);
+   virtual void m_HandleSyncNodeReplace(const uint32_t ou32_Index);
    virtual void m_HandleSyncNodeAboutToBeDeleted(const uint32_t ou32_Index);
+   virtual void m_HandleSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);
+   virtual void m_HandleSyncNodeDataPoolMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolSourceIndex,
+                                              const uint32_t ou32_DataPoolTargetIndex);
+   virtual void m_HandleSyncNodeDataPoolAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                         const uint32_t ou32_DataPoolIndex);
+   virtual void m_HandleSyncNodeDataPoolListAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                  const uint32_t ou32_ListIndex);
+   virtual void m_HandleSyncNodeDataPoolListMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                  const uint32_t ou32_ListSourceIndex,
+                                                  const uint32_t ou32_ListTargetIndex);
+   virtual void m_HandleSyncNodeDataPoolListAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                             const uint32_t ou32_DataPoolIndex,
+                                                             const uint32_t ou32_ListIndex);
+   virtual void m_HandleSyncNodeDataPoolListElementAdded(const uint32_t ou32_NodeIndex,
+                                                         const uint32_t ou32_DataPoolIndex,
+                                                         const uint32_t ou32_ListIndex,
+                                                         const uint32_t ou32_ElementIndex);
+   virtual void m_HandleSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeIndex,
+                                                         const uint32_t ou32_DataPoolIndex,
+                                                         const uint32_t ou32_ListIndex,
+                                                         const uint32_t ou32_ElementSourceIndex,
+                                                         const uint32_t ou32_ElementTargetIndex);
+   virtual void m_HandleSyncNodeDataPoolListElementAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                                    const uint32_t ou32_DataPoolIndex,
+                                                                    const uint32_t ou32_ListIndex,
+                                                                    const uint32_t ou32_ElementIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

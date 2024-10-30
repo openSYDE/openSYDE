@@ -225,7 +225,7 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540}  no memory leak because the ownership of these objects was never transferred to this class
-C_SyvDaPeBase::~C_SyvDaPeBase(void)
+C_SyvDaPeBase::~C_SyvDaPeBase(void) noexcept
 {
    delete mpc_Ui;
    delete mpc_Scene;

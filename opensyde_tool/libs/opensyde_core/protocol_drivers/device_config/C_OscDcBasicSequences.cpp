@@ -233,7 +233,7 @@ int32_t C_OscDcBasicSequences::ScanEnterFlashloader(const uint32_t ou32_Flashloa
    if (c_Results.size() == 0)
    {
       C_SclString c_Text;
-      c_Text.PrintFormatted("You now have %d seconds time to turn on your target device ...",
+      c_Text.PrintFormatted("You now have %u seconds time to turn on your target device ...",
                             u32_SCAN_TIME_MS / 1000);
       m_ReportProgress(C_WARN, c_Text);
    }
@@ -533,9 +533,9 @@ int32_t C_OscDcBasicSequences::ConfigureDevice(const uint8_t ou8_CurrentNodeId, 
             const uint32_t u32_KEY = 23U; // fixed in UDS stack for non secure mode
             if (u64_Seed != 42U)
             {
-               C_SclString c_Tmp;
-               c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
-                                    "expected value, expected: 42, got %i", u64_Seed);
+               const C_SclString c_Tmp =
+                  "Received seed in non secure mode does not match the expected value, expected: 42, got " +
+                  C_SclString::IntToStr(u64_Seed);
                osc_write_log_warning(c_LogActivity, c_Tmp.c_str());
             }
 
@@ -554,7 +554,7 @@ int32_t C_OscDcBasicSequences::ConfigureDevice(const uint8_t ou8_CurrentNodeId, 
          const C_OscProtocolDriverOsyNode c_NewServerId(0, ou8_NewNodeId);
          C_SclString c_ProgressLogMsg = "";
          c_ProgressLogMsg.PrintFormatted(
-            "Configuring Node ID \"%d\" to Node with current ID \"%d\" on Interface CAN %d.",
+            "Configuring Node ID \"%d\" to Node with current ID \"%d\" on Interface CAN %u.",
             ou8_NewNodeId, ou8_CurrentNodeId, ou8_InterfaceIndex + 1U);
          s32_Return = mc_OsyProtocol.OsySetNodeIdForChannel(0, ou8_InterfaceIndex, c_NewServerId, &u8_Nrc);
          m_ReportProgress(s32_Return, c_ProgressLogMsg);
@@ -567,7 +567,7 @@ int32_t C_OscDcBasicSequences::ConfigureDevice(const uint8_t ou8_CurrentNodeId, 
          {
             c_ProgressLogMsg = "";
             c_ProgressLogMsg.PrintFormatted(
-               "Configuring Bitrate %d kbit/s to Node on Interface CAN %d.",
+               "Configuring Bitrate %u kbit/s to Node on Interface CAN %u.",
                ou32_Bitrate, ou8_InterfaceIndex + 1U);
             s32_Return = mc_OsyProtocol.OsySetBitrate(0, ou8_InterfaceIndex, ou32_Bitrate * 1000U,
                                                       &u8_Nrc);

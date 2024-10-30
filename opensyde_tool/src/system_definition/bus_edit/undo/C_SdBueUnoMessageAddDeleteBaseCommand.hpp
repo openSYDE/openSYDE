@@ -53,8 +53,7 @@ private:
    void m_Store(void);
    void m_Remove(void);
    static void mh_UpdateSignalsToProtocol(stw::opensyde_core::C_OscCanMessage & orc_Message,
-                                          std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_Signals,
-                                          const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
+                                          std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignals, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignals, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

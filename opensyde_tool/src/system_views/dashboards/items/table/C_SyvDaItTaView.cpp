@@ -101,7 +101,7 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540}  no memory leak because of the parent of mpc_TableHeaderView assigned by setHorizontalHeader and the Qt
 // memory management
-C_SyvDaItTaView::~C_SyvDaItTaView(void)
+C_SyvDaItTaView::~C_SyvDaItTaView(void) noexcept
 {
 }
 

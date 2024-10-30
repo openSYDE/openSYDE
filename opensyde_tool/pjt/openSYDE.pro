@@ -33,6 +33,7 @@ SOURCES += ../src/main.cpp \
     ../src/com_import_export/C_CieConverter.cpp \
     ../src/com_import_export/C_CieImportDataAssignment.cpp \
     ../src/com_import_export/C_CieImportedMessageVectorData.cpp \
+    ../src/graphic_items/C_GiProgressBarUtil.cpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.cpp \
     ../src/graphic_items/system_view_items/C_GiSvSubNodeData.cpp \
     ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.cpp \
@@ -40,6 +41,9 @@ SOURCES += ../src/main.cpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
     ../src/navigable_gui/C_NagTopTreeModel.cpp \
     ../src/navigable_gui/C_NagTopTreeView.cpp \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesPopUpDialog.cpp \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesTableModel.cpp \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesTableView.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGenericWithContextMenu.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconEvents.cpp \
@@ -47,9 +51,11 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.cpp \
     ../src/project_gui/C_PuiTargetSupportPackageFiler.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerDataLoggerLogic.cpp \
+    ../src/project_gui/system_definition/C_PuiSdLastKnownHalElementId.cpp \
+    ../src/project_gui/system_definition/node/C_PuiSdNodeDataPoolListElementIdSyncUtil.cpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.cpp \
     ../src/project_gui/system_definition/node/can/C_PuiSdNodeCanUtil.cpp \
-    ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatter.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatterConfig.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCrcGroup.cpp \
@@ -76,6 +82,12 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobPropertiesWidget.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.cpp \
@@ -943,6 +955,7 @@ HEADERS  += \
     ../libs/opensyde_core/miniz/miniz.h \
     ../src/com_import_export/C_CieImportDataAssignment.hpp \
     ../src/com_import_export/C_CieImportedMessageVectorData.hpp \
+    ../src/graphic_items/C_GiProgressBarUtil.hpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.hpp \
     ../src/graphic_items/system_view_items/C_GiSvSubNodeData.hpp \
     ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.hpp \
@@ -950,6 +963,9 @@ HEADERS  += \
     ../src/navigable_gui/C_NagTopTreeDelegate.hpp \
     ../src/navigable_gui/C_NagTopTreeModel.hpp \
     ../src/navigable_gui/C_NagTopTreeView.hpp \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesPopUpDialog.hpp \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesTableModel.hpp \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesTableView.hpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGenericWithContextMenu.hpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.hpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconEvents.hpp \
@@ -957,9 +973,11 @@ HEADERS  += \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.hpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.hpp \
     ../src/project_gui/C_PuiTargetSupportPackageFiler.hpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerDataLoggerLogic.hpp \
+    ../src/project_gui/system_definition/C_PuiSdLastKnownHalElementId.hpp \
+    ../src/project_gui/system_definition/node/C_PuiSdNodeDataPoolListElementIdSyncUtil.hpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.hpp \
     ../src/project_gui/system_definition/node/can/C_PuiSdNodeCanUtil.hpp \
-    ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatter.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementDisplayFormatterConfig.hpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCrcGroup.hpp \
@@ -986,6 +1004,12 @@ HEADERS  += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobPropertiesWidget.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.hpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.hpp \
@@ -1822,6 +1846,7 @@ HEADERS  += \
 FORMS    += \
     ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.ui \
     ../src/navigable_gui/C_NagServiceModeInfo.ui \
+    ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesPopUpDialog.ui \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
     ../src/system_definition/bus_edit/C_SdBueImportCommMessagesWidget.ui \
@@ -1833,6 +1858,10 @@ FORMS    += \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.ui \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.ui \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobPropertiesWidget.ui \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.ui \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.ui \
@@ -2017,6 +2046,7 @@ INCLUDEPATH += ../src \
                ../src/system_definition/managers/undo \
                ../src/system_definition/node_edit \
                ../src/system_definition/node_edit/data_blocks \
+               ../src/system_definition/node_edit/data_logger \
                ../src/system_definition/node_edit/datapools \
                ../src/system_definition/node_edit/canopen_manager \
                ../src/system_definition/node_edit/halc \
@@ -2059,6 +2089,7 @@ INCLUDEPATH += ../src \
                ../src/graphic_items/system_view_items \
                ../src/graphic_items/system_view_items/dashboard \
                ../src/navigable_gui \
+               ../src/navigable_gui/unused_project_files \
                ../src/project_gui \
                ../src/project_gui/base \
                ../src/project_gui/system_views \

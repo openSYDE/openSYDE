@@ -17,6 +17,7 @@
 #include "TglUtils.hpp"
 #include "stwerrors.hpp"
 #include "C_OscUtils.hpp"
+#include "C_SclChecksums.hpp"
 #include "C_SdBueSortHelper.hpp"
 #include "C_PuiSdHandlerData.hpp"
 #include "C_OscLoggingHandler.hpp"
@@ -140,7 +141,8 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
                //Load separate UI files
                s32_Return = C_PuiSdHandlerFiler::h_LoadSystemDefinitionUiFile(c_FilePath, this->mc_UiNodes,
                                                                               this->mc_UiBuses, this->c_BusTextElements,
-                                                                              this->c_Elements);
+                                                                              this->c_Elements,
+                                                                              this->mc_LastKnownHalcCrcs);
 
                // Loading separate shared Datapool configuration
                if (s32_Return == C_NO_ERR)
@@ -219,6 +221,7 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
 
    \param[in]  orc_Path                      Path to system definition file
    \param[in]  oq_UseDeprecatedFileFormatV2  Flag to enable saving using the deprecated V2 file format
+   \param[in]  oq_UpdateInternalState        Allow update of internal state (only if no export or similar action)
 
    \return
    C_NO_ERR   data saved
@@ -226,7 +229,8 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerData::SaveToFile(const stw::scl::C_SclString & orc_Path, const bool oq_UseDeprecatedFileFormatV2)
+int32_t C_PuiSdHandlerData::SaveToFile(const stw::scl::C_SclString & orc_Path, const bool oq_UseDeprecatedFileFormatV2,
+                                       const bool oq_UpdateInternalState)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -290,7 +294,8 @@ int32_t C_PuiSdHandlerData::SaveToFile(const stw::scl::C_SclString & orc_Path, c
             s32_Return = C_PuiSdHandlerFiler::h_SaveSystemDefinitionUiFile(c_FilePath, this->mc_CoreDefinition,
                                                                            this->mc_UiNodes, this->mc_UiBuses,
                                                                            this->c_BusTextElements,
-                                                                           this->c_Elements);
+                                                                           this->c_Elements,
+                                                                           this->mc_LastKnownHalcCrcs);
 
             // Saving shared Datapool configuration
             if (s32_Return == C_NO_ERR)
@@ -314,7 +319,10 @@ int32_t C_PuiSdHandlerData::SaveToFile(const stw::scl::C_SclString & orc_Path, c
          }
          //Only update hash in non deprecated mode
          //calculate the hash value and save it for comparing
-         this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
+         if (oq_UpdateInternalState)
+         {
+            this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
+         }
       }
    }
 
@@ -363,6 +371,15 @@ uint32_t C_PuiSdHandlerData::CalcHashSystemDefinition(void) const
    this->mc_CoreDefinition.CalcHash(u32_Hash);
 
    // calculate the hash for the ui elements
+   for (std::map<C_OscNodeDataPoolListElementOptArrayId, C_PuiSdLastKnownHalElementId>::const_iterator c_It =
+           this->mc_LastKnownHalcCrcs.begin();
+        c_It != this->mc_LastKnownHalcCrcs.end(); ++c_It)
+   {
+      c_It->first.CalcHash(u32_Hash);
+      c_It->second.CalcHash(u32_Hash);
+      stw::scl::C_SclChecksums::CalcCRC32(&c_It->second, sizeof(uint32_t), u32_Hash);
+   }
+
    this->c_Elements.CalcHash(u32_Hash);
 
    for (u32_Counter = 0U; u32_Counter < this->c_BusTextElements.size(); ++u32_Counter)
@@ -402,6 +419,7 @@ void C_PuiSdHandlerData::Clear(const bool oq_TriggerSyncSignals)
    this->c_Elements.Clear();
    this->c_BusTextElements.clear();
    this->mc_SharedDatapools.Clear();
+   this->mc_LastKnownHalcCrcs.clear();
 
    //Reset hash
    this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
@@ -689,6 +707,28 @@ void C_PuiSdHandlerData::m_HandleSyncNodeAdded(const uint32_t ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node halc
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeHalc(const uint32_t ou32_Index)
+{
+   Q_EMIT this->SigSyncNodeHalc(ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node replace
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeReplace(const uint32_t ou32_Index)
+{
+   Q_EMIT this->SigSyncNodeReplace(ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle data sync for node about to be deleted
 
    \param[in]  ou32_Index  Index
@@ -697,6 +737,150 @@ void C_PuiSdHandlerData::m_HandleSyncNodeAdded(const uint32_t ou32_Index)
 void C_PuiSdHandlerData::m_HandleSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
 {
    Q_EMIT this->SigSyncNodeAboutToBeDeleted(ou32_Index, false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool added
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolAdded(ou32_NodeIndex, ou32_DataPoolIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool moved
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolSourceIndex   Data pool source index
+   \param[in]  ou32_DataPoolTargetIndex   Data pool target index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolMoved(const uint32_t ou32_NodeIndex,
+                                                       const uint32_t ou32_DataPoolSourceIndex,
+                                                       const uint32_t ou32_DataPoolTargetIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolMoved(ou32_NodeIndex, ou32_DataPoolSourceIndex, ou32_DataPoolTargetIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool about to be deleted
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_DataPoolIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list added
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListAdded(const uint32_t ou32_NodeIndex,
+                                                           const uint32_t ou32_DataPoolIndex,
+                                                           const uint32_t ou32_ListIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListAdded(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list moved
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_DataPoolIndex      Data pool index
+   \param[in]  ou32_ListSourceIndex    List source index
+   \param[in]  ou32_ListTargetIndex    List target index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListMoved(const uint32_t ou32_NodeIndex,
+                                                           const uint32_t ou32_DataPoolIndex,
+                                                           const uint32_t ou32_ListSourceIndex,
+                                                           const uint32_t ou32_ListTargetIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListMoved(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListSourceIndex,
+                                             ou32_ListTargetIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list about to be deleted
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                                      const uint32_t ou32_DataPoolIndex,
+                                                                      const uint32_t ou32_ListIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element added
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListElementAdded(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_DataPoolIndex,
+                                                                  const uint32_t ou32_ListIndex,
+                                                                  const uint32_t ou32_ElementIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListElementAdded(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                    ou32_ElementIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element moved
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolIndex         Data pool index
+   \param[in]  ou32_ListIndex             List index
+   \param[in]  ou32_ElementSourceIndex    Element source index
+   \param[in]  ou32_ElementTargetIndex    Element target index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_DataPoolIndex,
+                                                                  const uint32_t ou32_ListIndex,
+                                                                  const uint32_t ou32_ElementSourceIndex,
+                                                                  const uint32_t ou32_ElementTargetIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListElementMoved(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                    ou32_ElementSourceIndex, ou32_ElementTargetIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element about to be deleted
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListElementAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                                             const uint32_t ou32_DataPoolIndex,
+                                                                             const uint32_t ou32_ListIndex,
+                                                                             const uint32_t ou32_ElementIndex)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListElementAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                               ou32_ElementIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

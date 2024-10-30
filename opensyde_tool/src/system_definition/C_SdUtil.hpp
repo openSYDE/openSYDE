@@ -21,6 +21,7 @@
 #include "C_OscCanMessage.hpp"
 #include "C_OscSystemBus.hpp"
 #include "C_OscNode.hpp"
+#include "C_PuiSdNodeDataPoolListElement.hpp"
 #include "C_OscNodeDataPoolListElementId.hpp"
 #include "C_OscCanMessageIdentificationIndices.hpp"
 #include "C_PuiSdNodeCanMessage.hpp"
@@ -76,11 +77,10 @@ public:
                                                                            const int32_t & ors32_SpecialInterface);
    static void h_AdaptMessageToProtocolType(stw::opensyde_core::C_OscCanMessage & orc_Message,
                                             stw::opensyde_gui_logic::C_PuiSdNodeCanMessage * const opc_UiMessage,
-                                            std::vector<opensyde_core::C_OscNodeDataPoolListElement> & orc_SignalListElements, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos, const bool oq_IncludeSignalUpdate = true);
+                                            std::vector<opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalListElements, const std::vector<opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UiSignalListElements, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos, const bool oq_IncludeSignalUpdate = true);
    static void h_AdaptSignalToProtocolType(stw::opensyde_core::C_OscCanSignal & orc_Signal,
-                                           opensyde_core::C_OscNodeDataPoolListElement & orc_SignalListElement,
-                                           const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type,
-                                           QStringList * const opc_AdaptationInfos);
+                                           opensyde_core::C_OscNodeDataPoolListElement & orc_OscSignalListElement,
+                                           const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiSignalListElement, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos);
    static QString h_InitUsedIdsString(const std::vector<uint32_t> & orc_UsedIds, const QString & orc_ItemName,
                                       const QString & orc_ItemType, const bool oq_SkipItem = false);
    static QString h_InitUsedIpsString(const std::vector<std::vector<uint8_t> > & orc_UsedIps,
@@ -135,6 +135,14 @@ public:
 private:
    static void mh_WriteEtherCanLogMessage(const opensyde_core::C_OscNodeProperties * const opc_NodeProperties,
                                           const opensyde_core::C_OscDeviceDefinition * const opc_DevDef);
+   static void mh_AdaptSignalToUnsignedType(opensyde_core::C_OscNodeDataPoolListElement & orc_SignalListElement,
+                                            QStringList & orc_AdaptationInfos);
+   static void mh_AdaptSignalMaxToUnsignedType(opensyde_core::C_OscNodeDataPoolContent & orc_Content,
+                                               QStringList & orc_AdaptationInfos, const uint16_t ou16_BitLength,
+                                               const QString & orc_SignalName);
+   static void mh_AdaptDataElementToUnsignedType(opensyde_core::C_OscNodeDataPoolContent & orc_Content,
+                                                 QStringList & orc_AdaptationInfos, const QString & orc_ContentType,
+                                                 const QString & orc_SignalName);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

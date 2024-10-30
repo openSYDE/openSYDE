@@ -359,7 +359,7 @@ void C_PuiSvDashboardFiler::h_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElement
    orc_XmlParser.CreateNodeChild("invalid-type-placeholder",
                                  C_OscNodeDataPoolFiler::h_DataPoolToString(orc_Id.GetInvalidTypePlaceholder()));
    orc_XmlParser.CreateNodeChild("invalid-name-placeholder", orc_Id.GetInvalidNamePlaceholder().toStdString().c_str());
-   orc_XmlParser.CreateNodeChild("hal-channel-name", orc_Id.GetHalChannelName().toStdString().c_str());
+   orc_XmlParser.CreateNodeChild("hal-channel-name", orc_Id.GetHalChannelName().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

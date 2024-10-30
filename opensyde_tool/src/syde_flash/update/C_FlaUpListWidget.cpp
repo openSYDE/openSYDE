@@ -192,7 +192,7 @@ void C_FlaUpListWidget::DeleteItem(const int32_t os32_CurrentHexFileIndex, const
 
    if (pc_CurrentItem != NULL)
    {
-      C_FlaUpListItemWidget * const pc_ItemWidget =
+      C_FlaUpListItemWidget * pc_ItemWidget =
          dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
 
       if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
@@ -210,28 +210,20 @@ void C_FlaUpListWidget::DeleteItem(const int32_t os32_CurrentHexFileIndex, const
             c_MessageBox.SetCustomMinHeight(180, 180);
             if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
             {
-               this->takeItem(os32_CurrentHexFileIndex);
-               //lint -e{774,831,948} Surpass lint warnings
-               if (pc_ItemWidget != NULL)
-               {
-                  delete pc_ItemWidget;
-               }
+               pc_ItemWidget = dynamic_cast<C_FlaUpListItemWidget *>(this->takeItem(os32_CurrentHexFileIndex));
+               delete pc_ItemWidget;
                Q_EMIT (this->SigUpdateFileCounter());
                m_UpdateHexFileWidgetIndex(os32_CurrentHexFileIndex);
             }
          }
          else
          {
-            this->takeItem(os32_CurrentHexFileIndex);
-            //lint -e{774,831,948} Surpass lint warnings
-            if (pc_ItemWidget != NULL)
-            {
-               delete pc_ItemWidget;
-            }
+            pc_ItemWidget = dynamic_cast<C_FlaUpListItemWidget *>(this->takeItem(os32_CurrentHexFileIndex));
+            delete pc_ItemWidget;
          }
+         Q_EMIT (this->SigFileRemoved());
       }
    }
-   Q_EMIT (this->SigFileRemoved());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

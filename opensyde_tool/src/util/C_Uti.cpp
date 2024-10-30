@@ -600,13 +600,13 @@ QString C_Uti::h_GetApplicationVersion(const bool oq_UseStwFormat)
          {
             if (oq_UseStwFormat)
             {
-               c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+               c_Version.PrintFormatted("V%lu.%02lur%lu", (pc_Info->dwFileVersionMS >> 16U),
                                         pc_Info->dwFileVersionMS & 0x0000FFFFUL,
                                         (pc_Info->dwFileVersionLS >> 16U));
             }
             else
             {
-               c_Version.PrintFormatted("%d.%02d.%d", (pc_Info->dwFileVersionMS >> 16U),
+               c_Version.PrintFormatted("%lu.%02lu.%lu", (pc_Info->dwFileVersionMS >> 16U),
                                         pc_Info->dwFileVersionMS & 0x0000FFFFUL,
                                         (pc_Info->dwFileVersionLS >> 16U));
             }

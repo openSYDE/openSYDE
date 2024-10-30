@@ -50,6 +50,7 @@ int32_t C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 0;
    \param[in]      oq_ShowNvmLists              Optional flag to only show NVM LISTs
    \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
                                                 will be marked as used an will be disabled. Usable for non NVM list mode
+   \param[in]      oq_UseInSysViews             True if the dialog is used within system views/commissioning, false otherwise
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_ViewIndex,
@@ -57,8 +58,8 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
                                                        const bool oq_ShowArrayElements,
                                                        const bool oq_ShowArrayIndexElements,
                                                        const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
-                                                       const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
-   :
+                                                       const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                       const bool oq_UseInSysViews) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeDataElementBrowse),
    mpc_ContextMenu(NULL),
@@ -123,6 +124,15 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
          q_TreeFilled = true;
       }
    }
+
+   // Used in system definition for selecting data pool elements
+   if (oq_UseInSysViews == false)
+   {
+      this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("Data Element")));
+      this->mpc_Ui->pc_ComboBoxType->setVisible(false);
+      this->mpc_Ui->pc_LabelDataElement->setText(C_GtGetText::h_GetText("Select Data Element"));
+   }
+
    //Avoid filling/resetting the tree if already set up (and user settings/ last known state takes priority)
    if (q_TreeFilled == false)
    {
@@ -130,7 +140,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
                                         oq_ShowArrayIndexElements,
                                         oq_Show64BitValues,
                                         oq_ShowNvmLists,
-                                        opc_AlreasyUsedElements);
+                                        opc_AlreasyUsedElements, oq_UseInSysViews);
    }
    //After tree was filled
    m_UpdateSelection(0);

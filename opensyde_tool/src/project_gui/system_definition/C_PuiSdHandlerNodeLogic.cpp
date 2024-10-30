@@ -1387,7 +1387,7 @@ void C_PuiSdHandlerNodeLogic::ReplaceNode(const uint32_t ou32_NodeIndex,
    //insert UI part at same position as OSC part:
    this->mc_UiNodes[ou32_NodeIndex] = orc_UiNode;
 
-   Q_EMIT (this->SigSyncNodeReplace(ou32_NodeIndex));
+   m_HandleSyncNodeReplace(ou32_NodeIndex);
 
    //do not signal "node change" (unselects node in node bar and should not be necessary)
 }
@@ -1574,7 +1574,7 @@ int32_t C_PuiSdHandlerNodeLogic::InsertDataPool(const uint32_t & oru32_NodeIndex
          this->mc_SharedDatapools.OnDatapoolInserted(C_OscNodeDataPoolId(oru32_NodeIndex, oru32_DataPoolIndex));
 
          //Synchronization engine
-         Q_EMIT (this->SigSyncNodeDataPoolAdded(oru32_NodeIndex, oru32_DataPoolIndex));
+         m_HandleSyncNodeDataPoolAdded(oru32_NodeIndex, oru32_DataPoolIndex);
       }
       else
       {
@@ -1618,7 +1618,7 @@ int32_t C_PuiSdHandlerNodeLogic::RemoveDataPool(const uint32_t & oru32_NodeIndex
          if (oq_SuppressSyncSignal == false)
          {
             //Synchronization engine (First!)
-            Q_EMIT (this->SigSyncNodeDataPoolAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex));
+            m_HandleSyncNodeDataPoolAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex);
          }
          //Handle COMM
          m_CleanUpComDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
@@ -2044,7 +2044,7 @@ int32_t C_PuiSdHandlerNodeLogic::MoveDataPool(const uint32_t ou32_NodeIndex, con
                                                      C_OscNodeDataPoolId(ou32_NodeIndex, ou32_TargetIndex));
 
             //Synchronization engine
-            Q_EMIT (this->SigSyncNodeDataPoolMoved(ou32_NodeIndex, ou32_SourceIndex, ou32_TargetIndex));
+            m_HandleSyncNodeDataPoolMoved(ou32_NodeIndex, ou32_SourceIndex, ou32_TargetIndex);
          }
       }
    }
@@ -2965,7 +2965,7 @@ int32_t C_PuiSdHandlerNodeLogic::InsertDataPoolList(const uint32_t & oru32_NodeI
             rc_OscNode.RecalculateAddress();
 
             //Synchronization engine
-            Q_EMIT (this->SigSyncNodeDataPoolListAdded(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex));
+            m_HandleSyncNodeDataPoolListAdded(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex);
 
             // Handle shared Datapools
             if (oq_HandleSharedDatapools == true)
@@ -3046,8 +3046,8 @@ int32_t C_PuiSdHandlerNodeLogic::RemoveDataPoolList(const uint32_t & oru32_NodeI
          if (oru32_DataPoolListIndex < rc_OscDataPool.c_Lists.size())
          {
             //Synchronization engine (First!)
-            Q_EMIT (this->SigSyncNodeDataPoolListAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                  oru32_DataPoolListIndex));
+            m_HandleSyncNodeDataPoolListAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                         oru32_DataPoolListIndex);
             rc_UiDataPool.c_DataPoolLists.erase(rc_UiDataPool.c_DataPoolLists.begin() + oru32_DataPoolListIndex);
             rc_OscDataPool.c_Lists.erase(rc_OscDataPool.c_Lists.begin() + oru32_DataPoolListIndex);
 
@@ -4195,8 +4195,8 @@ int32_t C_PuiSdHandlerNodeLogic::MoveDataPoolList(const uint32_t & oru32_NodeInd
             rc_UiDataPool.c_DataPoolLists.insert(rc_UiDataPool.c_DataPoolLists.begin() + oru32_TargetIndex, c_Data);
 
             //Synchronization engine
-            Q_EMIT (this->SigSyncNodeDataPoolListMoved(oru32_NodeIndex, oru32_DataPoolIndex, oru32_SourceIndex,
-                                                       oru32_TargetIndex));
+            m_HandleSyncNodeDataPoolListMoved(oru32_NodeIndex, oru32_DataPoolIndex, oru32_SourceIndex,
+                                              oru32_TargetIndex);
 
             // Handle shared Datapools
             if (oq_HandleSharedDatapools == true)
@@ -4503,9 +4503,9 @@ int32_t C_PuiSdHandlerNodeLogic::InsertDataPoolListElement(const uint32_t & oru3
                rc_OscNode.RecalculateAddress();
 
                //Synchronization engine
-               Q_EMIT (this->SigSyncNodeDataPoolListElementAdded(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                 oru32_DataPoolListIndex,
-                                                                 oru32_DataPoolListElementIndex));
+               m_HandleSyncNodeDataPoolListElementAdded(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                        oru32_DataPoolListIndex,
+                                                        oru32_DataPoolListElementIndex);
 
                // Handle shared Datapools
                if (oq_HandleSharedDatapools == true)
@@ -4602,9 +4602,9 @@ int32_t C_PuiSdHandlerNodeLogic::RemoveDataPoolListElement(const uint32_t & oru3
             if (oru32_DataPoolListElementIndex < rc_UiList.c_DataPoolListElements.size())
             {
                //Synchronization engine (First!)
-               Q_EMIT (this->SigSyncNodeDataPoolListElementAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                            oru32_DataPoolListIndex,
-                                                                            oru32_DataPoolListElementIndex));
+               m_HandleSyncNodeDataPoolListElementAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                   oru32_DataPoolListIndex,
+                                                                   oru32_DataPoolListElementIndex);
                rc_UiList.c_DataPoolListElements.erase(rc_UiList.c_DataPoolListElements.begin() +
                                                       oru32_DataPoolListElementIndex);
                rc_OscList.c_Elements.erase(rc_OscList.c_Elements.begin() + oru32_DataPoolListElementIndex);
@@ -5610,9 +5610,9 @@ int32_t C_PuiSdHandlerNodeLogic::MoveDataPoolListElement(const uint32_t & oru32_
                   rc_UiList.c_DataPoolListElements.begin() + oru32_TargetIndex, c_Data);
 
                //Synchronization engine
-               Q_EMIT this->SigSyncNodeDataPoolListElementMoved(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                oru32_DataPoolListIndex,
-                                                                oru32_SourceIndex, oru32_TargetIndex);
+               m_HandleSyncNodeDataPoolListElementMoved(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                        oru32_DataPoolListIndex,
+                                                        oru32_SourceIndex, oru32_TargetIndex);
 
                // Handle shared Datapools
                if (oq_HandleSharedDatapools == true)

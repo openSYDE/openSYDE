@@ -214,7 +214,7 @@ int32_t C_OscBuSequences::ActivateFlashLoader(const uint32_t ou32_FlashloaderRes
       C_SclString c_Text;
       osc_write_log_warning(c_LogActivity, "Could not request an ECU reset.");
 
-      c_Text.PrintFormatted("You now have %d seconds time to turn on your target device ...",
+      c_Text.PrintFormatted("You now have %u seconds time to turn on your target device ...",
                             u32_SCAN_TIME_MS / 1000);
       m_ReportProgress(C_WARN, c_Text);
    }
@@ -529,9 +529,9 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
 
          if (u64_Seed != 42U)
          {
-            C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
-                                 "expected value, expected: 42, got %i", u64_Seed);
+            const C_SclString c_Tmp =
+               "Received seed in non secure mode does not match the expected value, expected: 42, got " +
+               C_SclString::IntToStr(u64_Seed);
             osc_write_log_warning(c_LogActivity, c_Tmp.c_str());
          }
 
@@ -561,7 +561,7 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
          {
             C_SclString c_Error;
             c_Error.PrintFormatted("(Offset: 0x%08x Size: 0x%08x)", pc_HexDump->at_Blocks[u16_Area].u32_AddressOffset,
-                                   pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength());
+                                   static_cast<uint32_t>(pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength()));
             osc_write_log_error(c_LogActivity,  "Could not get confirmation about flash memory availability " +
                                 c_Error + "! Details: " +
                                 C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NumberCode));
@@ -627,7 +627,7 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
          {
             C_SclString c_Error;
             c_Error.PrintFormatted("(Offset: 0x%08X Size: 0x%08X)", pc_HexDump->at_Blocks[u16_Area].u32_AddressOffset,
-                                   pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength());
+                                   static_cast<uint32_t>(pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength()));
             osc_write_log_error(c_LogActivity, "Could not request download " + c_Error + "! Details: " +
                                 C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NumberCode));
             q_ErrorOccurred = true;

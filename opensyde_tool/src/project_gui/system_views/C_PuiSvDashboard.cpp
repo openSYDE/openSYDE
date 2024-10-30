@@ -22,6 +22,7 @@
 #include "C_PuiSvHandler.hpp"
 #include "C_PuiSvDashboard.hpp"
 #include "C_OscNodeDataPoolContentUtil.hpp"
+#include "C_PuiSdNodeDataPoolListElementIdSyncUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -1080,8 +1081,8 @@ void C_PuiSvDashboard::OnSyncNodeAdded(const uint32_t ou32_Index)
    \param[in]  orc_MapCurToNew   Map cur to new
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDashboard::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                                                C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew)
+void C_PuiSvDashboard::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_OscNodeDataPoolListElementOptArrayId,
+                                                                                C_OscNodeDataPoolListElementOptArrayId> & orc_MapCurToNew)
 {
    std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
    m_GetAllWidgetItems(c_Widgets);
@@ -1958,10 +1959,7 @@ void C_PuiSvDashboard::h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & or
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (orc_DataElementId.u32_NodeIndex >= ou32_Index)
-      {
-         ++orc_DataElementId.u32_NodeIndex;
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeAdded(orc_DataElementId, ou32_Index);
    }
 }
 
@@ -1974,45 +1972,17 @@ void C_PuiSvDashboard::h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & or
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeHalc(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
-                                        const uint32_t ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                                                  C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew)
+                                        const uint32_t ou32_Index,
+                                        const std::map<C_OscNodeDataPoolListElementOptArrayId,
+                                                       C_OscNodeDataPoolListElementOptArrayId> & orc_MapCurToNew)
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (orc_DataElementId.u32_NodeIndex == ou32_Index)
+      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeHalc(orc_DataElementId, ou32_Index,
+                                                                     orc_MapCurToNew) == true)
       {
-         const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                        C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_It = orc_MapCurToNew.find(
-            orc_DataElementId);
-         if (c_It != orc_MapCurToNew.end())
-         {
-            //Replace
-            orc_DataElementId = c_It->second;
-         }
-         else
-         {
-            if (C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_DataElementId.u32_NodeIndex,
-                                                                orc_DataElementId.u32_DataPoolIndex) != NULL)
-            {
-               C_OscNodeDataPool::E_Type e_Type;
-               if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(ou32_Index, orc_DataElementId.u32_DataPoolIndex,
-                                                                    e_Type) == C_NO_ERR)
-               {
-                  if ((e_Type == C_OscNodeDataPool::eHALC) || (e_Type == C_OscNodeDataPool::eHALC_NVM))
-                  {
-                     //Delete
-                     orc_DataElementId.MarkInvalid(e_Type,
-                                                   C_GtGetText::h_GetText("Unknown HAL data element"));
-                  }
-               }
-            }
-            else
-            {
-               //Delete
-               orc_DataElementId.MarkInvalid(C_OscNodeDataPool::eHALC,
-                                             C_GtGetText::h_GetText("Unknown HAL data element"));
-            }
-         }
+         orc_DataElementId.MarkInvalid(C_OscNodeDataPool::eHALC,
+                                       C_GtGetText::h_GetText("Unknown HAL data element"));
       }
    }
 }
@@ -2030,20 +2000,10 @@ void C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(C_PuiSvDbNodeDataPoolListEle
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (orc_DataElementId.u32_NodeIndex > ou32_Index)
-      {
-         if (!oq_OnlyMarkInvalid)
-         {
-            --orc_DataElementId.u32_NodeIndex;
-         }
-      }
-      else if (orc_DataElementId.u32_NodeIndex == ou32_Index)
+      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeAboutToBeDeleted(orc_DataElementId, ou32_Index,
+                                                                                 oq_OnlyMarkInvalid))
       {
          mh_MarkInvalid(orc_DataElementId);
-      }
-      else
-      {
-         //No adaptation necessary
       }
    }
 }
@@ -2061,13 +2021,8 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolAdded(C_PuiSvDbNodeDataPoolListElemen
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (orc_DataElementId.u32_NodeIndex == ou32_NodeIndex)
-      {
-         if (orc_DataElementId.u32_DataPoolIndex >= ou32_DataPoolIndex)
-         {
-            ++orc_DataElementId.u32_DataPoolIndex;
-         }
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolAdded(orc_DataElementId, ou32_NodeIndex,
+                                                                          ou32_DataPoolIndex);
    }
 }
 
@@ -2086,36 +2041,9 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolMoved(C_PuiSvDbNodeDataPoolListElemen
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (orc_DataElementId.u32_NodeIndex == ou32_NodeIndex)
-      {
-         if (orc_DataElementId.u32_DataPoolIndex > ou32_DataPoolSourceIndex)
-         {
-            --orc_DataElementId.u32_DataPoolIndex;
-            if (orc_DataElementId.u32_DataPoolIndex >= ou32_DataPoolTargetIndex)
-            {
-               ++orc_DataElementId.u32_DataPoolIndex;
-            }
-            else
-            {
-               //No adaptation necessary
-            }
-         }
-         else if (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolSourceIndex)
-         {
-            orc_DataElementId.u32_DataPoolIndex = ou32_DataPoolTargetIndex;
-         }
-         else
-         {
-            if (orc_DataElementId.u32_DataPoolIndex >= ou32_DataPoolTargetIndex)
-            {
-               ++orc_DataElementId.u32_DataPoolIndex;
-            }
-            else
-            {
-               //No adaptation necessary
-            }
-         }
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolMoved(orc_DataElementId, ou32_NodeIndex,
+                                                                          ou32_DataPoolSourceIndex,
+                                                                          ou32_DataPoolTargetIndex);
    }
 }
 
@@ -2133,20 +2061,11 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolAboutToBeDeleted(C_PuiSvDbNodeDataPoo
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (orc_DataElementId.u32_NodeIndex == ou32_NodeIndex)
+      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolAboutToBeDeleted(orc_DataElementId,
+                                                                                         ou32_NodeIndex,
+                                                                                         ou32_DataPoolIndex))
       {
-         if (orc_DataElementId.u32_DataPoolIndex > ou32_DataPoolIndex)
-         {
-            --orc_DataElementId.u32_DataPoolIndex;
-         }
-         else if (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)
-         {
-            mh_MarkInvalid(orc_DataElementId);
-         }
-         else
-         {
-            //No adaptation necessary
-         }
+         mh_MarkInvalid(orc_DataElementId);
       }
    }
 }
@@ -2166,14 +2085,8 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAdded(C_PuiSvDbNodeDataPoolListEl
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if ((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
-          (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex))
-      {
-         if (orc_DataElementId.u32_ListIndex >= ou32_ListIndex)
-         {
-            ++orc_DataElementId.u32_ListIndex;
-         }
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAdded(orc_DataElementId, ou32_NodeIndex,
+                                                                              ou32_DataPoolIndex, ou32_ListIndex);
    }
 }
 
@@ -2194,37 +2107,9 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListMoved(C_PuiSvDbNodeDataPoolListEl
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if ((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
-          (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex))
-      {
-         if (orc_DataElementId.u32_ListIndex > ou32_ListSourceIndex)
-         {
-            --orc_DataElementId.u32_ListIndex;
-            if (orc_DataElementId.u32_ListIndex >= ou32_ListTargetIndex)
-            {
-               ++orc_DataElementId.u32_ListIndex;
-            }
-            else
-            {
-               //No adaptation necessary
-            }
-         }
-         else if (orc_DataElementId.u32_ListIndex == ou32_ListSourceIndex)
-         {
-            orc_DataElementId.u32_ListIndex = ou32_ListTargetIndex;
-         }
-         else
-         {
-            if (orc_DataElementId.u32_ListIndex >= ou32_ListTargetIndex)
-            {
-               ++orc_DataElementId.u32_ListIndex;
-            }
-            else
-            {
-               //No adaptation necessary
-            }
-         }
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListMoved(orc_DataElementId, ou32_NodeIndex,
+                                                                              ou32_DataPoolIndex, ou32_ListSourceIndex,
+                                                                              ou32_ListTargetIndex);
    }
 }
 
@@ -2244,21 +2129,12 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAboutToBeDeleted(C_PuiSvDbNodeDat
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if ((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
-          (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex))
+      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAboutToBeDeleted(orc_DataElementId,
+                                                                                             ou32_NodeIndex,
+                                                                                             ou32_DataPoolIndex,
+                                                                                             ou32_ListIndex))
       {
-         if (orc_DataElementId.u32_ListIndex > ou32_ListIndex)
-         {
-            --orc_DataElementId.u32_ListIndex;
-         }
-         else if (orc_DataElementId.u32_ListIndex == ou32_ListIndex)
-         {
-            mh_MarkInvalid(orc_DataElementId);
-         }
-         else
-         {
-            //No adaptation necessary
-         }
+         mh_MarkInvalid(orc_DataElementId);
       }
    }
 }
@@ -2281,15 +2157,9 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAdded(C_PuiSvDbNodeDataPoo
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
-           (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
-          (orc_DataElementId.u32_ListIndex == ou32_ListIndex))
-      {
-         if (orc_DataElementId.u32_ElementIndex >= ou32_ElementIndex)
-         {
-            ++orc_DataElementId.u32_ElementIndex;
-         }
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAdded(orc_DataElementId, ou32_NodeIndex,
+                                                                                     ou32_DataPoolIndex, ou32_ListIndex,
+                                                                                     ou32_ElementIndex);
    }
 }
 
@@ -2313,38 +2183,10 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementMoved(C_PuiSvDbNodeDataPoo
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
-           (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
-          (orc_DataElementId.u32_ListIndex == ou32_ListIndex))
-      {
-         if (orc_DataElementId.u32_ElementIndex > ou32_ElementSourceIndex)
-         {
-            --orc_DataElementId.u32_ElementIndex;
-            if (orc_DataElementId.u32_ElementIndex >= ou32_ElementTargetIndex)
-            {
-               ++orc_DataElementId.u32_ElementIndex;
-            }
-            else
-            {
-               //No adaptation necessary
-            }
-         }
-         else if (orc_DataElementId.u32_ElementIndex == ou32_ElementSourceIndex)
-         {
-            orc_DataElementId.u32_ElementIndex = ou32_ElementTargetIndex;
-         }
-         else
-         {
-            if (orc_DataElementId.u32_ElementIndex >= ou32_ElementTargetIndex)
-            {
-               ++orc_DataElementId.u32_ElementIndex;
-            }
-            else
-            {
-               //No adaptation necessary
-            }
-         }
-      }
+      C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementMoved(orc_DataElementId, ou32_NodeIndex,
+                                                                                     ou32_DataPoolIndex, ou32_ListIndex,
+                                                                                     ou32_ElementSourceIndex,
+                                                                                     ou32_ElementTargetIndex);
    }
 }
 
@@ -2364,22 +2206,13 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
-           (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
-          (orc_DataElementId.u32_ListIndex == ou32_ListIndex))
+      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAboutToBeDeleted(orc_DataElementId,
+                                                                                             ou32_NodeIndex,
+                                                                                             ou32_DataPoolIndex,
+                                                                                             ou32_ListIndex,
+                                                                                             ou32_ElementIndex))
       {
-         if (orc_DataElementId.u32_ElementIndex > ou32_ElementIndex)
-         {
-            --orc_DataElementId.u32_ElementIndex;
-         }
-         else if (orc_DataElementId.u32_ElementIndex == ou32_ElementIndex)
-         {
-            mh_MarkInvalid(orc_DataElementId);
-         }
-         else
-         {
-            //No adaptation necessary
-         }
+         mh_MarkInvalid(orc_DataElementId);
       }
    }
 }

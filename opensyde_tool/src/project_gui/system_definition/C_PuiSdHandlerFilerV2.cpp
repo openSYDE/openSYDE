@@ -51,8 +51,8 @@ C_PuiSdHandlerFilerV2::C_PuiSdHandlerFilerV2(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pools
 
-   \param[in,out] orc_DataPools Data pool elements (Cleared if necessary)
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "gui" element
+   \param[in,out]  orc_DataPools    Data pool elements (Cleared if necessary)
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "gui" element
 
    \return
    C_NO_ERR    information loaded
@@ -103,7 +103,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> 
          if (u32_ExpectedSize != orc_DataPools.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected UI Datapool count, expected: %i, got %i", u32_ExpectedSize,
+            c_Tmp.PrintFormatted("Unexpected UI Datapool count, expected: %u, got %zu", u32_ExpectedSize,
                                  orc_DataPools.size());
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
@@ -150,8 +150,8 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool lists
 
-   \param[in,out] orc_DataPoolLists Data pool lists element
-   \param[in,out] orc_XmlParser     XML parser with the "current" element set to the "lists" element
+   \param[in,out]  orc_DataPoolLists   Data pool lists element
+   \param[in,out]  orc_XmlParser       XML parser with the "current" element set to the "lists" element
 
    \return
    C_NO_ERR    information loaded
@@ -204,7 +204,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPo
       if (u32_ExpectedSize != orc_DataPoolLists.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected UI list count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected UI list count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_DataPoolLists.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -244,8 +244,8 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool list elements
 
-   \param[in,out] orc_DataPoolListElements Data pool list elements
-   \param[in,out] orc_XmlParser            XML parser with the "current" element set to the "data-elements" element
+   \param[in,out]  orc_DataPoolListElements  Data pool list elements
+   \param[in,out]  orc_XmlParser             XML parser with the "current" element set to the "data-elements" element
 
    \return
    C_NO_ERR    information loaded
@@ -296,7 +296,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
       if (u32_ExpectedSize != orc_DataPoolListElements.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected UI data element count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected UI data element count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_DataPoolListElements.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -441,8 +441,8 @@ void C_PuiSdHandlerFilerV2::h_SaveDataPoolListElement(const C_PuiSdNodeDataPoolL
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can protocols
 
-   \param[in,out] orc_CanProtocols Can protocols (Cleared if necessary)
-   \param[in,out] orc_XmlParser    XML parser with the "current" element set to the "gui" element
+   \param[in,out]  orc_CanProtocols    Can protocols (Cleared if necessary)
+   \param[in,out]  orc_XmlParser       XML parser with the "current" element set to the "gui" element
 
    \return
    C_NO_ERR    information loaded
@@ -496,7 +496,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadCanProtocols(std::vector<C_PuiSdNodeCanProt
          if (u32_ExpectedSize != orc_CanProtocols.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected UI protocol count, expected: %i, got %i", u32_ExpectedSize,
+            c_Tmp.PrintFormatted("Unexpected UI protocol count, expected: %u, got %zu", u32_ExpectedSize,
                                  orc_CanProtocols.size());
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
@@ -544,9 +544,9 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadCanProtocol(C_PuiSdNodeCanProtocol & orc_Ca
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can message containers
 
-   \param[in,out] orc_CanMessageContainers Can message containers
-   \param[in,out] orc_XmlParser            XML parser with the "current" element set
-                                           to the "com-message-containers" element
+   \param[in,out]  orc_CanMessageContainers  Can message containers
+   \param[in,out]  orc_XmlParser             XML parser with the "current" element set
+                                             to the "com-message-containers" element
 
    \return
    C_NO_ERR    information loaded
@@ -599,7 +599,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadCanMessageContainers(
       if (u32_ExpectedSize != orc_CanMessageContainers.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_CanMessageContainers.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -650,8 +650,8 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadCanMessageContainer(C_PuiSdNodeCanMessageCo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can messages
 
-   \param[in,out] orc_CanMessages Can messages
-   \param[in,out] orc_XmlParser   XML parser with the "current" element set to unknown element
+   \param[in,out]  orc_CanMessages  Can messages
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to unknown element
 
    \return
    C_NO_ERR    information loaded
@@ -703,7 +703,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadCanMessages(std::vector<C_PuiSdNodeCanMessa
       if (u32_ExpectedSize != orc_CanMessages.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected UI messages count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected UI messages count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_CanMessages.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -761,12 +761,8 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadCanMessage(C_PuiSdNodeCanMessage & orc_CanM
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can signals
 
-   \param[in,out] orc_CanSignals Can signals
-   \param[in,out] orc_XmlParser  XML parser with the "current" element set to the "com-signals" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in,out]  orc_CanSignals   Can signals
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "com-signals" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFilerV2::h_LoadCanSignals(std::vector<C_PuiSdNodeCanSignal> & orc_CanSignals,
@@ -806,7 +802,7 @@ void C_PuiSdHandlerFilerV2::h_LoadCanSignals(std::vector<C_PuiSdNodeCanSignal> &
       if (u32_ExpectedSize != orc_CanSignals.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_CanSignals.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -1004,8 +1000,8 @@ void C_PuiSdHandlerFilerV2::h_SaveCanSignal(const C_PuiSdNodeCanSignal & orc_Can
    Also uses base class function to load basic information.
    Postcondition: XMLParser has the node "nodes" selected.
 
-   \param[out]     orc_Nodes      UI node data containers
-   \param[in,out]  orc_XmlParser  XMLParser with the "current" element set to the "nodes" element
+   \param[out]     orc_Nodes        UI node data containers
+   \param[in,out]  orc_XmlParser    XMLParser with the "current" element set to the "nodes" element
 
    \return
    C_NO_ERR    everything ok
@@ -1053,7 +1049,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes,
       if (u32_ExpectedSize != orc_Nodes.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected UI nodes count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected UI nodes count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_Nodes.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -1096,8 +1092,8 @@ void C_PuiSdHandlerFilerV2::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nod
    Load GUI-specific information about bus.
    Also uses base class function to load basic information.
 
-   \param[in,out]  orc_Buses      UI bus data containers
-   \param[in,out]  orc_XmlParser  XML parser with the "current" element set to the "buses" element
+   \param[in,out]  orc_Buses        UI bus data containers
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "buses" element
 
    \return
    C_NO_ERR    information loaded
@@ -1145,7 +1141,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadBuses(std::vector<C_PuiSdBus> & orc_Buses, 
       if (u32_ExpectedSize != orc_Buses.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected bus count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected bus count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_Buses.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
@@ -1188,8 +1184,8 @@ void C_PuiSdHandlerFilerV2::h_SaveBuses(const std::vector<C_PuiSdBus> & orc_Buse
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load text elements
 
-   \param[in,out] orc_BusTextElements Text element data elements
-   \param[in,out] orc_XmlParser       XML parser with the "current" element set to the "bus-text-elements" element
+   \param[in,out]  orc_BusTextElements    Text element data elements
+   \param[in,out]  orc_XmlParser          XML parser with the "current" element set to the "bus-text-elements" element
 
    \return
    C_NO_ERR    information loaded
@@ -1238,7 +1234,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadBusTextElements(std::vector<C_PuiSdTextElem
       if (u32_ExpectedSize != orc_BusTextElements.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected bus text element count, expected: %i, got %i", u32_ExpectedSize,
+         c_Tmp.PrintFormatted("Unexpected bus text element count, expected: %u, got %zu", u32_ExpectedSize,
                               orc_BusTextElements.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }

@@ -19,6 +19,8 @@
 #include "C_OscUtils.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_OgeWiCustomMessage.hpp"
+#include "C_PopUtil.hpp"
+#include "C_NagUnUsedProjectFilesPopUpDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -60,11 +62,16 @@ C_NagCharLengthSettingPopupDialog::C_NagCharLengthSettingPopupDialog(
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 
+   //Hiding show unused files feature (UnUsed Files : Hide)
+   this->mpc_Ui->pc_GbxUnusedFiles->setVisible(false);
+
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_NagCharLengthSettingPopupDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this,
            &C_NagCharLengthSettingPopupDialog::m_CancelClicked);
    connect(this->mpc_Ui->pc_SpinBox, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged), this,
            &C_NagCharLengthSettingPopupDialog::m_ValueChanged);
+   connect(this->mpc_Ui->pc_ButtonShow, &QPushButton::clicked, this,
+           &C_NagCharLengthSettingPopupDialog::m_ShowUnUsedFiles);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,35 +90,43 @@ C_NagCharLengthSettingPopupDialog::~C_NagCharLengthSettingPopupDialog(void)
 void C_NagCharLengthSettingPopupDialog::InitStaticNames(void) const
 {
    const QString c_SpinBoxToolTip =
-      static_cast<QString>("Mininum: %1\nMaximum : %2").arg(this->mpc_Ui->pc_SpinBox->minimum()).arg(
+      static_cast<QString>(C_GtGetText::h_GetText("Mininum: %1\nMaximum : %2")).arg(this->mpc_Ui->pc_SpinBox->minimum())
+      .arg(
          this->mpc_Ui->pc_SpinBox->maximum());
    const QString c_ResultMaxCharOfDiagOrNvm =
-      static_cast<QString>("Resulting max. length of generated variable name (DIAG/NVM) = %1").arg(
+      static_cast<QString>(C_GtGetText::h_GetText("Resulting max. length of generated variable name (DIAG/NVM) = %1")).
+      arg(
          this->mpc_Ui->pc_SpinBox->value() + 5);
    const QString c_ResultMaxCharOfCommSignal =
-      static_cast<QString>("Resulting max. length of generated variable name (COMM Signal) = %1").arg(
+      static_cast<QString>(C_GtGetText::h_GetText("Resulting max. length of generated variable name (COMM Signal) = %1"))
+      .arg(
          (2 * this->mpc_Ui->pc_SpinBox->value()) + 5);
 
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("PROJECT"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Global Settings"));
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("System Definition"));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
-   this->mpc_Ui->pc_SpinBox->SetToolTipInformation("Value", c_SpinBoxToolTip);
+   this->mpc_Ui->pc_SpinBox->SetToolTipInformation(C_GtGetText::h_GetText("Value"), c_SpinBoxToolTip);
 
-   this->mpc_Ui->pc_SetMaxLengthLabel->setText("Max length of openSYDE element names");
-   this->mpc_Ui->pc_SetMaxLengthLabel->SetToolTipInformation("",
-                                                             "This limit is used for openSYDE element names like Nodes, Buses, Datapools, "
-                                                             "Variables, Parameters, COMM Signals, ...");
+   this->mpc_Ui->pc_SetMaxLengthLabel->setText(C_GtGetText::h_GetText("Max length of openSYDE element names"));
+   this->mpc_Ui->pc_SetMaxLengthLabel->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                             C_GtGetText::h_GetText(
+                                                                "This limit is used for openSYDE element names like Nodes, Buses, Datapools, "
+                                                                "Variables, Parameters, COMM Signals, ..."));
    this->mpc_Ui->pc_ResultLengthOfDIAGorNVM->setText(c_ResultMaxCharOfDiagOrNvm);
    this->mpc_Ui->pc_ResultLengthOfCOMMSignal->setText(c_ResultMaxCharOfCommSignal);
    this->mpc_Ui->pc_ResultLengthOfDIAGorNVM->SetToolTipInformation(
-      "As a result, this limit affects the length of the variable names in generated code",
-      "Example C Coder:\nMax. length of generated variable name (DIAG/NVM): <prefix=4>+_+<diag/nvm_var_name_length>;\n"
-      "Max. length of generated variable name (COMM): <prefix=3>+_+<COMM_message_name_length>+_+<COMM_signal_name_length>;");
+      C_GtGetText::h_GetText("As a result, this limit affects the length of the variable names in generated code"),
+      C_GtGetText::h_GetText(
+         "Example C Coder:\nMax. length of generated variable name (DIAG/NVM): <prefix=4>+_+<diag/nvm_var_name_length>;\n"
+         "Max. length of generated variable name (COMM): <prefix=3>+_+<COMM_message_name_length>+_+<COMM_signal_name_length>;"));
    this->mpc_Ui->pc_ResultLengthOfCOMMSignal->SetToolTipInformation(
-      "As a result, this limit affects the length of the variable names in generated code",
-      "Example C Coder:\nMax. length of generated variable name (DIAG/NVM): <prefix=4>+_+<diag/nvm_var_name_length>;\n"
-      "Max. length of generated variable name (COMM): <prefix=3>+_+<COMM_message_name_length>+_+<COMM_signal_name_length>;");
+      C_GtGetText::h_GetText("As a result, this limit affects the length of the variable names in generated code"),
+      C_GtGetText::h_GetText(
+         "Example C Coder:\nMax. length of generated variable name (DIAG/NVM): <prefix=4>+_+<diag/nvm_var_name_length>;\n"
+         "Max. length of generated variable name (COMM): <prefix=3>+_+<COMM_message_name_length>+_+<COMM_signal_name_length>;"));
+   this->mpc_Ui->pc_LabelProjectFiles->setText(C_GtGetText::h_GetText("Project Files"));
+   this->mpc_Ui->pc_LabelFilesUnUsed->setText(C_GtGetText::h_GetText("Check for un-used project files"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -352,4 +367,26 @@ bool C_NagCharLengthSettingPopupDialog::m_AskUserForModifyName(
       C_PuiSdHandler::h_GetInstance()->ApplyNameMaxCharLimit(this->mpc_Ui->pc_SpinBox->value());
    }
    return q_IsMaxCharLimitChanged;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Showing Popup dialog for unused project files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagCharLengthSettingPopupDialog::m_ShowUnUsedFiles()
+{
+   if (C_PopUtil::h_AskUserToContinue(this, false) == true)
+   {
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+      C_NagUnUsedProjectFilesPopUpDialog * const pc_Dialog = new C_NagUnUsedProjectFilesPopUpDialog(*c_New);
+      pc_Dialog->ShowAllUnusedFiles();
+      c_New->SetSize(QSize(1000, 900));
+      c_New->exec();
+      pc_Dialog->CancelDialog();
+      if (c_New != NULL)
+      {
+         c_New->HideOverlay();
+         c_New->deleteLater();
+      }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

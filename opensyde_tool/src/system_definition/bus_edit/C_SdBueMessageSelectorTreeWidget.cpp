@@ -977,11 +977,13 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                      //Auto fix signal restrictions of safety protocols
                      for (uint32_t u32_ItSignal = 0; u32_ItSignal < c_Signals.size(); ++u32_ItSignal)
                      {
-                        if (c_Signals[u32_ItSignal].u32_ComDataElementIndex < c_OscSignalCommons.size())
+                        if ((c_Signals[u32_ItSignal].u32_ComDataElementIndex < c_OscSignalCommons.size()) &&
+                            (c_Signals[u32_ItSignal].u32_ComDataElementIndex < c_UiSignalCommons.size()))
                         {
                            C_SdUtil::h_AdaptSignalToProtocolType(
                               c_Signals[u32_ItSignal],
                               c_OscSignalCommons[c_Signals[u32_ItSignal].u32_ComDataElementIndex],
+                              c_UiSignalCommons[c_Signals[u32_ItSignal].u32_ComDataElementIndex],
                               this->me_ProtocolType, NULL);
                         }
                      }
@@ -1033,11 +1035,12 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
             //Auto fix messages
             for (uint32_t u32_ItMessage = 0; u32_ItMessage < c_Messages.size(); ++u32_ItMessage)
             {
-               if (u32_ItMessage < c_OscMsgSignalCommons.size())
+               if ((u32_ItMessage < c_OscMsgSignalCommons.size()) && (u32_ItMessage < c_UiMsgSignalCommons.size()))
                {
                   C_SdUtil::h_AdaptMessageToProtocolType(c_Messages[u32_ItMessage],
                                                          NULL,
                                                          c_OscMsgSignalCommons[u32_ItMessage],
+                                                         c_UiMsgSignalCommons[u32_ItMessage],
                                                          this->me_ProtocolType, NULL);
                }
             }

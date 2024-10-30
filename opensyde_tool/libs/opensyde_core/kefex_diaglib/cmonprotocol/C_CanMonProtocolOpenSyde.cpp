@@ -125,6 +125,7 @@ using namespace stw::can;
 #define UDC_H_DATAID_SECURITY_ACTIVATION                    (0xA821U)
 #define UDC_H_DATAID_DEBUGGER_ACTIVATION                    (0xA822U)
 #define UDC_H_DATAID_SECURITY_KEY                           (0xA823U)
+#define UDC_H_DATAID_CERTIFICATE_SERIAL_NUMBER_L7           (0xA824U)
 #define UDC_H_DATAID_BOOTSOFTWARE_IDENTIFICATION            (0xF180U)
 #define FL_H_DATAID_SOFTWARE_FINGERPRINT                    (0xF184U)
 #define UDC_H_DATAID_ACTIVE_DIAGNOSTIC_SESSION              (0xF186U)
@@ -1280,6 +1281,25 @@ C_SclString C_CanMonProtocolOpenSyde::m_DataIdentifierAndDataToText(const bool o
       break;
    case UDC_H_DATAID_CERTIFICATE_SERIAL_NUMBER:
       c_Text = "CertificateSerialNumber";
+      if (oq_IsResponse == true)
+      {
+         if (ou8_PayloadSize != 3U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            C_SclString c_Text2;
+            c_Text2.PrintFormatted("  CERTIFICATESNR:%02x:%02x:%02x", opu8_Payload[0], opu8_Payload[1],
+                                   opu8_Payload[2]);
+
+            c_Text += c_Text2;
+            u8_FirstRawByte = 3U; //finished here ...
+         }
+      }
+      break;
+   case UDC_H_DATAID_CERTIFICATE_SERIAL_NUMBER_L7:
+      c_Text = "CertificateSerialNumberL7";
       if (oq_IsResponse == true)
       {
          if (ou8_PayloadSize != 3U)

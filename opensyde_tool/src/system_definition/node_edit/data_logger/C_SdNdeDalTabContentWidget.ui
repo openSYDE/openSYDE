@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_SdNdeDalTabContentWidget</class>
+ <widget class="QWidget" name="C_SdNdeDalTabContentWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>811</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_SdNdeDalTabContentWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="stw::opensyde_gui::C_SdNdeDalLogJobsWidget" name="pc_LogJobsWidget" native="true"/>
+     <widget class="QWidget" name="widget_2" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="stw::opensyde_gui::C_SdNdeDalLogJobPropertiesWidget" name="pc_LogJobPropertiesWidget" native="true"/>
+       </item>
+       <item>
+        <widget class="stw::opensyde_gui::C_SdNdeDalLogJobDataSelectionWidget" name="pc_LogJobDataSelectionWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeSpiStandard</class>
+   <extends>QSplitter</extends>
+   <header>C_OgeSpiStandard.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_SdNdeDalLogJobsWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeDalLogJobsWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_SdNdeDalLogJobPropertiesWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeDalLogJobPropertiesWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_SdNdeDalLogJobDataSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeDalLogJobDataSelectionWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

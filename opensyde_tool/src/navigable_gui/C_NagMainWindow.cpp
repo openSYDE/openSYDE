@@ -1436,6 +1436,11 @@ bool C_NagMainWindow::m_ChangeMode(const int32_t os32_Mode, const int32_t os32_S
          q_Continue = true;
       }
    }
+   else if ((this->mpc_ActiveWidget != NULL) && ((os32_Mode == ms32_MODE_SYSVIEW) && (ou32_Flag == 1UL)))
+   {
+      //Special case, force reload "same" view (new content)
+      q_Continue = true;
+   }
    else
    {
       //Same mode

@@ -43,7 +43,8 @@ public:
                                        const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
                                        const bool oq_ShowNvmLists,
                                        const std::vector<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements =
-                                          NULL);
+                                          NULL,
+                                       const bool oq_UseInSysViews = true);
    ~C_SyvDaPeDataElementBrowse(void) override;
 
    void InitStaticNames(void) const;

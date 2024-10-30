@@ -122,6 +122,17 @@ void C_CamComDriverBase::UpdateBitrate(const int32_t os32_Bitrate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clear messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamComDriverBase::ClearRxMessages()
+{
+   this->mc_CriticalSectionMsg.Acquire();
+   C_OscComDriverBase::ClearRxMessages();
+   this->mc_CriticalSectionMsg.Release();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Distributes the CAN message to all registered C_OscMessageLogger instances.
 
    This function is thread safe

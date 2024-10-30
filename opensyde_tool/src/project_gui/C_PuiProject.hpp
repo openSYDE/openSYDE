@@ -52,6 +52,7 @@ public:
    bool IsEmptyProject(void) const;
    static void h_HandlePendingEvents(void);
    static void h_AdaptProjectPathToSystemDefinition(const QString & orc_ProjectPath, QString & orc_SystemDefintionPath);
+   int32_t SaveAsWithoutInternalChange(const QString & orc_FilePath, const bool oq_UseDeprecatedFileFormatV2);
 
 private:
    static C_PuiProject * mhpc_Singleton;
@@ -73,6 +74,8 @@ private:
    int32_t m_LoadProject(uint16_t * const opu16_FileVersion);
    int32_t m_LoadServiceModeProject(const QString & orc_Password, uint16_t * const opu16_FileVersion);
    bool m_IsServiceModeProject(void) const;
+   int32_t m_SaveAs(const QString & orc_FilePath, const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2,
+                    const bool oq_UpdateInternalState);
 
    static void mh_AdaptProjectPathToSystemViews(const QString & orc_ProjectPath, QString & orc_SystemViewsPath);
    static void mh_AdaptProjectPathToSystemViewsV1(const QString & orc_ProjectPath, QString & orc_SystemViewsPath);

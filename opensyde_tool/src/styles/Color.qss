@@ -199,7 +199,13 @@ stw--opensyde_gui--C_SdNdeDpImportRamViewReport,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
 stw--opensyde_gui--C_SyvUpPacServiceUpdatePackageDialog,
 stw--opensyde_gui--C_NagCharLengthSettingPopupDialog,
-stw--opensyde_gui--C_SyvUpPacSecureArchiveDialog
+stw--opensyde_gui--C_SyvUpPacSecureArchiveDialog,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionWidget,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
+stw--opensyde_gui--C_NagUnUsedProjectFilesPopUpDialog
 {
 background-color: transparent;
 }
@@ -229,7 +235,8 @@ stw--opensyde_gui--C_SyvDaItPaArView QTableCornerButton::section,
 stw--opensyde_gui--C_SdNdeDpListArrayEditView QTableCornerButton::section,
 stw--opensyde_gui--C_SdNdeDpListDataSetView QTableCornerButton::section,
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
-stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][BackgroundChecked="false"]
+stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][BackgroundChecked="false"],
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
 {
 border-color: transparent;
 }
@@ -461,7 +468,9 @@ stw--opensyde_gui--C_SdNdeHalcConfigImportView::item,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item,
 stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="1"],
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView
 {
 color: rgb(19, 19, 45);
 }
@@ -691,7 +700,13 @@ stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw--opensyde_gui_elements--C_OgeRabProperties[CheckedColor="4"]:checked,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item::selected,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:selected,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item::selected,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
 {
 color: rgb(57, 57, 109);
 }
@@ -988,7 +1003,11 @@ stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section
 {
 border-color: rgb(155, 155, 170);
 }
@@ -1090,7 +1109,9 @@ stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground:checked[CheckedBac
 stw--opensyde_gui_elements--C_OgePubHalcPanel:enabled:hover:pressed,
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement:hover:pressed[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"],
-stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"]
+stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item:selected,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:selected
 {
      background-color: rgb(206, 206, 217);
 }
@@ -1317,10 +1338,13 @@ stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:!checked,
 stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Hovered="11"]:hover,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
 stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Background="11"],
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:disabled,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator:enabled:!checked,
-stw--opensyde_gui--C_SdBueImportCommMessagesWidget
+stw--opensyde_gui--C_SdBueImportCommMessagesWidget,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:disabled,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:enabled:!checked
 {
 background-color: rgb(237, 237, 242);
 }
@@ -1545,7 +1569,9 @@ stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:indetermin
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:checked,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:indeterminate,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:checked,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:indeterminate
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:indeterminate,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator::enabled:checked,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator::enabled:indeterminate
 {
 background-color: rgb(203, 235, 193);
 }

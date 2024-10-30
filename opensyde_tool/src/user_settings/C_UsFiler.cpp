@@ -982,9 +982,12 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
 
    // Sys def node edit HALC splitter
    orc_Ini.WriteInteger("SdNodeEdit", "HalcSplitterX", orc_UserSettings.GetSdNodeEditHalcSplitterHorizontal());
-   // Sys def node edit HALC splitter
+   // Sys def node edit CANopen Manager splitter
    orc_Ini.WriteInteger("SdNodeEdit", "CoManagerSplitterX",
                         orc_UserSettings.GetSdNodeEditCoManagerSplitterHorizontal());
+   // Sys def node edit data logger splitter
+   orc_Ini.WriteInteger("SdNodeEdit", "DataLoggerSplitterX",
+                        orc_UserSettings.GetSdNodeEditDataLoggerSplitterHorizontal());
 
    // Sys def bus edit splitters
    orc_Ini.WriteInteger("SdBusEdit", "TreeSplitterX", orc_UserSettings.GetSdBusEditTreeSplitterHorizontal());
@@ -2084,6 +2087,10 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    // Sys def node edit CANopen Manager splitter
    s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "CoManagerSplitterX", 400);
    orc_UserSettings.SetSdNodeEditCoManagerSplitterHorizontal(s32_Value);
+
+   // Sys def node edit data logger splitter
+   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "DataLoggerSplitterX", 400);
+   orc_UserSettings.SetSdNodeEditDataLoggerSplitterHorizontal(s32_Value);
 
    // Sys def bus edit splitters
    s32_Value = orc_Ini.ReadInteger("SdBusEdit", "TreeSplitterX", 0);

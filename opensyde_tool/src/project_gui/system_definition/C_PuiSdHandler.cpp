@@ -63,7 +63,7 @@ void C_PuiSdHandler::h_Destroy(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdHandler::C_PuiSdHandler(QObject * const opc_Parent) :
-   C_PuiSdHandlerCanOpenLogic(opc_Parent)
+   C_PuiSdHandlerDataLoggerLogic(opc_Parent)
 {
 }
 

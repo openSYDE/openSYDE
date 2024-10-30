@@ -41,6 +41,7 @@ public:
 
    void UpdateBitrate(const int32_t os32_Bitrate) override;
 
+   void ClearRxMessages(void) override;
    void DistributeMessages(void) override;
    void SendCanMessageQueued(const stw::can::T_STWCAN_Msg_TX & orc_Msg) override;
 

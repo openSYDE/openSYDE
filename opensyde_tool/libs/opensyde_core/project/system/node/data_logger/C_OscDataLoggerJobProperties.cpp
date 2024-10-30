@@ -1,22 +1,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       ID to allow reidentification of HAL elements
+   \brief       Data logger job properties
 
-   ID to allow reidentification of HAL elements
+   Data logger job properties
 
-   \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
+   \copyright   Copyright 2024 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include "stwtypes.hpp"
 #include "C_SclChecksums.hpp"
-#include "C_PuiSvLastKnownHalElementId.hpp"
+#include "C_OscDataLoggerJobProperties.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,43 +35,34 @@ using namespace stw::opensyde_gui_logic;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvLastKnownHalElementId::C_PuiSvLastKnownHalElementId() :
-   u32_Crc(0UL)
+C_OscDataLoggerJobProperties::C_OscDataLoggerJobProperties() :
+   c_Name("LogJob"),
+   e_LogFileFormat(eLFF_CSV),
+   u32_MaxLogFileSizeMb(500),
+   e_LocalLogTrigger(eLLT_ON_CHANGE)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Default constructor
-
-   \param[in]  ou32_Crc       Crc
-   \param[in]  orc_HalDpName  Hal datapool name
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_PuiSvLastKnownHalElementId::C_PuiSvLastKnownHalElementId(const uint32_t ou32_Crc, const QString & orc_HalDpName)
-{
-   this->u32_Crc = ou32_Crc;
-   this->c_HalDpName = orc_HalDpName;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Default destructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_PuiSvLastKnownHalElementId::~C_PuiSvLastKnownHalElementId()
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over all data
+/*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
+   It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvLastKnownHalElementId::CalcHash(uint32_t & oru32_HashValue) const
+void C_OscDataLoggerJobProperties::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_Crc, sizeof(this->u32_Crc), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_HalDpName.toStdString().c_str(),
-                                       this->c_HalDpName.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_LogFileFormat,
+                                       sizeof(this->e_LogFileFormat),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_MaxLogFileSizeMb,
+                                       sizeof(this->u32_MaxLogFileSizeMb),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_LocalLogTrigger,
+                                       sizeof(this->e_LocalLogTrigger),
+                                       oru32_HashValue);
 }

@@ -197,7 +197,9 @@ padding-left: 12px;
 
 }
 
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QScrollBar::vertical
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QScrollBar::vertical,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QScrollBar::vertical,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QScrollBar::vertical
 {
 width: 15px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right: 0px;
@@ -427,7 +429,9 @@ stw--opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar:horizontal,
 stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar:horizontal,
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar:horizontal,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar:horizontal,
-stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QScrollBar::horizontal
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QScrollBar::horizontal,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QScrollBar::horizontal,
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QScrollBar::horizontal
 {
 height: 5px; /*real width of scroll bar is 5px; Real width = width - padding-bottom/top */
 padding-bottom: 0px;

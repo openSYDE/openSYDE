@@ -107,8 +107,9 @@ public:
 
    //Sync to system definition
    void OnSyncNodeAdded(const uint32_t ou32_Index);
-   void OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                                 C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew);
+   void OnSyncNodeHalc(const uint32_t ou32_Index,
+                       const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                                      stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId> & orc_MapCurToNew);
    void OnSyncNodeReplace(const uint32_t ou32_Index);
    void OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid);
    void OnSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);

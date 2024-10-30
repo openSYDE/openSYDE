@@ -990,8 +990,8 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32_t ou32_Index)
    \param[in]  orc_MapCurToNew   Map cur to new
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                                                           C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew)
+void C_PuiSvData::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_OscNodeDataPoolListElementOptArrayId,
+                                                                           C_OscNodeDataPoolListElementOptArrayId> & orc_MapCurToNew)
 {
    QMap<C_OscNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
    for (uint32_t u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
@@ -1017,8 +1017,8 @@ void C_PuiSvData::OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_Pui
                if ((e_Type == C_OscNodeDataPool::eHALC) || (e_Type == C_OscNodeDataPool::eHALC_NVM))
                {
                   //Manual compare because only base is necessary
-                  for (std::map<C_PuiSvDbNodeDataPoolListElementId,
-                                C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_ItMap =
+                  for (std::map<C_OscNodeDataPoolListElementOptArrayId,
+                                C_OscNodeDataPoolListElementOptArrayId>::const_iterator c_ItMap =
                           orc_MapCurToNew.begin();
                        c_ItMap != orc_MapCurToNew.end(); ++c_ItMap)
                   {

@@ -11,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <cstdio>
+#include <ctime>
 #include <stdlib.h>
 #include <dirent.h>
 #include <fnmatch.h>
@@ -25,7 +26,6 @@
 #include "C_SclDateTime.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-
 using namespace stw::errors;
 using namespace stw::tgl;
 using namespace stw::scl;
@@ -48,11 +48,11 @@ static bool m_FileAgeDosTime(const C_SclString & orc_FileName, uint16_t * const 
 {
    bool q_Return = false;
    struct stat t_stat;
-   struct tm t_tm, *pt_tm;
+   struct std::tm t_tm, *pt_tm;
 
    if (stat(orc_FileName.c_str(), &t_stat) == 0)
    {
-      pt_tm = localtime(&t_stat.st_mtime);
+      pt_tm = std::localtime(&t_stat.st_mtime);
       if (pt_tm != NULL)
       {
          t_tm = *pt_tm;
@@ -335,7 +335,7 @@ C_SclString stw::tgl::TglGetExePath(void)
 
     c_VecPath.resize(1, 0);
 
-    sprintf(acn_Arg, "/proc/%d/exe", getpid());
+    std::sprintf(acn_Arg, "/proc/%d/exe", getpid());
     do
     {
       c_VecPath.resize(c_VecPath.size() + PATH_MAX, 0);

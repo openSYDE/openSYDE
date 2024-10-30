@@ -519,6 +519,8 @@ void C_CamMainWindow::m_StartLogging(void)
    if ((s32_Return == C_NO_ERR) ||
        (s32_Return == C_WARN))
    {
+      // Clear before start
+      this->mc_ComDriver.ClearRxMessages();
       // Use the current configured bitrate of the CAN DLL for the bus load calculation
       this->mc_ComDriver.StartLogging(s32_Bitrate);
       this->mpc_Ui->pc_TraceWidget->SetCanBitrate(s32_Bitrate);

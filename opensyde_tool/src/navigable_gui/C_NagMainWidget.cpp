@@ -1012,6 +1012,7 @@ void C_NagMainWidget::m_SetNameStringLength()
 
    C_NagCharLengthSettingPopupDialog * const pc_Dialog = new C_NagCharLengthSettingPopupDialog(*c_New);
 
+   //c_New->SetSize(QSize(890, 500)); //Size for UnUsed files (UnUsed Files : Hide)
    c_New->SetSize(QSize(890, 400));
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
