@@ -149,23 +149,23 @@ const
    for (uint32_t u32_ItInvisibleRootChild = 0;
         u32_ItInvisibleRootChild < c_InvisibleRootChildren.size(); u32_ItInvisibleRootChild++)
    {
-      C_TblTreeModelCheckableItem * const pc_VisibleRootItem =
+      const C_TblTreeModelCheckableItem * const pc_VisibleRootItem =
          dynamic_cast<C_TblTreeModelCheckableItem *>(c_InvisibleRootChildren.at(u32_ItInvisibleRootChild));
       if (pc_VisibleRootItem != NULL)
       {
-         std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
+         const std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
          for (uint32_t u32_ItVisibleRootChild = 0;
               u32_ItVisibleRootChild < c_VisibleRootChildren.size(); u32_ItVisibleRootChild++)
          {
-            C_TblTreeModelCheckableItem * const pc_ViewItem =
+            const C_TblTreeModelCheckableItem * const pc_ViewItem =
                dynamic_cast<C_TblTreeModelCheckableItem *>(c_VisibleRootChildren.at(u32_ItVisibleRootChild));
             if (pc_ViewItem != NULL)
             {
-               std::vector<C_TblTreSimpleItem *> c_ViewChildren = pc_ViewItem->c_Children;
+               const std::vector<C_TblTreSimpleItem *> c_ViewChildren = pc_ViewItem->c_Children;
                std::vector<uint32_t> c_ChildIndices;
                for (uint32_t u32_ItNodeChild = 0; u32_ItNodeChild < c_ViewChildren.size(); u32_ItNodeChild++)
                {
-                  C_TblTreeModelCheckableItem * const pc_ChildItem =
+                  const C_TblTreeModelCheckableItem * const pc_ChildItem =
                      dynamic_cast<C_TblTreeModelCheckableItem *>(c_ViewChildren.at(u32_ItNodeChild));
                   if ((pc_ChildItem != NULL) && (pc_ChildItem->e_CheckState == Qt::Checked))
                   {

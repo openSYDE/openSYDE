@@ -311,7 +311,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32_t> & orc_NodeIndices,
       if (s32_Result == C_NO_ERR) // inform about success with file generation report
       {
          const QPointer<C_OgePopUpDialog> c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent, opc_Parent);
-         C_ImpCodeGenerationReportWidget * const pc_DialogExportReport =  new C_ImpCodeGenerationReportWidget(
+         const C_ImpCodeGenerationReportWidget * const pc_DialogExportReport =  new C_ImpCodeGenerationReportWidget(
             *c_PopUpDialogReportDialog);
 
          c_PopUpDialogReportDialog->SetSize(QSize(1100, 700));
@@ -501,7 +501,6 @@ int32_t C_ImpUtil::h_OpenIde(const QString & orc_IdeExeCall)
 
    if (orc_IdeExeCall.compare("") != 0)
    {
-      std::vector<HWND> c_Windows;
       QString c_ExeOnly;
       QStringList c_HelpList;
       bool q_ContinueWithExeOpening = false;
@@ -534,6 +533,7 @@ int32_t C_ImpUtil::h_OpenIde(const QString & orc_IdeExeCall)
       const QFileInfo c_ExeFile(c_ExeOnly);
       if (c_ExeFile.exists() == true)
       {
+         std::vector<HWND> c_Windows;
          c_ExeOnly = c_ExeFile.fileName();
 
          C_ImpUtil::mh_GetExistingApplicationHandle(c_ExeOnly.toStdWString().c_str(), c_Windows);
@@ -726,25 +726,61 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
    }
    else if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
    {
-      // ask user
-      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Relative Path"));
-      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                       "Do you want to save the selected path (%1) relative or absolute?")).arg(
-                                  c_PathAbsolute));
-      c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
-                           arg(c_PathRelative).arg(c_PathAbsolute));
-      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));
-      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Absolute"));
-      c_Message.SetCustomMinHeight(230, 250);
-
-      if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+      //only show this thing if user settings say so or nothing is set yet
+      if ((C_UsHandler::h_GetInstance()->GetPathHandlingSelection() == "") ||
+          (C_UsHandler::h_GetInstance()->GetPathHandlingSelection() == "Ask User"))
       {
-         c_Return = c_PathRelative;
+         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Relative Path"));
+         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Do you want to save the selected path (%1) relative or absolute?")).arg(
+                                     c_PathAbsolute));
+         c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
+                              arg(c_PathRelative).arg(c_PathAbsolute));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));
+         c_Message.SetNoButtonText(C_GtGetText::h_GetText("Absolute"));
+         c_Message.SetCheckboxText(C_GtGetText::h_GetText("Remember this selection"));
+         c_Message.SetCheckboxTooltip(
+            C_GtGetText::h_GetText("Path handling"),
+            C_GtGetText::h_GetText(
+               "If checkbox is enabled the option you chose will be applied and this message will no longer appear.\n"
+               "This option can be reverted in Tool Settings"));
+         c_Message.SetCustomMinHeight(230, 250);
+         c_Message.SetCustomMinWidth(700);
+
+         if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+         {
+            c_Return = c_PathRelative;
+            if (c_Message.GetCheckboxState() == true)
+            {
+               C_UsHandler::h_GetInstance()->SetPathHandlingSelection("Relative");
+            }
+         }
+         else
+         {
+            c_Return = c_PathAbsolute;
+            if (c_Message.GetCheckboxState() == true)
+            {
+               C_UsHandler::h_GetInstance()->SetPathHandlingSelection("Absolute");
+            }
+         }
       }
       else
       {
-         c_Return = c_PathAbsolute;
+         //in case the path handling shall be remembered we need to check which way is currently desired
+         //to get the correct return value
+         if (C_UsHandler::h_GetInstance()->GetPathHandlingSelection() == "Relative")
+         {
+            c_Return = c_PathRelative;
+         }
+         else if (C_UsHandler::h_GetInstance()->GetPathHandlingSelection() == "Absolute")
+         {
+            c_Return = c_PathAbsolute;
+         }
+         else
+         {
+            //nothing to do here, shall never happen
+         }
       }
    }
    else

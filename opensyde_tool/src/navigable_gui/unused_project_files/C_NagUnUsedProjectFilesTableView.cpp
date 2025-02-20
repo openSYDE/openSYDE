@@ -69,7 +69,9 @@ C_NagUnUsedProjectFilesTableView::C_NagUnUsedProjectFilesTableView(QWidget * con
    this->verticalHeader()->setVisible(false);
    this->setGridStyle(Qt::NoPen);
    this->setShowGrid(false);
+
    this->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+   this->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
    connect(this->verticalScrollBar(), &QScrollBar::rangeChanged, this,
            &C_NagUnUsedProjectFilesTableView::m_ShowHideVerticalScrollBar);
@@ -112,21 +114,16 @@ bool C_NagUnUsedProjectFilesTableView::IsEmpty() const
  *
   */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagUnUsedProjectFilesTableView::SelectAllFiles()
+void C_NagUnUsedProjectFilesTableView::m_SelectAllFiles()
 {
-   const QModelIndex c_TopLeft = this->mc_Model.index(0, 0);
-   const QModelIndex c_BottomRight = this->mc_Model.index(this->mc_Model.rowCount() - 1,
-                                                          this->mc_Model.columnCount() - 1);
-   const QItemSelection c_Selection(c_TopLeft, c_BottomRight);
-
-   this->selectionModel()->select(c_Selection, QItemSelectionModel::Select);
+   this->selectAll();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete selected files
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagUnUsedProjectFilesTableView::DeleteSelectedFiles()
+void C_NagUnUsedProjectFilesTableView::m_DeleteSelectedFiles()
 {
    C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eQUESTION);
    const QItemSelection c_Selection = this->selectionModel()->selection();
@@ -144,17 +141,16 @@ void C_NagUnUsedProjectFilesTableView::DeleteSelectedFiles()
    const QString c_Details = this->mc_Model.DetailsOfFilesToDelete(c_SourceSelection);
 
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Delete Files"));
-   c_MessageBox.SetDescription(
-      "Are you sure about deleting following files?");
+   c_MessageBox.SetDescription(C_GtGetText::h_GetText("Are you sure about deleting following files?"));
    c_MessageBox.SetDetails(c_Details);
-   c_MessageBox.SetOkButtonText("Yes");
-   c_MessageBox.SetNoButtonText("Cancel");
+   c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+   c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
    c_MessageBox.SetCustomMinHeight(180, 550);
    c_MessageBox.SetCustomMinWidth(800);
 
    if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
    {
-      this->mc_Model.DeleteSelectedFiles(c_Selection);
+      this->mc_Model.DeleteSelectedFiles(c_SourceSelection);
       Q_EMIT (this->SigUpdateTable());
    }
 }
@@ -211,13 +207,13 @@ void C_NagUnUsedProjectFilesTableView::keyPressEvent(QKeyEvent * const opc_KeyEv
    {
       if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
       {
-         this->SelectAllFiles();
+         this->m_SelectAllFiles();
       }
    }
 
    if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Delete))
    {
-      this->DeleteSelectedFiles();
+      this->m_DeleteSelectedFiles();
    }
 }
 
@@ -329,11 +325,11 @@ void C_NagUnUsedProjectFilesTableView::m_SetupContextMenu()
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select all"),
                                     this,
-                                    &C_NagUnUsedProjectFilesTableView::SelectAllFiles,
+                                    &C_NagUnUsedProjectFilesTableView::m_SelectAllFiles,
                                     static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete selected"),
                                     this,
-                                    &C_NagUnUsedProjectFilesTableView::DeleteSelectedFiles,
+                                    &C_NagUnUsedProjectFilesTableView::m_DeleteSelectedFiles,
                                     static_cast<int32_t>(Qt::Key_Delete));
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);

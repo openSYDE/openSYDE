@@ -10,6 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"
+#include "C_OscSystemBus.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -39,11 +40,13 @@ public:
 
    void CalcHash(uint32_t & oru32_HashValue) const;
 
-   stw::scl::C_SclString c_Name;        ///< data logger job name
-   stw::scl::C_SclString c_Comment;     ///< data logger job comment
-   E_LogFileFormat e_LogFileFormat;     ///< selected log file format
-   uint32_t u32_MaxLogFileSizeMb;       ///< max log file size in MB
-   E_LocalLogTrigger e_LocalLogTrigger; ///< selected local log trigger
+   stw::scl::C_SclString c_Name;                    ///< data logger job name
+   stw::scl::C_SclString c_Comment;                 ///< data logger job comment
+   E_LogFileFormat e_LogFileFormat;                 ///< selected log file format
+   uint32_t u32_MaxLogFileSizeMb;                   ///< max log file size in MB
+   E_LocalLogTrigger e_LocalLogTrigger;             ///< selected local log trigger
+   C_OscSystemBus::E_Type e_ConnectedInterfaceType; ///< e.g. CAN, ethernet
+   uint8_t u8_ConnectedInterfaceNumber;             ///< 0 = first interface for this type
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

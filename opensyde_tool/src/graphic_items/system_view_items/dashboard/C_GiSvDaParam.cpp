@@ -207,15 +207,6 @@ void C_GiSvDaParam::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the shown value of the element
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaParam::UpdateShowValue(void)
-{
-   C_GiSvDaRectBaseGroup::UpdateShowValue();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active   Flag if connection is active or not active now

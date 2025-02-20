@@ -76,7 +76,7 @@ int32_t C_GtGetText::h_Initialize(const C_SclString & orc_BasePath, const C_SclS
    }
    else
    {
-      char_t * pcn_Return;
+      const char_t * pcn_Return;
       pcn_Return = bindtextdomain(orc_MoFileName.c_str(), orc_BasePath.c_str());
       if (pcn_Return != NULL)
       {

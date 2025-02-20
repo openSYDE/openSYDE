@@ -1008,7 +1008,7 @@ void C_CieUtil::mh_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssign
          C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData[u32_ItMessage];
          std::vector<C_OscNodeDataPoolListElement> & rc_SignalListElements =
             rc_CurData.c_ImportData.c_Core.c_OscRxSignalData;
-         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, rc_SignalListElements,
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, rc_CurUiMessage, rc_SignalListElements,
                                                 rc_CurData.c_ImportData.c_Ui.c_UiRxSignalData,
                                                 oe_ProtocolType, &c_Infos);
          //Add info
@@ -1028,7 +1028,7 @@ void C_CieUtil::mh_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssign
          C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData[u32_ItMessage];
          std::vector<C_OscNodeDataPoolListElement> & rc_SignalListElements =
             rc_CurData.c_ImportData.c_Core.c_OscTxSignalData;
-         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, rc_SignalListElements,
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, rc_CurUiMessage, rc_SignalListElements,
                                                 rc_CurData.c_ImportData.c_Ui.c_UiTxSignalData, oe_ProtocolType,
                                                 &c_Infos);
          //Add info

@@ -164,13 +164,12 @@ void C_SdNdeCoDeviceEdsWidget::m_OnUpdateClicked(void)
                      const C_OscCanOpenManagerDeviceInfo c_NewConfig = C_SdNdeCoConfigTreeView::h_CreateNewDevice(
                         c_FilePath);
                      const QPointer<C_OgePopUpDialog> c_PopUp = new C_OgePopUpDialog(this, this);
-                     C_SdNdeCoDeviceUpdateEdsDialog * const pc_AddDialog = new C_SdNdeCoDeviceUpdateEdsDialog(*c_PopUp,
-                                                                                                              this->mu32_ManagerNodeIndex, this->mu8_ManagerInterfaceId, this->mc_DeviceInterfaceId,
-                                                                                                              c_FilePath, c_NewConfig,
-                                                                                                              c_NodeAssignmenVector[
-                                                                                                                 0],
-                                                                                                              c_InvalidNodeAssignmentVector[
-                                                                                                                 0]);
+                     const C_SdNdeCoDeviceUpdateEdsDialog * const pc_AddDialog = new C_SdNdeCoDeviceUpdateEdsDialog(
+                        *c_PopUp,
+                        this->mu32_ManagerNodeIndex, this->mu8_ManagerInterfaceId, this->mc_DeviceInterfaceId,
+                        c_FilePath, c_NewConfig,
+                        c_NodeAssignmenVector[0],
+                        c_InvalidNodeAssignmentVector[0]);
 
                      //Resize
                      c_PopUp->SetSize(QSize(1200, 745));

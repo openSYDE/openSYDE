@@ -684,9 +684,9 @@ void C_OscDataDealer::m_ReadDataPoolDataEventErrorReceived(const uint8_t ou8_Dat
    }
    else
    {
-      C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
-                                                                                               ou16_ListIndex,
-                                                                                               ou16_ElementIndex);
+      const C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
+                                                                                                     ou16_ListIndex,
+                                                                                                     ou16_ElementIndex);
       if (pc_Element == NULL)
       {
          stw::scl::C_SclString c_Error;

@@ -163,6 +163,13 @@ C_SyvDaDashboardsWidget::~C_SyvDaDashboardsWidget(void)
 {
    this->m_CloseOsyDriver();
 
+   // Save the time of disconnect in case of an active connection
+   // In this scenario it can be relevant when switching the views and reconnect instantly again
+   if (this->mq_ConnectActive == true)
+   {
+      C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TglGetTickCount();
+   }
+
    if (this->mpc_Toolbox != NULL)
    {
       this->mpc_Toolbox->hide();

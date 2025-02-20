@@ -85,6 +85,7 @@ int32_t C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & 
          //Parse ini
          C_SclIniFile c_Ini(orc_Path.toStdString().c_str());
          mh_SaveCommon(orc_UserSettings, c_Ini);
+         mh_SaveEnvironment(orc_UserSettings, c_Ini);
          mh_SaveColors(orc_UserSettings, c_Ini);
          mh_SaveNextRecentColorButtonNumber(orc_UserSettings, c_Ini);
          mh_SaveRecentProjects(orc_UserSettings, c_Ini);
@@ -133,6 +134,7 @@ int32_t C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pa
          orc_UserSettings.SetDefault();
 
          mh_LoadCommon(orc_UserSettings, c_Ini);
+         mh_LoadEnvironment(orc_UserSettings, c_Ini);
          mh_LoadColors(orc_UserSettings, c_Ini);
          mh_LoadNextRecentColorButtonNumber(orc_UserSettings, c_Ini);
          mh_LoadScreenshotGifSucessTimeout(orc_UserSettings, c_Ini);
@@ -872,9 +874,22 @@ void C_UsFiler::mh_SaveCommon(const C_UsHandler & orc_UserSettings, C_SclIniFile
 
    // Performance measurement
    orc_Ini.WriteBool("Common", "PerformanceMeasurementActive", orc_UserSettings.GetPerformanceActive());
+}
 
-   // TSP shortcut
-   orc_Ini.WriteBool("Common", "TSPShortcutActive", orc_UserSettings.GetTspShortcutActive());
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save environment part of user settings (options in GeneralSettings dialog in MainWindow)
+
+   \param[in]      orc_UserSettings    User settings
+   \param[in,out]  orc_Ini             Ini handler
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_SaveEnvironment(const C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
+{
+   //Path handling
+   orc_Ini.WriteString("Environment", "PathHandlingSelection",
+                       orc_UserSettings.GetPathHandlingSelection().toStdString().c_str());
+   orc_Ini.WriteString("Environment", "SkipTspImportSelection",
+                       orc_UserSettings.GetSkipTspSelection().toStdString().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1921,7 +1936,7 @@ void C_UsFiler::mh_LoadDashboard(C_SclIniFile & orc_Ini, const QString & orc_Sec
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load INI language section
+/*! \brief   Load INI common section
 
    \param[in,out]  orc_UserSettings    User settings
    \param[in,out]  orc_Ini             Current ini
@@ -1944,9 +1959,23 @@ void C_UsFiler::mh_LoadCommon(C_UsHandler & orc_UserSettings, C_SclIniFile & orc
 
    // Performance measurement
    orc_UserSettings.SetPerformanceActive(orc_Ini.ReadBool("Common", "PerformanceMeasurementActive", false));
+}
 
-   // Enable|Disable TSP shortcut
-   orc_UserSettings.SetTspShortcutActive(orc_Ini.ReadBool("Common", "TSPShortcutActive", true));
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI environment section (options of GeneralSettings dialog in MainWindow)
+
+   \param[in,out]  orc_UserSettings    User settings
+   \param[in,out]  orc_Ini             Current ini
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadEnvironment(C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
+{
+   //Path handling
+   orc_UserSettings.SetPathHandlingSelection(orc_Ini.ReadString("Environment", "PathHandlingSelection", "").c_str());
+
+   //Skip TSP import
+   orc_UserSettings.SetSkipTspSelection(orc_Ini.ReadString("Environment", "SkipTspImportSelection",
+                                                           "").c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

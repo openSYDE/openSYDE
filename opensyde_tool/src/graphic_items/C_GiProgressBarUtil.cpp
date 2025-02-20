@@ -57,7 +57,8 @@ using namespace stw::opensyde_gui_elements;
    \param[in]  orc_Pen                 Arrow pen
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiProgressBarUtil::h_DrawArrow(QPainter * const opc_Painter, std::array<QPointF, 3> & orc_ArrowCornerPoints,
+void C_GiProgressBarUtil::h_DrawArrow(QPainter * const opc_Painter, const std::array<QPointF,
+                                                                                     3> & orc_ArrowCornerPoints,
                                       const QPen & orc_Pen)
 {
    const QPointF c_ArrowCornerPoint1 = orc_ArrowCornerPoints[0];
@@ -364,10 +365,10 @@ void C_GiProgressBarUtil::h_SetType1Arrow(const C_OgeDashboardProgressBar * cons
 
    if (ore_Alignment == C_PuiSvDbProgressBar::eTOP)
    {
-      std::array<QPointF, 3> ac_ArrowCornerPoints = mh_GetType1ArrowCornerPoints(ore_Alignment,
-                                                                                 orc_ArrowSpacerString,
-                                                                                 orc_Painter, opc_ProgressBar,
-                                                                                 orc_ValueRect);
+      const std::array<QPointF, 3> ac_ArrowCornerPoints = mh_GetType1ArrowCornerPoints(ore_Alignment,
+                                                                                       orc_ArrowSpacerString,
+                                                                                       orc_Painter, opc_ProgressBar,
+                                                                                       orc_ValueRect);
 
       C_GiProgressBarUtil::h_DrawArrow(&orc_Painter,
                                        ac_ArrowCornerPoints,
@@ -375,10 +376,10 @@ void C_GiProgressBarUtil::h_SetType1Arrow(const C_OgeDashboardProgressBar * cons
    }
    else if (ore_Alignment == C_PuiSvDbProgressBar::eBOTTOM)
    {
-      std::array<QPointF, 3> ac_ArrowCornerPoints = mh_GetType1ArrowCornerPoints(ore_Alignment,
-                                                                                 orc_ArrowSpacerString,
-                                                                                 orc_Painter, opc_ProgressBar,
-                                                                                 orc_ValueRect);
+      const std::array<QPointF, 3> ac_ArrowCornerPoints = mh_GetType1ArrowCornerPoints(ore_Alignment,
+                                                                                       orc_ArrowSpacerString,
+                                                                                       orc_Painter, opc_ProgressBar,
+                                                                                       orc_ValueRect);
       C_GiProgressBarUtil::h_DrawArrow(&orc_Painter,
                                        ac_ArrowCornerPoints,
                                        c_ArrowPen);

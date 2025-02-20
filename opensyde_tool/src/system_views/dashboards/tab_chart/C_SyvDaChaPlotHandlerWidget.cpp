@@ -1836,7 +1836,7 @@ uint8_t C_SyvDaChaPlotHandlerWidget::m_GetNextNotUsedColor(void)
    uint32_t u32_SectionNumber;
    bool q_FreeColorFound = false;
    bool q_RandomColorFound = false;
-   uint8_t u8_ColorIndex;
+   uint8_t u8_ColorIndex = 0U;
 
    srand(stw::tgl::TglGetTickCount());
 
@@ -3257,7 +3257,7 @@ void C_SyvDaChaPlotHandlerWidget::m_LoadState(const bool oq_IsPaused, const bool
    // Adapt all Y axes
    for (u32_ScreenStateCounter = 0U; u32_ScreenStateCounter < orc_ScreenState.size(); ++u32_ScreenStateCounter)
    {
-      QCPAxis * const pc_VerticalAxis = this->m_GetVerticalAxis(u32_ScreenStateCounter);
+      const QCPAxis * const pc_VerticalAxis = this->m_GetVerticalAxis(u32_ScreenStateCounter);
       if (pc_VerticalAxis != NULL)
       {
          const std::array<float64_t, 4> & rc_DisplayRange = orc_ScreenState[u32_ScreenStateCounter];

@@ -599,7 +599,7 @@ int32_t C_OscComDriverFlash::SendOsyReadDeviceName(const C_OscProtocolDriverOsyN
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverFlash::SendOsyReadSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                                      C_OscProtocolSerialNumber & orc_SerialNumberExt,
-                                                     uint8_t * const opu8_NrCode)
+                                                     uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
@@ -633,7 +633,7 @@ int32_t C_OscComDriverFlash::SendOsyReadSerialNumber(const C_OscProtocolDriverOs
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverFlash::SendOsyReadSerialNumberExt(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                                         C_OscProtocolSerialNumber & orc_SerialNumberExt,
-                                                        uint8_t * const opu8_NrCode)
+                                                        uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
@@ -1270,7 +1270,8 @@ int32_t C_OscComDriverFlash::SendOsyRequestFileTransfer(const C_OscProtocolDrive
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverFlash::SendOsyTransferData(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                                  const uint8_t ou8_BlockSequenceCounter,
-                                                 std::vector<uint8_t> & orc_Data, uint8_t * const opu8_NrCode) const
+                                                 const std::vector<uint8_t> & orc_Data,
+                                                 uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
@@ -1693,7 +1694,7 @@ int32_t C_OscComDriverFlash::SendOsySetIpAddressForChannel(const C_OscProtocolDr
                                                            const uint8_t (&orau8_IpAddress)[4],
                                                            const uint8_t (&orau8_NetMask)[4],
                                                            const uint8_t (&orau8_DefaultGateway)[4],
-                                                           uint8_t * const opu8_NrCode)
+                                                           uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);

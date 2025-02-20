@@ -86,7 +86,7 @@ public:
                          const bool & orq_MessageIsTx, const stw::opensyde_core::C_OscCanMessage & orc_Message,
                          const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
                          const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
-                         const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals, uint32_t & oru32_MessageIndex);
+                         const C_PuiSdNodeCanMessage & orc_UiMessage, uint32_t & oru32_MessageIndex);
    int32_t InsertCanMessage(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                             const stw::opensyde_core::C_OscCanMessage & orc_Message,
                             const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons,

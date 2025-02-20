@@ -441,7 +441,7 @@ void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
       {
          if (this->mpc_ModelViewManager != NULL)
          {
-            C_SdNdeDpListDataSetModel * const pc_Model = this->mpc_ModelViewManager->GetDataSetModel(
+            const C_SdNdeDpListDataSetModel * const pc_Model = this->mpc_ModelViewManager->GetDataSetModel(
                this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
             if (pc_Model != NULL)
             {
@@ -663,7 +663,7 @@ void C_SdNdeDpListDataSetView::m_CheckActions(const std::vector<uint32_t> & orc_
    {
       if (this->mpc_ModelViewManager != NULL)
       {
-         C_SdNdeDpListDataSetModel * const pc_Model = this->mpc_ModelViewManager->GetDataSetModel(
+         const C_SdNdeDpListDataSetModel * const pc_Model = this->mpc_ModelViewManager->GetDataSetModel(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
          if (pc_Model != NULL)
          {

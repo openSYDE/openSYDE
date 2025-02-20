@@ -864,7 +864,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const int32_t os
                case eCAN_COUNTER:
                   if (os32_Role == ms32_USER_ROLE_SORT)
                   {
-                     c_Retval = pc_CurMessage->c_Counter.ToInt64();
+                     c_Retval = static_cast<qlonglong>(pc_CurMessage->c_Counter.ToInt64());
                   }
                   else
                   {
@@ -1323,7 +1323,6 @@ int32_t C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, c
 {
    int32_t s32_Row = -1;
    const uint32_t u32_NumberEntries = this->rowCount();
-   uint32_t u32_NumberEntriesToCheck = u32_NumberEntries;
    const int32_t s32_START_AT_LAST_SIGNAL = -2;
 
    ors32_SignalRow = -1;
@@ -1331,6 +1330,7 @@ int32_t C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, c
 
    if (u32_NumberEntries > 0U)
    {
+      uint32_t u32_NumberEntriesToCheck = u32_NumberEntries;
       uint32_t u32_Counter;
       uint32_t u32_StartIndex;
       // -1 means no signal was the match at the last search

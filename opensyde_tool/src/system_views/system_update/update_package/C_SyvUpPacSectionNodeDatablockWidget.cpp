@@ -361,7 +361,7 @@ const
 
          if (pc_Item != NULL)
          {
-            C_SyvUpPacListNodeItemWidget * const pc_App =
+            const C_SyvUpPacListNodeItemWidget * const pc_App =
                dynamic_cast<C_SyvUpPacListNodeItemWidget *>(pc_Item->widget());
 
             if (pc_App != NULL)

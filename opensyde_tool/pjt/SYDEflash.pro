@@ -65,6 +65,7 @@ SOURCES += \
     ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBase.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxProperties.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxToolTipBase.cpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxDefaultCheckedDisabled.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxIconDelegate.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxIconOnly.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxMultiSelect.cpp \
@@ -234,6 +235,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBase.hpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxProperties.hpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxToolTipBase.hpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxDefaultCheckedDisabled.hpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxIconDelegate.hpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxIconOnly.hpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxMultiSelect.hpp \

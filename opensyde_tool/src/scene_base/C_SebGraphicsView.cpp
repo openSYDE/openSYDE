@@ -444,7 +444,7 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
       }
       else
       {
-         C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+         const C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
 
          if (pc_Scene != NULL)
          {
@@ -622,7 +622,7 @@ void C_SebGraphicsView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+   const C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
    bool q_BlockPressHandling = false;
 
    if (pc_Scene != NULL)

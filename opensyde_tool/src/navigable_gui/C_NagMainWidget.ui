@@ -111,6 +111,16 @@
         </spacer>
        </item>
        <item>
+        <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnToolSettings">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string>Settings</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnAbout">
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>

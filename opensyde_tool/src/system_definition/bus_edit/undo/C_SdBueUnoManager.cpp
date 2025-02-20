@@ -143,7 +143,7 @@ void C_SdBueUnoManager::DoAddMessage(const C_OscCanMessageIdentificationIndices 
    c_Messages.push_back(c_Message);
    pc_UndoCommand->SetInitialData(c_Messages, std::vector<std::vector<C_OscNodeDataPoolListElement> >(),
                                   std::vector<std::vector<C_PuiSdNodeDataPoolListElement> >(),
-                                  std::vector<std::vector<C_PuiSdNodeCanSignal> >(),
+                                  std::vector<C_PuiSdNodeCanMessage>(),
                                   std::vector<std::vector<QString> >(),
                                   std::vector<std::vector<uint32_t> >(), std::vector<std::vector<uint32_t> >(),
                                   std::vector<std::vector<bool> >());
@@ -158,7 +158,7 @@ void C_SdBueUnoManager::DoAddMessage(const C_OscCanMessageIdentificationIndices 
    \param[in]      orc_Messages                 Message data
    \param[in]      orc_OscSignalCommons         Signal common osc data
    \param[in]      orc_UiSignalCommons          Signal common ui data
-   \param[in]      orc_UiSignals                Signal ui data
+   \param[out]     orc_UiMessages               Message ui data
    \param[in]      orc_OwnerNodeName            Owner node names
    \param[in]      orc_OwnerNodeInterfaceIndex  Owner node interface index
    \param[in]      orc_OwnerNodeDatapoolIndex   Owner node Datapool index
@@ -170,12 +170,12 @@ void C_SdBueUnoManager::DoAddMessage(const C_OscCanMessageIdentificationIndices 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoPasteMessages(const C_OscCanMessageIdentificationIndices & orc_MessageId,
                                         const std::vector<C_OscCanMessage> & orc_Messages,
-                                        const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
+                                        const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanMessage> & orc_UiMessages, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
                                         std::vector<C_OscCanMessageIdentificationIndices> & orc_NewIds)
 {
    //Check if consistent size
    if (((((((orc_Messages.size() == orc_OscSignalCommons.size()) &&
-            (orc_Messages.size() == orc_UiSignalCommons.size()))) && (orc_Messages.size() == orc_UiSignals.size())) &&
+            (orc_Messages.size() == orc_UiSignalCommons.size()))) && (orc_Messages.size() == orc_UiMessages.size())) &&
          (orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size())) &&
         (orc_OwnerNodeName.size() == orc_OwnerNodeDatapoolIndex.size())) &&
        (orc_OwnerNodeName.size() == orc_OwnerIsTxFlag.size()))
@@ -218,7 +218,7 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OscCanMessageIdentificationIndic
             //If vector are empty default behavior is used instead
             pc_AddCommand->SetInitialData(orc_Messages, orc_OscSignalCommons,
                                           orc_UiSignalCommons,
-                                          orc_UiSignals,
+                                          orc_UiMessages,
                                           c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
                                           c_OwnerNodeDatapoolIndex,
                                           c_OwnerIsTxFlag);

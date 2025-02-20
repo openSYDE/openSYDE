@@ -398,15 +398,19 @@ void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize tree structure
 
-   \param[in]  oq_ShowOnlyWriteElements   Optional flag to show only writable elements
-   \param[in]  oq_ShowArrayElements       Optional flag to hide all array elements (if false)
-   \param[in]  oq_ShowArrayIndexElements  Optional flag to hide all array index elements (if false)
-   \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
-   \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                          will be marked as used an will be disabled
+   \param[in]  ou32_SdDataLoggerUseCaseNodeIndex         System definition data logger use case: node index
+   \param[in]  ou32_SdDataLoggerUseCaseDataLoggerIndex   System definition data logger use case: data logger index
+   \param[in]  oq_ShowOnlyWriteElements                  Optional flag to show only writable elements
+   \param[in]  oq_ShowArrayElements                      Optional flag to hide all array elements (if false)
+   \param[in]  oq_ShowArrayIndexElements                 Optional flag to hide all array index elements (if false)
+   \param[in]  oq_Show64BitValues                        Optional flag to hide all 64 bit elements (if false)
+   \param[in]  opc_AlreasyUsedElements                   Optional pointer to vector with already used elements. All added elements
+                                                         will be marked as used an will be disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementModel::InitSdDatapoolElements(const bool oq_ShowOnlyWriteElements,
+void C_TblTreDataElementModel::InitSdDatapoolElements(const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
+                                                      const uint32_t ou32_SdDataLoggerUseCaseDataLoggerIndex,
+                                                      const bool oq_ShowOnlyWriteElements,
                                                       const bool oq_ShowArrayElements,
                                                       const bool oq_ShowArrayIndexElements,
                                                       const bool oq_Show64BitValues,
@@ -420,7 +424,9 @@ void C_TblTreDataElementModel::InitSdDatapoolElements(const bool oq_ShowOnlyWrit
    CleanUpLastModel();
    this->mpc_InvisibleRootItem = new C_TblTreItem();
    m_InitDatapoolElements(0U, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
-                          oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements, false);
+                          oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements, false,
+                          ou32_SdDataLoggerUseCaseNodeIndex,
+                          ou32_SdDataLoggerUseCaseDataLoggerIndex);
    //Clean up (old values probably not necessary in future);
    mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDe);
    //Directly store the model (after filling it-> for sync managers)
@@ -810,14 +816,16 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize tree structure for data pool elements
 
-   \param[in]  ou32_ViewIndex             View index
-   \param[in]  oq_ShowOnlyWriteElements   Optional flag to show only writable elements
-   \param[in]  oq_ShowArrayElements       Optional flag to hide all array elements (if false)
-   \param[in]  oq_ShowArrayIndexElements  Optional flag to hide all array index elements (if false)
-   \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
-   \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                          will be marked as used an will be disabled
-   \param[in]  oq_IsModelUsedInSysViews   True if the model is used for a view in system views, false otherwise
+   \param[in]  ou32_ViewIndex                            View index
+   \param[in]  oq_ShowOnlyWriteElements                  Optional flag to show only writable elements
+   \param[in]  oq_ShowArrayElements                      Optional flag to hide all array elements (if false)
+   \param[in]  oq_ShowArrayIndexElements                 Optional flag to hide all array index elements (if false)
+   \param[in]  oq_Show64BitValues                        Optional flag to hide all 64 bit elements (if false)
+   \param[in]  opc_AlreasyUsedElements                   Optional pointer to vector with already used elements. All added elements
+                                                         will be marked as used an will be disabled
+   \param[in]  oq_IsModelUsedInSysViews                  True if the model is used for a view in system views, false otherwise
+   \param[in]  ou32_SdDataLoggerUseCaseNodeIndex         System definition data logger use case: node index
+   \param[in]  ou32_SdDataLoggerUseCaseDataLoggerIndex   System definition data logger use case: data logger index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIndex,
@@ -825,8 +833,8 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                                       const bool oq_ShowArrayElements,
                                                       const bool oq_ShowArrayIndexElements,
                                                       const bool oq_Show64BitValues,
-                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
-                                                      const bool oq_IsModelUsedInSysViews)
+                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_IsModelUsedInSysViews, const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
+                                                      const uint32_t ou32_SdDataLoggerUseCaseDataLoggerIndex)
 {
    std::vector<uint8_t> c_NodeActiveFlags;
    const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
@@ -857,12 +865,17 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
 
       for (uint32_t u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
-         bool q_Check = mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode);
+         bool q_Check;
 
          // Model used in a different context than system views e.g. system definition
          if (oq_IsModelUsedInSysViews == false)
          {
-            q_Check = true;
+            q_Check = C_PuiSdUtil::h_CheckDataLoggerNodeReachable(ou32_SdDataLoggerUseCaseNodeIndex,
+                                                                  ou32_SdDataLoggerUseCaseDataLoggerIndex, u32_ItNode);
+         }
+         else
+         {
+            q_Check = mh_SvCheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode);
          }
 
          if ((c_NodeActiveFlags[u32_ItNode] == 1U) && (q_Check == true))
@@ -2096,7 +2109,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32_t ou32_ViewIndex)
       tgl_assert(c_NodeActiveFlags.size() == u32_NodeSize);
       for (uint32_t u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
-         if ((c_NodeActiveFlags[u32_ItNode] == 1U) && (mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
+         if ((c_NodeActiveFlags[u32_ItNode] == 1U) && (mh_SvCheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
          {
             C_TblTreItem * const pc_NodeItem = new C_TblTreItem();
             const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ItNode);
@@ -2591,7 +2604,7 @@ std::vector<uint32_t> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32_t 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if diagnostic mode activated
+/*! \brief  Check if diagnostic mode activated for views
 
    \param[in]  ou32_ViewIndex    View index
    \param[in]  ou32_NodeIndex    Node index
@@ -2601,7 +2614,7 @@ std::vector<uint32_t> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32_t 
    False No diagnostic mode activated
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_TblTreDataElementModel::mh_CheckNodeDiagnostic(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex)
+bool C_TblTreDataElementModel::mh_SvCheckNodeDiagnostic(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex)
 {
    bool q_Retval = false;
    const C_SyvRoRouteCalculation c_RouteCalculation(ou32_ViewIndex, ou32_NodeIndex,

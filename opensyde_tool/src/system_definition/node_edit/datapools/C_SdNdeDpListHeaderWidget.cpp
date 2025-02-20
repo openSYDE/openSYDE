@@ -643,7 +643,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
    {
       // open comment edit popup
       const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
-      C_SdNdeDpListCommentDialog * const pc_ArrayEditWidget =
+      const C_SdNdeDpListCommentDialog * const pc_ArrayEditWidget =
          new C_SdNdeDpListCommentDialog(*c_Dialog, this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                         this->mu32_ListIndex);
       //Resize

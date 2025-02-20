@@ -45,7 +45,6 @@ public:
    void UpdateData(void) override;
    void DeleteData(void) override;
 
-   void UpdateShowValue(void) override;
    void ConnectionActiveChanged(const bool oq_Active) override;
    void EditModeActiveChanged(const bool oq_Active) override;
    bool EnableEditContent(void) override;

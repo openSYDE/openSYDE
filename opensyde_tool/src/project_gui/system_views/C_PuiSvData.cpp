@@ -2917,7 +2917,6 @@ void C_PuiSvData::InitFromSystemDefinition(void)
             std::vector<stw::scl::C_SclString> c_ApplPaths;
             std::vector<C_OscViewNodeUpdateParamInfo> c_ParamInfos;
             std::vector<bool> c_ApplSkipFlags;
-            std::vector<bool> c_ParamSetSkipFlags;
             C_OscViewNodeUpdate c_Info;
             c_Info.u32_NodeUpdatePosition = u32_ItInfo;
             //Sync applications
@@ -2954,6 +2953,7 @@ void C_PuiSvData::InitFromSystemDefinition(void)
 
             if (c_ParamInfos.size() > 0)
             {
+               std::vector<bool> c_ParamSetSkipFlags;
                c_ParamSetSkipFlags.resize(c_ParamInfos.size(), false);
                c_Info.SetParamInfos(c_ParamInfos);
                c_Info.SetSkipUpdateOfParamInfosFlags(c_ParamSetSkipFlags);

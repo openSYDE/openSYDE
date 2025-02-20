@@ -137,10 +137,9 @@ void C_SdNdeUnoDasDataPoolListManager::DoPaste(const uint32_t & oru32_NodeIndex,
    if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OscNames,
                                                                       c_OscDataSetValues) == stw::errors::C_NO_ERR)
    {
-      std::vector<uint32_t> c_Indices;
-
       if (c_OscNames.size() == c_OscDataSetValues.size())
       {
+         std::vector<uint32_t> c_Indices;
          QUndoCommand * pc_Command;
          c_Indices.reserve(c_OscNames.size());
          for (uint32_t u32_NewIndices = 0; u32_NewIndices < c_OscNames.size(); ++u32_NewIndices)

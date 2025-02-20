@@ -71,10 +71,15 @@ public:
    void SetOkButtonText(const QString & orc_Text) const;
    void SetNoButtonText(const QString & orc_Text) const;
    void SetCancelButtonText(const QString & orc_Text);
+   void SetCheckboxText(const QString & orc_Text);
+   void SetCheckboxTooltip(const QString & orc_Heading, const QString & orc_Description);
    void ShowCancelButton(void);
+   void ShowCheckBox(void);
 
    void SetCustomMinWidth(const int32_t & ors32_MinWidth) const;
    void SetCustomMinHeight(const int32_t & ors32_MinHeight, const int32_t & ors32_MaxHeight);
+
+   bool GetCheckboxState(void) const;
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -85,6 +90,7 @@ private:
    QPoint mc_LastPos; ///< Last known position of this widget
 
    bool mq_ShowCancelButton;
+   bool mq_ShowCheckboxRemember;
 
    QPixmap mc_PixmapIcon;
    QString mc_Style;
@@ -105,11 +111,18 @@ private:
    void m_OkClicked(void);
    void m_NoClicked(void);
    void m_CancelClicked(void);
+   void m_CheckboxToggled(void);
    void m_Size(void) const;
 
    // Avoid call
    C_OgeWiCustomMessage(const C_OgeWiCustomMessage &);
    C_OgeWiCustomMessage & operator =(const C_OgeWiCustomMessage &) &;
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   void SigRememberSelection(const bool oq_DoRemember);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

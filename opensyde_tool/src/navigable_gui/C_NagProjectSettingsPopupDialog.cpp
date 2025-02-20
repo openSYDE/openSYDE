@@ -14,13 +14,15 @@
 
 #include "stwtypes.hpp"
 #include "C_GtGetText.hpp"
-#include "C_NagCharLengthSettingPopupDialog.hpp"
-#include "ui_C_NagCharLengthSettingPopupDialog.h"
+#include "C_NagProjectSettingsPopupDialog.hpp"
+#include "ui_C_NagProjectSettingsPopupDialog.h"
 #include "C_OscUtils.hpp"
 #include "C_PuiSdHandler.hpp"
+#include "C_PuiProject.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_PopUtil.hpp"
 #include "C_NagUnUsedProjectFilesPopUpDialog.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -48,10 +50,10 @@ using namespace stw::opensyde_core;
    \param[in,out] orc_Parent Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagCharLengthSettingPopupDialog::C_NagCharLengthSettingPopupDialog(
+C_NagProjectSettingsPopupDialog::C_NagProjectSettingsPopupDialog(
    stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
-   mpc_Ui(new Ui::C_NagCharLengthSettingPopupDialog),
+   mpc_Ui(new Ui::C_NagProjectSettingsPopupDialog),
    mrc_ParentDialog(orc_Parent),
    mu32_CurrentSpinBoxValue(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit())
 {
@@ -63,22 +65,22 @@ C_NagCharLengthSettingPopupDialog::C_NagCharLengthSettingPopupDialog(
    this->mrc_ParentDialog.SetWidget(this);
 
    //Hiding show unused files feature (UnUsed Files : Hide)
-   this->mpc_Ui->pc_GbxUnusedFiles->setVisible(false);
+   this->mpc_Ui->pc_GbxUnusedFiles->setVisible(true);
 
-   connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_NagCharLengthSettingPopupDialog::m_OkClicked);
+   connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_NagProjectSettingsPopupDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this,
-           &C_NagCharLengthSettingPopupDialog::m_CancelClicked);
+           &C_NagProjectSettingsPopupDialog::m_CancelClicked);
    connect(this->mpc_Ui->pc_SpinBox, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged), this,
-           &C_NagCharLengthSettingPopupDialog::m_ValueChanged);
+           &C_NagProjectSettingsPopupDialog::m_ValueChanged);
    connect(this->mpc_Ui->pc_ButtonShow, &QPushButton::clicked, this,
-           &C_NagCharLengthSettingPopupDialog::m_ShowUnUsedFiles);
+           &C_NagProjectSettingsPopupDialog::m_ShowUnUsedFiles);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagCharLengthSettingPopupDialog::~C_NagCharLengthSettingPopupDialog(void)
+C_NagProjectSettingsPopupDialog::~C_NagProjectSettingsPopupDialog(void)
 {
    delete this->mpc_Ui;
 }
@@ -87,7 +89,7 @@ C_NagCharLengthSettingPopupDialog::~C_NagCharLengthSettingPopupDialog(void)
 /*! \brief   Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagCharLengthSettingPopupDialog::InitStaticNames(void) const
+void C_NagProjectSettingsPopupDialog::InitStaticNames(void) const
 {
    const QString c_SpinBoxToolTip =
       static_cast<QString>(C_GtGetText::h_GetText("Mininum: %1\nMaximum : %2")).arg(this->mpc_Ui->pc_SpinBox->minimum())
@@ -127,6 +129,10 @@ void C_NagCharLengthSettingPopupDialog::InitStaticNames(void) const
          "Max. length of generated variable name (COMM): <prefix=3>+_+<COMM_message_name_length>+_+<COMM_signal_name_length>;"));
    this->mpc_Ui->pc_LabelProjectFiles->setText(C_GtGetText::h_GetText("Project Files"));
    this->mpc_Ui->pc_LabelFilesUnUsed->setText(C_GtGetText::h_GetText("Check for un-used project files"));
+
+   this->mpc_Ui->pc_LabelFilesUnUsed->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                            C_GtGetText::h_GetText(
+                                                               "Scan current project directory for un-used project files."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,7 +142,7 @@ void C_NagCharLengthSettingPopupDialog::InitStaticNames(void) const
    bool q_IsMaxCharLimitChanged
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_NagCharLengthSettingPopupDialog::ApplyMaxCharLimitSettings()
+bool C_NagProjectSettingsPopupDialog::ApplyMaxCharLimitSettings()
 {
    bool q_IsMaxCharLimitChanged = false;
 
@@ -166,7 +172,7 @@ bool C_NagCharLengthSettingPopupDialog::ApplyMaxCharLimitSettings()
    \param[in,out] opc_KeyEvent Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagCharLengthSettingPopupDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+void C_NagProjectSettingsPopupDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
 
@@ -195,7 +201,7 @@ void C_NagCharLengthSettingPopupDialog::keyPressEvent(QKeyEvent * const opc_KeyE
 /*! \brief   Slot of Ok button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagCharLengthSettingPopupDialog::m_OkClicked(void)
+void C_NagProjectSettingsPopupDialog::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
@@ -204,7 +210,7 @@ void C_NagCharLengthSettingPopupDialog::m_OkClicked(void)
 /*! \brief   Slot of cancel button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagCharLengthSettingPopupDialog::m_CancelClicked()
+void C_NagProjectSettingsPopupDialog::m_CancelClicked()
 {
    this->mrc_ParentDialog.reject();
 }
@@ -213,7 +219,7 @@ void C_NagCharLengthSettingPopupDialog::m_CancelClicked()
 /*! \brief  Slot for spin box value change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagCharLengthSettingPopupDialog::m_ValueChanged()
+void C_NagProjectSettingsPopupDialog::m_ValueChanged()
 {
    const QString c_ResultMaxCharOfDiagOrNvm =
       static_cast<QString>("Resulting max. length of generated variable name (DIAG/NVM) = %1").arg(
@@ -233,8 +239,8 @@ void C_NagCharLengthSettingPopupDialog::m_ValueChanged()
    bool q_IsMaxCharLimitChanged
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_NagCharLengthSettingPopupDialog::m_AskUserForModifyName(
-   std::list<C_OscSystemNameMaxCharLimitChangeReportItem> orc_ChangedItems)
+bool C_NagProjectSettingsPopupDialog::m_AskUserForModifyName(
+   const std::list<C_OscSystemNameMaxCharLimitChangeReportItem> & orc_ChangedItems)
 {
    bool q_IsMaxCharLimitChanged = false;
    QString c_Details;
@@ -373,20 +379,37 @@ bool C_NagCharLengthSettingPopupDialog::m_AskUserForModifyName(
 /*! \brief  Showing Popup dialog for unused project files
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagCharLengthSettingPopupDialog::m_ShowUnUsedFiles()
+void C_NagProjectSettingsPopupDialog::m_ShowUnUsedFiles()
 {
-   if (C_PopUtil::h_AskUserToContinue(this, false) == true)
+   //sanity check: table model of C_NagUnUsedProjectFilesPopUpDialog uses the project path to scan for unused files.
+   //if project path is empty (e.g. first tool start) openSYDE crashes without this check.
+   if (C_PuiProject::h_GetInstance()->GetFolderPath() != "")
    {
-      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-      C_NagUnUsedProjectFilesPopUpDialog * const pc_Dialog = new C_NagUnUsedProjectFilesPopUpDialog(*c_New);
-      pc_Dialog->ShowAllUnusedFiles();
-      c_New->SetSize(QSize(1000, 900));
-      c_New->exec();
-      pc_Dialog->CancelDialog();
-      if (c_New != NULL)
+      if (C_PopUtil::h_AskUserToContinue(this, false) == true)
       {
-         c_New->HideOverlay();
-         c_New->deleteLater();
-      }
-   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+         C_NagUnUsedProjectFilesPopUpDialog * const pc_Dialog = new C_NagUnUsedProjectFilesPopUpDialog(*c_New);
+         pc_Dialog->ShowAllUnusedFiles();
+         c_New->SetSize(QSize(1000, 900));
+         c_New->exec();
+         pc_Dialog->CancelDialog();
+         if (c_New != NULL)
+         {
+            c_New->HideOverlay();
+            c_New->deleteLater();
+         }
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   }
+   else
+   {
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eINFORMATION);
+
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("SHOW UNUSED FILES"));
+      c_MessageBox.SetDescription(
+         "Currently there is no active project, thus no unused files can be shown.");
+      c_MessageBox.SetOkButtonText("OK");
+      c_MessageBox.SetCustomMinHeight(180, 250);
+
+      c_MessageBox.Execute();
+   }
 }

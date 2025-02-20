@@ -33,10 +33,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <property name="spacing">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="leftMargin">
-       <number>15</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
        <number>9</number>
@@ -52,8 +52,11 @@
         <property name="spacing">
          <number>6</number>
         </property>
+        <property name="leftMargin">
+         <number>30</number>
+        </property>
         <property name="rightMargin">
-         <number>20</number>
+         <number>30</number>
         </property>
         <item>
          <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingPreview">
@@ -166,11 +169,14 @@
         <property name="spacing">
          <number>0</number>
         </property>
+        <property name="leftMargin">
+         <number>30</number>
+        </property>
         <property name="topMargin">
          <number>1</number>
         </property>
         <property name="rightMargin">
-         <number>20</number>
+         <number>30</number>
         </property>
         <property name="bottomMargin">
          <number>0</number>
@@ -200,25 +206,12 @@
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>6</width>
-          <height>6</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="rightMargin">
+        <property name="topMargin">
          <number>20</number>
+        </property>
+        <property name="rightMargin">
+         <number>30</number>
         </property>
         <property name="bottomMargin">
          <number>0</number>
@@ -246,25 +239,12 @@
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer_6">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>6</width>
-          <height>6</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,1">
+        <property name="leftMargin">
+         <number>30</number>
+        </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>15</number>
         </property>
         <property name="bottomMargin">
          <number>0</number>
@@ -280,7 +260,23 @@
          </widget>
         </item>
         <item>
-         <widget class="stw::opensyde_gui::C_NagUnUsedProjectFilesTableView" name="pc_TableViewUnUsedFiles"/>
+         <widget class="stw::opensyde_gui::C_NagUnUsedProjectFilesTableView" name="pc_TableViewUnUsedFiles">
+          <property name="editTriggers">
+           <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="gridStyle">
+           <enum>Qt::SolidLine</enum>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderStretchLastSection">
+           <bool>false</bool>
+          </attribute>
+         </widget>
         </item>
        </layout>
       </item>
@@ -365,6 +361,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.hpp</header>
@@ -376,9 +377,15 @@
    <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.hpp</header>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbx.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
@@ -386,20 +393,9 @@
    <header>C_OgePubIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbx.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui::C_NagUnUsedProjectFilesTableView</class>
    <extends>QTableView</extends>
    <header>C_NagUnUsedProjectFilesTableView.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

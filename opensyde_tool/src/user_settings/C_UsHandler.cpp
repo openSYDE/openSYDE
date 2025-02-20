@@ -138,7 +138,8 @@ void C_UsHandler::SetDefault(void)
    this->mc_RecentColors.fill(QColor(255, 255, 255, 255), 6);
 
    ms32_ScreenshotGifSucessTimeout = 3000;
-   mq_ActiveTspShortcut = false;
+   mc_PathHandlingSelection = "";
+   mc_SkipTspImportSelection = "";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -418,18 +419,30 @@ int32_t C_UsHandler::GetScreenshotGifSucessTimeout() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get TSP shortcut activation
+/*! \brief  Get the currently selected option for path handling
+
+   \retval   Relative
+   \retval   Absolute
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetPathHandlingSelection() const
+{
+   return this->mc_PathHandlingSelection;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get TSP shortcut usage
 
    \return
    bool
 
-   \retval   true   TSP shortcut dialog will be opened after adding a new node
-   \retval   false   TSP shortcut dialog will not appear after adding a new node
+   \retval   true    TSP shortcut dialog will not appear after adding a new node (Import is skipped always)
+   \retval   false   TSP shortcut dialog will appear after adding a new node
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_UsHandler::GetTspShortcutActive() const
+QString C_UsHandler::GetSkipTspSelection() const
 {
-   return this->mq_ActiveTspShortcut;
+   return this->mc_SkipTspImportSelection;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -909,10 +922,10 @@ int32_t C_UsHandler::GetProjLastSysDefBusTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 std::array<bool, 3> C_UsHandler::GetViewPermissions(const QString & orc_ViewName)
 {
-   std::array<bool, 3> c_Retval;
+   std::array<bool, 3> c_Retval = {false, false, false};
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
-      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+      const C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
 
       c_Retval[0] = rc_View.GetSetupPermission();
       c_Retval[1] = rc_View.GetUpdatePermission();
@@ -1163,14 +1176,25 @@ void C_UsHandler::SetNextRecentColorButtonNumber(const int32_t os32_NextRecentCo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set TSP shortcut activation
+/*! \brief   Set flag whether TSP Import on adding a Node shall be skipped always
 
-   \param[in]       oq_Active     activate tsp shortcut dialog
+   \param[in]       orc_Selection     can be "Ask User" or "Skip"
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetTspShortcutActive(const bool oq_Active)
+void C_UsHandler::SetSkipTspSelection(const QString & orc_Selection)
 {
-   mq_ActiveTspShortcut = oq_Active;
+   this->mc_SkipTspImportSelection = orc_Selection;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set flag for the currently selected option for the path handling
+
+   \param[in]       orc_Selection     can be "Ask User", "Relative" or "Absolute"
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetPathHandlingSelection(const QString & orc_Selection)
+{
+   this->mc_PathHandlingSelection = orc_Selection;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

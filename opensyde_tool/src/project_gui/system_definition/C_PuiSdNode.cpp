@@ -120,7 +120,7 @@ void C_PuiSdNode::DeleteConnection(const C_PuiSdNodeConnectionId & orc_Connectio
 {
    for (uint32_t u32_Index = 0; u32_Index < this->c_UiBusConnections.size(); ++u32_Index)
    {
-      C_PuiSdNodeConnection & rc_BusConnection = this->c_UiBusConnections[u32_Index];
+      const C_PuiSdNodeConnection & rc_BusConnection = this->c_UiBusConnections[u32_Index];
       if (rc_BusConnection.c_ConnectionId == orc_ConnectionId)
       {
          this->c_UiBusConnections.erase(this->c_UiBusConnections.begin() + u32_Index);

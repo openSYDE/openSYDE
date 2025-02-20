@@ -36,6 +36,12 @@ public:
                                               C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveDataElementOptArrayId(const C_OscNodeDataPoolListElementOptArrayId & orc_Config,
                                            C_OscXmlParserBase & orc_XmlParser);
+   static int32_t h_LoadCommInterfaceId(C_OscSystemBus::E_Type & ore_Type, uint8_t & oru8_InterfaceNumber,
+                                        C_OscXmlParserBase & orc_XmlParser,
+                                        const stw::scl::C_SclString & orc_ParentNodeName,
+                                        const stw::scl::C_SclString & orc_UseCase);
+   static void h_SaveCommInterfaceId(const C_OscSystemBus::E_Type oe_Type, const uint8_t ou8_InterfaceNumber,
+                                     C_OscXmlParserBase & orc_XmlParser);
 
 private:
    C_OscDataLoggerJobFiler();

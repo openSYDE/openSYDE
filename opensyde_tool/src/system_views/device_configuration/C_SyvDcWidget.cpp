@@ -2457,8 +2457,6 @@ void C_SyvDcWidget::m_Timer(void)
       bool q_ShowFinalErrorMessage = false;
       QString c_ErrorDescription = "";
 
-      std::vector<C_OscDcDeviceInformation> c_DeviceInfo;
-
       if ((this->mq_InitializationFinished == false) &&
           (this->me_Step == eSCANCANENTERFLASHLOADER))
       {
@@ -2539,6 +2537,7 @@ void C_SyvDcWidget::m_Timer(void)
          case eSCANCANGETINFOFROMSTWFLASHLOADERDEVICES:
             if (s32_SequenceResult == C_NO_ERR)
             {
+               std::vector<C_OscDcDeviceInformation> c_DeviceInfo;
                this->mpc_DcSequences->GetDeviceInfosResult(c_DeviceInfo);
 
                this->mc_FoundDevices.reserve(this->mc_FoundDevices.size() + c_DeviceInfo.size());
@@ -2592,6 +2591,7 @@ void C_SyvDcWidget::m_Timer(void)
          case eSCANETHGETINFOFROMOPENSYDEDEVICES: // Same data handling
             if (s32_SequenceResult == C_NO_ERR)
             {
+               std::vector<C_OscDcDeviceInformation> c_DeviceInfo;
                this->mpc_DcSequences->GetDeviceInfosResult(c_DeviceInfo);
                this->mpc_DcSequences->GetSecurityFeatureUsageResult(this->mq_SecurityFeatureUsed);
 

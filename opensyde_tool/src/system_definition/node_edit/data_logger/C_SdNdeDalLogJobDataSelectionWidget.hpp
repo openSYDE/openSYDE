@@ -11,6 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_OscDataLoggerDataElementReference.hpp"
+#include "C_OgeContextMenu.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -38,18 +39,22 @@ public:
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
    void SetNodeDataLoggerJob(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
-
-   void InitText(void) const;
+   void InitStaticNames(void) const;
+   void ReloadDataElements(void);
 
 private:
-   Ui::C_SdNdeDalLogJobDataSelectionWidget * mpc_Ui;
-
    void m_AddClicked(void);
    void m_UpdateUi() const;
-   void m_UpdateSelection(const uint32_t ou32_SelectionCount) const;
+   void m_UpdateSelection() const;
    void m_LoadDataElements();
-   void m_DataChangedInModel(const QModelIndex orc_Index, const QString oc_Data);
-   void m_UpdateCustomLoggingName(const uint32_t ou32_Index, const QString oc_Data);
+   void m_OnDataChangedInModel(const QModelIndex orc_Index, const QString oc_Data);
+   void m_UpdateCustomLoggingName(const uint32_t ou32_Index, const QString oc_Data, const bool oq_UseCustomName);
+   void m_SetupContextMenu(void);
+   void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
+   void m_DeleteSelectedDataElements(void);
+
+   Ui::C_SdNdeDalLogJobDataSelectionWidget * mpc_Ui;
+   stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
 
    uint32_t mu32_NodeIndex;
    uint32_t mu32_DataLoggerJobIndex;

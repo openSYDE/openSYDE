@@ -40,7 +40,7 @@ public:
    void SetGroupName(const stw::scl::C_SclString & orc_GroupName);
    stw::scl::C_SclString GetGroupName(void) const;
 
-   std::vector<C_OscDeviceDefinition> GetDevices(void) const;
+   const std::vector<C_OscDeviceDefinition> & GetDevices(void) const;
 
 private:
    stw::scl::C_SclString mc_GroupName;            ///< Group name

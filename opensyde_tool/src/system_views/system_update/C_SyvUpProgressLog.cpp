@@ -252,7 +252,7 @@ void C_SyvUpProgressLog::UpdateStatus(const uint32_t ou32_NodeIndex, const QStri
    }
    for (uint32_t u32_ItEntry = 0; u32_ItEntry < pc_Entries->size(); ++u32_ItEntry)
    {
-      C_SyvUpProgressLogEntry * const pc_Entry = pc_Entries->at(u32_ItEntry);
+      const C_SyvUpProgressLogEntry * const pc_Entry = pc_Entries->at(u32_ItEntry);
       if ((pc_Entry != NULL) && (pc_Entry->DoesIndexMatch(ou32_NodeIndex) == true))
       {
          pc_Entry->SetEntryStatus(orc_Value);

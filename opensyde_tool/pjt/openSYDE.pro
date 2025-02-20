@@ -36,7 +36,8 @@ SOURCES += ../src/main.cpp \
     ../src/graphic_items/C_GiProgressBarUtil.cpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.cpp \
     ../src/graphic_items/system_view_items/C_GiSvSubNodeData.cpp \
-    ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.cpp \
+    ../src/navigable_gui/C_NagProjectSettingsPopupDialog.cpp \
+    ../src/navigable_gui/C_NagToolSettingsPopupDialog.cpp \
     ../src/navigable_gui/C_NagServiceModeInfo.cpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
     ../src/navigable_gui/C_NagTopTreeModel.cpp \
@@ -82,6 +83,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableDelegate.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.cpp \
@@ -958,7 +960,8 @@ HEADERS  += \
     ../src/graphic_items/C_GiProgressBarUtil.hpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.hpp \
     ../src/graphic_items/system_view_items/C_GiSvSubNodeData.hpp \
-    ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.hpp \
+    ../src/navigable_gui/C_NagProjectSettingsPopupDialog.hpp \
+    ../src/navigable_gui/C_NagToolSettingsPopupDialog.hpp \
     ../src/navigable_gui/C_NagServiceModeInfo.hpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.hpp \
     ../src/navigable_gui/C_NagTopTreeModel.hpp \
@@ -1004,6 +1007,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableDelegate.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.hpp \
@@ -1844,7 +1848,8 @@ HEADERS  += \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamView.hpp
 
 FORMS    += \
-    ../src/navigable_gui/C_NagCharLengthSettingPopupDialog.ui \
+    ../src/navigable_gui/C_NagProjectSettingsPopupDialog.ui \
+    ../src/navigable_gui/C_NagToolSettingsPopupDialog.ui \
     ../src/navigable_gui/C_NagServiceModeInfo.ui \
     ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesPopUpDialog.ui \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \

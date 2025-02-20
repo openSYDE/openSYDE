@@ -252,8 +252,11 @@ unsigned_integer
         : UNSIGNED_INTEGER { $$ = std::stoul($1); }
         ;
 // 2023-03-15 STW: Remove unused int32 type (replaced by int64 to allow compatibility with int64 DBC files)
+// 2025-01-07 STW: Added double type (improve parsing of invalid dbc files with float notation for INT type)
 signed_64_integer
-        : UNSIGNED_INTEGER { $$ = std::stoll($1); }
+        : DOUBLE { $$ = std::stod($1);
+                   osc_write_log_warning("DBC parser", "Converted \"" + $1 + "\" to int due to data type restrictions"); }
+        | UNSIGNED_INTEGER { $$ = std::stoll($1); }
         | SIGNED_INTEGER { $$ = std::stoll($1); }
         ;
 double

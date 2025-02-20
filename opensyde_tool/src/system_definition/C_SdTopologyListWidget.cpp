@@ -264,7 +264,7 @@ void C_SdTopologyListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_P
 {
    this->mc_Position = orc_Pos;
 
-   QListWidgetItem * const pc_Item = this->itemAt(orc_Pos);
+   const QListWidgetItem * const pc_Item = this->itemAt(orc_Pos);
 
    // add action shall be shown only if no item concrete was clicked
    if (pc_Item != NULL)

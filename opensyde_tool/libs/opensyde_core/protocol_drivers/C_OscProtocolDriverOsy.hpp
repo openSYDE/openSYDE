@@ -392,7 +392,7 @@ public:
                               uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestFileTransfer(const stw::scl::C_SclString & orc_FilePath, const uint32_t ou32_FileSize,
                                   uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL);
-   int32_t OsyTransferData(const uint8_t ou8_BlockSequenceCounter, std::vector<uint8_t> & orc_Data,
+   int32_t OsyTransferData(const uint8_t ou8_BlockSequenceCounter, const std::vector<uint8_t> & orc_Data,
                            uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestTransferExitAddressBased(const bool oq_SendSignatureBlockAddress,
                                               const uint32_t ou32_SignatureBlockAddress,

@@ -278,6 +278,25 @@
              <number>6</number>
             </property>
             <item>
+             <widget class="stw::opensyde_gui_elements::C_OgeChxDefaultCheckedDisabled" name="pc_ChxRememberSelection">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>RememberSelection</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer_2">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -420,6 +439,11 @@
    <class>stw::opensyde_gui_elements::C_OgePubMessageCancel</class>
    <extends>QPushButton</extends>
    <header>C_OgePubMessageCancel.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeChxDefaultCheckedDisabled</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxDefaultCheckedDisabled.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

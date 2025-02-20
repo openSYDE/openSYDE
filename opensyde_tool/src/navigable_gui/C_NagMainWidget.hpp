@@ -76,6 +76,7 @@ private:
    void m_SysDefClicked();
    void m_SysViewClicked();
    void m_AboutClicked();
+   void m_SettingsClicked();
    void m_InitIcons(void) const;
    void m_InitGuiElements() const;
    void m_UpdateCurrProjInfo(void);

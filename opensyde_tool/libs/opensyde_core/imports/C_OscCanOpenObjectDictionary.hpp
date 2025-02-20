@@ -129,7 +129,7 @@ public:
    static const uint16_t hu16_OD_INDEX_EMCY = 0x1014U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_CONSUMER = 0x1016U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_PRODUCER = 0x1017U;
-   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1300U;
+   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1301U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO = 0x1400U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO = 0x1800U;
    static const uint8_t hu8_OD_SUB_INDEX_COB_ID = 0x1U;

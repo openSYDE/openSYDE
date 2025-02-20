@@ -711,7 +711,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
          std::vector<C_OscCanMessage> c_Messages;
          std::vector<std::vector<C_OscNodeDataPoolListElement> > c_OscSignalCommons;
          std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > c_UiSignalCommons;
-         std::vector<std::vector<C_PuiSdNodeCanSignal> > c_UiSignals;
+         std::vector<C_PuiSdNodeCanMessage> c_UiMessages;
          std::vector<std::vector<QString> > c_OwnerNodeName;
          std::vector<std::vector<uint32_t> > c_OwnerNodeInterfaceIndex;
          std::vector<std::vector<uint32_t> > c_OwnerNodeDatapoolIndex;
@@ -721,7 +721,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
          c_Messages.resize(c_IndexList.size());
          c_OscSignalCommons.resize(c_IndexList.size());
          c_UiSignalCommons.resize(c_IndexList.size());
-         c_UiSignals.resize(c_IndexList.size());
+         c_UiMessages.resize(c_IndexList.size());
 
          for (QModelIndexList::const_iterator c_ItIndex = c_IndexList.begin(); c_ItIndex != c_IndexList.end();
               ++c_ItIndex)
@@ -746,7 +746,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
                                                                                     c_Messages[u32_ItVec],
                                                                                     c_OscSignalCommons[u32_ItVec],
                                                                                     c_UiSignalCommons[u32_ItVec],
-                                                                                    c_UiSignals[u32_ItVec], true) ==
+                                                                                    c_UiMessages[u32_ItVec], true) ==
                              C_NO_ERR);
 
                   //Get owner data
@@ -778,7 +778,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
             }
             ++u32_ItVec;
          }
-         C_SdClipBoardHelper::h_StoreMessages(c_Messages, c_OscSignalCommons, c_UiSignalCommons, c_UiSignals,
+         C_SdClipBoardHelper::h_StoreMessages(c_Messages, c_OscSignalCommons, c_UiSignalCommons, c_UiMessages,
                                               c_OwnerNodeName, c_OwnerNodeInterfaceIndex, c_OwnerNodeDatapoolIndex,
                                               c_OwnerIsTxFlag, this->me_ProtocolType);
       }
@@ -1022,13 +1022,13 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
          std::vector<C_OscCanMessage> c_Messages;
          std::vector<std::vector<C_OscNodeDataPoolListElement> > c_OscMsgSignalCommons;
          std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > c_UiMsgSignalCommons;
-         std::vector<std::vector<C_PuiSdNodeCanSignal> > c_UiMsgSignals;
+         std::vector<C_PuiSdNodeCanMessage> c_UiMessages;
          std::vector<std::vector<QString> > c_OwnerNodeName;
          std::vector<std::vector<uint32_t> > c_OwnerNodeInterfaceIndex;
          std::vector<std::vector<uint32_t> > c_OwnerNodeDatapoolIndex;
          std::vector<std::vector<bool> > c_OwnerIsTxFlag;
          if (C_SdClipBoardHelper::h_LoadMessages(c_Messages, c_OscMsgSignalCommons, c_UiMsgSignalCommons,
-                                                 c_UiMsgSignals, c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
+                                                 c_UiMessages, c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
                                                  c_OwnerNodeDatapoolIndex, c_OwnerIsTxFlag) == C_NO_ERR)
          {
             C_OscCanMessageIdentificationIndices c_MessageId;
@@ -1038,7 +1038,7 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                if ((u32_ItMessage < c_OscMsgSignalCommons.size()) && (u32_ItMessage < c_UiMsgSignalCommons.size()))
                {
                   C_SdUtil::h_AdaptMessageToProtocolType(c_Messages[u32_ItMessage],
-                                                         NULL,
+                                                         c_UiMessages[u32_ItMessage],
                                                          c_OscMsgSignalCommons[u32_ItMessage],
                                                          c_UiMsgSignalCommons[u32_ItMessage],
                                                          this->me_ProtocolType, NULL);
@@ -1050,7 +1050,7 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                std::vector<C_OscCanMessageIdentificationIndices> c_NewIds;
                this->mpc_UndoManager->DoPasteMessages(c_MessageId, c_Messages, c_OscMsgSignalCommons,
                                                       c_UiMsgSignalCommons,
-                                                      c_UiMsgSignals, c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
+                                                      c_UiMessages, c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
                                                       c_OwnerNodeDatapoolIndex,
                                                       c_OwnerIsTxFlag, this->mpc_MessageSyncManager, this, c_NewIds);
                //Selection

@@ -321,6 +321,65 @@ void C_OscDataLoggerJobFiler::h_SaveDataElementOptArrayId(const C_OscNodeDataPoo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load comm interface id
+
+   \param[out]     ore_Type               Type
+   \param[out]     oru8_InterfaceNumber   Interface number
+   \param[in,out]  orc_XmlParser          Xml parser
+   \param[in]      orc_ParentNodeName     Parent node name
+   \param[in]      orc_UseCase            Use case
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(C_OscSystemBus::E_Type & ore_Type,
+                                                       uint8_t & oru8_InterfaceNumber,
+                                                       C_OscXmlParserBase & orc_XmlParser,
+                                                       const stw::scl::C_SclString & orc_ParentNodeName,
+                                                       const stw::scl::C_SclString & orc_UseCase)
+{
+   int32_t s32_Retval;
+
+   oru8_InterfaceNumber =
+      static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("interface-number"));
+   //Type
+   if (orc_XmlParser.SelectNodeChild("type") == "type")
+   {
+      s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(
+         orc_XmlParser.GetNodeContent(), ore_Type);
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == orc_ParentNodeName);
+   }
+   else
+   {
+      osc_write_log_error(orc_UseCase,
+                          "Could not find \"" + orc_ParentNodeName + "\".\"type\" node.");
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save comm interface id
+
+   \param[in]      oe_Type                Type
+   \param[in]      ou8_InterfaceNumber    Interface number
+   \param[in,out]  orc_XmlParser          Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(const C_OscSystemBus::E_Type oe_Type,
+                                                    const uint8_t ou8_InterfaceNumber,
+                                                    C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.SetAttributeUint32("interface-number",
+                                    static_cast<uint32_t>(ou8_InterfaceNumber));
+   orc_XmlParser.CreateNodeChild("type",
+                                 C_OscSystemFilerUtil::h_BusTypeEnumToString(oe_Type));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -431,6 +490,23 @@ int32_t C_OscDataLoggerJobFiler::mh_LoadJobProperties(C_OscDataLoggerJobProperti
          tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (orc_XmlParser.SelectNodeChild("connected-interface") == "connected-interface")
+      {
+         s32_Retval = C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(orc_Config.e_ConnectedInterfaceType,
+                                                                     orc_Config.u8_ConnectedInterfaceNumber,
+                                                                     orc_XmlParser, "connected-interface",
+                                                                     "Loading data loggers data");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+      }
+      else
+      {
+         //Default
+         orc_Config.e_ConnectedInterfaceType = C_OscSystemBus::eCAN;
+         orc_Config.u8_ConnectedInterfaceNumber = 0U;
+      }
+   }
    tgl_assert(orc_XmlParser.SelectNodeParent() == "job");
    return s32_Retval;
 }
@@ -451,6 +527,10 @@ void C_OscDataLoggerJobFiler::mh_SaveJobProperties(const C_OscDataLoggerJobPrope
    orc_XmlParser.CreateNodeChild("comment", orc_Config.c_Comment);
    orc_XmlParser.CreateNodeChild("log-file-format", mh_LogFileTypeTypeToString(orc_Config.e_LogFileFormat));
    orc_XmlParser.CreateNodeChild("local-log-trigger", mh_LocalLogTriggerTypeToString(orc_Config.e_LocalLogTrigger));
+   orc_XmlParser.CreateAndSelectNodeChild("connected-interface");
+   C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(orc_Config.e_ConnectedInterfaceType,
+                                                  orc_Config.u8_ConnectedInterfaceNumber, orc_XmlParser);
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
    tgl_assert(orc_XmlParser.SelectNodeParent() == "job");
 }
 

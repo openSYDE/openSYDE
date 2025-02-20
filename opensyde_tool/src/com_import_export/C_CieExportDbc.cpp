@@ -428,7 +428,7 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
 {
    int32_t s32_Return = C_NO_ERR;
 
-   for (auto c_CieSignal : orc_CieSignals)
+   for (const auto c_CieSignal : orc_CieSignals)
    {
       Vector::DBC::Signal c_DbcSignal;
       // set byte order
@@ -467,7 +467,7 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
       C_CieExportDbc::mh_SetSignalSpnValue(c_CieSignal, c_DbcSignal);
 
       // set signal values
-      C_CieConverter::C_CieDataPoolElement & rc_Element = c_CieSignal.c_Element;
+      const C_CieConverter::C_CieDataPoolElement & rc_Element = c_CieSignal.c_Element;
       s32_Return = mh_SetSignalValues(rc_Element, c_DbcSignal);
       tgl_assert(s32_Return == C_NO_ERR);
 
@@ -903,7 +903,7 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
                                        c_NmStationName, c_NmStationAttributeDef));
 
    // set initial value
-   std::string c_SigInitialValueName = mhc_SIG_INITIAL_VALUE.c_str();
+   std::string c_SigInitialValueName = mhc_SIG_INITIAL_VALUE;
    Vector::DBC::AttributeDefinition c_SigInitialValueAttribute;
    c_SigInitialValueAttribute.name = c_SigInitialValueName;
    c_SigInitialValueAttribute.objectType = Vector::DBC::AttributeObjectType::Signal;

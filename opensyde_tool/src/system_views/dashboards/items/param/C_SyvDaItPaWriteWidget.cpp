@@ -1104,7 +1104,7 @@ bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32_t ou32_NodeIndex, 
               u32_ElementCounter < this->mc_ChangedElementsForEachNode[u32_VectorNodeIndex].size();
               ++u32_ElementCounter)
          {
-            C_OscNodeDataPoolListElementId & rc_ElementId =
+            const C_OscNodeDataPoolListElementId & rc_ElementId =
                this->mc_ChangedElementsForEachNode[u32_VectorNodeIndex][u32_ElementCounter];
             if ((rc_ElementId.u32_DataPoolIndex == ou32_DataPoolIndex) &&
                 (rc_ElementId.u32_ListIndex == ou32_ListIndex) &&

@@ -57,6 +57,7 @@ C_SdNdeDalLogJobDataSelectionTableView::C_SdNdeDalLogJobDataSelectionTableView(Q
    delete pc_LastSelectionModel;
 
    this->mc_SortProxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+   this->setItemDelegate(&this->mc_Delegate);
 
    this->m_InitColumns();
 
@@ -67,6 +68,7 @@ C_SdNdeDalLogJobDataSelectionTableView::C_SdNdeDalLogJobDataSelectionTableView(Q
    this->setDragEnabled(false);
    this->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
    this->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+   this->horizontalHeader()->setStretchLastSection(true);
 
    // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -77,6 +79,12 @@ C_SdNdeDalLogJobDataSelectionTableView::C_SdNdeDalLogJobDataSelectionTableView(Q
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
+
+   //Row Height
+   this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+   this->verticalHeader()->setMinimumSectionSize(30);
+   this->verticalHeader()->setMaximumSectionSize(30);
+   this->verticalHeader()->setDefaultSectionSize(30);
 
    //Hide vertical header
    this->verticalHeader()->hide();
@@ -170,7 +178,7 @@ void C_SdNdeDalLogJobDataSelectionTableView::Search(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Convey data changes to model
+/*! \brief  Convey data changes to refresh the model
  *
  *  \param[in]  orc_DataElements    Selected data elements to be added
  *  \param[in]  ou32_NodeIndex      Current node index
@@ -181,11 +189,24 @@ void C_SdNdeDalLogJobDataSelectionTableView::UpdateData(
    const std::vector<stw::opensyde_core::C_OscDataLoggerDataElementReference> & orc_DataElements,
    const uint32_t ou32_NodeIndex)
 {
-   //   this->sortByColumn(C_SdNdeDalLogJobDataSelectionTableModel::h_EnumToColumn(
-   //                         C_SdNdeDalLogJobDataSelectionTableModel::eDATA_ELEMENT),
-   //                      Qt::AscendingOrder);
-
    this->mc_Model.UpdateData(orc_DataElements, ou32_NodeIndex);
+
+   // Resize the "Comment" column (Since it may have longer text)
+   this->resizeColumnToContents(C_SdNdeDalLogJobDataSelectionTableModel::h_EnumToColumn(
+                                   C_SdNdeDalLogJobDataSelectionTableModel::eCOMMENT));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convey data changes to add to the model
+ *
+ *  \param[in]  orc_DataElements    Selected data elements to be added
+ *  \param[in]  ou32_NodeIndex      Current node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionTableView::AddData(
+   const std::vector<C_OscDataLoggerDataElementReference> & orc_DataElements, const uint32_t ou32_NodeIndex)
+{
+   this->mc_Model.AddData(orc_DataElements, ou32_NodeIndex);
 
    // Resize the "Comment" column (Since it may have longer text)
    this->resizeColumnToContents(C_SdNdeDalLogJobDataSelectionTableModel::h_EnumToColumn(
@@ -204,16 +225,107 @@ void C_SdNdeDalLogJobDataSelectionTableView::UpdateData(
 void C_SdNdeDalLogJobDataSelectionTableView::selectionChanged(const QItemSelection & orc_Selected,
                                                               const QItemSelection & orc_Deselected)
 {
-   // This method call ensures correct item row selection
+   // Calling this method ensures correct item row selection
    C_TblViewScroll::selectionChanged(orc_Selected, orc_Deselected);
+}
 
-   std::vector<uint32_t> c_SelectedIndices;
-   if (orc_Selected.size() >= 0)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten key press event slot
+
+   Here: Handle specific enter key cases
+
+   \param[in,out] opc_KeyEvent Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionTableView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+{
+   // Shortcut (Ctrl + A) to select all messages
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_A))
    {
-      c_SelectedIndices = C_SdNdeDpUtil::h_ConvertVector(this->selectedIndexes());
-      C_Uti::h_Uniqueify(c_SelectedIndices);
-      Q_EMIT this->SigSelectionChanged(c_SelectedIndices.size());
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
+      {
+         this->selectAll();
+      }
    }
+   else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Delete))
+   {
+      Q_EMIT this->SigDeleteSelectedElements();
+   }
+   else
+   {
+   }
+
+   C_TblViewScroll::keyPressEvent(opc_KeyEvent);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fetch the selected elements
+ *
+ *  NOTE: Selected indices are mapped from sort indices to original indices and placed in descending order to ensure
+ *  correct deletion of vector elements
+ *
+ *  \param[in, out]  orc_SelectedIndices    Selected elements filled up in this vector
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionTableView::GetSelectedElements(std::vector<uint32_t> & orc_SelectedIndices) const
+{
+   // Convert the selected indexes to original values
+   const QModelIndexList c_IndexList = this->m_MapModelIndices(this->selectedIndexes());
+
+   // Convert the redundant index values to unique ones
+   const std::vector<uint32_t> c_SelectedItems = C_SdNdeDpUtil::h_ConvertVector(c_IndexList);
+
+   // Sort to descending order (optimal for deleting elements from the vector)
+   orc_SelectedIndices = C_Uti::h_UniquifyAndSortDescending(c_SelectedItems);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map model indices
+
+   \param[in]  orc_SortModelIndices    Sort model indices
+
+   \return
+   Converted model indices from sort indices to original indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QModelIndexList C_SdNdeDalLogJobDataSelectionTableView::m_MapModelIndices(const QModelIndexList & orc_SortModelIndices)
+const
+{
+   QModelIndexList c_Retval;
+
+   c_Retval.reserve(orc_SortModelIndices.size());
+   for (QModelIndexList::ConstIterator c_ItSortModelIndex = orc_SortModelIndices.cbegin();
+        c_ItSortModelIndex != orc_SortModelIndices.cend(); ++c_ItSortModelIndex)
+   {
+      c_Retval.push_back(this->mc_SortProxyModel.mapToSource(*c_ItSortModelIndex));
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete selected data elements
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionTableView::DeleteSelectedElements()
+{
+   std::vector<uint32_t> c_SelectedIndices;
+   this->GetSelectedElements(c_SelectedIndices);
+
+   this->mc_Model.DoRemoveRows(c_SelectedIndices);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the number of local and remote elements
+
+   \param[in,out]   oru32_LocalElements     Number of local elements
+   \param[in,out]   oru32_RemoteElements    Number of remote elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionTableView::GetElementLocationCount(uint32_t & oru32_LocalElements,
+                                                                     uint32_t & oru32_RemoteElements)
+{
+   this->mc_Model.GetElementLocationCount(oru32_LocalElements, oru32_RemoteElements);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

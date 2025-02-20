@@ -1,6 +1,5 @@
 /* --------------------------------------------------------------------- */
-stw--opensyde_gui_elements--C_OgeTableWidgetComIf QLineEdit,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item
+stw--opensyde_gui_elements--C_OgeTableWidgetComIf QLineEdit
 {
 border-style: none;
 }
@@ -38,7 +37,8 @@ stw--opensyde_gui--C_SdNdeSfoResetMessageTableView::item,
 stw--opensyde_gui_elements--C_OgeTableWidgetComIf,
 stw--opensyde_gui_elements--C_OgeTableWidgetComIf::item,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
-stw--opensyde_gui--C_NagUnUsedProjectFilesTableView
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item
 {
 border-style: none;
 outline: none;
@@ -87,7 +87,6 @@ padding: 6px;
 
 stw--opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
 stw--opensyde_gui_elements--C_OgeTableWidgetComIf QHeaderView::section,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView
 {
 border-style: solid;
@@ -209,7 +208,6 @@ image: url(://images/system_definition/NodeEdit/lists/IconSortUp.svg) 0 0 0 0 st
 stw--opensyde_gui--C_SyvDaItPaArView QTableCornerButton::section,
 stw--opensyde_gui--C_SdNdeDpListArrayEditView QTableCornerButton::section,
 stw--opensyde_gui--C_SdNdeDpListDataSetView QTableCornerButton::section,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
 {
 border-style: none;
@@ -233,7 +231,6 @@ padding-bottom:15px;
 
 /* --------------------------------------------------------------------- */
 /* Margins */
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
 {
 margin-top: 3px;

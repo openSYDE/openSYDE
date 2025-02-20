@@ -198,7 +198,8 @@ stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogDialog,
 stw--opensyde_gui--C_SdNdeDpImportRamViewReport,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
 stw--opensyde_gui--C_SyvUpPacServiceUpdatePackageDialog,
-stw--opensyde_gui--C_NagCharLengthSettingPopupDialog,
+stw--opensyde_gui--C_NagProjectSettingsPopupDialog,
+stw--opensyde_gui--C_NagToolSettingsPopupDialog,
 stw--opensyde_gui--C_SyvUpPacSecureArchiveDialog,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionWidget,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
@@ -236,7 +237,8 @@ stw--opensyde_gui--C_SdNdeDpListArrayEditView QTableCornerButton::section,
 stw--opensyde_gui--C_SdNdeDpListDataSetView QTableCornerButton::section,
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][BackgroundChecked="false"],
-stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item
 {
 border-color: transparent;
 }
@@ -469,7 +471,6 @@ stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item,
 stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="1"],
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView
 {
 color: rgb(19, 19, 45);
@@ -702,8 +703,6 @@ stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::secti
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item::selected,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:selected,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item::selected,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
@@ -823,7 +822,8 @@ stw--opensyde_gui_elements--C_OgeLabDashboardProgressBarMaximum[Style="OPENSYDE_
 stw--opensyde_gui_elements--C_OgeLabNodePropComIfTable[COMIF_TableCell_Hyperlink="true"]:enabled,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="6"],
 stw--opensyde_gui_elements--C_OgePubTextOnly,
-stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="6"]
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="6"],
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:enabled:selected:!focus
 {
 color: rgb(86, 86, 104);
 }
@@ -2442,4 +2442,11 @@ color: rgb(255, 255, 255);
 stw--opensyde_gui_elements--C_OgePubToolBar[Background="true"]:hover
 {
 background-color: rgb(57, 57, 109);
+}
+
+
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:selected:focus
+{
+background-color: rgb(130, 130, 143);
+color: rgb(255,255,255);
 }

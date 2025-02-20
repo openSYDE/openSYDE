@@ -337,8 +337,12 @@ void C_NagUnUsedProjectFilesTableModel::DeleteAllFiles()
 //----------------------------------------------------------------------------------------------------------------------
 QString C_NagUnUsedProjectFilesTableModel::DetailsOfFilesToDelete(const QItemSelection & orc_Selection)
 {
+   QString c_FileDetails = "";
+
    std::set<int32_t> c_UniqueRows;
    std::vector<uint32_t> c_SelectedFileIndexes;
+
+   //for getting unique rows (due to 2 columns in a row)
    for (const QModelIndex & rc_Index : orc_Selection.indexes())
    {
       const uint32_t u32_Row = static_cast<uint32_t>(rc_Index.row());
@@ -349,16 +353,15 @@ QString C_NagUnUsedProjectFilesTableModel::DetailsOfFilesToDelete(const QItemSel
    }
    c_SelectedFileIndexes.assign(c_UniqueRows.begin(), c_UniqueRows.end());
    std::sort(c_SelectedFileIndexes.begin(), c_SelectedFileIndexes.end());
-   std::ostringstream c_DeleteFiles;
-
    if (!c_SelectedFileIndexes.empty())
    {
-      for (const uint32_t u32_FileIndex : c_SelectedFileIndexes)
+      for (uint32_t u32_It = 0; u32_It < c_SelectedFileIndexes.size(); ++u32_It)
       {
-         c_DeleteFiles << this->mc_FileInfoList[u32_FileIndex].c_Path.toStdString() << "\n";
+         const uint32_t u32_FileIndex = c_SelectedFileIndexes[u32_It];
+         c_FileDetails +=  this->mc_FileInfoList[u32_FileIndex].c_Path + "\n";
       }
    }
-   return QString::fromStdString(c_DeleteFiles.str());
+   return c_FileDetails;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

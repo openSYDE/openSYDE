@@ -1241,196 +1241,203 @@ namespace Vector { namespace DBC {
 #line 1242 "Parser.cpp"
     break;
 
-  case 6: // signed_64_integer: UNSIGNED_INTEGER
-#line 256 "Parser.yy"
-                           { yylhs.value.as < int64_t > () = std::stoll(yystack_[0].value.as < std::string > ()); }
-#line 1248 "Parser.cpp"
-    break;
-
-  case 7: // signed_64_integer: SIGNED_INTEGER
+  case 6: // signed_64_integer: DOUBLE
 #line 257 "Parser.yy"
-                         { yylhs.value.as < int64_t > () = std::stoll(yystack_[0].value.as < std::string > ()); }
-#line 1254 "Parser.cpp"
+                 { yylhs.value.as < int64_t > () = std::stod(yystack_[0].value.as < std::string > ());
+                   osc_write_log_warning("DBC parser", "Converted \"" + yystack_[0].value.as < std::string > () + "\" to int due to data type restrictions"); }
+#line 1249 "Parser.cpp"
     break;
 
-  case 8: // double: DOUBLE
+  case 7: // signed_64_integer: UNSIGNED_INTEGER
+#line 259 "Parser.yy"
+                           { yylhs.value.as < int64_t > () = std::stoll(yystack_[0].value.as < std::string > ()); }
+#line 1255 "Parser.cpp"
+    break;
+
+  case 8: // signed_64_integer: SIGNED_INTEGER
 #line 260 "Parser.yy"
+                         { yylhs.value.as < int64_t > () = std::stoll(yystack_[0].value.as < std::string > ()); }
+#line 1261 "Parser.cpp"
+    break;
+
+  case 9: // double: DOUBLE
+#line 263 "Parser.yy"
                  { yylhs.value.as < double > () = std::stod(yystack_[0].value.as < std::string > ()); }
-#line 1260 "Parser.cpp"
+#line 1267 "Parser.cpp"
     break;
 
-  case 9: // double: SIGNED_INTEGER
-#line 261 "Parser.yy"
+  case 10: // double: SIGNED_INTEGER
+#line 264 "Parser.yy"
                          { yylhs.value.as < double > () = std::stod(yystack_[0].value.as < std::string > ()); }
-#line 1266 "Parser.cpp"
+#line 1273 "Parser.cpp"
     break;
 
-  case 10: // double: UNSIGNED_INTEGER
-#line 262 "Parser.yy"
-                           { yylhs.value.as < double > () = std::stod(yystack_[0].value.as < std::string > ()); }
-#line 1272 "Parser.cpp"
-    break;
-
-  case 11: // char_string: CHAR_STRING
+  case 11: // double: UNSIGNED_INTEGER
 #line 265 "Parser.yy"
-                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1278 "Parser.cpp"
+                           { yylhs.value.as < double > () = std::stod(yystack_[0].value.as < std::string > ()); }
+#line 1279 "Parser.cpp"
     break;
 
-  case 12: // char_string_eol: CHAR_STRING EOL
-#line 269 "Parser.yy"
+  case 12: // char_string: CHAR_STRING
+#line 268 "Parser.yy"
+                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1285 "Parser.cpp"
+    break;
+
+  case 13: // char_string_eol: CHAR_STRING EOL
+#line 272 "Parser.yy"
                           { yylhs.value.as < std::string > () = yystack_[1].value.as < std::string > (); }
-#line 1284 "Parser.cpp"
+#line 1291 "Parser.cpp"
     break;
 
-  case 13: // char_string_eol: CHAR_STRING
-#line 270 "Parser.yy"
-                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1290 "Parser.cpp"
-    break;
-
-  case 14: // char_strings: CHAR_STRING
+  case 14: // char_string_eol: CHAR_STRING
 #line 273 "Parser.yy"
-                      { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); yylhs.value.as < std::vector<std::string> > ().push_back(yystack_[0].value.as < std::string > ()); }
-#line 1296 "Parser.cpp"
-    break;
-
-  case 15: // char_strings: char_strings COMMA CHAR_STRING
-#line 274 "Parser.yy"
-                                         { yylhs.value.as < std::vector<std::string> > () = yystack_[2].value.as < std::vector<std::string> > (); yylhs.value.as < std::vector<std::string> > ().push_back(yystack_[0].value.as < std::string > ()); }
-#line 1302 "Parser.cpp"
-    break;
-
-  case 16: // dbc_identifier: DBC_IDENTIFIER
-#line 277 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1308 "Parser.cpp"
-    break;
-
-  case 17: // version: VERSION candb_version_string EOL
-#line 282 "Parser.yy"
-                                           { network->version = yystack_[1].value.as < std::string > (); }
-#line 1314 "Parser.cpp"
-    break;
-
-  case 18: // candb_version_string: char_string
-#line 285 "Parser.yy"
                       { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1320 "Parser.cpp"
+#line 1297 "Parser.cpp"
     break;
 
-  case 20: // new_symbols: NS COLON EOL new_symbol_values
-#line 290 "Parser.yy"
-                            { network->newSymbols = yystack_[0].value.as < std::vector<std::string> > (); }
-#line 1326 "Parser.cpp"
+  case 15: // char_strings: CHAR_STRING
+#line 276 "Parser.yy"
+                      { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); yylhs.value.as < std::vector<std::string> > ().push_back(yystack_[0].value.as < std::string > ()); }
+#line 1303 "Parser.cpp"
     break;
 
-  case 21: // new_symbol_values: %empty
+  case 16: // char_strings: char_strings COMMA CHAR_STRING
+#line 277 "Parser.yy"
+                                         { yylhs.value.as < std::vector<std::string> > () = yystack_[2].value.as < std::vector<std::string> > (); yylhs.value.as < std::vector<std::string> > ().push_back(yystack_[0].value.as < std::string > ()); }
+#line 1309 "Parser.cpp"
+    break;
+
+  case 17: // dbc_identifier: DBC_IDENTIFIER
+#line 280 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1315 "Parser.cpp"
+    break;
+
+  case 18: // version: VERSION candb_version_string EOL
+#line 285 "Parser.yy"
+                                           { network->version = yystack_[1].value.as < std::string > (); }
+#line 1321 "Parser.cpp"
+    break;
+
+  case 19: // candb_version_string: char_string
+#line 288 "Parser.yy"
+                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1327 "Parser.cpp"
+    break;
+
+  case 21: // new_symbols: NS COLON EOL new_symbol_values
 #line 293 "Parser.yy"
+                            { network->newSymbols = yystack_[0].value.as < std::vector<std::string> > (); }
+#line 1333 "Parser.cpp"
+    break;
+
+  case 22: // new_symbol_values: %empty
+#line 296 "Parser.yy"
                  { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); }
-#line 1332 "Parser.cpp"
+#line 1339 "Parser.cpp"
     break;
 
-  case 22: // new_symbol_values: new_symbol_values NS_VALUE EOL
-#line 294 "Parser.yy"
+  case 23: // new_symbol_values: new_symbol_values NS_VALUE EOL
+#line 297 "Parser.yy"
                                          { yylhs.value.as < std::vector<std::string> > () = yystack_[2].value.as < std::vector<std::string> > (); yylhs.value.as < std::vector<std::string> > ().push_back(yystack_[1].value.as < std::string > ()); }
-#line 1338 "Parser.cpp"
+#line 1345 "Parser.cpp"
     break;
 
-  case 24: // bit_timing: BS COLON baudrate COLON btr1 COMMA btr2 EOL
-#line 300 "Parser.yy"
+  case 25: // bit_timing: BS COLON baudrate COLON btr1 COMMA btr2 EOL
+#line 303 "Parser.yy"
                                                       {
               network->bitTiming.baudrate = yystack_[5].value.as < uint32_t > ();
               network->bitTiming.btr1 = yystack_[3].value.as < uint32_t > ();
               network->bitTiming.btr2 = yystack_[1].value.as < uint32_t > ();
           }
-#line 1348 "Parser.cpp"
+#line 1355 "Parser.cpp"
     break;
 
-  case 25: // baudrate: unsigned_integer
-#line 307 "Parser.yy"
-                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1354 "Parser.cpp"
-    break;
-
-  case 26: // btr1: unsigned_integer
+  case 26: // baudrate: unsigned_integer
 #line 310 "Parser.yy"
                            { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1360 "Parser.cpp"
+#line 1361 "Parser.cpp"
     break;
 
-  case 27: // btr2: unsigned_integer
+  case 27: // btr1: unsigned_integer
 #line 313 "Parser.yy"
                            { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1366 "Parser.cpp"
+#line 1367 "Parser.cpp"
     break;
 
-  case 31: // node_names: node_names node_name
-#line 323 "Parser.yy"
-                               { network->nodes[yystack_[0].value.as < std::string > ()].name = yystack_[0].value.as < std::string > (); }
-#line 1372 "Parser.cpp"
+  case 28: // btr2: unsigned_integer
+#line 316 "Parser.yy"
+                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
+#line 1373 "Parser.cpp"
     break;
 
-  case 32: // node_name: dbc_identifier
+  case 32: // node_names: node_names node_name
 #line 326 "Parser.yy"
+                               { network->nodes[yystack_[0].value.as < std::string > ()].name = yystack_[0].value.as < std::string > (); }
+#line 1379 "Parser.cpp"
+    break;
+
+  case 33: // node_name: dbc_identifier
+#line 329 "Parser.yy"
                          { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1378 "Parser.cpp"
+#line 1385 "Parser.cpp"
     break;
 
-  case 34: // value_tables: value_tables value_table
-#line 332 "Parser.yy"
+  case 35: // value_tables: value_tables value_table
+#line 335 "Parser.yy"
                                    { network->valueTables[yystack_[0].value.as < ValueTable > ().name] = yystack_[0].value.as < ValueTable > (); }
-#line 1384 "Parser.cpp"
+#line 1391 "Parser.cpp"
     break;
 
-  case 35: // value_table: VAL_TABLE value_table_name value_encoding_descriptions semicolon_with_optional_eol
-#line 336 "Parser.yy"
+  case 36: // value_table: VAL_TABLE value_table_name value_encoding_descriptions semicolon_with_optional_eol
+#line 339 "Parser.yy"
                                                                                              {
               yylhs.value.as < ValueTable > () = ValueTable();
               yylhs.value.as < ValueTable > ().name = yystack_[2].value.as < std::string > ();
               yylhs.value.as < ValueTable > ().valueDescriptions = yystack_[1].value.as < std::map<int64_t, std::string> > ();
           }
-#line 1394 "Parser.cpp"
+#line 1401 "Parser.cpp"
     break;
 
-  case 36: // value_table_name: dbc_identifier
-#line 343 "Parser.yy"
+  case 37: // value_table_name: dbc_identifier
+#line 346 "Parser.yy"
                          { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1400 "Parser.cpp"
+#line 1407 "Parser.cpp"
     break;
 
-  case 37: // value_encoding_descriptions: %empty
-#line 349 "Parser.yy"
+  case 38: // value_encoding_descriptions: %empty
+#line 352 "Parser.yy"
                  { yylhs.value.as < std::map<int64_t, std::string> > () = std::map<int64_t, std::string>(); }
-#line 1406 "Parser.cpp"
+#line 1413 "Parser.cpp"
     break;
 
-  case 38: // value_encoding_descriptions: value_encoding_descriptions value_encoding_description
-#line 350 "Parser.yy"
+  case 39: // value_encoding_descriptions: value_encoding_descriptions value_encoding_description
+#line 353 "Parser.yy"
                                                                  { yylhs.value.as < std::map<int64_t, std::string> > () = yystack_[1].value.as < std::map<int64_t, std::string> > (); yylhs.value.as < std::map<int64_t, std::string> > ().insert(yystack_[0].value.as < std::pair<int64_t, std::string> > ()); }
-#line 1412 "Parser.cpp"
+#line 1419 "Parser.cpp"
     break;
 
-  case 39: // value_encoding_description: signed_64_integer char_string_eol
-#line 355 "Parser.yy"
+  case 40: // value_encoding_description: signed_64_integer char_string_eol
+#line 358 "Parser.yy"
                                             { yylhs.value.as < std::pair<int64_t, std::string> > () = std::make_pair(yystack_[1].value.as < int64_t > (), yystack_[0].value.as < std::string > ()); }
-#line 1418 "Parser.cpp"
+#line 1425 "Parser.cpp"
     break;
 
-  case 40: // value_encoding_description: signed_64_integer EOL char_string_eol
-#line 356 "Parser.yy"
+  case 41: // value_encoding_description: signed_64_integer EOL char_string_eol
+#line 359 "Parser.yy"
                                                 { yylhs.value.as < std::pair<int64_t, std::string> > () = std::make_pair(yystack_[2].value.as < int64_t > (), yystack_[0].value.as < std::string > ()); }
-#line 1424 "Parser.cpp"
+#line 1431 "Parser.cpp"
     break;
 
-  case 42: // messages: messages message
-#line 362 "Parser.yy"
-                           { network->messages[yystack_[0].value.as < Message > ().id] = yystack_[0].value.as < Message > (); }
-#line 1430 "Parser.cpp"
-    break;
-
-  case 43: // message: BO message_id message_name COLON message_size transmitter EOL signals
+  case 43: // messages: messages message
 #line 365 "Parser.yy"
+                           { network->messages[yystack_[0].value.as < Message > ().id] = yystack_[0].value.as < Message > (); }
+#line 1437 "Parser.cpp"
+    break;
+
+  case 44: // message: BO message_id message_name COLON message_size transmitter EOL signals
+#line 368 "Parser.yy"
                                                                                 {
               yylhs.value.as < Message > () = Message();
               yylhs.value.as < Message > ().id = yystack_[6].value.as < uint32_t > ();
@@ -1439,53 +1446,53 @@ namespace Vector { namespace DBC {
               yylhs.value.as < Message > ().transmitter = yystack_[2].value.as < std::string > ();
               yylhs.value.as < Message > ().signals = yystack_[0].value.as < std::map<std::string, Signal> > ();
           }
-#line 1443 "Parser.cpp"
+#line 1450 "Parser.cpp"
     break;
 
-  case 44: // message_id: unsigned_integer
-#line 375 "Parser.yy"
-                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1449 "Parser.cpp"
-    break;
-
-  case 45: // message_name: dbc_identifier
+  case 45: // message_id: unsigned_integer
 #line 378 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1455 "Parser.cpp"
-    break;
-
-  case 46: // message_size: unsigned_integer
-#line 381 "Parser.yy"
                            { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1461 "Parser.cpp"
+#line 1456 "Parser.cpp"
     break;
 
-  case 47: // transmitter: node_name
+  case 46: // message_name: dbc_identifier
+#line 381 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1462 "Parser.cpp"
+    break;
+
+  case 47: // message_size: unsigned_integer
 #line 384 "Parser.yy"
+                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
+#line 1468 "Parser.cpp"
+    break;
+
+  case 48: // transmitter: node_name
+#line 387 "Parser.yy"
                     { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1467 "Parser.cpp"
+#line 1474 "Parser.cpp"
     break;
 
-  case 48: // transmitter: VECTOR_XXX
-#line 385 "Parser.yy"
+  case 49: // transmitter: VECTOR_XXX
+#line 388 "Parser.yy"
                      { yylhs.value.as < std::string > () = ""; }
-#line 1473 "Parser.cpp"
+#line 1480 "Parser.cpp"
     break;
 
-  case 49: // signals: %empty
-#line 392 "Parser.yy"
+  case 50: // signals: %empty
+#line 395 "Parser.yy"
                  { yylhs.value.as < std::map<std::string, Signal> > () = std::map<std::string, Signal>(); }
-#line 1479 "Parser.cpp"
+#line 1486 "Parser.cpp"
     break;
 
-  case 50: // signals: signals signal
-#line 393 "Parser.yy"
-                         { yylhs.value.as < std::map<std::string, Signal> > () = yystack_[1].value.as < std::map<std::string, Signal> > (); yylhs.value.as < std::map<std::string, Signal> > ()[yystack_[0].value.as < Signal > ().name] = yystack_[0].value.as < Signal > (); }
-#line 1485 "Parser.cpp"
-    break;
-
-  case 51: // signal: SG signal_name multiplexer_indicator COLON start_bit VERTICAL_BAR signal_size AT byte_order value_type OPEN_PARENTHESIS factor COMMA offset CLOSE_PARENTHESIS OPEN_BRACKET minimum VERTICAL_BAR maximum CLOSE_BRACKET unit receivers EOL
+  case 51: // signals: signals signal
 #line 396 "Parser.yy"
+                         { yylhs.value.as < std::map<std::string, Signal> > () = yystack_[1].value.as < std::map<std::string, Signal> > (); yylhs.value.as < std::map<std::string, Signal> > ()[yystack_[0].value.as < Signal > ().name] = yystack_[0].value.as < Signal > (); }
+#line 1492 "Parser.cpp"
+    break;
+
+  case 52: // signal: SG signal_name multiplexer_indicator COLON start_bit VERTICAL_BAR signal_size AT byte_order value_type OPEN_PARENTHESIS factor COMMA offset CLOSE_PARENTHESIS OPEN_BRACKET minimum VERTICAL_BAR maximum CLOSE_BRACKET unit receivers EOL
+#line 399 "Parser.yy"
                                                                                                                                                                                                                                                    {
               yylhs.value.as < Signal > () = Signal();
               yylhs.value.as < Signal > ().name = yystack_[21].value.as < std::string > ();
@@ -1507,152 +1514,152 @@ namespace Vector { namespace DBC {
               yylhs.value.as < Signal > ().unit = yystack_[2].value.as < std::string > ();
               yylhs.value.as < Signal > ().receivers = yystack_[1].value.as < std::set<std::string> > ();
           }
-#line 1511 "Parser.cpp"
+#line 1518 "Parser.cpp"
     break;
 
-  case 52: // signal_name: dbc_identifier
-#line 419 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1517 "Parser.cpp"
-    break;
-
-  case 53: // signal_names: %empty
+  case 53: // signal_name: dbc_identifier
 #line 422 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1524 "Parser.cpp"
+    break;
+
+  case 54: // signal_names: %empty
+#line 425 "Parser.yy"
                  { yylhs.value.as < std::set<std::string> > () = std::set<std::string>(); }
-#line 1523 "Parser.cpp"
+#line 1530 "Parser.cpp"
     break;
 
-  case 54: // signal_names: signal_names signal_name
-#line 423 "Parser.yy"
-                                   { yylhs.value.as < std::set<std::string> > () = yystack_[1].value.as < std::set<std::string> > (); yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ()); }
-#line 1529 "Parser.cpp"
-    break;
-
-  case 55: // multiplexer_indicator: %empty
+  case 55: // signal_names: signal_names signal_name
 #line 426 "Parser.yy"
+                                   { yylhs.value.as < std::set<std::string> > () = yystack_[1].value.as < std::set<std::string> > (); yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ()); }
+#line 1536 "Parser.cpp"
+    break;
+
+  case 56: // multiplexer_indicator: %empty
+#line 429 "Parser.yy"
                  { yylhs.value.as < std::string > () = ""; }
-#line 1535 "Parser.cpp"
+#line 1542 "Parser.cpp"
     break;
 
-  case 56: // multiplexer_indicator: DBC_IDENTIFIER
-#line 427 "Parser.yy"
+  case 57: // multiplexer_indicator: DBC_IDENTIFIER
+#line 430 "Parser.yy"
                          { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); yylhs.value.as < std::string > ().erase(0, 1); }
-#line 1541 "Parser.cpp"
+#line 1548 "Parser.cpp"
     break;
 
-  case 57: // multiplexer_indicator: UPPER_M
-#line 428 "Parser.yy"
+  case 58: // multiplexer_indicator: UPPER_M
+#line 431 "Parser.yy"
                   { yylhs.value.as < std::string > () = "*"; }
-#line 1547 "Parser.cpp"
+#line 1554 "Parser.cpp"
     break;
 
-  case 58: // start_bit: unsigned_integer
-#line 434 "Parser.yy"
-                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1553 "Parser.cpp"
-    break;
-
-  case 59: // signal_size: unsigned_integer
+  case 59: // start_bit: unsigned_integer
 #line 437 "Parser.yy"
                            { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1559 "Parser.cpp"
+#line 1560 "Parser.cpp"
     break;
 
-  case 60: // byte_order: UNSIGNED_INTEGER
+  case 60: // signal_size: unsigned_integer
 #line 440 "Parser.yy"
+                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
+#line 1566 "Parser.cpp"
+    break;
+
+  case 61: // byte_order: UNSIGNED_INTEGER
+#line 443 "Parser.yy"
                            {
               if (yystack_[0].value.as < std::string > () == "0") { yylhs.value.as < ByteOrder > () = ByteOrder::BigEndian; }
               if (yystack_[0].value.as < std::string > () == "1") { yylhs.value.as < ByteOrder > () = ByteOrder::LittleEndian; }
           }
-#line 1568 "Parser.cpp"
+#line 1575 "Parser.cpp"
     break;
 
-  case 61: // value_type: PLUS
-#line 446 "Parser.yy"
+  case 62: // value_type: PLUS
+#line 449 "Parser.yy"
                { yylhs.value.as < ValueType > () = ValueType::Unsigned; }
-#line 1574 "Parser.cpp"
+#line 1581 "Parser.cpp"
     break;
 
-  case 62: // value_type: MINUS
-#line 447 "Parser.yy"
-                { yylhs.value.as < ValueType > () = ValueType::Signed; }
-#line 1580 "Parser.cpp"
-    break;
-
-  case 63: // factor: double
+  case 63: // value_type: MINUS
 #line 450 "Parser.yy"
-                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1586 "Parser.cpp"
+                { yylhs.value.as < ValueType > () = ValueType::Signed; }
+#line 1587 "Parser.cpp"
     break;
 
-  case 64: // offset: double
+  case 64: // factor: double
 #line 453 "Parser.yy"
                  { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1592 "Parser.cpp"
+#line 1593 "Parser.cpp"
     break;
 
-  case 65: // minimum: double
+  case 65: // offset: double
 #line 456 "Parser.yy"
                  { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1598 "Parser.cpp"
+#line 1599 "Parser.cpp"
     break;
 
-  case 66: // maximum: double
+  case 66: // minimum: double
 #line 459 "Parser.yy"
                  { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1604 "Parser.cpp"
+#line 1605 "Parser.cpp"
     break;
 
-  case 67: // unit: char_string
+  case 67: // maximum: double
 #line 462 "Parser.yy"
-                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1610 "Parser.cpp"
+                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
+#line 1611 "Parser.cpp"
     break;
 
-  case 68: // receivers: receiver
+  case 68: // unit: char_string
 #line 465 "Parser.yy"
+                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1617 "Parser.cpp"
+    break;
+
+  case 69: // receivers: receiver
+#line 468 "Parser.yy"
                    {
               yylhs.value.as < std::set<std::string> > () = std::set<std::string>();
               if (!yystack_[0].value.as < std::string > ().empty()) {
                   yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ());
               }
           }
-#line 1621 "Parser.cpp"
+#line 1628 "Parser.cpp"
     break;
 
-  case 69: // receivers: receivers COMMA receiver
-#line 471 "Parser.yy"
+  case 70: // receivers: receivers COMMA receiver
+#line 474 "Parser.yy"
                                    {
               yylhs.value.as < std::set<std::string> > () = yystack_[2].value.as < std::set<std::string> > ();
               if (!yystack_[0].value.as < std::string > ().empty()) {
                   yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ());
               }
           }
-#line 1632 "Parser.cpp"
+#line 1639 "Parser.cpp"
     break;
 
-  case 70: // receiver: node_name
-#line 479 "Parser.yy"
+  case 71: // receiver: node_name
+#line 482 "Parser.yy"
                     { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1638 "Parser.cpp"
+#line 1645 "Parser.cpp"
     break;
 
-  case 71: // receiver: VECTOR_XXX
-#line 480 "Parser.yy"
+  case 72: // receiver: VECTOR_XXX
+#line 483 "Parser.yy"
                      { yylhs.value.as < std::string > () = ""; }
-#line 1644 "Parser.cpp"
+#line 1651 "Parser.cpp"
     break;
 
-  case 74: // signal_extended_value_type: SIG_VALTYPE message_id signal_name COLON signal_extended_value_type_type semicolon_with_optional_eol
-#line 488 "Parser.yy"
+  case 75: // signal_extended_value_type: SIG_VALTYPE message_id signal_name COLON signal_extended_value_type_type semicolon_with_optional_eol
+#line 491 "Parser.yy"
                                                                                                                {
               network->messages[yystack_[4].value.as < uint32_t > ()].signals[yystack_[3].value.as < std::string > ()].extendedValueType = yystack_[1].value.as < Signal::ExtendedValueType > ();
           }
-#line 1652 "Parser.cpp"
+#line 1659 "Parser.cpp"
     break;
 
-  case 75: // signal_extended_value_type_type: unsigned_integer
-#line 493 "Parser.yy"
+  case 76: // signal_extended_value_type_type: unsigned_integer
+#line 496 "Parser.yy"
                            {
               switch (yystack_[0].value.as < uint32_t > ()) {
               case 0:
@@ -1666,37 +1673,37 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 1670 "Parser.cpp"
+#line 1677 "Parser.cpp"
     break;
 
-  case 78: // message_transmitter: BO_TX_BU message_id COLON transmitters semicolon_with_optional_eol
-#line 515 "Parser.yy"
-                                                                             { network->messages[yystack_[3].value.as < uint32_t > ()].transmitters = yystack_[1].value.as < std::set<std::string> > (); }
-#line 1676 "Parser.cpp"
-    break;
-
-  case 79: // transmitters: transmitter
+  case 79: // message_transmitter: BO_TX_BU message_id COLON transmitters semicolon_with_optional_eol
 #line 518 "Parser.yy"
+                                                                             { network->messages[yystack_[3].value.as < uint32_t > ()].transmitters = yystack_[1].value.as < std::set<std::string> > (); }
+#line 1683 "Parser.cpp"
+    break;
+
+  case 80: // transmitters: transmitter
+#line 521 "Parser.yy"
                       { yylhs.value.as < std::set<std::string> > () = std::set<std::string>(); yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ()); }
-#line 1682 "Parser.cpp"
+#line 1689 "Parser.cpp"
     break;
 
-  case 80: // transmitters: transmitters COMMA transmitter
-#line 519 "Parser.yy"
+  case 81: // transmitters: transmitters COMMA transmitter
+#line 522 "Parser.yy"
                                          { yylhs.value.as < std::set<std::string> > () = yystack_[2].value.as < std::set<std::string> > (); yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ()); }
-#line 1688 "Parser.cpp"
+#line 1695 "Parser.cpp"
     break;
 
-  case 84: // value_descriptions_for_signal: VAL message_id signal_name value_encoding_descriptions semicolon_with_optional_eol
-#line 530 "Parser.yy"
+  case 85: // value_descriptions_for_signal: VAL message_id signal_name value_encoding_descriptions semicolon_with_optional_eol
+#line 533 "Parser.yy"
                                                                                              {
               network->messages[yystack_[3].value.as < uint32_t > ()].signals[yystack_[2].value.as < std::string > ()].valueDescriptions = yystack_[1].value.as < std::map<int64_t, std::string> > ();
           }
-#line 1696 "Parser.cpp"
+#line 1703 "Parser.cpp"
     break;
 
-  case 87: // environment_variable: EV env_var_name COLON env_var_type OPEN_BRACKET minimum VERTICAL_BAR maximum CLOSE_BRACKET unit initial_value ev_id access_type access_nodes semicolon_with_optional_eol
-#line 542 "Parser.yy"
+  case 88: // environment_variable: EV env_var_name COLON env_var_type OPEN_BRACKET minimum VERTICAL_BAR maximum CLOSE_BRACKET unit initial_value ev_id access_type access_nodes semicolon_with_optional_eol
+#line 545 "Parser.yy"
                                                                                                                                                                                    {
               EnvironmentVariable & environmentVariable = network->environmentVariables[yystack_[13].value.as < std::string > ()];
               environmentVariable.name = yystack_[13].value.as < std::string > ();
@@ -1725,144 +1732,144 @@ namespace Vector { namespace DBC {
               }
               environmentVariable.accessNodes = yystack_[1].value.as < std::set<std::string> > ();
           }
-#line 1729 "Parser.cpp"
+#line 1736 "Parser.cpp"
     break;
 
-  case 88: // env_var_name: dbc_identifier
-#line 572 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1735 "Parser.cpp"
-    break;
-
-  case 89: // env_var_type: UNSIGNED_INTEGER
+  case 89: // env_var_name: dbc_identifier
 #line 575 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1742 "Parser.cpp"
+    break;
+
+  case 90: // env_var_type: UNSIGNED_INTEGER
+#line 578 "Parser.yy"
                            {
               if (yystack_[0].value.as < std::string > () == "0") { yylhs.value.as < EnvironmentVariable::Type > () = EnvironmentVariable::Type::Integer; }
               if (yystack_[0].value.as < std::string > () == "1") { yylhs.value.as < EnvironmentVariable::Type > () = EnvironmentVariable::Type::Float; }
               if (yystack_[0].value.as < std::string > () == "2") { yylhs.value.as < EnvironmentVariable::Type > () = EnvironmentVariable::Type::String; }
           }
-#line 1745 "Parser.cpp"
+#line 1752 "Parser.cpp"
     break;
 
-  case 90: // initial_value: double
-#line 582 "Parser.yy"
-                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1751 "Parser.cpp"
-    break;
-
-  case 91: // ev_id: unsigned_integer
+  case 91: // initial_value: double
 #line 585 "Parser.yy"
-                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1757 "Parser.cpp"
+                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
+#line 1758 "Parser.cpp"
     break;
 
-  case 92: // access_type: DUMMY_NODE_VECTOR0
+  case 92: // ev_id: unsigned_integer
 #line 588 "Parser.yy"
-                             { yylhs.value.as < uint16_t > () = 0x0000; }
-#line 1763 "Parser.cpp"
+                           { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
+#line 1764 "Parser.cpp"
     break;
 
-  case 93: // access_type: DUMMY_NODE_VECTOR1
-#line 589 "Parser.yy"
-                             { yylhs.value.as < uint16_t > () = 0x0001; }
-#line 1769 "Parser.cpp"
-    break;
-
-  case 94: // access_type: DUMMY_NODE_VECTOR2
-#line 590 "Parser.yy"
-                             { yylhs.value.as < uint16_t > () = 0x0002; }
-#line 1775 "Parser.cpp"
-    break;
-
-  case 95: // access_type: DUMMY_NODE_VECTOR3
+  case 93: // access_type: DUMMY_NODE_VECTOR0
 #line 591 "Parser.yy"
-                             { yylhs.value.as < uint16_t > () = 0x0003; }
-#line 1781 "Parser.cpp"
+                             { yylhs.value.as < uint16_t > () = 0x0000; }
+#line 1770 "Parser.cpp"
     break;
 
-  case 96: // access_type: DUMMY_NODE_VECTOR8000
+  case 94: // access_type: DUMMY_NODE_VECTOR1
 #line 592 "Parser.yy"
-                                 { yylhs.value.as < uint16_t > () = 0x8000; }
-#line 1787 "Parser.cpp"
+                             { yylhs.value.as < uint16_t > () = 0x0001; }
+#line 1776 "Parser.cpp"
     break;
 
-  case 97: // access_type: DUMMY_NODE_VECTOR8001
+  case 95: // access_type: DUMMY_NODE_VECTOR2
 #line 593 "Parser.yy"
-                                 { yylhs.value.as < uint16_t > () = 0x8001; }
-#line 1793 "Parser.cpp"
+                             { yylhs.value.as < uint16_t > () = 0x0002; }
+#line 1782 "Parser.cpp"
     break;
 
-  case 98: // access_type: DUMMY_NODE_VECTOR8002
+  case 96: // access_type: DUMMY_NODE_VECTOR3
 #line 594 "Parser.yy"
-                                 { yylhs.value.as < uint16_t > () = 0x8002; }
-#line 1799 "Parser.cpp"
+                             { yylhs.value.as < uint16_t > () = 0x0003; }
+#line 1788 "Parser.cpp"
     break;
 
-  case 99: // access_type: DUMMY_NODE_VECTOR8003
+  case 97: // access_type: DUMMY_NODE_VECTOR8000
 #line 595 "Parser.yy"
-                                 { yylhs.value.as < uint16_t > () = 0x8003; }
-#line 1805 "Parser.cpp"
+                                 { yylhs.value.as < uint16_t > () = 0x8000; }
+#line 1794 "Parser.cpp"
     break;
 
-  case 100: // access_nodes: access_node
+  case 98: // access_type: DUMMY_NODE_VECTOR8001
+#line 596 "Parser.yy"
+                                 { yylhs.value.as < uint16_t > () = 0x8001; }
+#line 1800 "Parser.cpp"
+    break;
+
+  case 99: // access_type: DUMMY_NODE_VECTOR8002
+#line 597 "Parser.yy"
+                                 { yylhs.value.as < uint16_t > () = 0x8002; }
+#line 1806 "Parser.cpp"
+    break;
+
+  case 100: // access_type: DUMMY_NODE_VECTOR8003
 #line 598 "Parser.yy"
+                                 { yylhs.value.as < uint16_t > () = 0x8003; }
+#line 1812 "Parser.cpp"
+    break;
+
+  case 101: // access_nodes: access_node
+#line 601 "Parser.yy"
                       {
               yylhs.value.as < std::set<std::string> > () = std::set<std::string>();
               if (!yystack_[0].value.as < std::string > ().empty()) {
                   yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ());
               }
           }
-#line 1816 "Parser.cpp"
+#line 1823 "Parser.cpp"
     break;
 
-  case 101: // access_nodes: access_nodes COMMA access_node
-#line 604 "Parser.yy"
+  case 102: // access_nodes: access_nodes COMMA access_node
+#line 607 "Parser.yy"
                                          {
               yylhs.value.as < std::set<std::string> > () = yystack_[2].value.as < std::set<std::string> > ();
               if (!yystack_[0].value.as < std::string > ().empty()) {
                   yylhs.value.as < std::set<std::string> > ().insert(yystack_[0].value.as < std::string > ());
               }
           }
-#line 1827 "Parser.cpp"
+#line 1834 "Parser.cpp"
     break;
 
-  case 102: // access_node: node_name
-#line 612 "Parser.yy"
+  case 103: // access_node: node_name
+#line 615 "Parser.yy"
                     { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1833 "Parser.cpp"
+#line 1840 "Parser.cpp"
     break;
 
-  case 103: // access_node: VECTOR_XXX
-#line 613 "Parser.yy"
+  case 104: // access_node: VECTOR_XXX
+#line 616 "Parser.yy"
                      { yylhs.value.as < std::string > () = ""; }
-#line 1839 "Parser.cpp"
+#line 1846 "Parser.cpp"
     break;
 
-  case 106: // environment_variable_data: ENVVAR_DATA env_var_name COLON data_size semicolon_with_optional_eol
-#line 621 "Parser.yy"
+  case 107: // environment_variable_data: ENVVAR_DATA env_var_name COLON data_size semicolon_with_optional_eol
+#line 624 "Parser.yy"
                                                                                {
               network->environmentVariables[yystack_[3].value.as < std::string > ()].type = EnvironmentVariable::Type::Data;
               network->environmentVariables[yystack_[3].value.as < std::string > ()].dataSize = yystack_[1].value.as < uint32_t > ();
           }
-#line 1848 "Parser.cpp"
+#line 1855 "Parser.cpp"
     break;
 
-  case 107: // data_size: unsigned_integer
-#line 628 "Parser.yy"
+  case 108: // data_size: unsigned_integer
+#line 631 "Parser.yy"
                            { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1854 "Parser.cpp"
+#line 1861 "Parser.cpp"
     break;
 
-  case 108: // value_descriptions_for_env_var: VAL env_var_name value_encoding_descriptions semicolon_with_optional_eol
-#line 634 "Parser.yy"
+  case 109: // value_descriptions_for_env_var: VAL env_var_name value_encoding_descriptions semicolon_with_optional_eol
+#line 637 "Parser.yy"
                                                                                    {
               network->environmentVariables[yystack_[2].value.as < std::string > ()].valueDescriptions = yystack_[1].value.as < std::map<int64_t, std::string> > ();
           }
-#line 1862 "Parser.cpp"
+#line 1869 "Parser.cpp"
     break;
 
-  case 111: // signal_type: SGTYPE signal_type_name COLON signal_size VERTICAL_BAR byte_order value_type OPEN_PARENTHESIS factor COMMA offset CLOSE_PARENTHESIS OPEN_BRACKET minimum VERTICAL_BAR maximum CLOSE_BRACKET unit default_value COMMA value_table_name semicolon_with_optional_eol
-#line 649 "Parser.yy"
+  case 112: // signal_type: SGTYPE signal_type_name COLON signal_size VERTICAL_BAR byte_order value_type OPEN_PARENTHESIS factor COMMA offset CLOSE_PARENTHESIS OPEN_BRACKET minimum VERTICAL_BAR maximum CLOSE_BRACKET unit default_value COMMA value_table_name semicolon_with_optional_eol
+#line 652 "Parser.yy"
                                                                                 {
               SignalType & signalType = network->signalTypes[yystack_[20].value.as < std::string > ()];
               signalType.name = yystack_[20].value.as < std::string > ();
@@ -1877,23 +1884,23 @@ namespace Vector { namespace DBC {
               signalType.defaultValue = yystack_[3].value.as < double > ();
               signalType.valueTable = yystack_[1].value.as < std::string > ();
           }
-#line 1881 "Parser.cpp"
+#line 1888 "Parser.cpp"
     break;
 
-  case 112: // signal_type_name: dbc_identifier
-#line 665 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1887 "Parser.cpp"
-    break;
-
-  case 113: // default_value: double
+  case 113: // signal_type_name: dbc_identifier
 #line 668 "Parser.yy"
-                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
-#line 1893 "Parser.cpp"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1894 "Parser.cpp"
     break;
 
-  case 116: // signal_group: SIG_GROUP message_id signal_group_name repetitions COLON signal_names semicolon_with_optional_eol
-#line 686 "Parser.yy"
+  case 114: // default_value: double
+#line 671 "Parser.yy"
+                 { yylhs.value.as < double > () = yystack_[0].value.as < double > (); }
+#line 1900 "Parser.cpp"
+    break;
+
+  case 117: // signal_group: SIG_GROUP message_id signal_group_name repetitions COLON signal_names semicolon_with_optional_eol
+#line 689 "Parser.yy"
                                                                                                             {
               SignalGroup & signalGroup = network->messages[yystack_[5].value.as < uint32_t > ()].signalGroups[yystack_[4].value.as < std::string > ()];
               signalGroup.messageId = yystack_[5].value.as < uint32_t > ();
@@ -1901,181 +1908,181 @@ namespace Vector { namespace DBC {
               signalGroup.repetitions = yystack_[3].value.as < uint32_t > ();
               signalGroup.signals = yystack_[1].value.as < std::set<std::string> > ();
           }
-#line 1905 "Parser.cpp"
+#line 1912 "Parser.cpp"
     break;
 
-  case 117: // signal_group_name: dbc_identifier
-#line 695 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 1911 "Parser.cpp"
-    break;
-
-  case 118: // repetitions: unsigned_integer
+  case 118: // signal_group_name: dbc_identifier
 #line 698 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 1918 "Parser.cpp"
+    break;
+
+  case 119: // repetitions: unsigned_integer
+#line 701 "Parser.yy"
                            { yylhs.value.as < uint32_t > () = yystack_[0].value.as < uint32_t > (); }
-#line 1917 "Parser.cpp"
+#line 1924 "Parser.cpp"
     break;
 
-  case 121: // comment: CM char_string semicolon_with_optional_eol
-#line 708 "Parser.yy"
-                                                     { network->comment = yystack_[1].value.as < std::string > (); }
-#line 1923 "Parser.cpp"
-    break;
-
-  case 122: // comment: CM BU node_name char_string semicolon_with_optional_eol
-#line 709 "Parser.yy"
-                                                                  { network->nodes[yystack_[2].value.as < std::string > ()].comment = yystack_[1].value.as < std::string > (); }
-#line 1929 "Parser.cpp"
-    break;
-
-  case 123: // comment: CM BO message_id char_string semicolon_with_optional_eol
-#line 710 "Parser.yy"
-                                                                   { network->messages[yystack_[2].value.as < uint32_t > ()].comment = yystack_[1].value.as < std::string > (); }
-#line 1935 "Parser.cpp"
-    break;
-
-  case 124: // comment: CM SG message_id signal_name char_string semicolon_with_optional_eol
+  case 122: // comment: CM char_string semicolon_with_optional_eol
 #line 711 "Parser.yy"
-                                                                               { network->messages[yystack_[3].value.as < uint32_t > ()].signals[yystack_[2].value.as < std::string > ()].comment = yystack_[1].value.as < std::string > (); }
-#line 1941 "Parser.cpp"
+                                                     { network->comment = yystack_[1].value.as < std::string > (); }
+#line 1930 "Parser.cpp"
     break;
 
-  case 125: // comment: CM EV env_var_name char_string semicolon_with_optional_eol
+  case 123: // comment: CM BU node_name char_string semicolon_with_optional_eol
 #line 712 "Parser.yy"
-                                                                     { network->environmentVariables[yystack_[2].value.as < std::string > ()].comment = yystack_[1].value.as < std::string > (); }
-#line 1947 "Parser.cpp"
+                                                                  { network->nodes[yystack_[2].value.as < std::string > ()].comment = yystack_[1].value.as < std::string > (); }
+#line 1936 "Parser.cpp"
     break;
 
-  case 128: // attribute_definition: BA_DEF object_type attribute_name attribute_value_type semicolon_with_optional_eol
-#line 724 "Parser.yy"
+  case 124: // comment: CM BO message_id char_string semicolon_with_optional_eol
+#line 713 "Parser.yy"
+                                                                   { network->messages[yystack_[2].value.as < uint32_t > ()].comment = yystack_[1].value.as < std::string > (); }
+#line 1942 "Parser.cpp"
+    break;
+
+  case 125: // comment: CM SG message_id signal_name char_string semicolon_with_optional_eol
+#line 714 "Parser.yy"
+                                                                               { network->messages[yystack_[3].value.as < uint32_t > ()].signals[yystack_[2].value.as < std::string > ()].comment = yystack_[1].value.as < std::string > (); }
+#line 1948 "Parser.cpp"
+    break;
+
+  case 126: // comment: CM EV env_var_name char_string semicolon_with_optional_eol
+#line 715 "Parser.yy"
+                                                                     { network->environmentVariables[yystack_[2].value.as < std::string > ()].comment = yystack_[1].value.as < std::string > (); }
+#line 1954 "Parser.cpp"
+    break;
+
+  case 129: // attribute_definition: BA_DEF object_type attribute_name attribute_value_type semicolon_with_optional_eol
+#line 727 "Parser.yy"
                                                                                              {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[2].value.as < std::string > ()];
               attributeDefinition.name = yystack_[2].value.as < std::string > ();
               attributeDefinition.objectType = yystack_[3].value.as < AttributeObjectType > ();
               attributeDefinition.valueType = yystack_[1].value.as < AttributeValueType > ();
           }
-#line 1958 "Parser.cpp"
+#line 1965 "Parser.cpp"
     break;
 
-  case 129: // attribute_definition: BA_DEF_REL object_type attribute_name attribute_value_type semicolon_with_optional_eol
-#line 730 "Parser.yy"
+  case 130: // attribute_definition: BA_DEF_REL object_type attribute_name attribute_value_type semicolon_with_optional_eol
+#line 733 "Parser.yy"
                                                                                                  {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[2].value.as < std::string > ()];
               attributeDefinition.name = yystack_[2].value.as < std::string > ();
               attributeDefinition.objectType = yystack_[3].value.as < AttributeObjectType > ();
               attributeDefinition.valueType = yystack_[1].value.as < AttributeValueType > ();
           }
-#line 1969 "Parser.cpp"
+#line 1976 "Parser.cpp"
     break;
 
-  case 130: // object_type: %empty
-#line 738 "Parser.yy"
-                 { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Network; }
-#line 1975 "Parser.cpp"
-    break;
-
-  case 131: // object_type: BU
-#line 739 "Parser.yy"
-             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Node; }
-#line 1981 "Parser.cpp"
-    break;
-
-  case 132: // object_type: BO
-#line 740 "Parser.yy"
-             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Message; }
-#line 1987 "Parser.cpp"
-    break;
-
-  case 133: // object_type: SG
+  case 131: // object_type: %empty
 #line 741 "Parser.yy"
-             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Signal; }
-#line 1993 "Parser.cpp"
+                 { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Network; }
+#line 1982 "Parser.cpp"
     break;
 
-  case 134: // object_type: EV
+  case 132: // object_type: BU
 #line 742 "Parser.yy"
-             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::EnvironmentVariable; }
-#line 1999 "Parser.cpp"
+             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Node; }
+#line 1988 "Parser.cpp"
     break;
 
-  case 135: // object_type: BU_EV_REL
+  case 133: // object_type: BO
 #line 743 "Parser.yy"
-                    { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::ControlUnitEnvironmentVariable; }
-#line 2005 "Parser.cpp"
+             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Message; }
+#line 1994 "Parser.cpp"
     break;
 
-  case 136: // object_type: BU_BO_REL
+  case 134: // object_type: SG
 #line 744 "Parser.yy"
-                    { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::NodeTxMessage; }
-#line 2011 "Parser.cpp"
+             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::Signal; }
+#line 2000 "Parser.cpp"
     break;
 
-  case 137: // object_type: BU_SG_REL
+  case 135: // object_type: EV
 #line 745 "Parser.yy"
-                    { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::NodeMappedRxSignal; }
-#line 2017 "Parser.cpp"
+             { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::EnvironmentVariable; }
+#line 2006 "Parser.cpp"
     break;
 
-  case 138: // attribute_name: char_string
+  case 136: // object_type: BU_EV_REL
+#line 746 "Parser.yy"
+                    { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::ControlUnitEnvironmentVariable; }
+#line 2012 "Parser.cpp"
+    break;
+
+  case 137: // object_type: BU_BO_REL
+#line 747 "Parser.yy"
+                    { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::NodeTxMessage; }
+#line 2018 "Parser.cpp"
+    break;
+
+  case 138: // object_type: BU_SG_REL
 #line 748 "Parser.yy"
-                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2023 "Parser.cpp"
+                    { yylhs.value.as < AttributeObjectType > () = AttributeObjectType::NodeMappedRxSignal; }
+#line 2024 "Parser.cpp"
     break;
 
-  case 139: // attribute_value_type: INT signed_64_integer signed_64_integer
-#line 752 "Parser.yy"
+  case 139: // attribute_name: char_string
+#line 751 "Parser.yy"
+                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 2030 "Parser.cpp"
+    break;
+
+  case 140: // attribute_value_type: INT signed_64_integer signed_64_integer
+#line 755 "Parser.yy"
                                                   {
               yylhs.value.as < AttributeValueType > () = AttributeValueType();
               yylhs.value.as < AttributeValueType > ().type = AttributeValueType::Type::Int;
               yylhs.value.as < AttributeValueType > ().integerValue.minimum = yystack_[1].value.as < int64_t > ();
               yylhs.value.as < AttributeValueType > ().integerValue.maximum = yystack_[0].value.as < int64_t > ();
           }
-#line 2034 "Parser.cpp"
+#line 2041 "Parser.cpp"
     break;
 
-  case 140: // attribute_value_type: HEX signed_64_integer signed_64_integer
-#line 758 "Parser.yy"
+  case 141: // attribute_value_type: HEX signed_64_integer signed_64_integer
+#line 761 "Parser.yy"
                                                   {
               yylhs.value.as < AttributeValueType > () = AttributeValueType();
               yylhs.value.as < AttributeValueType > ().type = AttributeValueType::Type::Hex;
               yylhs.value.as < AttributeValueType > ().hexValue.minimum = yystack_[1].value.as < int64_t > ();
               yylhs.value.as < AttributeValueType > ().hexValue.maximum = yystack_[0].value.as < int64_t > ();
           }
-#line 2045 "Parser.cpp"
+#line 2052 "Parser.cpp"
     break;
 
-  case 141: // attribute_value_type: FLOAT double double
-#line 764 "Parser.yy"
+  case 142: // attribute_value_type: FLOAT double double
+#line 767 "Parser.yy"
                               {
               yylhs.value.as < AttributeValueType > () = AttributeValueType();
               yylhs.value.as < AttributeValueType > ().type = AttributeValueType::Type::Float;
               yylhs.value.as < AttributeValueType > ().floatValue.minimum = yystack_[1].value.as < double > ();
               yylhs.value.as < AttributeValueType > ().floatValue.maximum = yystack_[0].value.as < double > ();
           }
-#line 2056 "Parser.cpp"
+#line 2063 "Parser.cpp"
     break;
 
-  case 142: // attribute_value_type: STRING
-#line 770 "Parser.yy"
+  case 143: // attribute_value_type: STRING
+#line 773 "Parser.yy"
                  {
               yylhs.value.as < AttributeValueType > () = AttributeValueType();
               yylhs.value.as < AttributeValueType > ().type = AttributeValueType::Type::String;
           }
-#line 2065 "Parser.cpp"
+#line 2072 "Parser.cpp"
     break;
 
-  case 143: // attribute_value_type: ENUM char_strings
-#line 774 "Parser.yy"
+  case 144: // attribute_value_type: ENUM char_strings
+#line 777 "Parser.yy"
                             {
               yylhs.value.as < AttributeValueType > () = AttributeValueType();
               yylhs.value.as < AttributeValueType > ().type = AttributeValueType::Type::Enum;
               yylhs.value.as < AttributeValueType > ().enumValues = yystack_[0].value.as < std::vector<std::string> > ();
           }
-#line 2075 "Parser.cpp"
+#line 2082 "Parser.cpp"
     break;
 
-  case 146: // attribute_default: BA_DEF_DEF attribute_name attribute_value semicolon_with_optional_eol
-#line 788 "Parser.yy"
+  case 147: // attribute_default: BA_DEF_DEF attribute_name attribute_value semicolon_with_optional_eol
+#line 791 "Parser.yy"
                                                                                 {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[2].value.as < std::string > ()];
               Attribute & attributeDefault = network->attributeDefaults[yystack_[2].value.as < std::string > ()];
@@ -2101,11 +2108,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2105 "Parser.cpp"
+#line 2112 "Parser.cpp"
     break;
 
-  case 147: // attribute_default: BA_DEF_DEF_REL attribute_name attribute_value semicolon_with_optional_eol
-#line 813 "Parser.yy"
+  case 148: // attribute_default: BA_DEF_DEF_REL attribute_name attribute_value semicolon_with_optional_eol
+#line 816 "Parser.yy"
                                                                                     {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[2].value.as < std::string > ()];
               Attribute & attributeDefault = network->attributeDefaults[yystack_[2].value.as < std::string > ()];
@@ -2131,35 +2138,35 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2135 "Parser.cpp"
+#line 2142 "Parser.cpp"
     break;
 
-  case 148: // attribute_value: UNSIGNED_INTEGER
-#line 840 "Parser.yy"
-                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2141 "Parser.cpp"
-    break;
-
-  case 149: // attribute_value: SIGNED_INTEGER
-#line 841 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2147 "Parser.cpp"
-    break;
-
-  case 150: // attribute_value: DOUBLE
-#line 842 "Parser.yy"
-                 { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2153 "Parser.cpp"
-    break;
-
-  case 151: // attribute_value: CHAR_STRING
+  case 149: // attribute_value: UNSIGNED_INTEGER
 #line 843 "Parser.yy"
-                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2159 "Parser.cpp"
+                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 2148 "Parser.cpp"
     break;
 
-  case 154: // attribute_value_for_object: BA attribute_name attribute_value semicolon_with_optional_eol
-#line 853 "Parser.yy"
+  case 150: // attribute_value: SIGNED_INTEGER
+#line 844 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 2154 "Parser.cpp"
+    break;
+
+  case 151: // attribute_value: DOUBLE
+#line 845 "Parser.yy"
+                 { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 2160 "Parser.cpp"
+    break;
+
+  case 152: // attribute_value: CHAR_STRING
+#line 846 "Parser.yy"
+                      { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 2166 "Parser.cpp"
+    break;
+
+  case 155: // attribute_value_for_object: BA attribute_name attribute_value semicolon_with_optional_eol
+#line 856 "Parser.yy"
                                                                         {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[2].value.as < std::string > ()];
               Attribute & attribute = network->attributeValues[yystack_[2].value.as < std::string > ()];
@@ -2186,11 +2193,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2190 "Parser.cpp"
+#line 2197 "Parser.cpp"
     break;
 
-  case 155: // attribute_value_for_object: BA attribute_name BU node_name attribute_value semicolon_with_optional_eol
-#line 879 "Parser.yy"
+  case 156: // attribute_value_for_object: BA attribute_name BU node_name attribute_value semicolon_with_optional_eol
+#line 882 "Parser.yy"
                                                                                      {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[4].value.as < std::string > ()];
               Attribute & attribute = network->nodes[yystack_[2].value.as < std::string > ()].attributeValues[yystack_[4].value.as < std::string > ()];
@@ -2217,11 +2224,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2221 "Parser.cpp"
+#line 2228 "Parser.cpp"
     break;
 
-  case 156: // attribute_value_for_object: BA attribute_name BO message_id attribute_value semicolon_with_optional_eol
-#line 905 "Parser.yy"
+  case 157: // attribute_value_for_object: BA attribute_name BO message_id attribute_value semicolon_with_optional_eol
+#line 908 "Parser.yy"
                                                                                       {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[4].value.as < std::string > ()];
               Attribute & attribute = network->messages[yystack_[2].value.as < uint32_t > ()].attributeValues[yystack_[4].value.as < std::string > ()];
@@ -2248,11 +2255,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2252 "Parser.cpp"
+#line 2259 "Parser.cpp"
     break;
 
-  case 157: // attribute_value_for_object: BA attribute_name SG message_id signal_name attribute_value semicolon_with_optional_eol
-#line 931 "Parser.yy"
+  case 158: // attribute_value_for_object: BA attribute_name SG message_id signal_name attribute_value semicolon_with_optional_eol
+#line 934 "Parser.yy"
                                                                                                   {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[5].value.as < std::string > ()];
               Attribute & attribute = network->messages[yystack_[3].value.as < uint32_t > ()].signals[yystack_[2].value.as < std::string > ()].attributeValues[yystack_[5].value.as < std::string > ()];
@@ -2279,11 +2286,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2283 "Parser.cpp"
+#line 2290 "Parser.cpp"
     break;
 
-  case 158: // attribute_value_for_object: BA attribute_name EV env_var_name attribute_value semicolon_with_optional_eol
-#line 957 "Parser.yy"
+  case 159: // attribute_value_for_object: BA attribute_name EV env_var_name attribute_value semicolon_with_optional_eol
+#line 960 "Parser.yy"
                                                                                         {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[4].value.as < std::string > ()];
               Attribute & attribute = network->environmentVariables[yystack_[2].value.as < std::string > ()].attributeValues[yystack_[4].value.as < std::string > ()];
@@ -2310,11 +2317,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2314 "Parser.cpp"
+#line 2321 "Parser.cpp"
     break;
 
-  case 159: // attribute_value_for_object: BA_REL attribute_name BU_EV_REL node_name env_var_name attribute_value semicolon_with_optional_eol
-#line 983 "Parser.yy"
+  case 160: // attribute_value_for_object: BA_REL attribute_name BU_EV_REL node_name env_var_name attribute_value semicolon_with_optional_eol
+#line 986 "Parser.yy"
                                                                                                              {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[5].value.as < std::string > ()];
               AttributeRelation & attributeRelation = network->attributeRelationValues[yystack_[5].value.as < std::string > ()];
@@ -2343,11 +2350,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2347 "Parser.cpp"
+#line 2354 "Parser.cpp"
     break;
 
-  case 160: // attribute_value_for_object: BA_REL attribute_name BU_BO_REL node_name message_id attribute_value semicolon_with_optional_eol
-#line 1011 "Parser.yy"
+  case 161: // attribute_value_for_object: BA_REL attribute_name BU_BO_REL node_name message_id attribute_value semicolon_with_optional_eol
+#line 1014 "Parser.yy"
                                                                                                            {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[5].value.as < std::string > ()];
               AttributeRelation & attributeRelation = network->attributeRelationValues[yystack_[5].value.as < std::string > ()];
@@ -2376,11 +2383,11 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2380 "Parser.cpp"
+#line 2387 "Parser.cpp"
     break;
 
-  case 161: // attribute_value_for_object: BA_REL attribute_name BU_SG_REL node_name SG message_id signal_name attribute_value semicolon_with_optional_eol
-#line 1039 "Parser.yy"
+  case 162: // attribute_value_for_object: BA_REL attribute_name BU_SG_REL node_name SG message_id signal_name attribute_value semicolon_with_optional_eol
+#line 1042 "Parser.yy"
                                                                                                                           {
               AttributeDefinition & attributeDefinition = network->attributeDefinitions[yystack_[7].value.as < std::string > ()];
               AttributeRelation & attributeRelation = network->attributeRelationValues[yystack_[7].value.as < std::string > ()];
@@ -2410,57 +2417,57 @@ namespace Vector { namespace DBC {
                   break;
               }
           }
-#line 2414 "Parser.cpp"
+#line 2421 "Parser.cpp"
     break;
 
-  case 164: // multiplexed_signal: SG_MUL_VAL message_id multiplexed_signal_name multiplexor_switch_name multiplexor_value_ranges semicolon_with_optional_eol
-#line 1077 "Parser.yy"
+  case 165: // multiplexed_signal: SG_MUL_VAL message_id multiplexed_signal_name multiplexor_switch_name multiplexor_value_ranges semicolon_with_optional_eol
+#line 1080 "Parser.yy"
                                                                                                                                      {
               ExtendedMultiplexor & extendedMultiplexor = network->messages[yystack_[4].value.as < uint32_t > ()].signals[yystack_[3].value.as < std::string > ()].extendedMultiplexors[yystack_[2].value.as < std::string > ()];
               extendedMultiplexor.switchName = yystack_[2].value.as < std::string > ();
               extendedMultiplexor.valueRanges = yystack_[1].value.as < std::set<ExtendedMultiplexor::ValueRange> > ();
           }
-#line 2424 "Parser.cpp"
+#line 2431 "Parser.cpp"
     break;
 
-  case 165: // multiplexed_signal_name: dbc_identifier
-#line 1084 "Parser.yy"
-                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2430 "Parser.cpp"
-    break;
-
-  case 166: // multiplexor_switch_name: dbc_identifier
+  case 166: // multiplexed_signal_name: dbc_identifier
 #line 1087 "Parser.yy"
                          { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
-#line 2436 "Parser.cpp"
+#line 2437 "Parser.cpp"
     break;
 
-  case 167: // multiplexor_value_ranges: %empty
-#line 1091 "Parser.yy"
+  case 167: // multiplexor_switch_name: dbc_identifier
+#line 1090 "Parser.yy"
+                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
+#line 2443 "Parser.cpp"
+    break;
+
+  case 168: // multiplexor_value_ranges: %empty
+#line 1094 "Parser.yy"
                  { yylhs.value.as < std::set<ExtendedMultiplexor::ValueRange> > () = std::set<ExtendedMultiplexor::ValueRange>(); }
-#line 2442 "Parser.cpp"
+#line 2449 "Parser.cpp"
     break;
 
-  case 168: // multiplexor_value_ranges: multiplexor_value_ranges multiplexor_value_range_comma
-#line 1092 "Parser.yy"
+  case 169: // multiplexor_value_ranges: multiplexor_value_ranges multiplexor_value_range_comma
+#line 1095 "Parser.yy"
                                                                  { yylhs.value.as < std::set<ExtendedMultiplexor::ValueRange> > () = yystack_[1].value.as < std::set<ExtendedMultiplexor::ValueRange> > (); yylhs.value.as < std::set<ExtendedMultiplexor::ValueRange> > ().insert(yystack_[0].value.as < ExtendedMultiplexor::ValueRange > ()); }
-#line 2448 "Parser.cpp"
+#line 2455 "Parser.cpp"
     break;
 
-  case 169: // multiplexor_value_range_comma: multiplexor_value_range COMMA
-#line 1096 "Parser.yy"
+  case 170: // multiplexor_value_range_comma: multiplexor_value_range COMMA
+#line 1099 "Parser.yy"
                                         { yylhs.value.as < ExtendedMultiplexor::ValueRange > () = yystack_[1].value.as < ExtendedMultiplexor::ValueRange > (); }
-#line 2454 "Parser.cpp"
+#line 2461 "Parser.cpp"
     break;
 
-  case 170: // multiplexor_value_range_comma: multiplexor_value_range
-#line 1097 "Parser.yy"
+  case 171: // multiplexor_value_range_comma: multiplexor_value_range
+#line 1100 "Parser.yy"
                                   { yylhs.value.as < ExtendedMultiplexor::ValueRange > () = yystack_[0].value.as < ExtendedMultiplexor::ValueRange > (); }
-#line 2460 "Parser.cpp"
+#line 2467 "Parser.cpp"
     break;
 
-  case 171: // multiplexor_value_range: MULTIPLEXOR_VALUE_RANGE
-#line 1101 "Parser.yy"
+  case 172: // multiplexor_value_range: MULTIPLEXOR_VALUE_RANGE
+#line 1104 "Parser.yy"
                                   { 
         const std::string complete = yystack_[0].value.as < std::string > (); 
         const std::string token1_str = complete.substr(0, complete.find("-")); 
@@ -2469,11 +2476,11 @@ namespace Vector { namespace DBC {
         const uint32_t token2_int = std::stoul(token2_str);
         yylhs.value.as < ExtendedMultiplexor::ValueRange > () = std::make_pair(token1_int, token2_int); 
         }
-#line 2473 "Parser.cpp"
+#line 2480 "Parser.cpp"
     break;
 
 
-#line 2477 "Parser.cpp"
+#line 2484 "Parser.cpp"
 
             default:
               break;
@@ -2825,200 +2832,200 @@ namespace Vector { namespace DBC {
   }
 
 
-  const short Parser::yypact_ninf_ = -304;
+  const short Parser::yypact_ninf_ = -316;
 
   const signed char Parser::yytable_ninf_ = -1;
 
   const short
   Parser::yypact_[] =
   {
-       9,    16,    28,    27,  -304,  -304,   -23,  -304,    -2,    62,
-    -304,    14,    32,    95,  -304,     3,    42,  -304,   133,  -304,
-    -304,  -304,    76,   150,   156,   112,   171,  -304,     0,   168,
-    -304,   162,  -304,  -304,   117,  -304,  -304,  -304,  -304,  -304,
-    -304,   171,  -304,   159,   171,     8,  -304,   168,   171,  -304,
-     164,  -304,   119,  -304,  -304,   127,  -304,     5,  -304,  -304,
-     134,   135,   168,  -304,   163,  -304,  -304,   136,   191,  -304,
-     171,    86,  -304,   142,   168,  -304,   169,  -304,  -304,  -304,
-      86,  -304,  -304,  -304,    50,   202,   155,   168,  -304,   179,
-     152,    86,  -304,  -304,   166,   171,  -304,   160,    66,  -304,
-      68,  -304,  -304,   145,  -304,   165,   171,   168,   171,   171,
-     168,   165,     7,     7,  -304,    74,   204,  -304,  -304,  -304,
-    -304,   170,  -304,  -304,   172,    16,    16,   168,    16,  -304,
-    -304,  -304,  -304,  -304,  -304,  -304,  -304,    16,    16,    16,
-      16,  -304,   113,   168,  -304,   145,   220,   165,   165,  -304,
-      16,   165,  -304,    92,    92,   109,   109,    16,    16,   203,
-    -304,    38,  -304,   176,  -304,   102,  -304,  -304,   165,  -304,
-     123,   123,   145,  -304,   223,   165,   165,  -304,  -304,  -304,
-    -304,   165,   165,    26,   111,     6,  -304,  -304,   197,  -304,
-    -304,   174,    16,  -304,  -304,   182,  -304,   123,   123,   145,
-    -304,   175,  -304,  -304,  -304,  -304,   168,   171,   171,   168,
-     165,   168,   168,   168,   168,  -304,   171,   217,  -304,   171,
-    -304,   145,   145,  -304,  -304,  -304,   231,   109,   109,   168,
-     109,  -304,   168,   171,   226,  -304,     8,   168,   171,  -304,
-     190,  -304,   187,  -304,   171,  -304,   184,  -304,   165,   165,
-     109,   165,   109,   109,   171,     8,  -304,  -304,   171,   168,
-     171,  -304,   171,  -304,   237,   145,  -304,  -304,   165,  -304,
-     165,   165,   168,  -304,  -304,   189,   192,   168,   193,  -304,
-    -304,  -304,  -304,  -304,  -304,  -304,  -304,    87,  -304,   195,
-    -304,  -304,  -304,   109,  -304,   171,  -304,   168,   220,  -304,
-    -304,    79,  -304,   205,   165,    11,  -304,   165,  -304,  -304,
-     102,    87,  -304,   145,  -304,  -304,  -304,  -304,    13,   200,
-    -304,   201,  -304,  -304,  -304,   196,   145,   145,  -304,   198,
-     218,   145,    16,   215,   145,   222,  -304,   213,   145,   168,
-     224,   165,   145,  -304,   225,    16,    91,  -304,  -304,   110,
-    -304,    91,  -304,  -304
+      18,    24,    41,    66,  -316,  -316,    29,  -316,    37,   109,
+    -316,    61,    73,   122,  -316,     4,    91,  -316,   130,  -316,
+    -316,  -316,   110,   158,   161,   113,   174,  -316,     0,   170,
+    -316,   164,  -316,  -316,   120,  -316,  -316,  -316,  -316,  -316,
+    -316,   174,  -316,   162,   174,     9,  -316,   170,   174,  -316,
+     165,  -316,   131,  -316,  -316,  -316,   134,  -316,    -5,  -316,
+    -316,   135,   138,   170,  -316,   168,  -316,  -316,   139,   194,
+    -316,   174,    71,  -316,   147,   170,  -316,   176,  -316,  -316,
+    -316,    71,  -316,  -316,  -316,    -6,   210,   157,   170,  -316,
+     181,   155,    71,  -316,  -316,   171,   174,  -316,   166,    25,
+    -316,    33,  -316,  -316,   111,  -316,   160,   174,   170,   174,
+     174,   170,   160,     7,     7,  -316,    97,   208,  -316,  -316,
+    -316,  -316,   169,  -316,  -316,   172,    24,    24,   170,    24,
+    -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,    24,    24,
+      24,    24,  -316,   118,   170,  -316,   111,   225,   160,   160,
+    -316,    24,   160,  -316,    72,    72,   156,   156,    24,    24,
+     209,  -316,    17,  -316,   178,  -316,   116,  -316,  -316,   160,
+    -316,   133,   133,   111,  -316,   226,   160,   160,  -316,  -316,
+    -316,  -316,   160,   160,    67,   112,    51,  -316,  -316,   198,
+    -316,  -316,   179,    24,  -316,  -316,   183,  -316,   133,   133,
+     111,  -316,   177,  -316,  -316,  -316,  -316,   170,   174,   174,
+     170,   160,   170,   170,   170,   170,  -316,   174,   219,  -316,
+     174,  -316,   111,   111,  -316,  -316,  -316,   234,   156,   156,
+     170,   156,  -316,   170,   174,   227,  -316,     9,   170,   174,
+    -316,   195,  -316,   189,  -316,   174,  -316,   187,  -316,   160,
+     160,   156,   160,   156,   156,   174,     9,  -316,  -316,   174,
+     170,   174,  -316,   174,  -316,   238,   111,  -316,  -316,   160,
+    -316,   160,   160,   170,  -316,  -316,   192,   193,   170,   196,
+    -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,    80,  -316,
+     200,  -316,  -316,  -316,   156,  -316,   174,  -316,   170,   225,
+    -316,  -316,    42,  -316,   204,   160,    -2,  -316,   160,  -316,
+    -316,   116,    80,  -316,   111,  -316,  -316,  -316,  -316,     5,
+     203,  -316,   202,  -316,  -316,  -316,   199,   111,   111,  -316,
+     213,   205,   111,    24,   216,   111,   220,  -316,   214,   111,
+     170,   221,   160,   111,  -316,   229,    24,    83,  -316,  -316,
+      45,  -316,    83,  -316,  -316
   };
 
   const unsigned char
   Parser::yydefact_[] =
   {
-       0,     0,     0,    19,    11,    18,     0,     1,     0,     0,
-      17,     0,     0,     0,    21,     0,     0,    33,    20,     5,
-      23,    25,     0,    29,    41,     0,     0,    30,     0,     0,
-      34,    76,    22,    26,     0,    16,    28,    32,    31,    36,
-      37,     0,    42,    85,     0,     0,    44,     0,     0,    77,
-     104,    27,     0,     6,     7,     3,    35,     0,    38,    45,
-       0,     0,     0,    86,   109,    24,     4,    13,     0,    39,
-       0,     0,    88,     0,     0,   105,   119,    12,    40,    46,
-       0,    48,    47,    79,     0,     0,     0,     0,   110,   126,
-       0,     0,    78,    89,     0,     0,   112,     0,     0,   120,
-     144,    49,    80,     0,   107,     0,     0,     0,     0,     0,
-       0,     0,   130,   130,   127,   152,    43,    10,     9,     8,
-      65,     0,   106,    59,     0,     0,     0,     0,     0,   121,
-     131,   132,   133,   134,   135,   136,   137,     0,     0,     0,
-       0,   145,    81,     0,    50,     0,     0,     0,     0,    52,
-       0,     0,   138,     0,     0,     0,     0,     0,     0,   114,
-     153,    55,    66,     0,    60,     0,   122,   123,     0,   125,
-       0,     0,     0,   142,     0,     0,     0,   148,   149,   150,
-     151,     0,     0,     0,     0,     0,    82,    83,    72,    56,
-      57,     0,     0,    61,    62,     0,   124,     0,     0,     0,
-      14,   143,   128,   129,   146,   147,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    37,     0,   162,   115,     0,
-      67,     0,     0,   139,   140,   141,     0,     0,     0,     0,
-       0,   154,     0,     0,     0,    37,     0,     0,     0,    73,
-       2,    58,     0,    90,     0,    63,     0,    15,     0,     0,
-       0,     0,     0,     0,     0,     0,   108,   117,     0,     0,
-       0,   163,     0,    91,     0,     0,   155,   156,     0,   158,
-       0,     0,     0,    84,   118,     0,     0,     0,     0,    92,
-      93,    94,    95,    96,    97,    98,    99,     0,    64,     0,
-     157,   159,   160,     0,    53,     0,   165,     0,     0,   103,
-     102,     0,   100,     0,     0,     0,    75,     0,   166,   167,
-       0,     0,    87,     0,   161,   116,    54,    74,     0,     0,
-     101,     0,   171,   164,   168,   170,     0,     0,   169,     0,
-       0,     0,     0,     0,     0,     0,   113,     0,     0,     0,
-       0,     0,     0,   111,     0,     0,     0,    71,    70,     0,
-      68,     0,    51,    69
+       0,     0,     0,    20,    12,    19,     0,     1,     0,     0,
+      18,     0,     0,     0,    22,     0,     0,    34,    21,     5,
+      24,    26,     0,    30,    42,     0,     0,    31,     0,     0,
+      35,    77,    23,    27,     0,    17,    29,    33,    32,    37,
+      38,     0,    43,    86,     0,     0,    45,     0,     0,    78,
+     105,    28,     0,     7,     8,     6,     3,    36,     0,    39,
+      46,     0,     0,     0,    87,   110,    25,     4,    14,     0,
+      40,     0,     0,    89,     0,     0,   106,   120,    13,    41,
+      47,     0,    49,    48,    80,     0,     0,     0,     0,   111,
+     127,     0,     0,    79,    90,     0,     0,   113,     0,     0,
+     121,   145,    50,    81,     0,   108,     0,     0,     0,     0,
+       0,     0,     0,   131,   131,   128,   153,    44,    11,    10,
+       9,    66,     0,   107,    60,     0,     0,     0,     0,     0,
+     122,   132,   133,   134,   135,   136,   137,   138,     0,     0,
+       0,     0,   146,    82,     0,    51,     0,     0,     0,     0,
+      53,     0,     0,   139,     0,     0,     0,     0,     0,     0,
+     115,   154,    56,    67,     0,    61,     0,   123,   124,     0,
+     126,     0,     0,     0,   143,     0,     0,     0,   149,   150,
+     151,   152,     0,     0,     0,     0,     0,    83,    84,    73,
+      57,    58,     0,     0,    62,    63,     0,   125,     0,     0,
+       0,    15,   144,   129,   130,   147,   148,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    38,     0,   163,   116,
+       0,    68,     0,     0,   140,   141,   142,     0,     0,     0,
+       0,     0,   155,     0,     0,     0,    38,     0,     0,     0,
+      74,     2,    59,     0,    91,     0,    64,     0,    16,     0,
+       0,     0,     0,     0,     0,     0,     0,   109,   118,     0,
+       0,     0,   164,     0,    92,     0,     0,   156,   157,     0,
+     159,     0,     0,     0,    85,   119,     0,     0,     0,     0,
+      93,    94,    95,    96,    97,    98,    99,   100,     0,    65,
+       0,   158,   160,   161,     0,    54,     0,   166,     0,     0,
+     104,   103,     0,   101,     0,     0,     0,    76,     0,   167,
+     168,     0,     0,    88,     0,   162,   117,    55,    75,     0,
+       0,   102,     0,   172,   165,   169,   171,     0,     0,   170,
+       0,     0,     0,     0,     0,     0,     0,   114,     0,     0,
+       0,     0,     0,     0,   112,     0,     0,     0,    72,    71,
+       0,    69,     0,    52,    70
   };
 
   const short
   Parser::yypgoto_[] =
   {
-    -304,  -304,   -29,   -10,  -144,  -130,    -1,   186,  -304,   -26,
-    -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,
-     -27,  -304,  -304,   -59,  -190,  -304,  -304,  -304,   -44,  -304,
-    -304,   -33,  -304,  -304,  -136,  -304,  -304,  -304,    20,   -15,
-     -24,   -39,   -43,  -303,  -283,  -270,  -304,   -61,  -304,  -304,
-    -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,   -72,  -304,
-    -304,  -304,  -304,  -304,   -20,  -304,  -304,  -304,  -304,  -304,
-    -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,  -304,
-    -304,   180,   -52,   138,  -304,  -304,   -85,  -304,  -304,  -304,
-    -304,  -304,  -304,  -304,  -304,  -304
+    -316,  -316,   -29,   -10,  -153,  -129,    -1,   215,  -316,   -26,
+    -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,
+     -27,  -316,  -316,   -58,  -193,  -316,  -316,  -316,   -44,  -316,
+    -316,    -3,  -316,  -316,  -115,  -316,  -316,  -316,    20,   -12,
+     -23,   -38,   -41,  -304,  -315,  -307,  -316,   -60,  -316,  -316,
+    -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,   -64,  -316,
+    -316,  -316,  -316,  -316,   -19,  -316,  -316,  -316,  -316,  -316,
+    -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,  -316,
+    -316,   180,    -7,   140,  -316,  -316,  -124,  -316,  -316,  -316,
+    -316,  -316,  -316,  -316,  -316,  -316
   };
 
   const short
   Parser::yydefgoto_[] =
   {
-       0,     2,    56,    46,    57,   120,   152,    69,   201,    37,
+       0,     2,    57,    46,    58,   121,   153,    70,   202,    37,
        3,     6,     9,    18,    13,    22,    34,    52,    17,    28,
-      82,    24,    30,    40,    45,    58,    31,    42,    47,    60,
-      80,    83,   116,   144,   150,   305,   191,   242,   124,   165,
-     195,   246,   289,   121,   163,   221,   349,   350,   217,   239,
-     307,    43,    49,    84,   159,   186,    50,    63,    73,    94,
-     244,   264,   287,   301,   302,    64,    75,   105,   187,    76,
-      88,    97,   337,   188,   218,   258,   275,    89,    99,   100,
-     114,   137,   153,   175,   115,   141,   181,   142,   160,   240,
-     261,   297,   309,   318,   324,   325
+      83,    24,    30,    40,    45,    59,    31,    42,    47,    61,
+      81,    84,   117,   145,   151,   306,   192,   243,   125,   166,
+     196,   247,   290,   122,   164,   222,   350,   351,   218,   240,
+     308,    43,    49,    85,   160,   187,    50,    64,    74,    95,
+     245,   265,   288,   302,   303,    65,    76,   106,   188,    77,
+      89,    98,   338,   189,   219,   259,   276,    90,   100,   101,
+     115,   138,   154,   176,   116,   142,   182,   143,   161,   241,
+     262,   298,   310,   319,   325,   326
   };
 
   const short
   Parser::yytable_[] =
   {
-       5,    38,    86,    39,    61,    21,    19,   161,    35,    19,
-     321,    53,    67,    54,    35,   162,    33,   322,     1,    35,
-     130,    59,   131,     4,   132,   236,   197,   198,     7,   177,
-     133,   178,   179,   180,    51,   340,    72,     8,   128,   206,
-      10,   207,   199,   208,   330,   255,   189,    90,    72,   209,
-     134,   135,   136,   223,   224,    92,    11,   190,   102,   344,
-      79,    96,   334,    36,   126,   127,    20,    55,    68,   225,
-      55,   182,    55,     4,    12,   346,   122,    14,   235,   107,
-     125,   108,   129,   109,    72,   104,   154,   155,   156,   110,
-      15,   243,   245,   250,    35,    35,   123,   111,   210,    35,
-      23,   149,    81,   299,   112,   183,   184,   347,    16,    55,
-     113,    91,   177,   215,   178,   179,   180,   149,   166,   167,
-     139,   140,   169,   276,   147,   148,    53,   151,    54,   170,
-     171,   172,   173,   174,    26,   288,   293,   230,    55,   196,
-     311,   214,   248,   249,    25,   251,   202,   203,   117,   168,
-     118,   119,   204,   205,   211,   212,   213,   193,   194,    72,
-     252,   157,   158,   228,   229,   268,    27,   270,   271,   316,
-      29,   351,   237,   352,    19,    32,    35,    41,    44,   227,
-      48,   231,    65,    72,   232,   233,   234,    62,   149,   253,
-      66,   220,    70,    71,   259,    74,   245,   162,    67,    77,
-      85,   288,    87,   149,   336,    93,    72,   256,   304,   241,
-     272,   257,   162,    95,    98,   101,   277,   103,   106,   266,
-     267,   143,   269,   164,    55,   185,   273,   145,   192,   146,
-     200,   216,   219,   149,   263,   222,   226,   238,   247,   290,
-     260,   291,   292,   254,   262,   265,   149,   294,   274,   303,
-     295,   296,   123,   326,    78,   298,   313,   328,   327,   331,
-     300,   279,   280,   281,   282,   283,   284,   285,   286,   335,
-     332,   308,   312,   338,   339,   314,   315,   345,   317,   149,
-     341,   342,   278,   310,   300,   306,   319,   329,   333,   323,
-     353,   320,   176,   138,     0,     0,     0,     0,     0,     0,
+       5,    38,    68,    39,    62,    21,    35,    19,    35,   323,
+     322,    87,    53,   331,    54,    55,    33,   163,   198,   199,
+     131,    60,   132,   237,   133,   190,   335,     1,   345,   162,
+     134,     4,     4,   183,    51,   341,   191,    73,   108,   347,
+     109,     7,   110,   256,   200,   224,   225,   129,   111,    73,
+     135,   136,   137,    56,    19,    92,    93,    56,    69,    35,
+     211,    80,    97,    36,    56,   127,   128,    20,    56,   113,
+     178,   226,   179,   180,   181,   114,     8,   123,    91,    35,
+     207,   126,   208,   130,   209,    73,   105,    82,    35,   103,
+     210,    35,    10,   244,   246,    11,   300,   124,   112,   348,
+     236,    56,   150,   312,   249,   250,   352,   252,   353,   171,
+     172,   173,   174,   175,   118,   251,   119,   120,   150,   167,
+     168,    12,   216,   170,    14,   148,   149,   269,   152,   271,
+     272,    15,   155,   156,   157,    16,    53,   289,    54,    55,
+     197,    25,   215,   140,   141,   277,   231,   203,   204,    23,
+     169,   184,   185,   205,   206,   212,   213,   214,   294,   178,
+      73,   179,   180,   181,   229,   230,   158,   159,    26,   253,
+     305,   194,   195,   238,    27,    29,    32,    19,    35,    41,
+     228,    44,   232,    48,    73,   233,   234,   235,    63,   150,
+     254,   317,   221,    71,    66,   260,    72,    67,   246,   163,
+      75,    68,    78,   289,   150,    86,   337,    73,   257,    88,
+     242,   273,   258,    94,   163,    96,    99,   278,   102,    56,
+     267,   268,   104,   270,   107,   144,   146,   274,   165,   147,
+     193,   186,   217,   201,   150,   264,   223,   220,   227,   239,
+     291,   248,   292,   293,   255,   261,   263,   150,   266,   275,
+     295,   296,   297,   124,   304,   314,   327,   333,   299,   328,
+     329,   301,   280,   281,   282,   283,   284,   285,   286,   287,
+     336,   339,   309,   313,   332,   340,   315,   316,   343,   318,
+     150,   346,   342,   279,    79,   301,   307,   311,   320,   330,
+     324,   334,   354,   321,   139,   177,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   343,    39,     0,     0,     0,     0,     0,   348,
-       0,     0,     0,     0,   348,     0,     0,     0,     0,     0,
-       0,   220,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,   220
+       0,     0,     0,   344,    39,     0,     0,     0,     0,     0,
+     349,     0,     0,     0,     0,   349,     0,     0,     0,     0,
+       0,     0,   221,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,   221
   };
 
   const short
   Parser::yycheck_[] =
   {
-       1,    28,    74,    29,    48,    15,     3,   143,     8,     3,
-     313,     3,     7,     5,     8,   145,    26,     4,     9,     8,
-      13,    47,    15,     7,    17,   215,   170,   171,     0,     3,
-      23,     5,     6,     7,    44,   338,    62,    10,   110,    13,
-      63,    15,   172,    17,   327,   235,     8,    80,    74,    23,
-      43,    44,    45,   197,   198,    84,    58,    19,    91,   342,
-      70,    87,   332,    63,   108,   109,    63,    59,    63,   199,
-      59,   156,    59,     7,    12,   345,   105,    63,   214,    13,
-     107,    15,   111,    17,   110,    95,   138,   139,   140,    23,
-      58,   221,   222,   229,     8,     8,   106,    98,   183,     8,
-      58,   127,    16,    16,    36,   157,   158,    16,    13,    59,
-      42,    61,     3,   185,     5,     6,     7,   143,   147,   148,
-      46,    47,   151,   259,   125,   126,     3,   128,     5,    37,
-      38,    39,    40,    41,    58,   265,   272,   209,    59,   168,
-      61,   185,   227,   228,    11,   230,   175,   176,     3,   150,
-       5,     6,   181,   182,    43,    44,    45,    55,    56,   185,
-     232,    48,    49,   207,   208,   250,    16,   252,   253,   305,
-      14,    61,   216,    63,     3,    63,     8,    15,    61,   206,
-      21,   210,    63,   209,   211,   212,   213,    23,   214,   233,
-      63,   192,    58,    58,   238,    32,   326,   327,     7,    63,
-      58,   331,    33,   229,   334,     3,   232,   236,   293,   219,
-     254,   237,   342,    58,    35,    63,   260,    51,    58,   248,
-     249,    17,   251,     3,    59,    22,   255,    57,    52,    57,
-       7,    34,    58,   259,   244,    53,    61,    20,     7,   268,
-      50,   270,   271,    17,    57,    61,   272,    58,   258,    54,
-      58,   277,   262,    53,    68,    62,    51,    61,    57,    61,
-     287,    24,    25,    26,    27,    28,    29,    30,    31,    54,
-      52,   297,   301,    51,    61,   304,   305,    52,   307,   305,
-     339,    57,   262,   298,   311,   295,   310,   326,   331,   318,
-     351,   311,   154,   113,    -1,    -1,    -1,    -1,    -1,    -1,
+       1,    28,     7,    29,    48,    15,     8,     3,     8,     4,
+     314,    75,     3,   328,     5,     6,    26,   146,   171,   172,
+      13,    47,    15,   216,    17,     8,   333,     9,   343,   144,
+      23,     7,     7,   157,    44,   339,    19,    63,    13,   346,
+      15,     0,    17,   236,   173,   198,   199,   111,    23,    75,
+      43,    44,    45,    59,     3,    61,    85,    59,    63,     8,
+     184,    71,    88,    63,    59,   109,   110,    63,    59,    36,
+       3,   200,     5,     6,     7,    42,    10,   106,    81,     8,
+      13,   108,    15,   112,    17,   111,    96,    16,     8,    92,
+      23,     8,    63,   222,   223,    58,    16,   107,    99,    16,
+     215,    59,   128,    61,   228,   229,    61,   231,    63,    37,
+      38,    39,    40,    41,     3,   230,     5,     6,   144,   148,
+     149,    12,   186,   152,    63,   126,   127,   251,   129,   253,
+     254,    58,   139,   140,   141,    13,     3,   266,     5,     6,
+     169,    11,   186,    46,    47,   260,   210,   176,   177,    58,
+     151,   158,   159,   182,   183,    43,    44,    45,   273,     3,
+     186,     5,     6,     7,   208,   209,    48,    49,    58,   233,
+     294,    55,    56,   217,    16,    14,    63,     3,     8,    15,
+     207,    61,   211,    21,   210,   212,   213,   214,    23,   215,
+     234,   306,   193,    58,    63,   239,    58,    63,   327,   328,
+      32,     7,    63,   332,   230,    58,   335,   233,   237,    33,
+     220,   255,   238,     3,   343,    58,    35,   261,    63,    59,
+     249,   250,    51,   252,    58,    17,    57,   256,     3,    57,
+      52,    22,    34,     7,   260,   245,    53,    58,    61,    20,
+     269,     7,   271,   272,    17,    50,    57,   273,    61,   259,
+      58,    58,   278,   263,    54,    51,    53,    52,    62,    57,
+      61,   288,    24,    25,    26,    27,    28,    29,    30,    31,
+      54,    51,   298,   302,    61,    61,   305,   306,    57,   308,
+     306,    52,   340,   263,    69,   312,   296,   299,   311,   327,
+     319,   332,   352,   312,   114,   155,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,   341,   339,    -1,    -1,    -1,    -1,    -1,   346,
-      -1,    -1,    -1,    -1,   351,    -1,    -1,    -1,    -1,    -1,
-      -1,   332,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,   345
+      -1,    -1,    -1,   342,   340,    -1,    -1,    -1,    -1,    -1,
+     347,    -1,    -1,    -1,    -1,   352,    -1,    -1,    -1,    -1,
+      -1,    -1,   333,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,   346
   };
 
   const unsigned char
@@ -3029,83 +3036,83 @@ namespace Vector { namespace DBC {
       63,    67,    79,    58,    85,    11,    58,    16,    83,    14,
       86,    90,    63,    67,    80,     8,    63,    73,    84,    73,
       87,    15,    91,   115,    61,    88,    67,    92,    21,   116,
-     120,    67,    81,     3,     5,    59,    66,    68,    89,    73,
-      93,    92,    23,   121,   129,    63,    63,     7,    63,    71,
-      58,    58,    73,   122,    32,   130,   133,    63,    71,    67,
-      94,    16,    84,    95,   117,    58,   122,    33,   134,   141,
-      95,    61,    66,     3,   123,    58,    73,   135,    35,   142,
-     143,    63,    95,    51,    67,   131,    58,    13,    15,    17,
-      23,    70,    36,    42,   144,   148,    96,     3,     5,     6,
-      69,   107,    66,    67,   102,    84,    92,    92,   122,    66,
-      13,    15,    17,    23,    43,    44,    45,   145,   145,    46,
-      47,   149,   151,    17,    97,    57,    57,    70,    70,    73,
-      98,    70,    70,   146,   146,   146,   146,    48,    49,   118,
-     152,    98,    69,   108,     3,   103,    66,    66,    70,    66,
-      37,    38,    39,    40,    41,   147,   147,     3,     5,     6,
-       7,   150,   150,   146,   146,    22,   119,   132,   137,     8,
-      19,   100,    52,    55,    56,   104,    66,    68,    68,    69,
-       7,    72,    66,    66,    66,    66,    13,    15,    17,    23,
-     150,    43,    44,    45,    92,   122,    34,   112,   138,    58,
-      70,   109,    53,    68,    68,    69,    61,    84,    92,    92,
-     122,    66,    84,    84,    84,    98,    88,    92,    20,   113,
-     153,    67,   101,    69,   124,    69,   105,     7,   150,   150,
-      98,   150,   122,    92,    17,    88,    66,    73,   139,    92,
-      50,   154,    57,    67,   125,    61,    66,    66,   150,    66,
-     150,   150,    92,    66,    67,   140,    98,    92,   102,    24,
-      25,    26,    27,    28,    29,    30,    31,   126,    69,   106,
-      66,    66,    66,    98,    58,    58,    73,   155,    62,    16,
-      84,   127,   128,    54,   150,    99,    67,   114,    73,   156,
-     103,    61,    66,    51,    66,    66,    98,    66,   157,   104,
-     128,   107,     4,    66,   158,   159,    53,    57,    61,   105,
-     108,    61,    52,   106,   109,    54,    69,   136,    51,    61,
-     107,    87,    57,    66,   108,    52,   109,    16,    84,   110,
-     111,    61,    63,   111
+     120,    67,    81,     3,     5,     6,    59,    66,    68,    89,
+      73,    93,    92,    23,   121,   129,    63,    63,     7,    63,
+      71,    58,    58,    73,   122,    32,   130,   133,    63,    71,
+      67,    94,    16,    84,    95,   117,    58,   122,    33,   134,
+     141,    95,    61,    66,     3,   123,    58,    73,   135,    35,
+     142,   143,    63,    95,    51,    67,   131,    58,    13,    15,
+      17,    23,    70,    36,    42,   144,   148,    96,     3,     5,
+       6,    69,   107,    66,    67,   102,    84,    92,    92,   122,
+      66,    13,    15,    17,    23,    43,    44,    45,   145,   145,
+      46,    47,   149,   151,    17,    97,    57,    57,    70,    70,
+      73,    98,    70,    70,   146,   146,   146,   146,    48,    49,
+     118,   152,    98,    69,   108,     3,   103,    66,    66,    70,
+      66,    37,    38,    39,    40,    41,   147,   147,     3,     5,
+       6,     7,   150,   150,   146,   146,    22,   119,   132,   137,
+       8,    19,   100,    52,    55,    56,   104,    66,    68,    68,
+      69,     7,    72,    66,    66,    66,    66,    13,    15,    17,
+      23,   150,    43,    44,    45,    92,   122,    34,   112,   138,
+      58,    70,   109,    53,    68,    68,    69,    61,    84,    92,
+      92,   122,    66,    84,    84,    84,    98,    88,    92,    20,
+     113,   153,    67,   101,    69,   124,    69,   105,     7,   150,
+     150,    98,   150,   122,    92,    17,    88,    66,    73,   139,
+      92,    50,   154,    57,    67,   125,    61,    66,    66,   150,
+      66,   150,   150,    92,    66,    67,   140,    98,    92,   102,
+      24,    25,    26,    27,    28,    29,    30,    31,   126,    69,
+     106,    66,    66,    66,    98,    58,    58,    73,   155,    62,
+      16,    84,   127,   128,    54,   150,    99,    67,   114,    73,
+     156,   103,    61,    66,    51,    66,    66,    98,    66,   157,
+     104,   128,   107,     4,    66,   158,   159,    53,    57,    61,
+     105,   108,    61,    52,   106,   109,    54,    69,   136,    51,
+      61,   107,    87,    57,    66,   108,    52,   109,    16,    84,
+     110,   111,    61,    63,   111
   };
 
   const unsigned char
   Parser::yyr1_[] =
   {
-       0,    64,    65,    66,    66,    67,    68,    68,    69,    69,
-      69,    70,    71,    71,    72,    72,    73,    74,    75,    76,
-      76,    77,    77,    78,    78,    79,    80,    81,    82,    83,
-      83,    83,    84,    85,    85,    86,    87,    88,    88,    89,
-      89,    90,    90,    91,    92,    93,    94,    95,    95,    96,
-      96,    97,    98,    99,    99,   100,   100,   100,   101,   102,
-     103,   104,   104,   105,   106,   107,   108,   109,   110,   110,
-     111,   111,   112,   112,   113,   114,   115,   115,   116,   117,
-     117,   118,   118,   118,   119,   120,   120,   121,   122,   123,
-     124,   125,   126,   126,   126,   126,   126,   126,   126,   126,
-     127,   127,   128,   128,   129,   129,   130,   131,   132,   133,
-     133,   134,   135,   136,   137,   137,   138,   139,   140,   141,
-     141,   142,   142,   142,   142,   142,   143,   143,   144,   144,
-     145,   145,   145,   145,   145,   145,   145,   145,   146,   147,
-     147,   147,   147,   147,   148,   148,   149,   149,   150,   150,
-     150,   150,   151,   151,   152,   152,   152,   152,   152,   152,
-     152,   152,   153,   153,   154,   155,   156,   157,   157,   158,
-     158,   159
+       0,    64,    65,    66,    66,    67,    68,    68,    68,    69,
+      69,    69,    70,    71,    71,    72,    72,    73,    74,    75,
+      76,    76,    77,    77,    78,    78,    79,    80,    81,    82,
+      83,    83,    83,    84,    85,    85,    86,    87,    88,    88,
+      89,    89,    90,    90,    91,    92,    93,    94,    95,    95,
+      96,    96,    97,    98,    99,    99,   100,   100,   100,   101,
+     102,   103,   104,   104,   105,   106,   107,   108,   109,   110,
+     110,   111,   111,   112,   112,   113,   114,   115,   115,   116,
+     117,   117,   118,   118,   118,   119,   120,   120,   121,   122,
+     123,   124,   125,   126,   126,   126,   126,   126,   126,   126,
+     126,   127,   127,   128,   128,   129,   129,   130,   131,   132,
+     133,   133,   134,   135,   136,   137,   137,   138,   139,   140,
+     141,   141,   142,   142,   142,   142,   142,   143,   143,   144,
+     144,   145,   145,   145,   145,   145,   145,   145,   145,   146,
+     147,   147,   147,   147,   147,   148,   148,   149,   149,   150,
+     150,   150,   150,   151,   151,   152,   152,   152,   152,   152,
+     152,   152,   152,   153,   153,   154,   155,   156,   157,   157,
+     158,   158,   159
   };
 
   const signed char
   Parser::yyr2_[] =
   {
        0,     2,    18,     1,     2,     1,     1,     1,     1,     1,
-       1,     1,     2,     1,     1,     3,     1,     3,     1,     0,
-       4,     0,     3,     3,     8,     1,     1,     1,     4,     0,
-       1,     2,     1,     0,     2,     4,     1,     0,     2,     2,
-       3,     0,     2,     8,     1,     1,     1,     1,     1,     0,
-       2,    23,     1,     0,     2,     0,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     3,
-       1,     1,     0,     2,     6,     1,     0,     2,     5,     1,
-       3,     0,     2,     2,     5,     0,     2,    15,     1,     1,
+       1,     1,     1,     2,     1,     1,     3,     1,     3,     1,
+       0,     4,     0,     3,     3,     8,     1,     1,     1,     4,
+       0,     1,     2,     1,     0,     2,     4,     1,     0,     2,
+       2,     3,     0,     2,     8,     1,     1,     1,     1,     1,
+       0,     2,    23,     1,     0,     2,     0,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     3,     1,     1,     0,     2,     5,     1,     4,     0,
-       2,    22,     1,     1,     0,     2,     7,     1,     1,     0,
-       2,     3,     5,     5,     6,     5,     0,     2,     5,     5,
-       0,     1,     1,     1,     1,     1,     1,     1,     1,     3,
-       3,     3,     1,     2,     0,     2,     4,     4,     1,     1,
-       1,     1,     0,     2,     4,     6,     6,     7,     6,     7,
-       7,     9,     0,     2,     6,     1,     1,     0,     2,     2,
-       1,     1
+       3,     1,     1,     0,     2,     6,     1,     0,     2,     5,
+       1,     3,     0,     2,     2,     5,     0,     2,    15,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     3,     1,     1,     0,     2,     5,     1,     4,
+       0,     2,    22,     1,     1,     0,     2,     7,     1,     1,
+       0,     2,     3,     5,     5,     6,     5,     0,     2,     5,
+       5,     0,     1,     1,     1,     1,     1,     1,     1,     1,
+       3,     3,     3,     1,     2,     0,     2,     4,     4,     1,
+       1,     1,     1,     0,     2,     4,     6,     6,     7,     6,
+       7,     7,     9,     0,     2,     6,     1,     1,     0,     2,
+       2,     1,     1
   };
 
 
@@ -3164,24 +3171,24 @@ namespace Vector { namespace DBC {
   const short
   Parser::yyrline_[] =
   {
-       0,   219,   219,   248,   249,   252,   256,   257,   260,   261,
-     262,   265,   269,   270,   273,   274,   277,   282,   285,   288,
-     289,   293,   294,   299,   300,   307,   310,   313,   318,   321,
-     322,   323,   326,   331,   332,   336,   343,   349,   350,   355,
-     356,   361,   362,   365,   375,   378,   381,   384,   385,   392,
-     393,   396,   419,   422,   423,   426,   427,   428,   434,   437,
-     440,   446,   447,   450,   453,   456,   459,   462,   465,   471,
-     479,   480,   483,   484,   488,   493,   510,   511,   515,   518,
-     519,   524,   525,   526,   530,   537,   538,   542,   572,   575,
-     582,   585,   588,   589,   590,   591,   592,   593,   594,   595,
-     598,   604,   612,   613,   616,   617,   621,   628,   634,   641,
-     642,   646,   665,   668,   681,   682,   686,   695,   698,   703,
-     704,   708,   709,   710,   711,   712,   719,   720,   724,   730,
-     738,   739,   740,   741,   742,   743,   744,   745,   748,   752,
-     758,   764,   770,   774,   783,   784,   788,   813,   840,   841,
-     842,   843,   848,   849,   853,   879,   905,   931,   957,   983,
-    1011,  1039,  1072,  1073,  1077,  1084,  1087,  1091,  1092,  1096,
-    1097,  1101
+       0,   219,   219,   248,   249,   252,   257,   259,   260,   263,
+     264,   265,   268,   272,   273,   276,   277,   280,   285,   288,
+     291,   292,   296,   297,   302,   303,   310,   313,   316,   321,
+     324,   325,   326,   329,   334,   335,   339,   346,   352,   353,
+     358,   359,   364,   365,   368,   378,   381,   384,   387,   388,
+     395,   396,   399,   422,   425,   426,   429,   430,   431,   437,
+     440,   443,   449,   450,   453,   456,   459,   462,   465,   468,
+     474,   482,   483,   486,   487,   491,   496,   513,   514,   518,
+     521,   522,   527,   528,   529,   533,   540,   541,   545,   575,
+     578,   585,   588,   591,   592,   593,   594,   595,   596,   597,
+     598,   601,   607,   615,   616,   619,   620,   624,   631,   637,
+     644,   645,   649,   668,   671,   684,   685,   689,   698,   701,
+     706,   707,   711,   712,   713,   714,   715,   722,   723,   727,
+     733,   741,   742,   743,   744,   745,   746,   747,   748,   751,
+     755,   761,   767,   773,   777,   786,   787,   791,   816,   843,
+     844,   845,   846,   851,   852,   856,   882,   908,   934,   960,
+     986,  1014,  1042,  1075,  1076,  1080,  1087,  1090,  1094,  1095,
+    1099,  1100,  1104
   };
 
   void
@@ -3214,9 +3221,9 @@ namespace Vector { namespace DBC {
 
 #line 4 "Parser.yy"
 } } // Vector::DBC
-#line 3218 "Parser.cpp"
+#line 3225 "Parser.cpp"
 
-#line 1111 "Parser.yy"
+#line 1114 "Parser.yy"
 
 
 void Vector::DBC::Parser::error(const location_type & location, const std::string & message)

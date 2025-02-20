@@ -48,7 +48,7 @@ public:
                                      const uint8_t ou8_ProcessId,
                                      const stw::scl::C_SclString & orc_ExportToolInfo = "");
 
-private:
+protected:
    static const bool mhq_IS_HEADER_FILE = false;
    static const bool mhq_IS_IMPLEMENTATION_FILE = true;
 

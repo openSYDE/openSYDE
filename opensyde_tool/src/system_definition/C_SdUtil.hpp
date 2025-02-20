@@ -76,7 +76,7 @@ public:
                                                                            const uint32_t & oru32_SpecialNodeIndex,
                                                                            const int32_t & ors32_SpecialInterface);
    static void h_AdaptMessageToProtocolType(stw::opensyde_core::C_OscCanMessage & orc_Message,
-                                            stw::opensyde_gui_logic::C_PuiSdNodeCanMessage * const opc_UiMessage,
+                                            stw::opensyde_gui_logic::C_PuiSdNodeCanMessage & orc_UiMessage,
                                             std::vector<opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalListElements, const std::vector<opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UiSignalListElements, const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos, const bool oq_IncludeSignalUpdate = true);
    static void h_AdaptSignalToProtocolType(stw::opensyde_core::C_OscCanSignal & orc_Signal,
                                            opensyde_core::C_OscNodeDataPoolListElement & orc_OscSignalListElement,

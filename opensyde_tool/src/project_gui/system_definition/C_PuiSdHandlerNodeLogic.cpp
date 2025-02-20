@@ -519,6 +519,7 @@ void C_PuiSdHandlerNodeLogic::SetOscNodePropertiesDetailed(const uint32_t ou32_N
       m_SetOscNodeIds(ou32_NodeIndex, orc_NodeIds);
       //Signal new name!
       Q_EMIT (this->SigNodeChanged(ou32_NodeIndex));
+      this->m_HandleSyncNodeRoutingSettingsChanged();
    }
 }
 
@@ -697,7 +698,7 @@ void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32_t ou32_NodeIndex)
    }
 
    //signal "node change"
-   Q_EMIT (this->SigNodesChanged());
+   this->m_HandleSyncNodeDeleted();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2268,6 +2269,7 @@ bool C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea::operator <(
    reference to new instance
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9447}  False positive in this case. Return type of operator matches the expectation
 C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea
 ::operator =(const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & orc_Source) &
 {

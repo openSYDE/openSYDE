@@ -572,7 +572,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const int32_
                      }
                      else
                      {
-                        c_Retval = static_cast<uint64_t>(pc_Message->c_Bytes[u32_Index]);
+                        c_Retval = static_cast<qulonglong>(pc_Message->c_Bytes[u32_Index]);
                      }
                   }
                   break;

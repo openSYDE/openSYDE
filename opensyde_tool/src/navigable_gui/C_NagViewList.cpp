@@ -139,7 +139,7 @@ void C_NagViewList::UpdateNames(void) const
 {
    for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
+      const C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
       if (pc_View != NULL)
       {
          pc_View->UpdateName();
@@ -158,7 +158,7 @@ void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32_t o
 {
    if (oq_CheckOnlyThisView == true)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(static_cast<int32_t>(ou32_ViewIndex));
+      const C_NagViewItem * const pc_View = this->GetItemAt(static_cast<int32_t>(ou32_ViewIndex));
       if (pc_View != NULL)
       {
          pc_View->UpdateDeco();
@@ -168,7 +168,7 @@ void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32_t o
    {
       for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
       {
-         C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
+         const C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
          if (pc_View != NULL)
          {
             pc_View->UpdateDeco();

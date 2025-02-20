@@ -419,7 +419,7 @@ void C_NagUnUsedProjectFilesPopUpDialog::m_CheckAndAddEmptyFolder(const QString 
 
    const QDir c_Dir(orc_FolderPath);
    QStringList c_SubDirs = c_Dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-   for (QString & rc_SubDirName : c_SubDirs)
+   for (const QString & rc_SubDirName : c_SubDirs)
    {
       const QString c_SubDirPath = orc_FolderPath + "/" + rc_SubDirName;
       m_CheckAndAddEmptyFolder(c_SubDirPath, orc_EmptyFolders);

@@ -76,7 +76,8 @@ int32_t C_CamProClipBoardHelper::h_LoadMessages(std::vector<C_CamProMessageData>
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamProClipBoardHelper::C_CamProClipBoardHelper(void)
+C_CamProClipBoardHelper::C_CamProClipBoardHelper(void) :
+   C_UtiClipBoardHelper()
 {
 }
 

@@ -146,6 +146,7 @@ SOURCES += \
     ../src/opensyde_gui_elements/C_OgeTransparentScrollArea.cpp \
     ../src/can_monitor/can_monitor_gui_elements/check_box/C_CamOgeChxSettings.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxToolTipBase.cpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxDefaultCheckedDisabled.cpp \
     ../src/table_base/C_TblViewScroll.cpp \
     ../src/table_base/C_TblViewToolTipBase.cpp \
     ../src/table_base/C_TblDelegate.cpp \
@@ -398,6 +399,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/C_OgeTransparentScrollArea.hpp \
     ../src/can_monitor/can_monitor_gui_elements/check_box/C_CamOgeChxSettings.hpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxToolTipBase.hpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxDefaultCheckedDisabled.hpp \
     ../src/table_base/C_TblViewScroll.hpp \
     ../src/table_base/C_TblViewToolTipBase.hpp \
     ../src/table_base/C_TblDelegate.hpp \

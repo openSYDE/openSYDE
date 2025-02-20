@@ -251,6 +251,10 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
    this->mpc_Ui->pc_ButtonCancel->hide();
    mq_ShowCancelButton = false;
 
+   //hide checkbox "remember selection" (only shown when explicitly desired by use case)
+   this->mpc_Ui->pc_ChxRememberSelection->hide();
+   mq_ShowCheckboxRemember = false;
+
    // make details read only
    this->mpc_Ui->pc_TebDetails->setReadOnly(true);
 
@@ -271,6 +275,7 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
    connect(this->mpc_Ui->pc_ButtonOk, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_OkClicked);
    connect(this->mpc_Ui->pc_ButtonNo, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_NoClicked);
    connect(this->mpc_Ui->pc_ButtonCancel, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_CancelClicked);
+   connect(this->mpc_Ui->pc_ChxRememberSelection, &QCheckBox::toggled, this, &C_OgeWiCustomMessage::m_CheckboxToggled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -465,6 +470,17 @@ void C_OgeWiCustomMessage::m_CancelClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for Checkbox
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiCustomMessage::m_CheckboxToggled()
+{
+   const bool q_ChxIsChecked = this->mpc_Ui->pc_ChxRememberSelection->isChecked();
+
+   Q_EMIT (this->SigRememberSelection(q_ChxIsChecked));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new size of message box
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -579,6 +595,32 @@ void C_OgeWiCustomMessage::SetCancelButtonText(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new text for checkbox and show checkbox
+
+   \param[in]  orc_Text    checkbox text string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiCustomMessage::SetCheckboxText(const QString & orc_Text)
+{
+   this->mpc_Ui->pc_ChxRememberSelection->setText(orc_Text);
+
+   //make it visible
+   ShowCheckBox();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a tooltip for the checkbox if desired
+
+   \param[in]  orc_Heading      tooltip heading
+   \param[in]  orc_Description  tooltip description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiCustomMessage::SetCheckboxTooltip(const QString & orc_Heading, const QString & orc_Description)
+{
+   this->mpc_Ui->pc_ChxRememberSelection->SetToolTipInformation(orc_Heading, orc_Description);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the Cancel-button visible.
 
    The cancel button is per default not shown, because in most cases it has the
@@ -589,6 +631,18 @@ void C_OgeWiCustomMessage::ShowCancelButton(void)
 {
    mq_ShowCancelButton = true;
    this->mpc_Ui->pc_ButtonCancel->show();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the checkbox visible.
+
+   The checkbox "remember selection" is per default not shown, because we don't use this in every dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiCustomMessage::ShowCheckBox()
+{
+   mq_ShowCheckboxRemember = true;
+   this->mpc_Ui->pc_ChxRememberSelection->show();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -626,4 +680,15 @@ void C_OgeWiCustomMessage::SetCustomMinHeight(const int32_t & ors32_MinHeight, c
    // reset maximum height of details field so it can use the whole space
    this->mpc_Ui->pc_TebDetails->setMaximumHeight(QWIDGETSIZE_MAX); //lint !e893 !e9130 !e9136
    // we can not change Qt constant but it is still better than using the hard coded magic number 16777215
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns whether checkbox is checked or not
+
+  \retval true or false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OgeWiCustomMessage::GetCheckboxState() const
+{
+   return this->mpc_Ui->pc_ChxRememberSelection->isChecked();
 }

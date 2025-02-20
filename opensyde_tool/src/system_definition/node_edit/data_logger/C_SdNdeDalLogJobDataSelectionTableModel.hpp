@@ -15,6 +15,7 @@
 
 #include "C_OscDataLoggerDataElementReference.hpp"
 #include "C_SclString.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -43,6 +44,10 @@ public:
    explicit C_SdNdeDalLogJobDataSelectionTableModel(QObject * const opc_Parent = NULL);
    void UpdateData(const std::vector<stw::opensyde_core::C_OscDataLoggerDataElementReference> & orc_DataElements,
                    const uint32_t ou32_NodeIndex);
+   void DoRemoveRows(const std::vector<uint32_t> & orc_SelectedIndices);
+   void AddData(const std::vector<stw::opensyde_core::C_OscDataLoggerDataElementReference> & orc_DataElements,
+                const uint32_t ou32_NodeIndex);
+   void GetElementLocationCount(uint32_t & oru32_LocalElements, uint32_t & oru32_RemoteElements);
 
    int32_t columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    QVariant headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation, const int32_t os32_Role =

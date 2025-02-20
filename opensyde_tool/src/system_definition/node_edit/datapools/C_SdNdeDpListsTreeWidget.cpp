@@ -270,7 +270,7 @@ void C_SdNdeDpListsTreeWidget::InsertRowWithoutData(const uint32_t & oru32_Targe
 void C_SdNdeDpListsTreeWidget::Copy(void) const
 {
    const uint16_t u16_TimerId = osc_write_log_performance_start();
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -311,7 +311,7 @@ void C_SdNdeDpListsTreeWidget::Copy(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::Cut(void)
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -330,7 +330,7 @@ void C_SdNdeDpListsTreeWidget::Cut(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::Paste(void)
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -350,7 +350,7 @@ void C_SdNdeDpListsTreeWidget::Paste(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::Delete(void)
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -381,7 +381,7 @@ void C_SdNdeDpListsTreeWidget::InsertAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::Insert(const bool & orq_SetFocus)
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -433,7 +433,7 @@ void C_SdNdeDpListsTreeWidget::Insert(const bool & orq_SetFocus)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::DoMoveUp(void)
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -478,7 +478,7 @@ void C_SdNdeDpListsTreeWidget::DoMoveUp(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::DoMoveDown(void)
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -524,7 +524,7 @@ void C_SdNdeDpListsTreeWidget::DoMoveDown(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::Edit(void) const
 {
-   C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
+   const C_SdNdeDpListTableWidget * const pc_Table = m_GetActiveTable();
 
    if (pc_Table != NULL)
    {
@@ -652,7 +652,7 @@ void C_SdNdeDpListsTreeWidget::OpenDetail(const int32_t os32_ListIndex, const in
 
       if (os32_DataElementIndex >= 0)
       {
-         C_SdNdeDpListTableWidget * const pc_TableWidget =
+         const C_SdNdeDpListTableWidget * const pc_TableWidget =
             dynamic_cast<C_SdNdeDpListTableWidget * const>(this->itemWidget(pc_Item->child(0), 0));
 
          if (pc_TableWidget != NULL)
@@ -1230,7 +1230,7 @@ void C_SdNdeDpListsTreeWidget::m_SetupContextMenu(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 {
-   C_SdNdeDpListHeaderWidget * const pc_Widget =
+   const C_SdNdeDpListHeaderWidget * const pc_Widget =
       dynamic_cast<C_SdNdeDpListHeaderWidget * const>(this->indexWidget(orc_Index));
 
    if (pc_Widget != NULL)
@@ -1247,7 +1247,7 @@ void C_SdNdeDpListsTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 {
-   C_SdNdeDpListHeaderWidget * const pc_Widget =
+   const C_SdNdeDpListHeaderWidget * const pc_Widget =
       dynamic_cast<C_SdNdeDpListHeaderWidget * const>(this->indexWidget(orc_Index));
 
    if (pc_Widget != NULL)
@@ -1488,7 +1488,7 @@ QTreeWidgetItem * C_SdNdeDpListsTreeWidget::m_GetActiveTableTreeWidget(const boo
                QTreeWidgetItem * const pc_TableWidgetItem = pc_ListItem->child(0);
                if (pc_TableWidgetItem != NULL)
                {
-                  C_SdNdeDpListTableWidget * const pc_Table =
+                  const C_SdNdeDpListTableWidget * const pc_Table =
                      dynamic_cast<C_SdNdeDpListTableWidget *>(this->itemWidget(pc_TableWidgetItem, 0));
                   if ((pc_Table != NULL) && (pc_Table->IsSelected() == true))
                   {
@@ -1648,7 +1648,7 @@ void C_SdNdeDpListsTreeWidget::m_ClearTableSelection(const int32_t & ors32_Excep
             QTreeWidgetItem * const pc_TableWidgetItem = pc_TopLevelItem->child(0);
             if (pc_TableWidgetItem != NULL)
             {
-               C_SdNdeDpListTableWidget * const pc_Table =
+               const C_SdNdeDpListTableWidget * const pc_Table =
                   dynamic_cast<C_SdNdeDpListTableWidget * const>(this->itemWidget(pc_TableWidgetItem, 0));
 
                //Clear table selection
@@ -1743,7 +1743,7 @@ void C_SdNdeDpListsTreeWidget::m_StoreUserSettings(void) const
                //Variables
                if (pc_TableWidgetItem != NULL)
                {
-                  C_SdNdeDpListTableWidget * const pc_Table =
+                  const C_SdNdeDpListTableWidget * const pc_Table =
                      dynamic_cast<C_SdNdeDpListTableWidget * const>(this->itemWidget(pc_TableWidgetItem, 0));
 
                   //Check table selection
@@ -1845,7 +1845,7 @@ void C_SdNdeDpListsTreeWidget::m_RestoreUserSettings(void)
                      QTreeWidgetItem * const pc_TableWidgetItem = pc_TopLevelItem->child(0);
                      if (pc_TableWidgetItem != NULL)
                      {
-                        C_SdNdeDpListTableWidget * const pc_Table =
+                        const C_SdNdeDpListTableWidget * const pc_Table =
                            dynamic_cast<C_SdNdeDpListTableWidget * const>(this->itemWidget(pc_TableWidgetItem,
                                                                                            0));
 

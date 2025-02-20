@@ -718,7 +718,7 @@ const
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
-      C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
+      const C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
       pc_App = pc_DbWidget->GetAndSelectApplication(c_AdaptedPos);
 
       if (pc_App != NULL)
@@ -758,7 +758,7 @@ const
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
-      C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
+      const C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
       pc_App = pc_DbWidget->GetApplication(c_AdaptedPos, opu32_Number);
 
       if (pc_App != NULL)
@@ -877,7 +877,7 @@ int32_t C_SyvUpPacNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlash & orc
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
-      C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
+      const C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
       s32_Return = pc_DbWidget->GetUpdatePackage(orc_ApplicationsToWrite, opc_AllApplications,
                                                  this->mu32_FilesUpdated);
       if (s32_Return == C_NO_ERR)
@@ -1098,7 +1098,7 @@ void C_SyvUpPacNodeWidget::dragLeaveEvent(QDragLeaveEvent * const opc_Event)
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
-      C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
+      const C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
       this->m_SetApplicationsUnselected(pc_DbWidget);
    }
 
@@ -1405,7 +1405,7 @@ uint32_t C_SyvUpPacNodeWidget::m_GetFileCount(void) const
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
-      C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
+      const C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
       u32_Count += pc_DbWidget->GetFileCount();
    }
 

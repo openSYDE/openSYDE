@@ -529,35 +529,35 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
 
       QObject * const pc_Object = dynamic_cast<QObject *>(pc_Item);
 
-      C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Item);
+      const C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Item);
       if (pc_Widget != NULL)
       {
          m_RemoveWidgetOfScene(pc_Widget);
       }
       else
       {
-         C_GiSvDaBoundary * const pc_Boundary = dynamic_cast<C_GiSvDaBoundary *>(pc_Item);
+         const C_GiSvDaBoundary * const pc_Boundary = dynamic_cast<C_GiSvDaBoundary *>(pc_Item);
          if (pc_Boundary != NULL)
          {
             m_RemoveBoundaryOfScene(pc_Boundary);
          }
          else
          {
-            C_GiSvDaTextElement * const pc_TextElement = dynamic_cast<C_GiSvDaTextElement *>(pc_Item);
+            const C_GiSvDaTextElement * const pc_TextElement = dynamic_cast<C_GiSvDaTextElement *>(pc_Item);
             if (pc_TextElement != NULL)
             {
                m_RemoveTextElementOfScene(pc_TextElement);
             }
             else
             {
-               C_GiSvDaImageGroup * const pc_ImageGroup = dynamic_cast<C_GiSvDaImageGroup *>(pc_Item);
+               const C_GiSvDaImageGroup * const pc_ImageGroup = dynamic_cast<C_GiSvDaImageGroup *>(pc_Item);
                if (pc_ImageGroup != NULL)
                {
                   m_RemoveImageGroupOfScene(pc_ImageGroup);
                }
                else
                {
-                  C_GiSvDaArrow * const pc_Arrow = dynamic_cast<C_GiSvDaArrow *>(pc_Item);
+                  const C_GiSvDaArrow * const pc_Arrow = dynamic_cast<C_GiSvDaArrow *>(pc_Item);
                   if (pc_Arrow != NULL)
                   {
                      m_RemoveLineArrowOfScene(pc_Arrow);

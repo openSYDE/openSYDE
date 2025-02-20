@@ -2625,7 +2625,7 @@ bool C_OscNodeDataPoolContent::operator !=(const C_OscNodeDataPoolContent & orc_
             for (uint32_t u32_ItArray = 0; u32_ItArray < this->GetArraySize(); ++u32_ItArray)
             {
                //If one is not equal
-               if (this->m_CompareArrayEqual(orc_Cmp, u32_ItArray) == false)
+               if (this->CompareArrayEqual(orc_Cmp, u32_ItArray) == false)
                {
                   //Not equal
                   q_Retval = true;
@@ -3114,8 +3114,8 @@ std::vector<uint8_t> * stw::opensyde_core::C_OscNodeDataPoolContent::GetDataAcce
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OscNodeDataPoolContent::m_CompareArrayEqual(const C_OscNodeDataPoolContent & orc_Cmp,
-                                                   const uint32_t ou32_Index) const
+bool C_OscNodeDataPoolContent::CompareArrayEqual(const C_OscNodeDataPoolContent & orc_Cmp,
+                                                 const uint32_t ou32_Index) const
 {
    return (m_CompareArrayNotEqual(orc_Cmp, ou32_Index) == false);
 }

@@ -39,7 +39,8 @@
 #include "C_GiSyColorSelectWidget.hpp"
 #include "C_PopCreateServiceProjDialogWidget.hpp"
 #include "C_PopPasswordDialogWidget.hpp"
-#include "C_NagCharLengthSettingPopupDialog.hpp"
+#include "C_NagProjectSettingsPopupDialog.hpp"
+#include "C_NagToolSettingsPopupDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -85,6 +86,7 @@ C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_BtnSysDef, &QPushButton::clicked, this, &C_NagMainWidget::m_SysDefClicked);
    connect(this->mpc_Ui->pc_BtnSysView, &QPushButton::clicked, this, &C_NagMainWidget::m_SysViewClicked);
    connect(this->mpc_Ui->pc_BtnAbout, &QPushButton::clicked, this, &C_NagMainWidget::m_AboutClicked);
+   connect(this->mpc_Ui->pc_BtnToolSettings, &QPushButton::clicked, this, &C_NagMainWidget::m_SettingsClicked);
    connect(this->mpc_Ui->pc_BtnNewProj, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::m_OnNewProj);
    connect(this->mpc_Ui->pc_BtnOpenProj, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::m_OnOpenProj);
    connect(this->mpc_Ui->pc_BtnSaveProjAs, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::OnSaveProjAs);
@@ -172,6 +174,7 @@ void C_NagMainWidget::InitText(void) const
    this->mpc_Ui->pc_BtnSysDef->setText(c_String);
    this->mpc_Ui->pc_BtnSysView->setText(C_GtGetText::h_GetText("SYSTEM COMMISSIONING"));
    this->mpc_Ui->pc_BtnAbout->setText(C_GtGetText::h_GetText("About"));
+   this->mpc_Ui->pc_BtnToolSettings->setText(C_GtGetText::h_GetText("Settings"));
    this->mpc_Ui->pc_BtnNewProj->setText(C_GtGetText::h_GetText("New Project"));
    this->mpc_Ui->pc_BtnOpenProj->setText(C_GtGetText::h_GetText("Open Project"));
    this->mpc_Ui->pc_BtnSaveProjAs->setText(C_GtGetText::h_GetText("Save Project As"));
@@ -194,6 +197,8 @@ void C_NagMainWidget::InitText(void) const
                                                                    "Set a password and select the views that shall be accessible in your Service Project"));
    this->mpc_Ui->pc_BtnAbout->SetToolTipInformation(C_GtGetText::h_GetText("About"),
                                                     C_GtGetText::h_GetText("Show information about openSYDE tool."));
+   this->mpc_Ui->pc_BtnToolSettings->SetToolTipInformation(C_GtGetText::h_GetText("Tool Settings"),
+                                                           C_GtGetText::h_GetText("Define general tool behaviour."));
    this->mpc_Ui->pc_BtnSysDef->SetToolTipInformation(C_GtGetText::h_GetText("SYSTEM DEFINITION"),
                                                      C_GtGetText::h_GetText("Define your Network "
                                                                             "Topology, Nodes properties, Datapools, "
@@ -563,6 +568,7 @@ void C_NagMainWidget::m_InitIcons(void) const
 
    // settings (no icon -> less padding on right side)
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BtnAbout, "NoIcon", true);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BtnToolSettings, "NoIcon", true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -714,6 +720,28 @@ void C_NagMainWidget::m_AboutClicked()
 
    //Resize
    c_New->SetSize(QSize(650, 611));
+
+   c_New->exec();
+
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+      c_New->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  slot function for opening the tool setting dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::m_SettingsClicked()
+{
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+
+   new C_NagToolSettingsPopupDialog(*c_New);
+
+   //Resize
+   c_New->SetSize(QSize(700, 400));
 
    c_New->exec();
 
@@ -1010,10 +1038,9 @@ void C_NagMainWidget::m_SetNameStringLength()
 {
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
 
-   C_NagCharLengthSettingPopupDialog * const pc_Dialog = new C_NagCharLengthSettingPopupDialog(*c_New);
+   C_NagProjectSettingsPopupDialog * const pc_Dialog = new C_NagProjectSettingsPopupDialog(*c_New);
 
-   //c_New->SetSize(QSize(890, 500)); //Size for UnUsed files (UnUsed Files : Hide)
-   c_New->SetSize(QSize(890, 400));
+   c_New->SetSize(QSize(890, 500));
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       if (pc_Dialog->ApplyMaxCharLimitSettings())

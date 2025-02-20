@@ -1523,15 +1523,13 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
                                           u8_SYNC_START_VALUE, "Sync start value " + c_PdoCommentText);
                   orc_ConciseEntries.push_back(c_Entry);
                }
-            }
 
-            //for PDO mapping entries, we need to break the index pattern here
-            if (oq_IsTx)
-            {
+               //for PDO mapping entries, we need to break the index pattern here
                u16_ObjectIndex = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_TX_PDO_MAPPING;
             }
             else
             {
+               //for PDO mapping entries, we need to break the index pattern here
                u16_ObjectIndex = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_RX_PDO_MAPPING;
             }
 

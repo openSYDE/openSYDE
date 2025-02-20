@@ -38,7 +38,6 @@ protected:
    static const bool mhq_IS_HEADER_FILE = false;
    static const bool mhq_IS_IMPLEMENTATION_FILE = true;
 
-private:
    static int32_t mh_CreateHeaderFile(const stw::scl::C_SclString & orc_ExportToolInfo,
                                       const stw::scl::C_SclString & orc_Path, const C_OscHalcConfig & orc_HalcConfig,
                                       const stw::scl::C_SclString & orc_ProjectId, const bool oq_IsSafe,

@@ -90,7 +90,6 @@ public:
                                        const stw::opensyde_core::C_OscCanOpenManagerDeviceInfo & orc_Config);
    int32_t DeleteCanOpenManagerDevice(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber,
                                       const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceId);
-   int32_t DeleteAllCanOpenManagerDevices(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber);
    int32_t DeleteCanOpenManagerMessages(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber,
                                         const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceId);
 
@@ -104,6 +103,7 @@ protected:
    C_PuiSdHandlerCanOpenLogic(QObject * const opc_Parent = NULL);
 
    //CANOpen
+   int32_t m_DeleteAllCanOpenManagerDevices(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber);
    int32_t m_DeleteCanOpenManagerMessageVectors(
       const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageIdBase,
       const bool oq_VectorIsTx, const std::vector<stw::opensyde_core::C_OscCanMessage> & orc_MessageVector,

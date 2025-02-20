@@ -42,7 +42,7 @@ namespace opensyde_gui
 class C_GiProgressBarUtil
 {
 public:
-   static void h_DrawArrow(QPainter * const opc_Painter, std::array<QPointF, 3> & orc_ArrowCornerPoints,
+   static void h_DrawArrow(QPainter * const opc_Painter, const std::array<QPointF, 3> & orc_ArrowCornerPoints,
                            const QPen & orc_Pen);
 
    //-------Define progress bar type 1----------------------------------------------------------------------------------

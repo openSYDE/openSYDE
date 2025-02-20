@@ -820,7 +820,7 @@ void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestricitions(void)
 {
    this->mq_CoFixedMapping = false;
 
-   if (this->me_Protocol == C_OscCanProtocol::eCAN_OPEN)
+   if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eCAN_OPEN)
    {
       // The manager must be the only node associated by this message
       const C_OscCanOpenManagerDeviceInfo * const pc_Manager =

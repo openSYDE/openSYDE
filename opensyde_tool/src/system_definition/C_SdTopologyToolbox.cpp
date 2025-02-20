@@ -312,17 +312,13 @@ void C_SdTopologyToolbox::dropEvent(QDropEvent * const opc_Event)
 void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
 {
    std::vector<C_OgePubIconOnly *> c_Icons;
-   std::vector<C_OscDeviceDefinition> c_Devices;
    std::vector<C_OscDeviceGroup> c_DeviceGroups = C_OscSystemDefinition::hc_Devices.GetDeviceGroups();
    for (uint32_t u32_ItDeviceGroup = 0U; u32_ItDeviceGroup < c_DeviceGroups.size(); ++u32_ItDeviceGroup)
    {
-      c_Devices = c_DeviceGroups[u32_ItDeviceGroup].GetDevices();
+      const std::vector<C_OscDeviceDefinition> c_Devices = c_DeviceGroups[u32_ItDeviceGroup].GetDevices();
 
       if (c_DeviceGroups[u32_ItDeviceGroup].GetGroupName() != "User Nodes")
       {
-         this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/system_definition/PreviewNode.svg"), QIcon::Normal);
-         this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/system_definition/PreviewNode.svg"), QIcon::Selected);
-
          this->mpc_List = C_SebToolboxUtil::h_AddNewList(
             c_DeviceGroups[u32_ItDeviceGroup].GetGroupName().c_str(),
             this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets, this);
@@ -331,6 +327,20 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          {
             for (uint32_t u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
+               if (c_Devices[u32_ItDevice].c_ManufacturerDisplayValue != "Sensor-Technik Wiedemann GmbH")
+               {
+                  this->mc_Icon.addPixmap(
+                     static_cast<QPixmap>(c_Devices[u32_ItDevice].c_ToolboxIcon.c_str()), QIcon::Normal);
+                  this->mc_Icon.addPixmap(
+                     static_cast<QPixmap>(c_Devices[u32_ItDevice].c_ToolboxIcon.c_str()), QIcon::Selected);
+               }
+               else
+               {
+                  this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/system_definition/PreviewNode.svg"),
+                                          QIcon::Normal);
+                  this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/system_definition/PreviewNode.svg"),
+                                          QIcon::Selected);
+               }
                this->m_FillToolboxWithDynamicNodes(c_Devices[u32_ItDevice]);
             }
          }
@@ -772,7 +782,7 @@ int32_t C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
       // get all nodes, which are currently used in Network Topology
       for (uint32_t u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
       {
-         C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(u32_ItNode);
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {
@@ -844,7 +854,7 @@ int32_t C_SdTopologyToolbox::m_ClearAllUserNodes()
       // get all nodes, which are currently used in Network Topology
       for (uint32_t u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
       {
-         C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(u32_ItNode);
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {

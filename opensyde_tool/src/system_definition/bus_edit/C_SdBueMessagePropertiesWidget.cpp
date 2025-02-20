@@ -1990,7 +1990,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
          std::vector<QString> c_RxDatapoolNames;
          std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_RxReceiveTimeoutModes;
          std::vector<uint32_t> c_RxReceiveTimeoutValues;
-         std::vector<uint32_t> * pc_MappedDatapools;
+         const std::vector<uint32_t> * pc_MappedDatapools;
          uint32_t u32_EntryCounter = 0U;
          int32_t s32_RemoveCounter;
 

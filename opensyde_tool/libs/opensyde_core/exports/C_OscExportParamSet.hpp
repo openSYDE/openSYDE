@@ -35,7 +35,7 @@ public:
                                             const stw::scl::C_SclString & orc_ExportToolName = "",
                                             const stw::scl::C_SclString & orc_ExportToolVersion = "");
 
-private:
+protected:
    static int32_t mh_FillPsiStructure(const C_OscNode & orc_Node, const bool oq_IsSafe,
                                       const uint16_t ou16_ApplicationIndex, C_OscParamSetRawNode & orc_RawNode,
                                       C_OscParamSetInterpretedNode & orc_IntNode);

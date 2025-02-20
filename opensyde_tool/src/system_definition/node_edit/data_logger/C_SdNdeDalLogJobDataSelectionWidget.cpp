@@ -22,7 +22,7 @@
 #include "C_GtGetText.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_OscNodeDataPoolListElement.hpp"
-
+#include "C_Uti.hpp"
 #include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -55,31 +55,41 @@ using namespace stw::errors;
 C_SdNdeDalLogJobDataSelectionWidget::C_SdNdeDalLogJobDataSelectionWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDalLogJobDataSelectionWidget),
+   mpc_ContextMenu(NULL),
    mu32_NodeIndex(0),
    mu32_DataLoggerJobIndex(0)
+
 {
    this->mpc_Ui->setupUi(this);
 
-   this->mpc_Ui->pc_TableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+   this->InitStaticNames();
 
-   this->InitText();
+   // Hide the filter line edit for now
+   this->mpc_Ui->pc_LineEditFilter->setVisible(false);
+
+   this->mpc_Ui->pc_TableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
    this->mpc_Ui->pc_PushButtonAdd->SetCustomIcons("://images/IconAddEnabled.svg", "://images/IconAddHovered.svg",
                                                   "://images/IconAddClicked.svg", "://images/IconAddDisabled.svg");
 
+   this->m_SetupContextMenu();
+   this->m_UpdateSelection();
    this->m_UpdateUi();
 
    connect(this->mpc_Ui->pc_PushButtonAdd, &QPushButton::clicked, this,
            &C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked);
-   connect(this->mpc_Ui->pc_TableView, &C_SdNdeDalLogJobDataSelectionTableView::SigSelectionChanged, this,
-           &C_SdNdeDalLogJobDataSelectionWidget::m_UpdateSelection);
+
    connect(this->mpc_Ui->pc_TableView, &C_SdNdeDalLogJobDataSelectionTableView::SigDataChanged, this,
-           &C_SdNdeDalLogJobDataSelectionWidget::m_DataChangedInModel);
+           &C_SdNdeDalLogJobDataSelectionWidget::m_OnDataChangedInModel);
+
+   connect(this->mpc_Ui->pc_TableView, &C_SdNdeDalLogJobDataSelectionTableView::SigDeleteSelectedElements, this,
+           &C_SdNdeDalLogJobDataSelectionWidget::m_DeleteSelectedDataElements);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 C_SdNdeDalLogJobDataSelectionWidget::~C_SdNdeDalLogJobDataSelectionWidget()
 {
    delete this->mpc_Ui;
@@ -121,10 +131,21 @@ void C_SdNdeDalLogJobDataSelectionWidget::SetNodeDataLoggerJob(const uint32_t ou
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu32_DataLoggerJobIndex = ou32_DataLoggerJobIndex;
 
+   this->ReloadDataElements();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload data elements in the model
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionWidget::ReloadDataElements()
+{
    // Load data elements of the newly selected node
    this->m_LoadDataElements();
 
    this->mpc_Ui->pc_TableView->UpdateData(this->mc_DataElements, this->mu32_NodeIndex);
+   this->m_UpdateSelection();
    this->m_UpdateUi();
 }
 
@@ -133,10 +154,11 @@ void C_SdNdeDalLogJobDataSelectionWidget::SetNodeDataLoggerJob(const uint32_t ou
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobDataSelectionWidget::InitText() const
+void C_SdNdeDalLogJobDataSelectionWidget::InitStaticNames() const
 {
    this->mpc_Ui->pc_LabelLoggingData->setText(C_GtGetText::h_GetText("Logging Data"));
    this->mpc_Ui->pc_LabelSelection->setText(C_GtGetText::h_GetText("No selected element"));
+   this->mpc_Ui->pc_LabelNoMessages->setText(C_GtGetText::h_GetText("No data elements to display."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -149,22 +171,24 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked()
    // Dialog opens up for data element selection
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
 
-   C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, 0U, true, false, true, false,
-                                                                                 true, true, NULL, false);
+   C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, 0U, true, false, true, true,
+                                                                                 true, true, NULL, false,
+                                                                                 this->mu32_NodeIndex,
+                                                                                 this->mu32_DataLoggerJobIndex);
 
    //Resize
    c_New->SetSize(QSize(800, 800));
 
-   std::vector<stw::opensyde_core::C_OscDataLoggerDataElementReference> c_SelectedDataElements;
-
    // Save the selected data elements to system definition
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
+      std::vector<stw::opensyde_core::C_OscDataLoggerDataElementReference> c_SelectedDataElements;
       std::vector<C_PuiSvDbNodeDataPoolListElementId> c_DataElements = pc_Dialog->GetSelectedDataElements();
 
       //Cursor
       QApplication::setOverrideCursor(Qt::WaitCursor);
 
+      // If any data elements were selected from the popup dialog
       if (c_DataElements.size() > 0)
       {
          c_SelectedDataElements.reserve(c_DataElements.size());
@@ -180,12 +204,15 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked()
                C_OscDataLoggerDataElementReference c_Data;
                c_Data.c_ConfiguredElementId = c_DataElements[u32_Counter];
 
+               // Append the newly added data elements to the local vector
+               // And to the vector that is passed on to the model for insertion in the table
                this->mc_DataElements.push_back(c_Data);
                c_SelectedDataElements.push_back(c_Data);
 
                // Persistent storage of data element in the system definition
                C_PuiSdHandler::h_GetInstance()->AddDataLoggerElement(this->mu32_NodeIndex,
-                                                                     this->mu32_DataLoggerJobIndex, c_Data);
+                                                                     this->mu32_DataLoggerJobIndex,
+                                                                     c_Data);
             }
          }
       }
@@ -194,9 +221,9 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked()
       QApplication::restoreOverrideCursor();
 
       // Update the data elements in the view
-      this->mpc_Ui->pc_TableView->UpdateData(c_SelectedDataElements, this->mu32_NodeIndex);
+      this->mpc_Ui->pc_TableView->AddData(c_SelectedDataElements, this->mu32_NodeIndex);
+      this->m_UpdateSelection();
       this->m_UpdateUi();
-      this->m_UpdateSelection(0);
 
       c_SelectedDataElements.clear();
    }
@@ -258,10 +285,9 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateUi() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  \brief   Update number of selected items
 
-   \param[in]  os32_SelectionCount   Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateSelection(const uint32_t ou32_SelectionCount) const
+void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateSelection() const
 {
    if (this->mpc_Ui->pc_TableView->IsEmpty() == true)
    {
@@ -270,18 +296,32 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateSelection(const uint32_t ou32_
    else
    {
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
-      if (ou32_SelectionCount > 0)
+
+      // default string value set for 0 elements
+      QString c_DataElementsText(C_GtGetText::h_GetText("No data elements"));
+      uint32_t u32_LocalElements = 0;
+      uint32_t u32_RemoteElements = 0;
+
+      // Get the number of local / remote elements
+      this->mpc_Ui->pc_TableView->GetElementLocationCount(u32_LocalElements, u32_RemoteElements);
+
+      if (this->mc_DataElements.size() > 0)
       {
-         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
-                                                                          "%1 selected data element(s)")).
-                                                  arg(ou32_SelectionCount));
-         this->mpc_Ui->pc_TableView->update();
+         if (this->mc_DataElements.size() == 1)
+         {
+            c_DataElementsText =
+               static_cast<QString>(C_GtGetText::h_GetText("%1 data element (%2 local; %3 remote)")).arg(
+                  this->mc_DataElements.size()).arg(u32_LocalElements).arg(u32_RemoteElements);
+         }
+         else
+         {
+            c_DataElementsText =
+               static_cast<QString>(C_GtGetText::h_GetText("%1 data elements (%2 local; %3 remote)")).arg(
+                  this->mc_DataElements.size()).arg(u32_LocalElements).arg(u32_RemoteElements);
+         }
       }
-      else
-      {
-         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
-                                                                          "No selected data element")));
-      }
+
+      this->mpc_Ui->pc_LabelSelection->setText(c_DataElementsText);
    }
 }
 
@@ -293,30 +333,117 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateSelection(const uint32_t ou32_
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobDataSelectionWidget::m_DataChangedInModel(const QModelIndex orc_Index, const QString oc_Data)
+void C_SdNdeDalLogJobDataSelectionWidget::m_OnDataChangedInModel(const QModelIndex orc_Index, const QString oc_Data)
 {
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerElementProperties(this->mu32_NodeIndex, this->mu32_DataLoggerJobIndex,
-                                                                   orc_Index.row(), true, oc_Data.toStdString());
+   bool q_UseCustomName = true;
+   QString c_Data(oc_Data);
 
-   // The index row is the same as the index in the vector
-   this->m_UpdateCustomLoggingName(orc_Index.row(), oc_Data);
+   // If user has reset the logging name to the namespace text
+   if (oc_Data.compare(C_GtGetText::h_GetText("[Namespace]")) == 0)
+   {
+      q_UseCustomName = false;
+      c_Data = QString();
+   }
+
+   C_PuiSdHandler::h_GetInstance()->SetDataLoggerElementProperties(this->mu32_NodeIndex, this->mu32_DataLoggerJobIndex,
+                                                                   orc_Index.row(), q_UseCustomName,
+                                                                   c_Data.toStdString());
+
+   // Update logging name in local vector (orc_Index.row() is equal to the index in the vector)
+   this->m_UpdateCustomLoggingName(orc_Index.row(), oc_Data, q_UseCustomName);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Updates the custom logging name in the local vector for data management
+/*! \brief  Update the custom logging name in the local vector for data management
 
-   \param[in]     ou32_Index     The index at which
-   \param[in]     oc_Data        Detailed input/output parameter description
+   \param[in]     ou32_Index        The index at which
+   \param[in]     oc_Data           Detailed input/output parameter description
+   \param[in]     oq_UseCustomName  true if custom logging name defined by user, false otherwise
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateCustomLoggingName(const uint32_t ou32_Index, const QString oc_Data)
+void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateCustomLoggingName(const uint32_t ou32_Index, const QString oc_Data,
+                                                                    const bool oq_UseCustomName)
 {
    // update the custom logging name
-   if (ou32_Index <= this->mc_DataElements.size())
+   if (ou32_Index < this->mc_DataElements.size())
    {
       C_OscDataLoggerDataElementReference & rc_Data = this->mc_DataElements.at(ou32_Index);
       rc_Data.c_CustomName = oc_Data.toStdString();
-      rc_Data.q_UseCustomName = true;
+      rc_Data.q_UseCustomName = oq_UseCustomName;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionWidget::m_SetupContextMenu()
+{
+   this->mpc_ContextMenu = new C_OgeContextMenu(this);
+   this->setContextMenuPolicy(Qt::CustomContextMenu);
+
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                       "Select all"), this->mpc_Ui->pc_TableView,
+                                    &C_SdNdeDalLogJobDataSelectionTableView::selectAll,
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
+   // select all action
+   this->mpc_ContextMenu->addSeparator();
+
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete"),
+                                    this, &C_SdNdeDalLogJobDataSelectionWidget::m_DeleteSelectedDataElements,
+                                    static_cast<int32_t>(Qt::Key_Delete));
+
+   connect(this, &C_SdNdeDalLogJobDataSelectionWidget::customContextMenuRequested, this,
+           &C_SdNdeDalLogJobDataSelectionWidget::m_OnCustomContextMenuRequested);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
+
+   \param[in]  orc_Pos  Local context menu position
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
+{
+   const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+
+   // check if focus is on tree view
+   if ((this->mpc_Ui->pc_TableView->hasFocus() /*&& (this->mpc_Ui->pc_TreeView->HasVisibleData())*/))
+   {
+      this->mpc_ContextMenu->popup(c_PosGlobal);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*!   \brief   Delete selected data elements
+ *
+ */
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionWidget::m_DeleteSelectedDataElements(void)
+{
+   std::vector<uint32_t> c_SelectedIndices;
+
+   // Get the selected elements from the model (original indexes irrespective of sort order are fetched)
+   this->mpc_Ui->pc_TableView->GetSelectedElements(c_SelectedIndices);
+
+   // Delete operation takes place if one or mores items are selected
+   if (c_SelectedIndices.size() > 0)
+   {
+      // delete from data management
+      for (uint32_t u32_Index = 0; u32_Index < c_SelectedIndices.size(); u32_Index++)
+      {
+         const uint32_t u32_IndexToDelete = c_SelectedIndices.at(u32_Index);
+         C_PuiSdHandler::h_GetInstance()->DeleteDataLoggerElement(this->mu32_NodeIndex, this->mu32_DataLoggerJobIndex,
+                                                                  u32_IndexToDelete);
+
+         // delete from local vector
+         this->mc_DataElements.erase(this->mc_DataElements.begin() + u32_IndexToDelete);
+      }
+
+      // delete from model / view and ultimately the table
+      this->mpc_Ui->pc_TableView->DeleteSelectedElements();
+      this->m_UpdateSelection();
+      this->m_UpdateUi();
    }
 }

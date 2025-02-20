@@ -18,6 +18,7 @@
 #include "C_GtGetText.hpp"
 #include "C_OscHalcMagicianUtil.hpp"
 #include "TglUtils.hpp"
+#include "C_OscRoutingCalculation.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -853,9 +854,84 @@ void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if node is reachable from data logger using diagnostic routing
+
+   \param[in]  ou32_SdNodeIndex        System definition use case: node index
+   \param[in]  ou32_SdDataLoggerIndex  System definition use case: data logger index
+   \param[in]  ou32_TargetNodeIndex    Target node index
+
+   \return
+   True  Diagnostic mode activated
+   False No diagnostic mode activated
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdUtil::h_CheckDataLoggerNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_SdDataLoggerIndex,
+                                                 const uint32_t ou32_TargetNodeIndex)
+{
+   bool q_Retval = false;
+   const C_OscDataLoggerJob * const pc_Job = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(ou32_SdNodeIndex,
+                                                                                               ou32_SdDataLoggerIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_SdNodeIndex);
+
+   if ((pc_Job != NULL) && (pc_Node != NULL))
+   {
+      bool q_BusFound = false;
+      uint32_t u32_BusIndex = 0UL;
+      for (uint32_t u32_ItInterface = 0UL; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+           ++u32_ItInterface)
+      {
+         const C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
+         if (((rc_Interface.e_InterfaceType == pc_Job->c_Properties.e_ConnectedInterfaceType) &&
+              (rc_Interface.u8_InterfaceNumber == pc_Job->c_Properties.u8_ConnectedInterfaceNumber)) &&
+             (rc_Interface.q_IsDiagnosisEnabled))
+         {
+            //This interface
+            q_BusFound = rc_Interface.GetBusConnected();
+            u32_BusIndex = rc_Interface.u32_BusIndex;
+            break;
+         }
+      }
+      if (q_BusFound)
+      {
+         const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefintion =
+            C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
+         const C_OscRoutingCalculation c_Calculation(rc_SystemDefintion.c_Nodes,
+                                                     C_PuiSdUtil::mh_GetAllNodesActive(),
+                                                     u32_BusIndex,
+                                                     ou32_TargetNodeIndex, C_OscRoutingCalculation::eDIAGNOSTIC);
+
+         const int32_t s32_Retval = c_Calculation.GetState();
+
+         if (s32_Retval == C_NO_ERR)
+         {
+            q_Retval = true;
+         }
+      }
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdUtil::C_PuiSdUtil(void)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all nodes active
+
+   \return
+   All nodes active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint8_t> C_PuiSdUtil::mh_GetAllNodesActive()
+{
+   const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefintion =
+      C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
+   const std::vector<uint8_t> c_Retval(rc_SystemDefintion.c_Nodes.size(), 1UL);
+
+   return c_Retval;
 }

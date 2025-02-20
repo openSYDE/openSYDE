@@ -607,7 +607,7 @@ void C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(const QString
 void C_CamMosDatabaseItemWidget::m_OnSelectBus()
 {
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
+   const C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
       new C_CamMosDatabaseBusSelectionPopup(this->mc_Busses, this->mc_Database, *c_New);
 
    //Resize

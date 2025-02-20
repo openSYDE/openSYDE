@@ -649,7 +649,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
 void C_SdNdeDbViewWidget::m_AddManualApplication(void)
 {
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex, -1, *c_New);
+   const C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex, -1, *c_New);
 
    //Resize
    c_New->SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());

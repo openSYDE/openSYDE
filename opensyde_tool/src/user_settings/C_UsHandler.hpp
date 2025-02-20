@@ -71,7 +71,8 @@ public:
    QVector<QColor> GetRecentColors(void) const;
    int32_t GetNextRecentColorButtonNumber(void) const;
    int32_t GetScreenshotGifSucessTimeout(void) const;
-   bool GetTspShortcutActive(void) const;
+   QString GetPathHandlingSelection(void) const;
+   QString GetSkipTspSelection(void) const;
 
    void GetMostRecentFolder(QString & orc_Str) const;
    void GetRecentFolders(QStringList & orc_Folders) const;
@@ -133,7 +134,8 @@ public:
    void SetCurrentSaveAsPath(const QString & orc_Value);
    void SetRecentColors(const QVector<QColor> & orc_RecentColorsVector);
    void SetNextRecentColorButtonNumber(const int32_t os32_NextRecentColorButtonNumber);
-   void SetTspShortcutActive(const bool oq_Active);
+   void SetSkipTspSelection(const QString & orc_Selection);
+   void SetPathHandlingSelection(const QString & orc_Selection);
 
    void AddToRecentProjects(const QString & orc_Str);
    void RemoveOfRecentProjects(const QString & orc_Str);
@@ -270,23 +272,29 @@ private:
    // projects
    static const QPoint mhc_DEFAULT_VIEW_POS;      ///< Default view position
    static const int32_t mhs32_DEFAULT_ZOOM_LEVEL; ///< Default zoom level
-   const QString mc_DefaultProjectsFolder;        ///< Default openSYDE projects location if no recent projects
-                                                  // are available
-   QString mc_Lang;                               ///< Current language
-   bool mq_PerformanceMeasurementActive;          ///< Flag if performance measurement is active (log entries)
-   bool mq_ActiveTspShortcut;                     ///< Flag if TSP shortcut is active
-   QString mc_CurrentSaveAsPath;                  ///< Current save as base path
-   QVector<QColor> mc_RecentColors;               ///< Recent colors from color picker
-   int32_t ms32_NextRecentColorButtonNumber;      ///< Next recent color button for color from color picker
-   QStringList mc_RecentProjects;                 ///< Unique history of recent projects
-   QPoint mc_ScreenPos;                           ///< History of last known screen position
-   QSize mc_AppSize;                              ///< History of last known openSyde window size
-   bool mq_AppMaximized;                          ///< History of openSyde window state
-   QPoint mc_SdTopologyToolboxPos;                ///< History of last known sys def toolbox position
-   QSize mc_SdTopologyToolboxSize;                ///< History of last known sys def toolbox size
-   int32_t ms32_NaviBarSize;                      ///< Last known navi bar size
-   int32_t ms32_NaviBarNodeSectionSize;           ///< Last known navi bar node section size
-   int32_t ms32_SdNodeEditSplitterHorizontal;     ///< History of last known node edit splitter position x
+
+   //Common Section
+   QString mc_Lang;                        ///< Current language
+   const QString mc_DefaultProjectsFolder; ///< Default openSYDE projects location if no recent projects
+                                           // are available
+   bool mq_PerformanceMeasurementActive;   ///< Flag if performance measurement is active (log entries)
+
+   //Environment Section
+   QString mc_PathHandlingSelection;  ///< Currently chosen option (Relative or Absolute)
+   QString mc_SkipTspImportSelection; ///< Flag if TSP Import on Node Adding shall always be skipped
+
+   QString mc_CurrentSaveAsPath;              ///< Current save as base path
+   QVector<QColor> mc_RecentColors;           ///< Recent colors from color picker
+   int32_t ms32_NextRecentColorButtonNumber;  ///< Next recent color button for color from color picker
+   QStringList mc_RecentProjects;             ///< Unique history of recent projects
+   QPoint mc_ScreenPos;                       ///< History of last known screen position
+   QSize mc_AppSize;                          ///< History of last known openSyde window size
+   bool mq_AppMaximized;                      ///< History of openSyde window state
+   QPoint mc_SdTopologyToolboxPos;            ///< History of last known sys def toolbox position
+   QSize mc_SdTopologyToolboxSize;            ///< History of last known sys def toolbox size
+   int32_t ms32_NaviBarSize;                  ///< Last known navi bar size
+   int32_t ms32_NaviBarNodeSectionSize;       ///< Last known navi bar node section size
+   int32_t ms32_SdNodeEditSplitterHorizontal; ///< History of last known node edit splitter position x
    // value
    int32_t ms32_SdNodEditHalcSplitterHorizontal;      ///< History of last known halc splitter position x value
    int32_t ms32_SdNodEditCoManagerSplitterHorizontal; ///< History of last known CANopen Manager splitter position

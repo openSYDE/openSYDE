@@ -39,7 +39,9 @@ C_OscDataLoggerJobProperties::C_OscDataLoggerJobProperties() :
    c_Name("LogJob"),
    e_LogFileFormat(eLFF_CSV),
    u32_MaxLogFileSizeMb(500),
-   e_LocalLogTrigger(eLLT_ON_CHANGE)
+   e_LocalLogTrigger(eLLT_ON_CHANGE),
+   e_ConnectedInterfaceType(C_OscSystemBus::eCAN),
+   u8_ConnectedInterfaceNumber(0U)
 {
 }
 
@@ -64,5 +66,11 @@ void C_OscDataLoggerJobProperties::CalcHash(uint32_t & oru32_HashValue) const
                                        oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_LocalLogTrigger,
                                        sizeof(this->e_LocalLogTrigger),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_ConnectedInterfaceType,
+                                       sizeof(this->e_ConnectedInterfaceType),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_ConnectedInterfaceNumber,
+                                       sizeof(this->u8_ConnectedInterfaceNumber),
                                        oru32_HashValue);
 }

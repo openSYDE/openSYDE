@@ -537,7 +537,7 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
    {
       if (opc_HighestParentItem != this)
       {
-         C_GiBiCustomMouseItem * const pc_Other = dynamic_cast<C_GiBiCustomMouseItem *>(opc_HighestParentItem);
+         const C_GiBiCustomMouseItem * const pc_Other = dynamic_cast<C_GiBiCustomMouseItem *>(opc_HighestParentItem);
          if (((pc_Other != NULL) && (orq_RestoreMouseCursor == true)) &&
              (opc_HighestParentItem->isUnderMouse() == true))
          {

@@ -18,6 +18,7 @@
 #include "C_PuiSdHandler.hpp"
 #include "stwerrors.hpp"
 #include "C_GtGetText.hpp"
+#include "C_PuiSdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -53,12 +54,17 @@ C_SdNdeDalLogJobPropertiesWidget::C_SdNdeDalLogJobPropertiesWidget(QWidget * con
    mu32_NodeIndex(0),
    mu32_DataLoggerJobIndex(0),
    ms32_LastUsedLogFileFormatIndex(0),
-   ms32_LastUsedLocalDataIndex(0)
+   ms32_LastUsedLocalDataIndex(0),
+   ms32_LastUsedInterfaceNumberIndex(0)
+
 {
    this->mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_LabelIconFileFormat->SetForegroundColor(7);
    this->mpc_Ui->pc_LabelIconFileFormat->SetFontPixel(36, true);
    this->mpc_Ui->pc_LabelIcon->SetSvg("://images/IconLogging.svg");
+
+   this->mpc_Ui->pc_SpinBoxMaxFileSize->SetMinimumCustom(100);
+   this->mpc_Ui->pc_SpinBoxMaxFileSize->SetMaximumCustom(1024);
 
    // name length restriction
    this->mpc_Ui->pc_LineEditName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
@@ -75,6 +81,9 @@ C_SdNdeDalLogJobPropertiesWidget::C_SdNdeDalLogJobPropertiesWidget(QWidget * con
    connect(this->mpc_Ui->pc_ComboBoxLocalData,
            static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged);
+   connect(this->mpc_Ui->pc_ComboBoxClientInterface,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnClientInterfaceChanged);
    connect(this->mpc_Ui->pc_SpinBoxMaxFileSize, static_cast<void (QSpinBox::*)(
                                                                int32_t)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdNdeDalLogJobPropertiesWidget::m_OnFileSizeChanged);
@@ -101,17 +110,34 @@ void C_SdNdeDalLogJobPropertiesWidget::SetNodeDataLoggerJob(const uint32_t ou32_
 {
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(ou32_NodeIndex,
                                                                                                   ou32_DataLoggerJobIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
 
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu32_DataLoggerJobIndex = ou32_DataLoggerJobIndex;
    this->m_GetSupportedLogFileFormats();
    this->m_GetSupportedLocalData();
+   this->m_GetSupportedClientInterfaces();
 
-   this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str());
+   //this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str()); //AC: Disabled for fixed name
+   this->mpc_Ui->pc_LineEditName->setText("LogJob1");
+   this->mpc_Ui->pc_LineEditName->setDisabled(true);
    this->mpc_Ui->pc_TextEditComment->setText(pc_Retval->c_Properties.c_Comment.c_str());
    this->mpc_Ui->pc_ComboBoxLogFileFormat->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.e_LogFileFormat));
    this->mpc_Ui->pc_ComboBoxLocalData->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.e_LocalLogTrigger));
    this->mpc_Ui->pc_SpinBoxMaxFileSize->setValue(static_cast<int32_t>(pc_Retval->c_Properties.u32_MaxLogFileSizeMb));
+
+   if (pc_Retval->c_Properties.e_ConnectedInterfaceType == C_OscSystemBus::E_Type::eETHERNET)
+   {
+      this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
+                                                                                     u8_ConnectedInterfaceNumber +
+                                                                                     pc_DevDef->u8_NumCanBusses));
+   }
+   else
+   {
+      this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
+                                                                                     u8_ConnectedInterfaceNumber));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -193,6 +219,38 @@ void C_SdNdeDalLogJobPropertiesWidget::m_GetSupportedLocalData() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add client interfaces (CAN/ETHERNET) into related combo box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_GetSupportedClientInterfaces() const
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+
+   std::vector<QString> c_InterfaceNames;
+   QString c_InterfaceName;
+
+   for (uint8_t u8_Iterator = 0; u8_Iterator < pc_DevDef->u8_NumCanBusses; ++u8_Iterator)
+   {
+      c_InterfaceName = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN, u8_Iterator);
+      c_InterfaceNames.push_back(c_InterfaceName);
+   }
+
+   for (uint8_t u8_Iterator = 0; u8_Iterator < pc_DevDef->u8_NumEthernetBusses; ++u8_Iterator)
+   {
+      c_InterfaceName = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eETHERNET, u8_Iterator);
+      c_InterfaceNames.push_back(c_InterfaceName);
+   }
+
+   for (uint32_t u32_InterfaceNamesCounter = 0U;
+        u32_InterfaceNamesCounter < static_cast<uint32_t>(c_InterfaceNames.size());
+        ++u32_InterfaceNamesCounter)
+   {
+      this->mpc_Ui->pc_ComboBoxClientInterface->addItem(c_InterfaceNames[u32_InterfaceNamesCounter]);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot for editing finished on name property
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,7 +261,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnNameEdited()
    C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
    rc_Properties.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerProperties(mu32_NodeIndex, mu32_DataLoggerJobIndex, rc_Properties);
+   C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                   mu32_DataLoggerJobIndex,
+                                                                                   rc_Properties);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -217,7 +277,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnCommentEdited()
    C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
    rc_Properties.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerProperties(mu32_NodeIndex, mu32_DataLoggerJobIndex, rc_Properties);
+   C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                   mu32_DataLoggerJobIndex,
+                                                                                   rc_Properties);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -231,7 +293,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnFileSizeChanged()
    C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
    rc_Properties.u32_MaxLogFileSizeMb = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxMaxFileSize->value());
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerProperties(mu32_NodeIndex, mu32_DataLoggerJobIndex, rc_Properties);
+   C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                   mu32_DataLoggerJobIndex,
+                                                                                   rc_Properties);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -261,7 +325,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLogFileFormatChanged(const int32_t os
 
       rc_Properties.e_LogFileFormat =
          static_cast<C_OscDataLoggerJobProperties::E_LogFileFormat>(this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex());
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerProperties(mu32_NodeIndex, mu32_DataLoggerJobIndex, rc_Properties);
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                      mu32_DataLoggerJobIndex,
+                                                                                      rc_Properties);
       this->ms32_LastUsedLogFileFormatIndex = this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex();
    }
 }
@@ -282,7 +348,41 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged(const int32_t os32_N
 
       rc_Properties.e_LocalLogTrigger =
          static_cast<C_OscDataLoggerJobProperties::E_LocalLogTrigger>(this->mpc_Ui->pc_ComboBoxLocalData->currentIndex());
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerProperties(mu32_NodeIndex, mu32_DataLoggerJobIndex, rc_Properties);
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                      mu32_DataLoggerJobIndex,
+                                                                                      rc_Properties);
       this->ms32_LastUsedLocalDataIndex = this->mpc_Ui->pc_ComboBoxLocalData->currentIndex();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for client interface combo box index change.
+
+   \param[in]  os32_NewIndex  New combo box index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_OnClientInterfaceChanged(const int32_t os32_NewIndex)
+{
+   if (this->ms32_LastUsedInterfaceNumberIndex != os32_NewIndex)
+   {
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+      const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+      uint8_t u8_ConnectedInterfaceNumber;
+      C_OscSystemBus::E_Type e_ConnectedInterfaceType;
+
+      if (os32_NewIndex < pc_DevDef->u8_NumCanBusses)
+      {
+         e_ConnectedInterfaceType = C_OscSystemBus::E_Type::eCAN;
+         u8_ConnectedInterfaceNumber = static_cast<uint8_t>(os32_NewIndex);
+      }
+      else
+      {
+         e_ConnectedInterfaceType = C_OscSystemBus::E_Type::eETHERNET;
+         u8_ConnectedInterfaceNumber = static_cast<uint8_t>(os32_NewIndex) - pc_DevDef->u8_NumCanBusses;
+      }
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerInterface(mu32_NodeIndex, mu32_DataLoggerJobIndex,
+                                                              e_ConnectedInterfaceType, u8_ConnectedInterfaceNumber);
+      this->ms32_LastUsedInterfaceNumberIndex = this->mpc_Ui->pc_ComboBoxClientInterface->currentIndex();
+      Q_EMIT this->SigReloadDataLoggerDataElements();
    }
 }

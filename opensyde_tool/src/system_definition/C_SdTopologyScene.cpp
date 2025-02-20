@@ -172,7 +172,6 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
    {
       const uint32_t u32_SubDevicesSize = pc_MainDevice->c_SubDevices.size();
       const uint32_t u32_OriginalOscNodeSize = C_PuiSdHandler::h_GetInstance()->GetOscNodesSize();
-      const bool q_TspShortcutActive = C_UsHandler::h_GetInstance()->GetTspShortcutActive();
 
       stw::opensyde_gui_logic::C_PuiSdNode c_UiNode;
       C_GiNode * pc_Item;
@@ -233,9 +232,9 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
       m_AddNodeToScene(pc_Item);
 
       //TSP shortcut -> no 3rd Party TSP Shortcut
-      if (((pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeEthernet == true) ||
-           (pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeCan == true) ||
-           (pc_MainDevice->c_SubDevices[0].q_FlashloaderStwCan == true)) && q_TspShortcutActive)
+      if ((pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeEthernet == true) ||
+          (pc_MainDevice->c_SubDevices[0].q_FlashloaderOpenSydeCan == true) ||
+          (pc_MainDevice->c_SubDevices[0].q_FlashloaderStwCan == true))
       {
          const uint8_t u8_TIMER_THRESHOLD_IN_MSEC = 100;
          QString c_NodeName = pc_MainDevice->GetDisplayName().c_str();
@@ -875,35 +874,35 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                }
                else
                {
-                  C_GiSdBoundary * const pc_Boundary = dynamic_cast<C_GiSdBoundary *>(pc_Item);
+                  const C_GiSdBoundary * const pc_Boundary = dynamic_cast<C_GiSdBoundary *>(pc_Item);
                   if (pc_Boundary != NULL)
                   {
                      m_RemoveBoundaryOfScene(pc_Boundary);
                   }
                   else
                   {
-                     C_GiTextElementBus * const pc_BusTextElement = dynamic_cast<C_GiTextElementBus *>(pc_Item);
+                     const C_GiTextElementBus * const pc_BusTextElement = dynamic_cast<C_GiTextElementBus *>(pc_Item);
                      if (pc_BusTextElement != NULL)
                      {
                         m_RemoveTextElementBusOfScene(pc_BusTextElement);
                      }
                      else
                      {
-                        C_GiSdTextElement * const pc_TextElement = dynamic_cast<C_GiSdTextElement *>(pc_Item);
+                        const C_GiSdTextElement * const pc_TextElement = dynamic_cast<C_GiSdTextElement *>(pc_Item);
                         if (pc_TextElement != NULL)
                         {
                            m_RemoveTextElementOfScene(pc_TextElement);
                         }
                         else
                         {
-                           C_GiSdImageGroup * const pc_ImageGroup = dynamic_cast<C_GiSdImageGroup *>(pc_Item);
+                           const C_GiSdImageGroup * const pc_ImageGroup = dynamic_cast<C_GiSdImageGroup *>(pc_Item);
                            if (pc_ImageGroup != NULL)
                            {
                               m_RemoveImageGroupOfScene(pc_ImageGroup);
                            }
                            else
                            {
-                              C_GiSdArrow * const pc_Arrow = dynamic_cast<C_GiSdArrow *>(pc_Item);
+                              const C_GiSdArrow * const pc_Arrow = dynamic_cast<C_GiSdArrow *>(pc_Item);
                               if (pc_Arrow != NULL)
                               {
                                  m_RemoveLineArrowOfScene(pc_Arrow);
@@ -1299,7 +1298,7 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
          {
             //Revert mouse cursor manually after connect state
             //Might cause performance issues
-            QGraphicsItem * const pc_Item = this->itemAt(opc_Event->scenePos(), QTransform());
+            const QGraphicsItem * const pc_Item = this->itemAt(opc_Event->scenePos(), QTransform());
             if (pc_Item == NULL)
             {
                //TODO custom cursor
@@ -1373,7 +1372,7 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
                   }
                   else
                   {
-                     C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(pc_BusChild);
+                     const C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(pc_BusChild);
                      //Check node to node
                      this->m_ShowNewNodeToNodeConnectionPopUp(this->mpc_NodeConnectItem, pc_Node);
                   }
@@ -2155,7 +2154,7 @@ void C_SdTopologyScene::m_SelectionChanged(void)
                //Custom rubberband flag
                if (this->m_IsRubberBandActive() == true)
                {
-                  C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_LineItem);
+                  const C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_LineItem);
                   if (pc_BusConnector == NULL)
                   {
                      pc_LineItem->SetResizing(false);
@@ -3024,10 +3023,10 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
          }
       }
 
-      C_SdNodeComIfSetupWidget * const pc_ComIfWidget = new C_SdNodeComIfSetupWidget(*c_Dialog,
-                                                                                     opc_Node->GetIndex(),
-                                                                                     opc_Bus->GetIndex(),
-                                                                                     s32_SpecialInterface);
+      const C_SdNodeComIfSetupWidget * const pc_ComIfWidget = new C_SdNodeComIfSetupWidget(*c_Dialog,
+                                                                                           opc_Node->GetIndex(),
+                                                                                           opc_Bus->GetIndex(),
+                                                                                           s32_SpecialInterface);
       //Resize
       const QSize c_SIZE(800, 364);
       c_Dialog->SetSize(c_SIZE);
@@ -3115,9 +3114,10 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
       this->m_HandleHideToolTip();
       m_RevertOverrideCursor();
 
-      C_SdNodeToNodeConnectionSetupWidget * const pc_ComIfWidget = new C_SdNodeToNodeConnectionSetupWidget(*c_Dialog,
-                                                                                                           opc_Node1->GetIndex(),
-                                                                                                           opc_Node2->GetIndex());
+      const C_SdNodeToNodeConnectionSetupWidget * const pc_ComIfWidget = new C_SdNodeToNodeConnectionSetupWidget(
+         *c_Dialog,
+         opc_Node1->GetIndex(),
+         opc_Node2->GetIndex());
       //Resize
       c_Dialog->SetSize(QSize(800, 577));
       if (pc_ComIfWidget->GetInteractionPossible() == true)
@@ -4008,32 +4008,57 @@ bool C_SdTopologyScene::m_ShowShortcutTspOption(const QString & orc_NodeName,
 {
    bool q_UseShortcut = false;
 
-   const stw::scl::C_SclString c_TitleString = orc_NodeName.toStdString().c_str();
-   const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
-   const stw::scl::C_SclString c_MessageBoxText = "Do you want to import openSYDE Target Support Package file(s) to " +
-                                                  c_TitleString  + "?";
-   const stw::scl::C_SclString c_MessageBoxDetails =
-      "With an openSYDE Target Support Package the user is able to bring "
-      "an empty node (fresh placed from toolbox) to a defined default state. "
-      "\nNode definition import could contain e.g.: Data Blocks configuration, Template programming project, "
-      "Datapools configuration,... .";
-
-   QGraphicsView * const pc_View = this->views().at(0);
-   C_OgeWiCustomMessage pc_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
-
-   pc_MessageBox.SetHeading(C_GtGetText::h_GetText(c_MessageBoxTitle.c_str()));
-   pc_MessageBox.SetDescription(C_GtGetText::h_GetText(c_MessageBoxText.c_str()));
-   pc_MessageBox.SetDetails(C_GtGetText::h_GetText(c_MessageBoxDetails.c_str()));
-   pc_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
-   pc_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Skip"));
-   pc_MessageBox.SetCustomMinWidth(650);
-
-   const C_OgeWiCustomMessage::E_Outputs e_Output = pc_MessageBox.Execute();
-
-   if (e_Output == C_OgeWiCustomMessage::eOK)
+   //only show this thing if user settings say so or nothing is set yet
+   if ((C_UsHandler::h_GetInstance()->GetSkipTspSelection() == "") ||
+       (C_UsHandler::h_GetInstance()->GetSkipTspSelection() == "Ask User"))
    {
-      q_UseShortcut = true;
-      m_AddTspForAllSubNodes(oru32_SubDevicesSize, oru32_OriginalOscNodeSize, orc_NodeName.toStdString().c_str());
+      const stw::scl::C_SclString c_TitleString = orc_NodeName.toStdString().c_str();
+      const stw::scl::C_SclString c_MessageBoxTitle = "Import TSP Assistance";
+      const stw::scl::C_SclString c_MessageBoxText =
+         "Do you want to import openSYDE Target Support Package file(s) to " +
+         c_TitleString  + "?";
+      const stw::scl::C_SclString c_MessageBoxDetails =
+         "With an openSYDE Target Support Package the user is able to bring "
+         "an empty node (fresh placed from toolbox) to a defined default state. "
+         "\nNode definition import could contain e.g.: Data Blocks configuration, Template programming project, "
+         "Datapools configuration,... .";
+
+      QGraphicsView * const pc_View = this->views().at(0);
+      C_OgeWiCustomMessage c_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
+
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText(c_MessageBoxTitle.c_str()));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText(c_MessageBoxText.c_str()));
+      c_MessageBox.SetDetails(C_GtGetText::h_GetText(c_MessageBoxDetails.c_str()));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Skip"));
+      c_MessageBox.SetCheckboxText(C_GtGetText::h_GetText("Always skip TSP Import assistance"));
+      c_MessageBox.SetCheckboxTooltip(
+         C_GtGetText::h_GetText("Remember selection"),
+         C_GtGetText::h_GetText(
+            "If checkbox is checked the TSP Import Assistance will always be skipped and this message will not appear anymore.\n"
+            "This option can be changed in Tool Settings."));
+      c_MessageBox.SetCustomMinWidth(700);
+
+      const C_OgeWiCustomMessage::E_Outputs e_Output = c_MessageBox.Execute();
+
+      if (e_Output == C_OgeWiCustomMessage::eOK)
+      {
+         q_UseShortcut = true;
+
+         m_AddTspForAllSubNodes(oru32_SubDevicesSize, oru32_OriginalOscNodeSize, orc_NodeName.toStdString().c_str());
+      }
+      else if (e_Output == C_OgeWiCustomMessage::eNO)
+      {
+         //shall the skipping be remembered?
+         if (c_MessageBox.GetCheckboxState() == true)
+         {
+            C_UsHandler::h_GetInstance()->SetSkipTspSelection("Skip");
+         }
+      }
+      else
+      {
+         //nothing to do here
+      }
    }
 
    return q_UseShortcut;

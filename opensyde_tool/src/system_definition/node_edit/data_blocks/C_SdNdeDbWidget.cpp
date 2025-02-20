@@ -346,8 +346,8 @@ void C_SdNdeDbWidget::m_OnEdit(void)
    if (pc_Application != NULL)
    {
       const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-      C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex,
-                                                                      this->mu32_ApplicationIndex, *c_New);
+      const C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex,
+                                                                            this->mu32_ApplicationIndex, *c_New);
 
       //Resize
       if (pc_Application->e_Type != C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)

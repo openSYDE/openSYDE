@@ -283,7 +283,6 @@ const
    int32_t s32_Return;
    C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_REQ, 0U);
 
-   std::vector<uint8_t> c_Request;
    orc_DeviceInfos.clear();
    orc_DeviceExtendedInfos.clear();
    if (mpc_Dispatcher == NULL)
@@ -292,6 +291,7 @@ const
    }
    else
    {
+      std::vector<uint8_t> c_Request;
       c_Header.ComposeHeader(c_Request);
 
       s32_Return = mpc_Dispatcher->SendUdp(c_Request);
@@ -784,7 +784,6 @@ int32_t C_OscProtocolDriverOsyTpIp::BroadcastRequestProgramming(
    int32_t s32_Return;
    C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_REQUEST_PROGRAMMING_REQ, 0U);
 
-   std::vector<uint8_t> c_Request;
    orc_Results.clear();
    if (mpc_Dispatcher == NULL)
    {
@@ -792,6 +791,8 @@ int32_t C_OscProtocolDriverOsyTpIp::BroadcastRequestProgramming(
    }
    else
    {
+      std::vector<uint8_t> c_Request;
+
       c_Header.ComposeHeader(c_Request);
 
       s32_Return = mpc_Dispatcher->SendUdp(c_Request);

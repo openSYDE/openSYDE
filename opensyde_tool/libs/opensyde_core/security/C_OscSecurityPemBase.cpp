@@ -316,9 +316,16 @@ int32_t C_OscSecurityPemBase::m_ReadPublicKey(const std::vector<uint8_t> & orc_F
                               if ((c_PubKeySerialNumber[0UL] == 0x02U) &&
                                   (c_PubKeySerialNumber[1UL] == (c_PubKeySerialNumber.size() - 2UL)))
                               {
-                                 //Erase first two elments
+                                 //Erase first two elements
                                  c_PubKeySerialNumber.erase(c_PubKeySerialNumber.begin());
                                  c_PubKeySerialNumber.erase(c_PubKeySerialNumber.begin());
+
+                                 //Strip leading zeroes for compatibility (see #100795 for details)
+                                 while ((c_PubKeySerialNumber.size() > 0) && (c_PubKeySerialNumber[0] == 0x00U))
+                                 {
+                                    c_PubKeySerialNumber.erase(c_PubKeySerialNumber.begin());
+                                 }
+
                                  //Add serial number
                                  this->mc_KeyInfo.SetCertificateSerialNumber(c_PubKeySerialNumber);
                               }

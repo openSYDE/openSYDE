@@ -232,23 +232,23 @@ void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32_t> & orc_Elemen
    for (uint32_t u32_ItInvisibleRootChild = 0;
         u32_ItInvisibleRootChild < c_InvisibleRootChildren.size(); u32_ItInvisibleRootChild++)
    {
-      C_TblTreeModelCheckableItem * const pc_VisibleRootItem =
+      const C_TblTreeModelCheckableItem * const pc_VisibleRootItem =
          dynamic_cast<C_TblTreeModelCheckableItem *>(c_InvisibleRootChildren.at(u32_ItInvisibleRootChild));
       if (pc_VisibleRootItem != NULL)
       {
-         std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
+         const std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
          for (uint32_t u32_ItVisibleRootChild = 0;
               u32_ItVisibleRootChild < c_VisibleRootChildren.size(); u32_ItVisibleRootChild++)
          {
-            C_TblTreeModelCheckableItem * const pc_NodeItem =
+            const C_TblTreeModelCheckableItem * const pc_NodeItem =
                dynamic_cast<C_TblTreeModelCheckableItem *>(c_VisibleRootChildren.at(u32_ItVisibleRootChild));
             if (pc_NodeItem != NULL)
             {
-               std::vector<C_TblTreSimpleItem *> c_NodeChildren = pc_NodeItem->c_Children;
+               const std::vector<C_TblTreSimpleItem *> c_NodeChildren = pc_NodeItem->c_Children;
                std::vector<uint32_t> c_AppIndices;
                for (uint32_t u32_ItNodeChild = 0; u32_ItNodeChild < c_NodeChildren.size(); u32_ItNodeChild++)
                {
-                  C_TblTreeModelCheckableItem * const pc_AppItem =
+                  const C_TblTreeModelCheckableItem * const pc_AppItem =
                      dynamic_cast<C_TblTreeModelCheckableItem *>(c_NodeChildren.at(u32_ItNodeChild));
                   if ((pc_AppItem != NULL) && (pc_AppItem->e_CheckState == Qt::Checked))
                   {

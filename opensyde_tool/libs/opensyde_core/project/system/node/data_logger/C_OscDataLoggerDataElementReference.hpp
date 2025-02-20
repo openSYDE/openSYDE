@@ -29,7 +29,8 @@ public:
    void CalcHash(uint32_t & oru32_HashValue) const;
 
    bool q_UseCustomName;                                         ///< flag to use custom name or default name
-   stw::scl::C_SclString c_CustomName;                           ///< custom name to use for logging
+   stw::scl::C_SclString c_CustomName;                           ///< custom name to use for logging, do not use if
+                                                                 // q_UseCustomName is not set
    C_OscNodeDataPoolListElementOptArrayId c_ConfiguredElementId; ///< configured element ID
 };
 

@@ -1682,8 +1682,8 @@ void C_OscSystemDefinition::AddNodeSquad(std::vector<C_OscNode> & orc_Nodes,
                                          const std::vector<stw::scl::C_SclString> & orc_SubDeviceNames,
                                          const stw::scl::C_SclString & orc_MainDeviceName)
 {
-   tgl_assert(orc_SubDeviceNames.size() == orc_SubDeviceNames.size());
-   if (orc_SubDeviceNames.size() == orc_SubDeviceNames.size())
+   tgl_assert(orc_Nodes.size() == orc_SubDeviceNames.size());
+   if (orc_Nodes.size() == orc_SubDeviceNames.size())
    {
       uint32_t u32_Counter;
 

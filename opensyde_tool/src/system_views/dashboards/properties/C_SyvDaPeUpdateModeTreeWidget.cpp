@@ -314,7 +314,7 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 {
-   C_SyvDaPeUpdateModeNodeHeader * const pc_Widget =
+   const C_SyvDaPeUpdateModeNodeHeader * const pc_Widget =
       dynamic_cast<C_SyvDaPeUpdateModeNodeHeader * const>(this->indexWidget(orc_Index));
 
    if (pc_Widget != NULL)
@@ -331,7 +331,7 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 {
-   C_SyvDaPeUpdateModeNodeHeader * const pc_Widget =
+   const C_SyvDaPeUpdateModeNodeHeader * const pc_Widget =
       dynamic_cast<C_SyvDaPeUpdateModeNodeHeader * const>(this->indexWidget(orc_Index));
 
    if (pc_Widget != NULL)

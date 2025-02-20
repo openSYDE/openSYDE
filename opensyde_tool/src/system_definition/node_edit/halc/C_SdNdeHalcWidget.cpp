@@ -608,7 +608,7 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
          {
             QString c_ErrorDetails = "";
             const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
-            C_SdNdeHalcDefUpdateDialog * const pc_UpdateDialog =
+            const C_SdNdeHalcDefUpdateDialog * const pc_UpdateDialog =
                new C_SdNdeHalcDefUpdateDialog(*c_PopUpDialog, this->mu32_NodeIndex, c_HalcConfig, c_HalcDefPath);
 
             //Resize

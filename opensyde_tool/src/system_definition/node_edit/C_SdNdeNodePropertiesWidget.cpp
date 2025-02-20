@@ -246,6 +246,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelProtocol->setText(C_GtGetText::h_GetText("Protocol Support"));
    this->mpc_Ui->pc_LabelProgramming->setText(C_GtGetText::h_GetText("Programming Support"));
    this->mpc_Ui->pc_LabelComIfSettings->setText(C_GtGetText::h_GetText("Communication Interfaces Settings"));
+   this->mpc_Ui->pc_LabelProductPageLink->setText(C_GtGetText::h_GetText("Visit product page"));
 
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("openSYDE"));
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("KEFEX"));
@@ -444,7 +445,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
          tgl_assert(u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size());
          if (u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size())
          {
-            QFileInfo c_FileInfo;
+            QFileInfo c_FileInfoDevImg;
             bool q_FileExists;
             bool q_StwFlashloaderActive = false;
             uint32_t u32_NodeSquadIndex;
@@ -523,8 +524,8 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             }
 
             //load device picture
-            c_FileInfo.setFile(pc_DevDef->c_ImagePath.c_str());
-            q_FileExists = (c_FileInfo.exists() && c_FileInfo.isFile());
+            c_FileInfoDevImg.setFile(pc_DevDef->c_ImagePath.c_str());
+            q_FileExists = (c_FileInfoDevImg.exists() && c_FileInfoDevImg.isFile());
 
             //check if file exists
             if (q_FileExists == true)
@@ -543,6 +544,32 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                this->mpc_Ui->pc_LabelNoImageAvailable->setVisible(true);
                this->mpc_Ui->pc_DatapoolTypeImage->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
             }
+
+            //load company logo
+            if (pc_DevDef->c_ManufacturerDisplayValue != "Sensor-Technik Wiedemann GmbH")
+            {
+               QFileInfo c_FileInfoCompLogo;
+               c_FileInfoCompLogo.setFile(pc_DevDef->c_CompanyLogoLink.c_str());
+               q_FileExists = (c_FileInfoCompLogo.exists() && c_FileInfoCompLogo.isFile());
+
+               if (q_FileExists == true)
+               {
+                  QPixmap c_ImgCompLogo;
+                  c_ImgCompLogo.load(pc_DevDef->c_CompanyLogoLink.c_str());
+                  c_ImgCompLogo = c_ImgCompLogo.scaled((c_ImgCompLogo.width() / 10), (c_ImgCompLogo.height() / 10),
+                                                       Qt::KeepAspectRatio,
+                                                       Qt::SmoothTransformation);
+                  this->mpc_Ui->pc_CompanyLogo->setPixmap(c_ImgCompLogo);
+               }
+            }
+            else
+            {
+               this->mpc_Ui->pc_CompanyLogo->setVisible(false);
+               this->mpc_Ui->pc_LabelProductPageLink->setVisible(false);
+            }
+
+            //init hyperlink
+            this->m_InitHyperlinkLabel(static_cast<QString>(pc_DevDef->c_ProductPageLink.c_str()));
 
             this->mpc_Ui->pc_DatapoolTypeImage->setPixmap(c_ImgNode);
 
@@ -1607,7 +1634,7 @@ void C_SdNdeNodePropertiesWidget::m_HandleCellClick(const uint32_t ou32_Row, con
    }
    else if ((ou32_Column == s32_COL_BUS_BITRATE) && (q_EnabledCellBus == true))
    {
-      this->m_BusBitrateClick(ou32_Row, ou32_Column);
+      this->m_BusBitrateClick(ou32_Row);
    }
    else
    {
@@ -1661,44 +1688,33 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32_t ou32_Row)
  *          opensyde crashes, because of unexpected behaviour of the table. It seems that the table still wants to
  *          perform actions after signal is out and screen is changed (while parent widget is already deleted).
 
-   \param[in]  ou32_Row       Row
-   \param[in]  ou32_Column    Column
+   \param[in]  ou32_Row    Row
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32_t ou32_Row, const uint32_t ou32_Column)
+void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32_t ou32_Row)
 {
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    const C_OscNodeProperties c_Prop = pc_Node->c_Properties;
 
-   std::vector<C_OscNodeComInterfaceSettings> c_ComInterfaces = c_Prop.c_ComInterfaces;
+   const std::vector<C_OscNodeComInterfaceSettings> & rc_ComInterfaces = c_Prop.c_ComInterfaces;
 
-   for (uint32_t u32_It = 0; u32_It < c_ComInterfaces.size(); ++u32_It)
+   if (ou32_Row < rc_ComInterfaces.size())
    {
       //check to which buses the node is connected
-      if (pc_Node->c_Properties.c_ComInterfaces[u32_It].GetBusConnected() == true)
+      if (rc_ComInterfaces[ou32_Row].GetBusConnected() == true)
       {
-         const uint32_t u32_BusIndex = c_ComInterfaces[u32_It].u32_BusIndex;
+         const uint32_t u32_BusIndex = rc_ComInterfaces[ou32_Row].u32_BusIndex;
          //get name of connected bus
          const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
-            pc_Node->c_Properties.c_ComInterfaces[u32_It].u32_BusIndex);
-         const QString c_BusName = pc_Bus->c_Name.c_str();
-
-         //get label text of the cell, that was clicked
-
-         const QLabel * const pc_CellLabel =
-            dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row, ou32_Column));
-
-         if (pc_CellLabel != NULL)
+            rc_ComInterfaces[ou32_Row].u32_BusIndex);
+         tgl_assert(pc_Bus != NULL);
+         if (pc_Bus != NULL)
          {
-            const QString c_Text = pc_CellLabel->text();
-            // do we have a match? change screen
-            if (c_Text.contains(c_BusName) == true)
-            {
-               this->mu32_BusIndex = u32_BusIndex;
-               this->mc_BusName = c_BusName;
-               this->mc_Timer.start();
-               break;
-            }
+            const QString c_BusName = pc_Bus->c_Name.c_str();
+
+            this->mu32_BusIndex = u32_BusIndex;
+            this->mc_BusName = c_BusName;
+            this->mc_Timer.start();
          }
       }
    }
@@ -1747,4 +1763,28 @@ void C_SdNdeNodePropertiesWidget::m_FlashloaderOptions(void) const
          c_New->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initializes the "Visit product page" label as a clickable hyperlink and offers the functionality that
+            the system's standard browser is called
+
+   \param[in]       orc_Url     Detailed input parameter description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_InitHyperlinkLabel(const QString & orc_Url)
+{
+   const QString c_Hyperlink = orc_Url;
+   const QString c_Color = "rgb(86, 86, 104)";
+   const QString c_Font = "Segoe UI";
+
+   this->mpc_Ui->pc_LabelProductPageLink->setText(
+      static_cast<QString>(
+         "<a href=\"%1\"><span style=\"color: %2; font-family: '%3'; font-size: %4px;\">Visit product page</span></a>")
+      .arg(c_Hyperlink)
+      .arg(c_Color)
+      .arg(c_Font)
+      .arg(13));
+
+   this->mpc_Ui->pc_LabelProductPageLink->setOpenExternalLinks(true);
 }

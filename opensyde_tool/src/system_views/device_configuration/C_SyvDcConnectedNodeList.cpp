@@ -179,7 +179,7 @@ uint8_t C_SyvDcConnectedNodeList::GetSelectedNodeId(void) const
 
    if (pc_Item != NULL)
    {
-      C_SyvDcConnectedNodeWidget * const pc_Widget =
+      const C_SyvDcConnectedNodeWidget * const pc_Widget =
          dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(pc_Item));
       u8_NodeId = pc_Widget->GetNodeId();
    }
@@ -263,7 +263,7 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
    {
       if (oc_Items.size() > 0)
       {
-         C_SyvDcConnectedNodeWidget * const pc_Widget =
+         const C_SyvDcConnectedNodeWidget * const pc_Widget =
             dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(oc_Items[0]));
          if (pc_Widget != NULL)
          {

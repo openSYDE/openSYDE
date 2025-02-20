@@ -384,7 +384,6 @@ void C_OscExportDataPool::mh_AddIncludes(C_SclStringList & orc_Data, const C_Osc
    \param[in]  ou8_DataPoolIndex        index of Datapool
    \param[in]  orc_ProjectId            project id for consistency check
    \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
-   \param[in]  oq_FileType              .c or .h file selected
    \param[in]  oe_Linkage               flag for linkage context
    \param[in]  oe_ScalingSupport        Flag for data type and existence of factor, offset and scaling macros
 
@@ -1595,9 +1594,8 @@ C_SclString C_OscExportDataPool::mh_ConvertLinkageToString(const C_OscExportData
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get magic name for consistency checks.
 
-   \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             Datapool configuration
    \param[in]  orc_ProjectId            project id for consistency check
+   \param[in]  orc_DataPool             Datapool configuration
 
    \return
    Magic name
@@ -1614,7 +1612,10 @@ C_SclString C_OscExportDataPool::mh_GetMagicName(const C_SclString & orc_Project
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Utility for getting define string of factor value constant.
 
-   \param[in]       orc_Element     Datapool element
+   \param[in]       orc_DataPoolName   Name of Datapool
+   \param[in]       orc_ListName       Name of list
+   \param[in]       orc_ElementName    Name of element
+   \param[in]       oq_Factor          true: get string for factor; else: get string for offset
 
    \return
    scale value string, e.g. MY_NVM_SCALING_FACTOR_LIST1_U8VAR

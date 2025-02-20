@@ -526,7 +526,7 @@ void C_CamMetControlBarWidget::m_OpenTraceSettings(void)
 {
    //Set parent for better hierarchy handling via window manager
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
-   C_CamMetSettingsPopup * const pc_Dialog = new C_CamMetSettingsPopup(*c_New);
+   const C_CamMetSettingsPopup * const pc_Dialog = new C_CamMetSettingsPopup(*c_New);
 
    //Resize
    c_New->SetSize(QSize(600, 350));

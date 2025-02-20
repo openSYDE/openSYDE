@@ -1159,6 +1159,7 @@ C_CamProHandler * C_CamProHandler::h_GetInstance(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamProHandler::C_CamProHandler(void) :
+   QObject(),
    mu32_FileHash(0UL),
    mq_CyclicMessageTransmitActive(true),
    mq_FiltersActive(false),

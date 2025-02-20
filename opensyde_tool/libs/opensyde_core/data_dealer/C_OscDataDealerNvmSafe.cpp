@@ -748,7 +748,7 @@ int32_t C_OscDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_O
                      this->mpc_Node->c_DataPools[rc_DataPoolListId.u32_DataPoolIndex];
                   if (rc_DataPoolListId.u32_ListIndex < rc_DataPool.c_Lists.size())
                   {
-                     C_OscNodeDataPoolList & rc_List = rc_DataPool.c_Lists[rc_DataPoolListId.u32_ListIndex];
+                     const C_OscNodeDataPoolList & rc_List = rc_DataPool.c_Lists[rc_DataPoolListId.u32_ListIndex];
                      if (rc_List.q_NvmCrcActive == true)
                      {
                         C_OscParamSetRawEntry c_RawEntry;

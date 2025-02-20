@@ -321,7 +321,7 @@ void C_SyvDaDashboardSelectorTabWidget::Save(void)
    //Tabs
    for (int32_t s32_ItTab = 0; s32_ItTab < this->count(); ++s32_ItTab)
    {
-      C_SyvDaDashboardWidget * const pc_WidgetRef =
+      const C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_ItTab));
 
       if (pc_WidgetRef != NULL)
@@ -336,7 +336,7 @@ void C_SyvDaDashboardSelectorTabWidget::Save(void)
    for (QList<C_SyvDaTearOffWidget *>::const_iterator c_ItItem = this->mc_TearedOffWidgets.begin();
         c_ItItem != this->mc_TearedOffWidgets.end(); ++c_ItItem)
    {
-      C_SyvDaTearOffWidget * const pc_Widget = *c_ItItem;
+      const C_SyvDaTearOffWidget * const pc_Widget = *c_ItItem;
       if (pc_Widget != NULL)
       {
          //Delete
@@ -420,7 +420,7 @@ void C_SyvDaDashboardSelectorTabWidget::RegisterWidgets(C_SyvComDriverDiag & orc
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      C_SyvDaDashboardWidget * const pc_WidgetRef =
+      const C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -450,7 +450,7 @@ void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Ac
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      C_SyvDaDashboardWidget * const pc_WidgetRef =
+      const C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -494,7 +494,7 @@ void C_SyvDaDashboardSelectorTabWidget::UpdateShowValues(void) const
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      C_SyvDaDashboardWidget * const pc_WidgetRef =
+      const C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -520,7 +520,7 @@ void C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration()
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      C_SyvDaDashboardWidget * const pc_WidgetRef =
+      const C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -554,7 +554,7 @@ int32_t C_SyvDaDashboardSelectorTabWidget::GetDashboardIndexForTabIndex(const in
 
    if (os32_TabIndex < this->count())
    {
-      C_SyvDaDashboardWidget * const pc_Widget =
+      const C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(os32_TabIndex));
       if (pc_Widget != NULL)
       {
@@ -583,7 +583,7 @@ void C_SyvDaDashboardSelectorTabWidget::HandleManualOperationFinished(const int3
 {
    for (int32_t s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      C_SyvDaDashboardWidget * const pc_WidgetRef =
+      const C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -836,7 +836,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_CurrentChanged(const int32_t os32_Curr
    }
    //Focus
 
-   C_SyvDaDashboardWidget * const pc_Widget =
+   const C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(os32_CurrentIndex));
    if (pc_Widget != NULL)
    {
@@ -952,7 +952,7 @@ int32_t C_SyvDaDashboardSelectorTabWidget::m_MapDataIndexToTabIndex(const uint32
 
    for (int32_t s32_ItTab = 0; s32_ItTab < this->count(); ++s32_ItTab)
    {
-      C_SyvDaDashboardWidget * const pc_Widget =
+      const C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_ItTab));
       if (pc_Widget != NULL)
       {
@@ -1076,7 +1076,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnActiveChange(const C_OgeWiDashboardT
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-      C_SyvDaDashboardWidget * const pc_Widget =
+      const C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Match));
       if ((pc_Widget != NULL) && (pc_View != NULL))
       {
@@ -1100,7 +1100,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnCopyAction(const C_OgeWiDashboardTab
 {
    const int32_t s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   C_SyvDaDashboardWidget * const pc_Widget =
+   const C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<int32_t>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1120,7 +1120,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnCutAction(const C_OgeWiDashboardTab 
 {
    const int32_t s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   C_SyvDaDashboardWidget * const pc_Widget =
+   const C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<int32_t>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1164,7 +1164,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnDeleteAction(const C_OgeWiDashboardT
 {
    const int32_t s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   C_SyvDaDashboardWidget * const pc_Widget =
+   const C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<int32_t>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1243,7 +1243,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnEditProperties(C_OgeWiDashboardTab *
 {
    const int32_t s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   C_SyvDaDashboardWidget * const pc_Widget =
+   const C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<int32_t>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1386,7 +1386,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Da
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const int32_t os32_TabIndex)
 {
-   C_SyvDaDashboardWidget * const pc_Widget =
+   const C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<int32_t>(os32_TabIndex)));
    const bool q_LastDashboard = (this->count() == 1);
 
@@ -1563,7 +1563,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
       //Save tabs
       for (int32_t s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
       {
-         C_SyvDaDashboardWidget * const pc_Widget =
+         const C_SyvDaDashboardWidget * const pc_Widget =
             dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
          if (pc_Widget != NULL)
@@ -1683,7 +1683,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_SetCurrentTabNameForScreenshotFile()
 
    if (pc_View != NULL)
    {
-      C_SyvDaDashboardWidget * const pc_Widget =
+      const C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(this->currentIndex()));
       if (pc_Widget != NULL)
       {
@@ -1709,7 +1709,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_GetCurrentDashboardTabName(void) const
 
    if (pc_View != NULL)
    {
-      C_SyvDaDashboardWidget * const pc_Widget =
+      const C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(this->currentIndex()));
       if (pc_Widget != NULL)
       {

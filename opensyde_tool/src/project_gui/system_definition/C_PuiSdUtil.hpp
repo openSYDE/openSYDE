@@ -72,9 +72,12 @@ public:
    static void h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
                                          const C_PuiSdNodeConnectionId & orc_ConnectionId,
                                          std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
+   static bool h_CheckDataLoggerNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_SdDataLoggerIndex,
+                                              const uint32_t ou32_TargetNodeIndex);
 
 private:
    C_PuiSdUtil(void);
+   static std::vector<uint8_t> mh_GetAllNodesActive(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

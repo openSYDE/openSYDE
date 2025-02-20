@@ -604,6 +604,7 @@ void C_SdNdeNodeEditWidget::m_OnDpChanged(void)
 {
    this->m_ReloadCommMessages();
    this->m_ReloadHalc();
+   this->m_ReloadDataLoggerDataElements();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -675,6 +676,20 @@ void C_SdNdeNodeEditWidget::m_ReloadHalc(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger entire reload of data logger data elements section
+
+   Necessary if data elements could have changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_ReloadDataLoggerDataElements() const
+{
+   if (this->mpc_DataLoggerWidget != NULL)
+   {
+      this->mpc_DataLoggerWidget->ReloadDataLoggerDataElements();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  runs the HALC magician, reloads datapool Tab and HALC Tab Screen
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -717,6 +732,8 @@ void C_SdNdeNodeEditWidget::m_CreatePropertiesTab(const bool oq_AdaptCursor)
               this, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged, this,
               &C_SdNdeNodeEditWidget::m_ReloadCanOpenConfig);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadDataLoggerDataElements);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange, this,
               &C_SdNdeNodeEditWidget::SigErrorChange);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigOwnedDataPoolsChanged, this,

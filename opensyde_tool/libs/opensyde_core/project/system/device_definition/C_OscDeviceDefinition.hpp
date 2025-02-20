@@ -52,7 +52,11 @@ public:
    std::vector<C_OscSupportedCanInterfaceFeatures> c_SupportedCanFeatures; ///< supported CAN features per interface
 
    uint8_t u8_ManufacturerId;                        ///< manufacturer id used by device configuration
-   stw::scl::C_SclString c_ManufacturerDisplayValue; ///< manufacturer string, displayed in device configuration
+   stw::scl::C_SclString c_ManufacturerDisplayValue; ///< manufacturer string, displayed in device configuration, also
+                                                     // used for Toolbox Eco-Partners
+   stw::scl::C_SclString c_CompanyLogoLink;          ///< link to company logo (Eco-Partners)
+   stw::scl::C_SclString c_ProductPageLink;          ///< link to product page (Eco-Partner devices)
+   stw::scl::C_SclString c_ToolboxIcon;              ///< link to Toolbox Icon (Eco-Partners)
 
    std::vector<C_OscSubDeviceDefinition> c_SubDevices;
 

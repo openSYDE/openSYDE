@@ -33,7 +33,7 @@ public:
                                      const stw::scl::C_SclString & orc_ExportToolName = "",
                                      const stw::scl::C_SclString & orc_ExportToolVersion = "");
 
-private:
+protected:
    static int32_t mh_CreateOsyInitCode(const C_OscNode & orc_Node, const uint16_t ou16_ApplicationIndex,
                                        const stw::scl::C_SclString & orc_Path,
                                        std::vector<stw::scl::C_SclString> & orc_Files,

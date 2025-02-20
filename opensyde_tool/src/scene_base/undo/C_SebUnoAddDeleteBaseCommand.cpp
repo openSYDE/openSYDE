@@ -64,10 +64,10 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                                                  const C_PuiBsElements & orc_AllElements) const
 {
    std::vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
-   C_GiBiArrow * pc_LineArrow;
-   C_GiBiBoundary * pc_Boundary;
-   C_GiBiImageGroup * pc_Image;
-   C_GiBiTextElement * pc_TextElement;
+   const C_GiBiArrow * pc_LineArrow;
+   const C_GiBiBoundary * pc_Boundary;
+   const C_GiBiImageGroup * pc_Image;
+   const C_GiBiTextElement * pc_TextElement;
    C_PuiBsDataElement * pc_Data;
    C_GiUnique * pc_Unique;
 

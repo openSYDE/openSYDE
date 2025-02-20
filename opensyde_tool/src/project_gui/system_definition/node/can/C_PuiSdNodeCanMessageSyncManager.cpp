@@ -680,7 +680,7 @@ int32_t C_PuiSdNodeCanMessageSyncManager::SetCanSignalPosition(
    \param[in]   orc_Message            Message data
    \param[in]   orc_OscSignalCommons   Signals data (osc common)
    \param[in]   orc_UiSignalCommons    Signals data (ui common)
-   \param[in]   orc_UiSignals          Signals data (ui)
+   \param[out]  orc_UiMessage          Message ui data
    \param[out]  oru32_MessageIndex     New message index, only valid if C_NO_ERR
 
    \return
@@ -694,7 +694,7 @@ int32_t C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32_t & oru32_N
                                                         const uint32_t & oru32_DatapoolIndex,
                                                         const bool & orq_MessageIsTx,
                                                         const C_OscCanMessage & orc_Message,
-                                                        const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
+                                                        const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const C_PuiSdNodeCanMessage & orc_UiMessage,
                                                         uint32_t & oru32_MessageIndex)
 {
    int32_t s32_Retval = C_RANGE;
@@ -709,12 +709,9 @@ int32_t C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32_t & oru32_N
       const std::vector<C_OscCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(orq_MessageIsTx);
       const C_OscCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex,
                                                              oru32_DatapoolIndex, orq_MessageIsTx, rc_Messages.size());
-      C_PuiSdNodeCanMessage c_UiMessage;
-
-      c_UiMessage.c_Signals = orc_UiSignals;
       s32_Retval = this->InsertCanMessage(c_MessageId, orc_Message,
                                           orc_OscSignalCommons,
-                                          orc_UiSignalCommons, c_UiMessage);
+                                          orc_UiSignalCommons, orc_UiMessage);
       if (s32_Retval == C_NO_ERR)
       {
          oru32_MessageIndex = static_cast<uint32_t>(rc_Messages.size()) - 1UL;
@@ -840,7 +837,7 @@ int32_t C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OscCanMessa
       //Get complete message
       tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanMessageComplete(orc_MessageId, c_Message, c_OscSignalCommons,
                                                                         c_UiSignalCommons,
-                                                                        c_UiMessage.c_Signals) == C_NO_ERR);
+                                                                        c_UiMessage) == C_NO_ERR);
       //Add without register
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertCanMessage(c_NewId, c_Message, c_OscSignalCommons,
                                                                    c_UiSignalCommons,
@@ -944,7 +941,7 @@ int32_t C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OscCanMessageI
       //Get complete message
       tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanMessageComplete(orc_MessageId, c_Message, c_OscSignalCommons,
                                                                         c_UiSignalCommons,
-                                                                        c_UiMessage.c_Signals) == C_NO_ERR);
+                                                                        c_UiMessage) == C_NO_ERR);
       //Add without register
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertCanMessage(c_NewId, c_Message, c_OscSignalCommons,
                                                                    c_UiSignalCommons,

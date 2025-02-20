@@ -465,9 +465,9 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
    // message IDs
    // second parameter of int type is important for line edit data handling
    this->mpc_Ui->pc_LeCanIdStart->SetFromVariant(C_Uti::h_GetValueAsHex(orc_FilterItemData.u32_StartId),
-                                                 static_cast<uint64_t>(orc_FilterItemData.u32_StartId));
+                                                 static_cast<qulonglong>(orc_FilterItemData.u32_StartId));
    this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(C_Uti::h_GetValueAsHex(orc_FilterItemData.u32_EndId),
-                                               static_cast<uint64_t>(orc_FilterItemData.u32_EndId));
+                                               static_cast<qulonglong>(orc_FilterItemData.u32_EndId));
 
    // ID min/max (for tool tip in initial case)
    if (static_cast<bool>(orc_FilterItemData.u8_ExtendedId) == true)
@@ -556,9 +556,9 @@ void C_CamMosFilterPopup::m_UpdateLineEdits(const uint32_t ou32_RowIndex) const
       const C_CamProFilterItemData c_FilterItem = c_Data[ou32_RowIndex];
 
       this->mpc_Ui->pc_LeCanIdStart->SetFromVariant(C_Uti::h_GetValueAsHex(c_FilterItem.u32_StartId),
-                                                    static_cast<uint64_t>(c_FilterItem.u32_StartId));
+                                                    static_cast<qulonglong>(c_FilterItem.u32_StartId));
       this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(C_Uti::h_GetValueAsHex(c_FilterItem.u32_EndId),
-                                                  static_cast<uint64_t>(c_FilterItem.u32_EndId));
+                                                  static_cast<qulonglong>(c_FilterItem.u32_EndId));
    }
 }
 
@@ -776,7 +776,7 @@ void C_CamMosFilterPopup::m_OnTypeChanged(const int32_t os32_NewType) const
       {
          const C_CamProFilterItemData c_FilterItem = c_Data[s32_CurrentRowIndex];
          this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(C_Uti::h_GetValueAsHex(c_FilterItem.u32_EndId),
-                                                     static_cast<uint64_t>(c_FilterItem.u32_EndId));
+                                                     static_cast<qulonglong>(c_FilterItem.u32_EndId));
       }
 
       // GUI
@@ -963,7 +963,7 @@ void C_CamMosFilterPopup::m_OnExtendedToggled(const bool oq_Checked)
 void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
 {
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_CamMosDatabaseSelectionPopup * const pc_Dialog = new C_CamMosDatabaseSelectionPopup(*c_New, false);
+   const C_CamMosDatabaseSelectionPopup * const pc_Dialog = new C_CamMosDatabaseSelectionPopup(*c_New, false);
 
    //Resize
    c_New->SetSize(QSize(700, 800));

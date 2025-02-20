@@ -76,8 +76,8 @@ void C_OgeLeIpAddress::focusOutEvent(QFocusEvent * const opc_Event)
 
    if (opc_Event->reason() == Qt::TabFocusReason)
    {
-      Q_EMIT SignalTabKey(this);
+      Q_EMIT (SignalTabKey(this));
    }
 
-   Q_EMIT SignalFocusOut(this);
+   Q_EMIT (SignalFocusOut(this));
 }

@@ -36,6 +36,7 @@ public:
 
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
+   void ReloadDataLoggerDataElements(void);
    void SetNode(const uint32_t ou32_NodeIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality

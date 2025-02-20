@@ -20,7 +20,7 @@
 using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-bool C_OscDataLoggerJob::hq_AllowDataloggerFeature = false;
+bool C_OscDataLoggerJob::hq_AllowDataloggerFeature = true;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ bool C_OscDataLoggerJob::hq_AllowDataloggerFeature = false;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OscDataLoggerJob::C_OscDataLoggerJob() :
-   q_IsEnabled(true)
+   q_IsEnabled(false)
 {
 }
 

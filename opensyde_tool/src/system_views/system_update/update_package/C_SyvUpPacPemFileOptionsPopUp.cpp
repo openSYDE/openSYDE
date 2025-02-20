@@ -91,8 +91,7 @@ C_SyvUpPacPemFileOptionsPopUp::~C_SyvUpPacPemFileOptionsPopUp(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacPemFileOptionsPopUp::InitStaticNames(void) const
 {
-   const QString c_ToolTipContent = C_GtGetText::h_GetText("Explanation:\n"
-                                                           "No Change: Do not send service\n"
+   const QString c_ToolTipContent = C_GtGetText::h_GetText("No Change: Do not send service\n"
                                                            "Activate: Change current state to %1 active\n"
                                                            "Deactivate: Change current state to %1 inactive");
 

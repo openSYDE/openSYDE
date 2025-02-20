@@ -18,6 +18,7 @@
 #include "openssl/evp.h"
 #include "openssl/ecdsa.h"
 #include "openssl/pem.h"
+#include "openssl/core_names.h"
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -126,8 +127,8 @@ int32_t C_OscSecurityEcdsa::C_Ecdsa256Signature::GetAsDerString(C_SclString & or
          else
          {
             //only free manually if not done already indirectly via ECDSA_SIG_free
-            BN_free(pc_Rpart);
-            BN_free(pc_Spart);
+            BN_clear_free(pc_Rpart);
+            BN_clear_free(pc_Spart);
          }
       }
    }
@@ -253,7 +254,7 @@ C_OscSecurityEcdsa::~C_OscSecurityEcdsa()
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscSecurityEcdsa::h_ExtractPublicKeyFromX509Certificate(const std::vector<uint8_t> & orc_X509, uint8_t(
-                                                                     &orau8_Binary)[stw::opensyde_core::C_OscSecurityEcdsa::hu32_SECP256R1_PUBLIC_KEY_LENGTH])
+                                                                     &orau8_Binary)[C_OscSecurityEcdsa::hu32_SECP256R1_PUBLIC_KEY_LENGTH])
 {
    int32_t s32_Result = C_RANGE;
 
@@ -264,52 +265,60 @@ int32_t C_OscSecurityEcdsa::h_ExtractPublicKeyFromX509Certificate(const std::vec
       X509 * const pc_X509Data = d2i_X509(NULL, &pu8_KeyData,
                                           static_cast<long>(orc_X509.size())); //lint !e970 //using type to match
                                                                                // library interface
-
       if (pc_X509Data != NULL)
       {
          //Get key in EVP_PKEY format:
          EVP_PKEY * const pc_EvpKey = X509_get_pubkey(pc_X509Data);
          X509_free(pc_X509Data);
 
-         if (pc_EvpKey != NULL)
+         //check if the key is really an elliptic curve key
+         if ((pc_EvpKey != NULL) && (EVP_PKEY_base_id(pc_EvpKey) == EVP_PKEY_EC))
          {
-            //check if the key is really an elliptic curve key
-            if (EVP_PKEY_base_id(pc_EvpKey) == EVP_PKEY_EC)
+            //convert into EC KEY object
+            EC_GROUP * const pc_EcGroup = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+            if (pc_EcGroup != NULL)
             {
-               //convert into EC KEY object
-               EC_KEY * const pc_EcdsaKey = EVP_PKEY_get1_EC_KEY(pc_EvpKey);
-               if (pc_EcdsaKey != NULL)
+               EC_POINT * const pc_PublicKey = EC_POINT_new(pc_EcGroup);
+               if (pc_PublicKey != NULL)
                {
-                  EC_GROUP * const pc_EcGroup = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-                  if (pc_EcGroup != NULL)
+                  uint8_t au8_PublicKeyOctets[C_OscSecurityEcdsa::hu32_SECP256R1_PUBLIC_KEY_LENGTH];
+                  size_t x_NumBytesPublicKey; //lint !e970 !e8080 //use API type
+
+                  //get public key as octet string
+                  const int x_ResultGetPublicKey = //lint !e970 !e8080 //use API type
+                                                   EVP_PKEY_get_octet_string_param(pc_EvpKey,
+                                                                                   OSSL_PKEY_PARAM_PUB_KEY,
+                                                                                   au8_PublicKeyOctets,
+                                                                                   sizeof(au8_PublicKeyOctets),
+                                                                                   &x_NumBytesPublicKey);
+                  //convert from octet string to EC_POINT
+                  const int x_ResultOct2Point = //lint !e970 !e8080 //use API type
+                                                EC_POINT_oct2point(pc_EcGroup, pc_PublicKey, au8_PublicKeyOctets,
+                                                                   x_NumBytesPublicKey, NULL);
+                  if ((x_ResultGetPublicKey == 1)  && (x_ResultOct2Point == 1))
                   {
-                     const EC_POINT * const pc_PublicKey = EC_KEY_get0_public_key(pc_EcdsaKey);
-                     if (pc_PublicKey != NULL)
+                     BIGNUM * const pc_Xpart = BN_new();
+                     BIGNUM * const pc_Ypart = BN_new();
+                     //get unencoded x and y parts:
+                     int x_Result = //lint !e970 !e8080 //use API type
+                                    EC_POINT_get_affine_coordinates(
+                        pc_EcGroup, pc_PublicKey, pc_Xpart, pc_Ypart,
+                        NULL);
+                     if ((x_Result == 1) && (BN_num_bytes(pc_Xpart) == 32) && (BN_num_bytes(pc_Ypart) == 32))
                      {
-                        BIGNUM * const pc_Xpart = BN_new();
-                        BIGNUM * const pc_Ypart = BN_new();
-
-                        int x_Result = EC_POINT_get_affine_coordinates_GFp( //lint !e970 !e8080 //using type to match
-                                                                            // library interface
-                           pc_EcGroup, pc_PublicKey, pc_Xpart, pc_Ypart,
-                           NULL);
-                        if ((x_Result == 1) && (BN_num_bytes(pc_Xpart) == 32) && (BN_num_bytes(pc_Ypart) == 32))
-                        {
-                           //put x and y into array:
-                           x_Result = BN_bn2bin(pc_Xpart, &orau8_Binary[0]);
-                           tgl_assert(x_Result == 32); //size already checked; this would be unexpected
-                           x_Result = BN_bn2bin(pc_Ypart, &orau8_Binary[32]);
-                           tgl_assert(x_Result == 32); //size already checked; this would be unexpected
-                           s32_Result = C_NO_ERR;
-                        }
-
-                        BN_free(pc_Xpart);
-                        BN_free(pc_Ypart);
+                        //put x and y into array:
+                        x_Result = BN_bn2bin(pc_Xpart, &orau8_Binary[0]);
+                        tgl_assert(x_Result == 32); //size already checked; this would be unexpected
+                        x_Result = BN_bn2bin(pc_Ypart, &orau8_Binary[32]);
+                        tgl_assert(x_Result == 32); //size already checked; this would be unexpected
+                        s32_Result = C_NO_ERR;
                      }
-                     EC_GROUP_free(pc_EcGroup);
+                     BN_clear_free(pc_Xpart);
+                     BN_clear_free(pc_Ypart);
                   }
-                  EC_KEY_free(pc_EcdsaKey);
+                  EC_POINT_clear_free(pc_PublicKey);
                }
+               EC_GROUP_free(pc_EcGroup);
             }
          }
 
@@ -372,10 +381,11 @@ int32_t C_OscSecurityEcdsa::h_CalcEcdsaSecp256r1Signature(const uint8_t (&orau8_
             //So we will not perform an additional check for validity.
             s32_Return = C_NOACT;
 
-            BN_free(pc_BigNum);
+            BN_clear_free(pc_BigNum);
 
             //sign the digest
             ECDSA_SIG * const pc_Signature = ECDSA_do_sign(orau8_Digest, hu32_SHA256_FINAL_LENGTH, pc_EcdsaKey);
+            EC_KEY_set_private_key(pc_EcdsaKey, NULL);
             EC_KEY_free(pc_EcdsaKey);
 
             if (pc_Signature != NULL)
@@ -511,6 +521,7 @@ int32_t C_OscSecurityEcdsa::h_VerifyEcdsaSecp256r1Signature(
                      }
                      EC_GROUP_free(pc_EcGroup);
                   }
+                  EC_KEY_set_private_key(pc_EcdsaKey, NULL);
                   EC_KEY_free(pc_EcdsaKey);
                }
             }
@@ -519,11 +530,11 @@ int32_t C_OscSecurityEcdsa::h_VerifyEcdsaSecp256r1Signature(
          else
          {
             //only free R and S parts manually if they were not indirectly freed via ECDSA_SIG_free
-            BN_free(pc_Rpart);
-            BN_free(pc_Spart);
+            BN_clear_free(pc_Rpart);
+            BN_clear_free(pc_Spart);
          }
-         BN_free(pc_Xpart);
-         BN_free(pc_Ypart);
+         BN_clear_free(pc_Xpart);
+         BN_clear_free(pc_Ypart);
       }
    }
    return s32_Return;

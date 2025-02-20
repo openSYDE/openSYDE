@@ -36,6 +36,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_FlaSenDcBasicSequences::C_FlaSenDcBasicSequences(void) :
+   QObject(),
    C_OscDcBasicSequences(),
    me_Sequence(eNOT_ACTIVE),
    mu32_FlashloaderResetWaitTime(1000),

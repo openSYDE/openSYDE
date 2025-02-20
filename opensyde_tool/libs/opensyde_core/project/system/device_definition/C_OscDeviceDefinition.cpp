@@ -66,6 +66,9 @@ void C_OscDeviceDefinition::Clear(void)
 
    u8_ManufacturerId = 0;
    c_ManufacturerDisplayValue = C_OscDeviceDefinition::hc_DEFAULT_COMPANY_NAME;
+   c_CompanyLogoLink = "";
+   c_ProductPageLink = "";
+   c_ToolboxIcon = "";
 
    c_SubDevices.clear();
 }

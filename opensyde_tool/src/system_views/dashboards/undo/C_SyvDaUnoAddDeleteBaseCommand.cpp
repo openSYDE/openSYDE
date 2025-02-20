@@ -277,7 +277,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
             const std::vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
             C_PuiSvDbDataElement * pc_Data;
             C_GiUnique * pc_Unique;
-            C_GiSvDaRectBaseGroup * pc_RectBase;
+            const C_GiSvDaRectBaseGroup * pc_RectBase;
 
             this->m_Clear();
 

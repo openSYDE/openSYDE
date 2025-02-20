@@ -48,7 +48,7 @@ public:
                         const std::vector<stw::opensyde_core::C_OscCanMessage> & orc_Messages, const std::
                         vector<std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> > & orc_OscSignalCommons,
                         const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons,
-                        const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals,
+                        const std::vector<C_PuiSdNodeCanMessage> & orc_UiMessages,
                         const std::vector<std::vector<QString> > & orc_OwnerNodeName,
                         const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex,
                         const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,

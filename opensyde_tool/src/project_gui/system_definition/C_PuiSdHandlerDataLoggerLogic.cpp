@@ -12,8 +12,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <QMap>
+
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
+#include "C_PuiSdUtil.hpp"
 #include "C_PuiSdHandlerDataLoggerLogic.hpp"
 #include "C_PuiSdNodeDataPoolListElementIdSyncUtil.hpp"
 
@@ -93,6 +96,46 @@ const C_OscDataLoggerDataElementReference * C_PuiSdHandlerDataLoggerLogic::GetDa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set data logger active
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+   \param[in]  oq_Enabled                 Enabled
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerEnabled(const uint32_t ou32_NodeIndex,
+                                                            const uint32_t ou32_DataLoggerJobIndex,
+                                                            const bool oq_Enabled)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
+         rc_DataLoggerJob.q_IsEnabled = oq_Enabled;
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set data logger properties
 
    \param[in]      ou32_NodeIndex            Node index
@@ -106,9 +149,9 @@ const C_OscDataLoggerDataElementReference * C_PuiSdHandlerDataLoggerLogic::GetDa
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerProperties(const uint32_t ou32_NodeIndex,
-                                                               const uint32_t ou32_DataLoggerJobIndex,
-                                                               const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Data)
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerPropertiesWithoutInterfaceChanges(const uint32_t ou32_NodeIndex,
+                                                                                      const uint32_t ou32_DataLoggerJobIndex,
+                                                                                      const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Data)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -119,6 +162,50 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerProperties(const uint32_t ou
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
          rc_DataLoggerJob.c_Properties = orc_Data;
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set data logger properties
+
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  ou32_DataLoggerJobIndex       Data logger job index
+   \param[in]  oe_ConnectedInterfaceType     Connected interface type
+   \param[in]  ou8_ConnectedInterfaceNumber  Connected interface number
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerInterface(const uint32_t ou32_NodeIndex,
+                                                              const uint32_t ou32_DataLoggerJobIndex,
+                                                              const C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
+                                                              const uint8_t ou8_ConnectedInterfaceNumber)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
+         rc_DataLoggerJob.c_Properties.e_ConnectedInterfaceType = oe_ConnectedInterfaceType;
+         rc_DataLoggerJob.c_Properties.u8_ConnectedInterfaceNumber = ou8_ConnectedInterfaceNumber;
+         this->m_HandlePossibleRouteChange();
       }
       else
       {
@@ -330,6 +417,55 @@ void C_PuiSdHandlerDataLoggerLogic::m_AddLastKnownHalcCrc(const C_OscNodeDataPoo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node deleted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDeleted()
+{
+   m_HandlePossibleRouteChange();
+   C_PuiSdHandlerCanOpenLogic::m_HandleSyncNodeDeleted();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for bus deleted
+
+   \param[in]  ou32_BusIndex  Bus index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncBusDeleted(const uint32_t ou32_BusIndex)
+{
+   m_HandlePossibleRouteChange();
+   C_PuiSdHandlerCanOpenLogic::m_HandleSyncBusDeleted(ou32_BusIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node interface changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeInterfaceChanged()
+{
+   m_HandlePossibleRouteChange();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node interface deleted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeInterfaceDeleted()
+{
+   m_HandlePossibleRouteChange();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node routing settings changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeRoutingSettingsChanged()
+{
+   m_HandlePossibleRouteChange();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle data sync for node added
 
    \param[in]  ou32_Index  Index
@@ -405,6 +541,7 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeReplace(const uint32_t ou32_
 {
    C_PuiSdHandlerCanOpenLogic::m_HandleSyncNodeReplace(ou32_Index);
    m_HandleNodeAboutToBeDeleted(ou32_Index, true);
+   m_HandlePossibleRouteChange();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -779,6 +916,44 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleNodeAboutToBeDeleted(const uint32_t 
             if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeAboutToBeDeleted(
                    rc_DataLoggerElement.c_ConfiguredElementId,
                    ou32_Index, oq_OnlyMarkInvalid))
+            {
+               rc_DataLoggerJob.c_ConfiguredDataElements.erase(
+                  rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
+            }
+            else
+            {
+               ++u32_ItDataLoggerElement;
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle possible route change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandlePossibleRouteChange()
+{
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+      for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
+      {
+         QMap<uint32_t, bool> c_MapNodeReachable;
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         for (uint32_t u32_ItDataLoggerElement = 0UL;
+              u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
+         {
+            C_OscDataLoggerDataElementReference & rc_DataLoggerElement =
+               rc_DataLoggerJob.c_ConfiguredDataElements[u32_ItDataLoggerElement];
+            if (!c_MapNodeReachable.contains(rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex))
+            {
+               c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex] =
+                  C_PuiSdUtil::h_CheckDataLoggerNodeReachable(u32_ItNode, u32_ItDataLogger,
+                                                              rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex);
+            }
+            if (!c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex])
             {
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);

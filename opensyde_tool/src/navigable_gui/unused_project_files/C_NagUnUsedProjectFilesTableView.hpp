@@ -35,8 +35,6 @@ public:
    explicit C_NagUnUsedProjectFilesTableView(QWidget * const opc_Parent = NULL);
    void UpdateData(const QStringList & orc_UnUsedFilesList, const QStringList & orc_EmptyFoldersList);
    bool IsEmpty(void) const;
-   void SelectAllFiles();
-   void DeleteSelectedFiles(void);
    void DeleteAllFiles();
    bool HasVisibleFiles(void) const;
 
@@ -59,6 +57,8 @@ private:
    void m_ShowHideHorizontalScrollBar(const int32_t os32_Min, const int32_t os32_Max) const;
    void m_SetupContextMenu(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
+   void m_SelectAllFiles();
+   void m_DeleteSelectedFiles(void);
 
    stw::opensyde_gui_logic::C_TblTreMultiColumnLeafSortFilter mc_SortProxyModel;
    stw::opensyde_gui_logic::C_NagUnUsedProjectFilesTableModel mc_Model;

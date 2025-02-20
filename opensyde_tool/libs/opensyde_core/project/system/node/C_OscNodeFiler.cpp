@@ -879,26 +879,18 @@ int32_t C_OscNodeFiler::mh_LoadComInterface(std::vector<C_OscNodeComInterfaceSet
       {
          C_OscNodeComInterfaceSettings c_ComInterface;
 
-         c_ComInterface.u8_InterfaceNumber =
-            static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("interface-number"));
+         if (s32_Retval == C_NO_ERR)
+         {
+            s32_Retval = C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(c_ComInterface.e_InterfaceType,
+                                                                        c_ComInterface.u8_InterfaceNumber,
+                                                                        orc_XmlParser, "communication-interface",
+                                                                        "Loading node definition");
+         }
+
          c_ComInterface.u8_NodeId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("node-id"));
          c_ComInterface.q_IsUpdateEnabled = orc_XmlParser.GetAttributeBool("update-available");
          c_ComInterface.q_IsRoutingEnabled = orc_XmlParser.GetAttributeBool("routing-available");
          c_ComInterface.q_IsDiagnosisEnabled = orc_XmlParser.GetAttributeBool("diagnosis-available");
-         //Type
-         if ((orc_XmlParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
-         {
-            s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(
-               orc_XmlParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
-            //Return
-            tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
-         }
-         else
-         {
-            osc_write_log_error("Loading node definition",
-                                "Could not find \"communication-interface\".\"type\" node.");
-            s32_Retval = C_CONFIG;
-         }
 
          //IP address
          if ((orc_XmlParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
@@ -1013,14 +1005,12 @@ void C_OscNodeFiler::mh_SaveComInterface(const std::vector<C_OscNodeComInterface
       const C_OscNodeComInterfaceSettings & rc_CurComInterface = orc_ComInterfaces[u32_ItComInterface];
 
       orc_XmlParser.CreateAndSelectNodeChild("communication-interface");
-      orc_XmlParser.SetAttributeUint32("interface-number",
-                                       static_cast<uint32_t>(rc_CurComInterface.u8_InterfaceNumber));
+      C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(rc_CurComInterface.e_InterfaceType,
+                                                     rc_CurComInterface.u8_InterfaceNumber, orc_XmlParser);
       orc_XmlParser.SetAttributeUint32("node-id", static_cast<uint32_t>(rc_CurComInterface.u8_NodeId));
       orc_XmlParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
       orc_XmlParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
       orc_XmlParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
-      orc_XmlParser.CreateNodeChild("type",
-                                    C_OscSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
       if (rc_CurComInterface.e_InterfaceType == C_OscSystemBus::eETHERNET)
       {
          orc_XmlParser.CreateAndSelectNodeChild("ip-address");

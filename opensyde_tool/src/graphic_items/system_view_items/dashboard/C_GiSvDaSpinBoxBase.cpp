@@ -462,7 +462,7 @@ void C_GiSvDaSpinBoxBase::SetValuePe(const int32_t os32_Value)
       c_Max.SetValueS32(std::numeric_limits<int32_t>::max());
       this->mpc_SpinBoxWidget->Init(c_Min, c_Max);
       c_Value.SetValueS32(os32_Value);
-      this->mpc_SpinBoxWidget->SetValue(static_cast<QVariant>(static_cast<int64_t>(c_Value.GetValueS32())));
+      this->mpc_SpinBoxWidget->SetValue(static_cast<QVariant>(static_cast<qlonglong>(c_Value.GetValueS32())));
    }
 }
 

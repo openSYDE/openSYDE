@@ -69,10 +69,11 @@ private:
    void m_HandleErrorFeedback(const int32_t os32_InterfaceIndex, const bool oq_IdValid, const bool oq_IpValid) const;
    void m_HandleCellClick(const uint32_t ou32_Row, const uint32_t ou32_Column);
    void m_IpAddressClick(const uint32_t ou32_Row);
-   void m_BusBitrateClick(const uint32_t ou32_Row, const uint32_t ou32_Column);
+   void m_BusBitrateClick(const uint32_t ou32_Row);
    void m_OpenBus(void);
    void m_LoadFromData(void);
    void m_FlashloaderOptions(void) const;
+   void m_InitHyperlinkLabel(const QString & orc_Url);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

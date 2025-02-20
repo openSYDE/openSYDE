@@ -51,7 +51,9 @@ public:
    void InitSv(const uint32_t ou32_ViewIndex, const E_Mode oe_Mode, const bool oq_ShowOnlyWriteElements,
                const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
                const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
-   void InitSdDatapoolElements(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
+   void InitSdDatapoolElements(const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
+                               const uint32_t ou32_SdDataLoggerUseCaseDataLoggerIndex,
+                               const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
                                const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
 
@@ -107,7 +109,9 @@ private:
                                const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
                                const bool oq_Show64BitValues,
                                const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
-                               const bool oq_IsModelUsedInSysViews = true);
+                               const bool oq_IsModelUsedInSysViews = true,
+                               const uint32_t ou32_SdDataLoggerUseCaseNodeIndex = 0UL,
+                               const uint32_t ou32_SdDataLoggerUseCaseDataLoggerIndex = 0UL);
    static void mh_InitDatapoolElementsHalc(C_TblTreItem * const opc_DpItem, bool & orq_HalcValid,
                                            const stw::opensyde_core::C_OscNode & orc_Node,
                                            const stw::opensyde_core::C_OscNodeDataPool & orc_Dp,
@@ -180,7 +184,7 @@ private:
    static bool mh_Contains(const QMap<std::vector<uint32_t>, C_TblTreDataElementModelState> & orc_Map,
                            const C_TblTreSimpleItem * const opc_Item);
    static std::vector<uint32_t> mh_GetViewSdHash(const uint32_t ou32_ViewIndex);
-   static bool mh_CheckNodeDiagnostic(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex);
+   static bool mh_SvCheckNodeDiagnostic(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

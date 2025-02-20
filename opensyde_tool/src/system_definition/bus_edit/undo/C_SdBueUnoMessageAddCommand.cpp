@@ -55,24 +55,24 @@ C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set initial data
 
-   \param[in]  orc_Message                   Message data
-   \param[in]  orc_OscSignalCommons          Signals data (osc common)
-   \param[in]  orc_UiSignalCommons           Signals data (ui common)
-   \param[in]  orc_UiSignals                 Signals data (ui)
-   \param[in]  orc_OwnerNodeName             Owner node names
-   \param[in]  orc_OwnerNodeInterfaceIndex   Owner node interface index
-   \param[in]  orc_OwnerNodeDatapoolIndex    Owner node Datapool index
-   \param[in]  orc_OwnerIsTxFlag             Owner has message as Tx flags
+   \param[in]   orc_Message                  Message data
+   \param[in]   orc_OscSignalCommons         Signals data (osc common)
+   \param[in]   orc_UiSignalCommons          Signals data (ui common)
+   \param[out]  orc_UiMessages               Message ui data
+   \param[in]   orc_OwnerNodeName            Owner node names
+   \param[in]   orc_OwnerNodeInterfaceIndex  Owner node interface index
+   \param[in]   orc_OwnerNodeDatapoolIndex   Owner node Datapool index
+   \param[in]   orc_OwnerIsTxFlag            Owner has message as Tx flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OscCanMessage> & orc_Message,
-                                                 const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,
+                                                 const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanMessage> & orc_UiMessages, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,
                                                  const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
 {
    this->mc_Message = orc_Message;
    this->mc_OscSignalCommons = orc_OscSignalCommons;
    this->mc_UiSignalCommons = orc_UiSignalCommons;
-   this->mc_UiSignals = orc_UiSignals;
+   this->mc_UiMessage = orc_UiMessages;
    for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
    {
       //Convert to internal structure

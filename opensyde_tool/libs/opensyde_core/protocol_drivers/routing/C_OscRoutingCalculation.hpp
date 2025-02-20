@@ -40,7 +40,7 @@ public:
    C_OscRoutingCalculation(const std::vector<C_OscNode> & orc_AllNodes, const std::vector<uint8_t> & orc_ActiveNodes,
                            const uint32_t ou32_StartBusIndex, const uint32_t ou32_TargetNodeIndex,
                            const E_Mode oe_Mode);
-   ~C_OscRoutingCalculation();
+   virtual ~C_OscRoutingCalculation();
 
    const std::vector<C_OscRoutingRoute> * GetRoutes(void) const;
    const C_OscRoutingRoute * GetBestRoute(void) const;

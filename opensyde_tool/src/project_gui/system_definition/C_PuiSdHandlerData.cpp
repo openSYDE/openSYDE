@@ -696,6 +696,18 @@ uint32_t C_PuiSdHandlerData::m_GetHashBus(const uint32_t ou32_BusIndex) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for bus deleted
+
+   \param[in]  ou32_BusIndex  Bus index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncBusDeleted(const uint32_t ou32_BusIndex)
+{
+   Q_EMIT this->SigBussesChanged();
+   Q_EMIT this->SigSyncBusDeleted(ou32_BusIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle data sync for node added
 
    \param[in]  ou32_Index  Index
@@ -726,6 +738,15 @@ void C_PuiSdHandlerData::m_HandleSyncNodeHalc(const uint32_t ou32_Index)
 void C_PuiSdHandlerData::m_HandleSyncNodeReplace(const uint32_t ou32_Index)
 {
    Q_EMIT this->SigSyncNodeReplace(ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node deleted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDeleted()
+{
+   Q_EMIT (this->SigNodesChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

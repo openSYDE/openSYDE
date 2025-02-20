@@ -261,8 +261,7 @@ void C_PuiSdHandlerBusLogic::RemoveBus(const uint32_t ou32_BusIndex)
    }
 
    //signal "bus change"
-   Q_EMIT this->SigBussesChanged();
-   Q_EMIT this->SigSyncBusDeleted(ou32_BusIndex);
+   this->m_HandleSyncBusDeleted(ou32_BusIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -557,8 +556,10 @@ int32_t C_PuiSdHandlerBusLogic::SetAutomaticBusRoutingSettings(const uint32_t ou
       for (uint32_t u32_ItNode = 0UL; (u32_ItNode < c_NodeIndexes.size()) && (s32_Retval == C_NO_ERR); ++u32_ItNode)
       {
          s32_Retval =
-            this->SetAutomaticNodeInterfaceRoutingSettings(c_NodeIndexes[u32_ItNode], c_InterfaceIndexes[u32_ItNode]);
+            this->SetAutomaticNodeInterfaceRoutingSettings(c_NodeIndexes[u32_ItNode], c_InterfaceIndexes[u32_ItNode],
+                                                           false);
       }
+      this->m_HandleSyncNodeRoutingSettingsChanged();
    }
    else
    {
@@ -591,12 +592,13 @@ int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const u
       for (uint32_t u32_ItInterface = 0UL; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
            ++u32_ItInterface)
       {
-         C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
+         const C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
          if ((rc_Interface.u8_InterfaceNumber == ou8_InterfaceNumber) && (rc_Interface.e_InterfaceType == oe_ComType))
          {
             s32_Retval = this->SetAutomaticNodeInterfaceRoutingSettings(ou32_NodeIndex, u32_ItInterface);
          }
       }
+      this->m_HandleSyncNodeRoutingSettingsChanged();
    }
    else
    {
@@ -610,6 +612,7 @@ int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const u
 
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oq_SignalChange      Signal change
 
    \return
    C_NO_ERR Operation success
@@ -617,7 +620,8 @@ int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const u
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const uint32_t ou32_NodeIndex,
-                                                                         const uint32_t ou32_InterfaceIndex)
+                                                                         const uint32_t ou32_InterfaceIndex,
+                                                                         const bool oq_SignalChange)
 {
    int32_t s32_Retval = C_NO_ERR;
    C_OscNode * const pc_Node = this->GetOscNode(ou32_NodeIndex);
@@ -636,6 +640,10 @@ int32_t C_PuiSdHandlerBusLogic::SetAutomaticNodeInterfaceRoutingSettings(const u
                if (!pc_Bus->q_UseableForRouting)
                {
                   rc_Interface.q_IsRoutingEnabled = false;
+                  if (oq_SignalChange)
+                  {
+                     this->m_HandleSyncNodeRoutingSettingsChanged();
+                  }
                }
             }
             else
@@ -750,6 +758,7 @@ void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32_t ou32_NodeIndex, con
 
          rc_OscNode.c_Properties.DisconnectComInterface(orc_Id.e_InterfaceType, orc_Id.u8_InterfaceNumber);
          rc_UiNode.DeleteConnection(orc_Id);
+         this->m_HandleSyncNodeInterfaceDeleted();
       }
    }
 }
@@ -778,6 +787,7 @@ void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32_t ou32_NodeIndex, con
    m_HandleChangeConnectionForCanOpen(ou32_NodeIndex, c_OrgCopy, ou8_NewInterface);
    tgl_assert(this->SetAutomaticNodeInterfaceRoutingSettings(ou32_NodeIndex, orc_Id.e_InterfaceType,
                                                              ou8_NewInterface) == C_NO_ERR);
+   this->m_HandleSyncNodeInterfaceChanged();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -869,6 +879,7 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32_t ou32_NodeIn
          if (oq_IncludeCanOpenSync)
          {
             this->m_HandleChangeCompleteConnectionForCanOpen(u32_CurIndex, c_PrevIdCopy, orc_NewId);
+            this->m_HandleSyncNodeInterfaceChanged();
          }
       }
    }
@@ -1260,7 +1271,7 @@ const
    \param[out]  orc_Message                     Message data
    \param[out]  orc_OscSignalCommons            Signals data (osc common)
    \param[out]  orc_UiSignalCommons             Signals data (ui common)
-   \param[out]  orc_UiSignals                   Signals data (ui)
+   \param[out]  orc_UiMessage                   Message ui data
    \param[in]   oq_ChangeSignalIndicesToOutput  Change signal indices to output
 
    \return
@@ -1272,7 +1283,7 @@ int32_t C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OscCanMessageIdent
                                                       C_OscCanMessage & orc_Message,
                                                       std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
                                                       std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
-                                                      std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
+                                                      C_PuiSdNodeCanMessage & orc_UiMessage,
                                                       const bool oq_ChangeSignalIndicesToOutput) const
 {
    int32_t s32_Retval = C_NO_ERR;
@@ -1292,7 +1303,7 @@ int32_t C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OscCanMessageIdent
    if ((((pc_Message != NULL) && (pc_OscList != NULL)) && (pc_UiList != NULL)) && (pc_UiMessage != NULL))
    {
       orc_Message = *pc_Message;
-      orc_UiSignals = pc_UiMessage->c_Signals;
+      orc_UiMessage = *pc_UiMessage;
       //Copy RELEVANT signals
       orc_OscSignalCommons.clear();
       orc_UiSignalCommons.clear();

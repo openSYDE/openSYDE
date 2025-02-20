@@ -14,11 +14,18 @@
 
 #include "C_SdNdeDalLogJobsWidget.hpp"
 #include "ui_C_SdNdeDalLogJobsWidget.h"
+#include "C_OscDataLoggerJob.hpp"
+#include "C_OscDataLoggerJobProperties.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const uint32_t C_SdNdeDalLogJobsWidget::mhu32_STATIC_LOG_JOB_INDEX = 0UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -40,9 +47,14 @@ using namespace stw::opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDalLogJobsWidget::C_SdNdeDalLogJobsWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_SdNdeDalLogJobsWidget)
+   mpc_Ui(new Ui::C_SdNdeDalLogJobsWidget),
+   mu32_NodeIndex(0)
 {
    this->mpc_Ui->setupUi(this);
+   this->InitStaticNames();
+
+   connect(this->mpc_Ui->pc_ChkBoxLogJob, &QCheckBox::stateChanged, this,
+           &C_SdNdeDalLogJobsWidget::m_OnLogJobStateChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,6 +64,16 @@ C_SdNdeDalLogJobsWidget::C_SdNdeDalLogJobsWidget(QWidget * const opc_Parent) :
 C_SdNdeDalLogJobsWidget::~C_SdNdeDalLogJobsWidget()
 {
    delete this->mpc_Ui;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize all displayed static names
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::InitStaticNames() const
+{
+   this->mpc_Ui->pc_BtnLogJobs->setText("Log Jobs");
+   this->mpc_Ui->pc_ChkBoxLogJob->setText("LogJob1");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,9 +102,27 @@ void C_SdNdeDalLogJobsWidget::SaveUserSettings() const
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{1762,9175} TODO
 void C_SdNdeDalLogJobsWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
-   //TODO
-   Q_UNUSED(ou32_NodeIndex)
+   this->mu32_NodeIndex = ou32_NodeIndex;
+   const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                                                                  mhu32_STATIC_LOG_JOB_INDEX);
+   this->mpc_Ui->pc_ChkBoxLogJob->setChecked(pc_Retval->q_IsEnabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for Log job state change.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_OnLogJobStateChanged()
+{
+   const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
+      this->mu32_NodeIndex,
+      mhu32_STATIC_LOG_JOB_INDEX);
+
+   if (this->mpc_Ui->pc_ChkBoxLogJob->isChecked() != pc_Retval->q_IsEnabled)
+   {
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerEnabled(mu32_NodeIndex, mhu32_STATIC_LOG_JOB_INDEX,
+                                                            this->mpc_Ui->pc_ChkBoxLogJob->isChecked());
+   }
 }

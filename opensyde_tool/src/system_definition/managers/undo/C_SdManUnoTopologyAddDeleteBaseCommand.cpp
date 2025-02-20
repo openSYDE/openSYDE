@@ -98,7 +98,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::h_GetAllRelevantObjects(const QList
    {
       QGraphicsItem * const pc_CurrentItem = C_SebUtil::h_GetHighestParent(*c_ItSelectedItem);
 
-      C_GiUnique * const pc_UniqueElement = dynamic_cast<C_GiUnique *>(pc_CurrentItem);
+      const C_GiUnique * const pc_UniqueElement = dynamic_cast<C_GiUnique *>(pc_CurrentItem);
       if (pc_UniqueElement != NULL)
       {
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(pc_CurrentItem);
@@ -620,7 +620,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenBeforeDelete() const
 {
    const vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
    C_GiNode * pc_Node;
-   C_GiLiBus * pc_Bus;
+   const C_GiLiBus * pc_Bus;
    C_GiLiBusConnector * pc_BusConnector;
    C_PuiSdDataElement * pc_Data;
 
@@ -628,7 +628,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenBeforeDelete() const
    for (vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
         c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
    {
-      C_GiUnique * const pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
+      const C_GiUnique * const pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
       if (pc_Unique != NULL)
       {
          //lint -e{740}  no problem because of common base class
@@ -798,14 +798,15 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenBusBeforeDelete(cons
          {
             for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
             {
+               bool q_Tmp;
                uint8_t u8_InterfaceNumber;
                tgl_assert(C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(c_NodeIndexes[u32_ItNode],
                                                                                           c_InterfaceIndexes[u32_ItNode],
                                                                                           u8_InterfaceNumber) ==
                           C_NO_ERR);
                //Don't check result as this manager might not exist
-               C_PuiSdHandler::h_GetInstance()->DeleteAllCanOpenManagerDevices(c_NodeIndexes[u32_ItNode],
-                                                                               u8_InterfaceNumber);
+               C_PuiSdHandler::h_GetInstance()->DeleteCanOpenManager(c_NodeIndexes[u32_ItNode],
+                                                                     u8_InterfaceNumber, false, q_Tmp);
             }
          }
       }
@@ -840,8 +841,11 @@ const
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenManagerNodeBusConnectorBeforeDelete(
    const uint32_t ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ConnectionId) const
 {
+   bool q_Tmp;
+
    //Don't check result as this manager might not exist
-   C_PuiSdHandler::h_GetInstance()->DeleteAllCanOpenManagerDevices(ou32_NodeIndex, orc_ConnectionId.u8_InterfaceNumber);
+   C_PuiSdHandler::h_GetInstance()->DeleteCanOpenManager(ou32_NodeIndex, orc_ConnectionId.u8_InterfaceNumber, false,
+                                                         q_Tmp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

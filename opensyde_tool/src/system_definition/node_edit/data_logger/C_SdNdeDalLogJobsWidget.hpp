@@ -34,12 +34,18 @@ public:
    explicit C_SdNdeDalLogJobsWidget(QWidget * const opc_Parent = NULL);
    ~C_SdNdeDalLogJobsWidget(void) override;
 
+   void InitStaticNames(void) const;
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
    void SetNode(const uint32_t ou32_NodeIndex);
 
 private:
    Ui::C_SdNdeDalLogJobsWidget * mpc_Ui;
+   uint32_t mu32_NodeIndex;
+
+   static const uint32_t mhu32_STATIC_LOG_JOB_INDEX;
+
+   void m_OnLogJobStateChanged(void);
 
    //Avoid call
    C_SdNdeDalLogJobsWidget(const C_SdNdeDalLogJobsWidget &);

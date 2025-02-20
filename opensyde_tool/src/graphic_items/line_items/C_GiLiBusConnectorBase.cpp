@@ -468,7 +468,7 @@ void C_GiLiBusConnectorBase::m_UpdateConnection(const QPointF & orc_ScenePos)
 {
    if (this->GetBusItem() != NULL)
    {
-      C_GiLiLineConnection * pc_Conn;
+      const C_GiLiLineConnection * pc_Conn;
       this->GetBusItem()->FindClosestConnection(orc_ScenePos, this->ms32_ConnIndex);
       pc_Conn = m_GetCurrentConn();
       if (pc_Conn != NULL)
@@ -912,7 +912,7 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
 void C_GiLiBusConnectorBase::m_OnIterationBusInteractionPointMoveCleanUp(QGraphicsItem * const opc_HighestParentItem,
                                                                          bool & orq_RestoreMouseCursor)
 {
-   C_GiBiCustomMouseItem * const pc_Mouse = dynamic_cast<C_GiBiCustomMouseItem *>(opc_HighestParentItem);
+   const C_GiBiCustomMouseItem * const pc_Mouse = dynamic_cast<C_GiBiCustomMouseItem *>(opc_HighestParentItem);
 
    if ((pc_Mouse != NULL) && (pc_Mouse != this))
    {

@@ -118,7 +118,8 @@ bool C_OscIpDispatcherLinuxSock::C_BufferIdentifier::operator <(
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OscIpDispatcherLinuxSock::C_OscIpDispatcherLinuxSock(void) :
-   C_OscIpDispatcher()
+   C_OscIpDispatcher(),
+   ms32_SocketUdpServer(INVALID_SOCKET)
 {
 }
 
@@ -204,7 +205,7 @@ int32_t C_OscIpDispatcherLinuxSock::m_GetAllInstalledInterfaceIps(void)
          // Only report IPv4 interfaces
          if (pt_IfAddr->ifa_addr->sa_family == AF_INET)
          {
-            struct sockaddr_in * pt_InAddr = (struct sockaddr_in *)pt_IfAddr->ifa_addr;
+            struct sockaddr_in * pt_InAddr = reinterpret_cast<struct sockaddr_in *>(pt_IfAddr->ifa_addr);
 
             //ignore localhost; otherwise "locally" running servers will get requests via the localhost and
             // a physical local interface
@@ -579,7 +580,7 @@ int32_t C_OscIpDispatcherLinuxSock::IsTcpConnected(const uint32_t ou32_Handle)
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
-      osc_write_log_error("openSYDE IP-TP", "ReConnectTcp called with invalid handle.");
+      osc_write_log_error("openSYDE IP-TP", "IsTcpConnected called with invalid handle.");
       s32_Return = C_RANGE;
    }
    else if (this->mc_SocketsTcp[ou32_Handle].s32_Socket == INVALID_SOCKET)

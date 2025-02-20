@@ -311,7 +311,7 @@ QStringList C_FlaUpListWidget::m_GetHexFilePathsAsRelativeOrAbsolute() const
       QListWidgetItem * const pc_CurrentItem = this->item(s32_It);
       if (pc_CurrentItem != NULL)
       {
-         C_FlaUpListItemWidget * const pc_ItemWidget =
+         const C_FlaUpListItemWidget * const pc_ItemWidget =
             dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
          if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
          {
@@ -399,7 +399,7 @@ bool C_FlaUpListWidget::AreAllFilesValid(void) const
       QListWidgetItem * const pc_CurrentItem = this->item(s32_It);
       if (pc_CurrentItem != NULL)
       {
-         C_FlaUpListItemWidget * const pc_ItemWidget =
+         const C_FlaUpListItemWidget * const pc_ItemWidget =
             dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
          if (pc_ItemWidget != NULL)
          {
@@ -706,7 +706,7 @@ void C_FlaUpListWidget::ResetStatusIcons(void)
       QListWidgetItem * const pc_CurrentItem = this->item(s32_It);
       if (pc_CurrentItem != NULL)
       {
-         C_FlaUpListItemWidget * const pc_ItemWidget =
+         const C_FlaUpListItemWidget * const pc_ItemWidget =
             dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
          if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
          {

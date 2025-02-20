@@ -284,7 +284,7 @@ void C_SdBueMessageRxList::CheckSpecificNode(const uint32_t ou32_NodeIndex, cons
 {
    for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
-      C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
+      const C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if ((pc_Entry != NULL) && (pc_Entry->DoesMatch(ou32_NodeIndex, ou32_InterfaceIndex) == true))
       {
          pc_Entry->SetChecked(oq_Checked, false, ou32_DatapoolIndex);
@@ -343,7 +343,7 @@ void C_SdBueMessageRxList::SetExclusiveMode(const bool oq_Active)
       bool q_OneEntryChecked = false;
       for (u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
       {
-         C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
+         const C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
 
          if (pc_Entry->IsChecked() == true)
          {

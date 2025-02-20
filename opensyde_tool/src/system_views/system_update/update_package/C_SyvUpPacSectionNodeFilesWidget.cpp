@@ -363,9 +363,9 @@ void C_SyvUpPacSectionNodeFilesWidget::OpenPemFileSettings(C_SyvUpPacListNodeIte
       // Adapt the states
       {
          const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-         C_SyvUpPacPemFileOptionsPopUp * const pc_InfoDialog = new C_SyvUpPacPemFileOptionsPopUp(*c_New,
-                                                                                                 e_StateSecurity,
-                                                                                                 e_StateDebugger);
+         const C_SyvUpPacPemFileOptionsPopUp * const pc_InfoDialog = new C_SyvUpPacPemFileOptionsPopUp(*c_New,
+                                                                                                       e_StateSecurity,
+                                                                                                       e_StateDebugger);
 
          //Resize
          c_New->SetSize(QSize(500, 400));
@@ -419,7 +419,7 @@ void C_SyvUpPacSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpPacConfigNode 
             {
                if (pc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM)
                {
-                  C_SyvUpPacListNodeItemPemFileWidget * const pc_PemApp =
+                  const C_SyvUpPacListNodeItemPemFileWidget * const pc_PemApp =
                      dynamic_cast<C_SyvUpPacListNodeItemPemFileWidget *>(pc_App);
 
                   if (pc_PemApp != NULL)

@@ -247,7 +247,7 @@ void C_GiSyTextElementWidget::m_FontColorClicked(void)
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
    const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
-   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
+   const C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
    const QSize c_SIZE(462, 670);

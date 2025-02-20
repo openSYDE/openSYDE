@@ -814,7 +814,7 @@ int32_t C_PuiSdHandlerCanOpenLogic::DeleteCanOpenManager(const uint32_t ou32_Nod
       if (c_ItManager != rc_Node.c_CanOpenManagers.end())
       {
          uint32_t u32_InterfaceIndex = 0UL;
-         tgl_assert(this->DeleteAllCanOpenManagerDevices(ou32_NodeIndex, ou8_InterfaceNumber) == C_NO_ERR);
+         tgl_assert(this->m_DeleteAllCanOpenManagerDevices(ou32_NodeIndex, ou8_InterfaceNumber) == C_NO_ERR);
          //Delete manager
          rc_Node.c_CanOpenManagers.erase(c_ItManager);
          //Delete DP
@@ -1016,60 +1016,6 @@ int32_t C_PuiSdHandlerCanOpenLogic::DeleteCanOpenManagerDevice(const uint32_t ou
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Delete all CANopen manager devices
-
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  ou8_InterfaceNumber  Interface number
-
-   \return
-   STW error codes
-
-   \retval   C_NO_ERR   Operation success
-   \retval   C_RANGE    Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerCanOpenLogic::DeleteAllCanOpenManagerDevices(const uint32_t ou32_NodeIndex,
-                                                                   const uint8_t ou8_InterfaceNumber)
-{
-   int32_t s32_Retval = C_NO_ERR;
-
-   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      const std::map<uint8_t,
-                     C_OscCanOpenManagerInfo>::const_iterator c_ItManager = rc_Node.c_CanOpenManagers.find(
-         ou8_InterfaceNumber);
-      if (c_ItManager != rc_Node.c_CanOpenManagers.end())
-      {
-         //Delete items (handle DP)
-         std::vector<C_OscCanInterfaceId> c_Items;
-         c_Items.reserve(c_ItManager->second.c_CanOpenDevices.size());
-         for (std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
-                 c_ItManager->second.c_CanOpenDevices.begin();
-              c_ItDevice != c_ItManager->second.c_CanOpenDevices.end(); ++c_ItDevice)
-         {
-            c_Items.push_back(c_ItDevice->first);
-         }
-         for (uint32_t u32_ItDevice = 0UL; u32_ItDevice < c_Items.size(); ++u32_ItDevice)
-         {
-            tgl_assert(this->DeleteCanOpenManagerDevice(ou32_NodeIndex, ou8_InterfaceNumber,
-                                                        c_Items[u32_ItDevice]) == C_NO_ERR);
-         }
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete CANopen manager messages
 
    \param[in]  ou32_NodeIndex       Node index
@@ -1223,6 +1169,60 @@ int32_t C_PuiSdHandlerCanOpenLogic::TranslateCanInterfaceNumberToIndex(const uin
 C_PuiSdHandlerCanOpenLogic::C_PuiSdHandlerCanOpenLogic(QObject * const opc_Parent) :
    C_PuiSdHandlerBusLogic(opc_Parent)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete all CANopen manager devices
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou8_InterfaceNumber  Interface number
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerCanOpenLogic::m_DeleteAllCanOpenManagerDevices(const uint32_t ou32_NodeIndex,
+                                                                     const uint8_t ou8_InterfaceNumber)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      const std::map<uint8_t,
+                     C_OscCanOpenManagerInfo>::const_iterator c_ItManager = rc_Node.c_CanOpenManagers.find(
+         ou8_InterfaceNumber);
+      if (c_ItManager != rc_Node.c_CanOpenManagers.end())
+      {
+         //Delete items (handle DP)
+         std::vector<C_OscCanInterfaceId> c_Items;
+         c_Items.reserve(c_ItManager->second.c_CanOpenDevices.size());
+         for (std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+                 c_ItManager->second.c_CanOpenDevices.begin();
+              c_ItDevice != c_ItManager->second.c_CanOpenDevices.end(); ++c_ItDevice)
+         {
+            c_Items.push_back(c_ItDevice->first);
+         }
+         for (uint32_t u32_ItDevice = 0UL; u32_ItDevice < c_Items.size(); ++u32_ItDevice)
+         {
+            tgl_assert(this->DeleteCanOpenManagerDevice(ou32_NodeIndex, ou8_InterfaceNumber,
+                                                        c_Items[u32_ItDevice]) == C_NO_ERR);
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2101,15 +2101,17 @@ void C_PuiSdHandlerCanOpenLogic::m_HandleChangeCompleteConnectionForCanOpenManag
                                                                                    const C_PuiSdNodeConnectionId & orc_PrevId,
                                                                                    const C_PuiSdNodeConnectionId & orc_NewId)
 {
+   bool q_Tmp;
+
    if (orc_PrevId.e_InterfaceType == C_OscSystemBus::eCAN)
    {
-      DeleteAllCanOpenManagerDevices(ou32_NodeIndex, orc_PrevId.u8_InterfaceNumber);
+      DeleteCanOpenManager(ou32_NodeIndex, orc_PrevId.u8_InterfaceNumber, false, q_Tmp);
    }
    if (orc_NewId.e_InterfaceType == C_OscSystemBus::eCAN)
    {
-      DeleteAllCanOpenManagerDevices(ou32_NodeIndex, orc_NewId.u8_InterfaceNumber);
+      DeleteCanOpenManager(ou32_NodeIndex, orc_NewId.u8_InterfaceNumber, false, q_Tmp);
    }
-}
+} //lint !e438 q_Tmp necessary for interface
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle change of complete connection for CANopen device

@@ -276,7 +276,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
          int64_t s64_Value;
          if (pc_ComboBox->GetValue(s64_Value, c_ErrorDescription) == C_NO_ERR)
          {
-            opc_Model->setData(orc_Index, s64_Value, static_cast<int32_t>(Qt::EditRole));
+            opc_Model->setData(orc_Index, static_cast<qlonglong>(s64_Value), static_cast<int32_t>(Qt::EditRole));
          }
          else
          {

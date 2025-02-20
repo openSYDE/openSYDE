@@ -30,8 +30,14 @@ public:
       const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
       const uint32_t ou32_DataLoggerDataElementIndex) const;
 
-   int32_t SetDataLoggerProperties(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
-                                   const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Data);
+   int32_t SetDataLoggerEnabled(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
+                                const bool oq_Enabled);
+   int32_t SetDataLoggerPropertiesWithoutInterfaceChanges(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataLoggerJobIndex,
+                                                          const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Data);
+   int32_t SetDataLoggerInterface(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
+                                  const opensyde_core::C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
+                                  const uint8_t ou8_ConnectedInterfaceNumber);
 
    int32_t AddDataLoggerElement(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
                                 const stw::opensyde_core::C_OscDataLoggerDataElementReference & orc_Data);
@@ -51,6 +57,11 @@ protected:
    void m_AddLastKnownHalcCrc(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id,
                               const C_PuiSdLastKnownHalElementId & orc_Crc);
 
+   void m_HandleSyncNodeDeleted(void) override;
+   void m_HandleSyncBusDeleted(const uint32_t ou32_BusIndex) override;
+   void m_HandleSyncNodeInterfaceChanged(void) override;
+   void m_HandleSyncNodeInterfaceDeleted(void) override;
+   void m_HandleSyncNodeRoutingSettingsChanged(void) override;
    void m_HandleSyncNodeAdded(const uint32_t ou32_Index) override;
    void m_HandleSyncNodeHalc(const uint32_t ou32_Index) override;
    void m_HandleSyncNodeReplace(const uint32_t ou32_Index) override;
@@ -80,6 +91,7 @@ protected:
 
 private:
    void m_HandleNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid = false);
+   void m_HandlePossibleRouteChange(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

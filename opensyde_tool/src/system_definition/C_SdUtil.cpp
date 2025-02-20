@@ -916,7 +916,7 @@ std::vector<std::vector<uint8_t> > C_SdUtil::h_GetAllUsedIpAddressesForBus(const
 /*! \brief   Adapt message to protocol restrictions
 
    \param[in,out]  orc_Message                  Message to adapt
-   \param[in,out]  opc_UiMessage                Optional Ui Message to adapt
+   \param[in,out]  orc_UiMessage                Ui Message to adapt
    \param[in,out]  orc_OscSignalListElements    Core datapool list elements for signals
    \param[in]      orc_UiSignalListElements     Ui datapool list elements for signals
    \param[in]      oe_Type                      Protocol type
@@ -924,7 +924,7 @@ std::vector<std::vector<uint8_t> > C_SdUtil::h_GetAllUsedIpAddressesForBus(const
    \param[in]      oq_IncludeSignalUpdate       Flag to control signal update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_PuiSdNodeCanMessage * const opc_UiMessage,
+void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_PuiSdNodeCanMessage & orc_UiMessage,
                                             std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalListElements,
                                             const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalListElements, const C_OscCanProtocol::E_Type oe_Type, QStringList * const opc_AdaptationInfos,
                                             const bool oq_IncludeSignalUpdate)
@@ -955,10 +955,7 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
             orc_Message.u32_CycleTimeMs = C_PuiSdUtil::h_GetDefaultMessageCycleTime();
             orc_Message.u32_TimeoutMs = C_PuiSdUtil::h_GetMessageAutoTimeoutTime(orc_Message.u32_CycleTimeMs);
 
-            if (opc_UiMessage != NULL)
-            {
-               opc_UiMessage->e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
-            }
+            orc_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
          }
       }
    }
@@ -1879,7 +1876,6 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OscNodeDataPoolListEl
 {
    QString c_ToolTipContent = "";
 
-   std::vector<QString> c_HelpVector;
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       orc_NodeDatapoolListElementId.u32_NodeIndex);
    const C_OscNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
@@ -1911,6 +1907,8 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OscNodeDataPoolListEl
       }
       else
       {
+         std::vector<QString> c_HelpVector;
+
          // comment
          if (pc_DpListElement->c_Comment.IsEmpty() == false)
          {

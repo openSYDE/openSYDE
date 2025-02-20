@@ -79,7 +79,8 @@ void C_CamProFilterData::CalcHash(uint32_t & oru32_HashValue) const
 /*! \brief   Default constructor of filter item class.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamProFilterItemData::C_CamProFilterItemData()
+C_CamProFilterItemData::C_CamProFilterItemData() :
+   C_OscComMessageLoggerFilter()
 {
    this->q_Enabled = true;
    if (this->u32_StartId == this->u32_EndId)

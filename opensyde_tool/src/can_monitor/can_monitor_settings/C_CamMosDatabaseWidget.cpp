@@ -155,7 +155,7 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const int32_t os32_Result,
                const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
                                                                              this->mpc_Ui->pc_ScrollAreaContents);
 
-               C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
+               const C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
                   new C_CamMosDatabaseBusSelectionPopup(orc_Busses, this->mc_DatabasesToLoad[0]->GetDatabaseData(),
                                                         *c_New);
 

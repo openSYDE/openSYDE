@@ -136,6 +136,7 @@ int32_t C_OscSecurityPemSecUpdate::m_ReadPrivateKey(const std::vector<uint8_t> &
             this->mc_KeyInfo.SetPrivateKey(c_PrivKey);
 
             EVP_PKEY_free(pc_PrivKey);
+            EC_KEY_set_private_key(pc_EcdsaKey, NULL);
             EC_KEY_free(pc_EcdsaKey);
          }
       }

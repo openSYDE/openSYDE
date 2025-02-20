@@ -97,7 +97,7 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
             // open save as dialog
             const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> c_New =
                new stw::opensyde_gui_elements::C_OgePopUpDialog(opc_Parent, opc_Parent);
-            C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
+            const C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
 
             const QSize c_SIZE(906, 415);
             c_New->SetSize(c_SIZE);

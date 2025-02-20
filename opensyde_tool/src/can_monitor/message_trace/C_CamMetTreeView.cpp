@@ -852,7 +852,7 @@ void C_CamMetTreeView::m_CopySelection(void)
    //selectedIndexes returns a list of all selected indexes, but the indexes are NOT sorted
    //we need to sort them due to we want same row order as displayed in the trace
    std::sort(c_SelectedItems.begin(), c_SelectedItems.end(),
-             [] (const QModelIndex & orc_It1, const QModelIndex & orc_It2)
+             [] (const QModelIndex & orc_It1, const QModelIndex & orc_It2) -> bool
    {
       return orc_It1.row() < orc_It2.row();
    }

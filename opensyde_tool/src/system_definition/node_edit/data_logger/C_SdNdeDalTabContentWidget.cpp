@@ -46,6 +46,9 @@ C_SdNdeDalTabContentWidget::C_SdNdeDalTabContentWidget(QWidget * const opc_Paren
    mpc_Ui(new Ui::C_SdNdeDalTabContentWidget)
 {
    this->mpc_Ui->setupUi(this);
+
+   connect(this->mpc_Ui->pc_LogJobPropertiesWidget, &C_SdNdeDalLogJobPropertiesWidget::SigReloadDataLoggerDataElements,
+           this, &C_SdNdeDalTabContentWidget::ReloadDataLoggerDataElements);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +94,17 @@ void C_SdNdeDalTabContentWidget::SaveUserSettings() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Trigger entire reload of data logger data elements section
+
+   Necessary if data elements could have changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalTabContentWidget::ReloadDataLoggerDataElements()
+{
+   this->mpc_Ui->pc_LogJobDataSelectionWidget->ReloadDataElements();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set new node index.
 
    \param[in]  ou32_NodeIndex    Index of node
@@ -99,9 +113,10 @@ void C_SdNdeDalTabContentWidget::SaveUserSettings() const
 void C_SdNdeDalTabContentWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
    // Forward node index
+   // Table first as reloading might get triggered while initialising other widgets
+   this->mpc_Ui->pc_LogJobDataSelectionWidget->SetNodeDataLoggerJob(ou32_NodeIndex,
+                                                                    C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX);
    this->mpc_Ui->pc_LogJobsWidget->SetNode(ou32_NodeIndex);
    this->mpc_Ui->pc_LogJobPropertiesWidget->SetNodeDataLoggerJob(ou32_NodeIndex,
                                                                  C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX);
-   this->mpc_Ui->pc_LogJobDataSelectionWidget->SetNodeDataLoggerJob(ou32_NodeIndex,
-                                                                    C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX);
 }

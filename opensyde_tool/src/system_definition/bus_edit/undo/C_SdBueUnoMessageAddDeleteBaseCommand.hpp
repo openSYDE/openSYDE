@@ -43,7 +43,7 @@ protected:
    std::vector<stw::opensyde_core::C_OscCanMessage> mc_Message;
    std::vector<std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> > mc_OscSignalCommons;
    std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > mc_UiSignalCommons;
-   std::vector<std::vector<C_PuiSdNodeCanSignal> > mc_UiSignals;
+   std::vector<C_PuiSdNodeCanMessage> mc_UiMessage;
    std::vector<std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> > mc_MatchingIds;
 
    void m_Add(void);

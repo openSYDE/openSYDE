@@ -63,7 +63,7 @@ C_SdBueUnoMessageAddDeleteBaseCommand::C_SdBueUnoMessageAddDeleteBaseCommand(
    this->mc_OscSignalCommons.resize(this->mc_UniqueId.size(),
                                     std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement>());
    this->mc_UiSignalCommons.resize(this->mc_UniqueId.size(), std::vector<C_PuiSdNodeDataPoolListElement>());
-   this->mc_UiSignals.resize(this->mc_UniqueId.size(), std::vector<C_PuiSdNodeCanSignal>());
+   this->mc_UiMessage.resize(this->mc_UniqueId.size(), C_PuiSdNodeCanMessage());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,10 +76,8 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
    {
       for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
       {
-         C_PuiSdNodeCanMessage c_UiMessage;
-         c_UiMessage.c_Signals = this->mc_UiSignals[u32_ItStep];
          //Adapt default values for protocol
-         C_SdUtil::h_AdaptMessageToProtocolType(this->mc_Message[u32_ItStep], &c_UiMessage,
+         C_SdUtil::h_AdaptMessageToProtocolType(this->mc_Message[u32_ItStep], this->mc_UiMessage[u32_ItStep],
                                                 this->mc_OscSignalCommons[u32_ItStep],
                                                 this->mc_UiSignalCommons[u32_ItStep],
                                                 this->mc_LastMessageId[u32_ItStep].e_ComProtocol, NULL, false);
@@ -100,7 +98,7 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
                                                                 this->mc_Message[u32_ItStep],
                                                                 this->mc_OscSignalCommons[u32_ItStep],
                                                                 this->mc_UiSignalCommons[u32_ItStep],
-                                                                c_UiMessage.c_Signals,
+                                                                this->mc_UiMessage[u32_ItStep],
                                                                 this->mc_LastMessageId[u32_ItStep].u32_MessageIndex) ==
                     C_NO_ERR);
          for (uint32_t u32_ItMessage = 0U; u32_ItMessage < this->mc_MatchingIds[u32_ItStep].size(); ++u32_ItMessage)
@@ -195,19 +193,19 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Store(void)
             C_OscCanMessage c_Message;
             std::vector<C_OscNodeDataPoolListElement> c_OscSignalCommons;
             std::vector<C_PuiSdNodeDataPoolListElement> c_UiSignalCommons;
-            std::vector<C_PuiSdNodeCanSignal> c_UiSignal;
+            C_PuiSdNodeCanMessage c_UiMessage;
             tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanMessageComplete(this->mpc_MessageSyncManager->
                                                                               GetMessageIdForUniqueId(this->
                                                                                                       mc_UniqueId[
                                                                                                          u32_ItStep]),
                                                                               c_Message,
                                                                               c_OscSignalCommons, c_UiSignalCommons,
-                                                                              c_UiSignal) ==
+                                                                              c_UiMessage) ==
                        C_NO_ERR);
             this->mc_Message[u32_ItStep] = c_Message;
             this->mc_OscSignalCommons[u32_ItStep] = c_OscSignalCommons;
             this->mc_UiSignalCommons[u32_ItStep] = c_UiSignalCommons;
-            this->mc_UiSignals[u32_ItStep] = c_UiSignal;
+            this->mc_UiMessage[u32_ItStep] = c_UiMessage;
          }
          {
             const std::vector<C_OscCanMessageIdentificationIndices> c_MatchingIds =
