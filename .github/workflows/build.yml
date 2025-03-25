@@ -6,7 +6,7 @@ on:
         - "v*"
 
 jobs:
-    build-linux:
+    build-x86-linux:
         runs-on: ubuntu-latest
         permissions:
           contents: write
@@ -26,4 +26,25 @@ jobs:
               with:
                 files: |
                   opensyde_syde_sup/result/SYDEsup
+    build-arm64-linux:
+        runs-on: ubuntu-24.04-arm
+        permissions:
+          contents: write
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            - name: Set up toolchain
+              run: sudo apt-get update && sudo apt-get install -y gcc-9 g++-9
+            - name: Build
+              run: |
+                cd opensyde_syde_sup/bat
+                chmod +x ./build.raspi.sh
+                ./build.raspi.sh
+                cp ../result/SYDEsup ../result/SYDEsup.aarch64
+                
+            - name: Publish as release
+              uses: softprops/action-gh-release@v1
+              with:
+                files: |
+                  opensyde_syde_sup/result/SYDEsup.aarch64
 
