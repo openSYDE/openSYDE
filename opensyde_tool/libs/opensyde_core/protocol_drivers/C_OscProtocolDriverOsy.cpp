@@ -703,7 +703,10 @@ int32_t C_OscProtocolDriverOsy::m_ReadDataByIdentifier(const uint16_t ou16_Ident
             else
             {
                orc_ReadData.resize(c_Response.c_Data.size() - 3);
-               (void)std::memcpy(&orc_ReadData[0], &c_Response.c_Data[3], c_Response.c_Data.size() - 3);
+               if (c_Response.c_Data.size() > 3)
+               {
+                  (void)std::memcpy(&orc_ReadData[0], &c_Response.c_Data[3], c_Response.c_Data.size() - 3);
+               }
             }
             break;
          case C_WARN:
@@ -1600,19 +1603,33 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
 
    orc_SerialNumber.clear();
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER, 1U, false, orc_SerialNumber,
+   //According to the protocol specification the server shall respond with a "conditionsNotCorrect" NRC
+   // if it does not have a valid certificate serial number.
+   //Unfortunately there are incorrect implementations that send "ok" with a zero length value.
+   //We will play nice and accept such responses.
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER, 0U, false, orc_SerialNumber,
                                        u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //Strip leading zeroes for compatibility (see #100795 for details)
-      while ((orc_SerialNumber.size() > 0) && (orc_SerialNumber[0] == 0x00U))
+      if (orc_SerialNumber.size() == 0)
       {
-         orc_SerialNumber.erase(orc_SerialNumber.begin());
+         osc_write_log_warning("Protocol driver",
+                               "Protocol violation: received an empty certificate serial number. Reporting an invalid value to application.");
+
+         u8_NrErrorCode = hu8_NR_CODE_CONDITIONS_NOT_CORRECT;
       }
-      if (orc_SerialNumber.size() > 20)
+      else
       {
-         orc_SerialNumber.clear();
-         s32_Return = C_RANGE;
+         //Strip leading zeroes for compatibility (see #100795 for details)
+         while ((orc_SerialNumber.size() > 0) && (orc_SerialNumber[0] == 0x00U))
+         {
+            orc_SerialNumber.erase(orc_SerialNumber.begin());
+         }
+         if (orc_SerialNumber.size() > 20)
+         {
+            orc_SerialNumber.clear();
+            s32_Return = C_RANGE;
+         }
       }
    }
    if (opu8_NrCode != NULL)

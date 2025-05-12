@@ -30,6 +30,7 @@ public:
    std::vector<C_OscCanMessage> c_OscMessageData;
    std::vector<C_OscNodeDataPoolListElement> c_OscSignalData;
    std::vector<uint8_t> c_SignalDefaultMinMaxValuesUsed;
+   std::vector<uint8_t> c_MessageIsSrdo;
 
    void Clear(void);
 };

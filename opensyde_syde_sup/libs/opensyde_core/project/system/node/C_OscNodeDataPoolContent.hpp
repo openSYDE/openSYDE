@@ -153,6 +153,7 @@ public:
    bool operator !=(const C_OscNodeDataPoolContent & orc_Cmp) const;
 
    bool CompareContentStrict(const C_OscNodeDataPoolContent & orc_Cmp) const;
+   bool CompareArrayEqual(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
    bool CompareArrayGreaterOrEqual(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
    bool CompareArrayGreater(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
 
@@ -190,7 +191,6 @@ private:
    static void mh_UnsignedInt64ToBinaryLittle(const uint64_t ou64_Data, uint8_t * const opu8_Data);
    static void mh_UnsignedInt32ToBinaryLittle(const uint32_t ou32_Data, uint8_t * const opu8_Data);
 
-   bool m_CompareArrayEqual(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
    bool m_CompareArrayNotEqual(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
 
    // It is mutable because of the constness of the getter functions. Without the keyword mutable the getter functions

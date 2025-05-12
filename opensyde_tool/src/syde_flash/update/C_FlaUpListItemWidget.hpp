@@ -40,11 +40,9 @@ public:
    explicit C_FlaUpListItemWidget(QListWidget * const opc_Parent, C_FlaUpHexFileInfo * const opc_HexFileInfo,
                                   const bool oq_IsRelativePath);
    ~C_FlaUpListItemWidget(void) override;
-   void GetHexFileInformation(void);
    int32_t GetApplicationBlockIndex(void) const;
    bool IsFileExistingAndValid(void) const;
    void EnableSettings(const bool oq_Enabled);
-   QString GetFileSizeInformation(void) const;
    void SetState(const uint32_t ou32_State);
 
    C_FlaUpHexFileInfo * pc_HexFileInfo;
@@ -89,6 +87,7 @@ private:
    void m_SetSizePolicy(void);
    void m_RestartMovie(void);
    void m_GetAbsoluteAndRelativePaths(const QString & orc_Path, const QString & orc_AbsoluteReferenceDir);
+   void m_GetHexFileInformation(void);
 
    static const int32_t mhs32_TITLE_OFFSET = 140;
 

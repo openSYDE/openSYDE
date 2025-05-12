@@ -57,6 +57,7 @@ Q_SIGNALS:
                        const bool oq_CombineItemAndSubSubName);
    void SigBusBitrateClicked(const uint32_t & oru32_BusIndex, const QString & orc_BusName);
    void SigNodePropChanged(void);
+   void SigNodeXappSupportChanged(void);
    void SigUpdateTrigger(void);
 
 private:

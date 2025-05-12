@@ -69,6 +69,16 @@ C_SdNdeDalLogJobPropertiesWidget::C_SdNdeDalLogJobPropertiesWidget(QWidget * con
    // name length restriction
    this->mpc_Ui->pc_LineEditName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
 
+   //Hiding Max File Size for now
+   this->mpc_Ui->pc_LabelMaxFileSize->setVisible(false);
+   this->mpc_Ui->pc_SpinBoxMaxFileSize->setVisible(false);
+   this->mpc_Ui->horizontalSpacer_9->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+   this->mpc_Ui->horizontalSpacer_8->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+   //Set mode to disable for now
+   this->mpc_Ui->pc_ComboBoxLocalData->setDisabled(true);
+   this->mpc_Ui->pc_ComboBoxLocalData->setCurrentText("On Change");
+
    this->InitStaticNames();
 
    connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::editingFinished,
@@ -119,24 +129,29 @@ void C_SdNdeDalLogJobPropertiesWidget::SetNodeDataLoggerJob(const uint32_t ou32_
    this->m_GetSupportedLocalData();
    this->m_GetSupportedClientInterfaces();
 
-   //this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str()); //AC: Disabled for fixed name
-   this->mpc_Ui->pc_LineEditName->setText("LogJob1");
-   this->mpc_Ui->pc_LineEditName->setDisabled(true);
-   this->mpc_Ui->pc_TextEditComment->setText(pc_Retval->c_Properties.c_Comment.c_str());
-   this->mpc_Ui->pc_ComboBoxLogFileFormat->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.e_LogFileFormat));
-   this->mpc_Ui->pc_ComboBoxLocalData->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.e_LocalLogTrigger));
-   this->mpc_Ui->pc_SpinBoxMaxFileSize->setValue(static_cast<int32_t>(pc_Retval->c_Properties.u32_MaxLogFileSizeMb));
+   if (pc_Retval != NULL)
+   {
+      //this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str()); //AC: Disabled for fixed name
+      this->mpc_Ui->pc_LineEditName->setText("LogJob1");
+      this->mpc_Ui->pc_LineEditName->setDisabled(true);
+      this->mpc_Ui->pc_TextEditComment->setText(pc_Retval->c_Properties.c_Comment.c_str());
+      this->mpc_Ui->pc_ComboBoxLogFileFormat->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.
+                                                                                   e_LogFileFormat));
+      this->mpc_Ui->pc_ComboBoxLocalData->setCurrentIndex(
+         static_cast<int32_t>(pc_Retval->c_Properties.e_LocalLogTrigger));
+      this->mpc_Ui->pc_SpinBoxMaxFileSize->setValue(static_cast<int32_t>(pc_Retval->c_Properties.u32_MaxLogFileSizeMb));
 
-   if (pc_Retval->c_Properties.e_ConnectedInterfaceType == C_OscSystemBus::E_Type::eETHERNET)
-   {
-      this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
-                                                                                     u8_ConnectedInterfaceNumber +
-                                                                                     pc_DevDef->u8_NumCanBusses));
-   }
-   else
-   {
-      this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
-                                                                                     u8_ConnectedInterfaceNumber));
+      if (pc_Retval->c_Properties.e_ConnectedInterfaceType == C_OscSystemBus::E_Type::eETHERNET)
+      {
+         this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
+                                                                                        u8_ConnectedInterfaceNumber +
+                                                                                        pc_DevDef->u8_NumCanBusses));
+      }
+      else
+      {
+         this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
+                                                                                        u8_ConnectedInterfaceNumber));
+      }
    }
 }
 
@@ -258,12 +273,16 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnNameEdited()
 {
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                                                                   mu32_DataLoggerJobIndex);
-   C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
-   rc_Properties.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                   mu32_DataLoggerJobIndex,
-                                                                                   rc_Properties);
+   if (pc_Retval != NULL)
+   {
+      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+
+      rc_Properties.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                      mu32_DataLoggerJobIndex,
+                                                                                      rc_Properties);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -274,12 +293,16 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnCommentEdited()
 {
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                                                                   mu32_DataLoggerJobIndex);
-   C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
-   rc_Properties.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                   mu32_DataLoggerJobIndex,
-                                                                                   rc_Properties);
+   if (pc_Retval != NULL)
+   {
+      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+
+      rc_Properties.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                      mu32_DataLoggerJobIndex,
+                                                                                      rc_Properties);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -290,12 +313,16 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnFileSizeChanged()
 {
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                                                                   mu32_DataLoggerJobIndex);
-   C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
-   rc_Properties.u32_MaxLogFileSizeMb = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxMaxFileSize->value());
-   C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                   mu32_DataLoggerJobIndex,
-                                                                                   rc_Properties);
+   if (pc_Retval != NULL)
+   {
+      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+
+      rc_Properties.u32_MaxLogFileSizeMb = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxMaxFileSize->value());
+      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                      mu32_DataLoggerJobIndex,
+                                                                                      rc_Properties);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -310,25 +337,29 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLogFileFormatChanged(const int32_t os
    {
       const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                                                                      mu32_DataLoggerJobIndex);
-      switch (os32_NewIndex)
+      if (pc_Retval != NULL)
       {
-      case 0:
-         this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("CSV"));
-         break;
-      case 1:
-         this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("Parquet"));
-         break;
-      default:
-         break;
-      }
-      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+         switch (os32_NewIndex)
+         {
+         case 0:
+            this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("CSV"));
+            break;
+         case 1:
+            this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("Parquet"));
+            break;
+         default:
+            break;
+         }
+         C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
-      rc_Properties.e_LogFileFormat =
-         static_cast<C_OscDataLoggerJobProperties::E_LogFileFormat>(this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex());
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                      mu32_DataLoggerJobIndex,
-                                                                                      rc_Properties);
-      this->ms32_LastUsedLogFileFormatIndex = this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex();
+         rc_Properties.e_LogFileFormat =
+            static_cast<C_OscDataLoggerJobProperties::E_LogFileFormat>(this->mpc_Ui->pc_ComboBoxLogFileFormat->
+                                                                       currentIndex());
+         C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                         mu32_DataLoggerJobIndex,
+                                                                                         rc_Properties);
+         this->ms32_LastUsedLogFileFormatIndex = this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex();
+      }
    }
 }
 
@@ -344,14 +375,18 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged(const int32_t os32_N
    {
       const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                                                                      mu32_DataLoggerJobIndex);
-      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+      if (pc_Retval != NULL)
+      {
+         C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
 
-      rc_Properties.e_LocalLogTrigger =
-         static_cast<C_OscDataLoggerJobProperties::E_LocalLogTrigger>(this->mpc_Ui->pc_ComboBoxLocalData->currentIndex());
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                      mu32_DataLoggerJobIndex,
-                                                                                      rc_Properties);
-      this->ms32_LastUsedLocalDataIndex = this->mpc_Ui->pc_ComboBoxLocalData->currentIndex();
+         rc_Properties.e_LocalLogTrigger =
+            static_cast<C_OscDataLoggerJobProperties::E_LocalLogTrigger>(this->mpc_Ui->pc_ComboBoxLocalData->
+                                                                         currentIndex());
+         C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
+                                                                                         mu32_DataLoggerJobIndex,
+                                                                                         rc_Properties);
+         this->ms32_LastUsedLocalDataIndex = this->mpc_Ui->pc_ComboBoxLocalData->currentIndex();
+      }
    }
 }
 

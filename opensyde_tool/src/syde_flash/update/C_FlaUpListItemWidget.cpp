@@ -99,7 +99,7 @@ C_FlaUpListItemWidget::C_FlaUpListItemWidget(QListWidget * const opc_Parent, C_F
    stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_Separator,
                                                                    "HasColor9Background", true);
 
-   this->GetHexFileInformation();
+   this->m_GetHexFileInformation();
    this->m_SetupContextMenu();
 
    this->m_GetAbsoluteAndRelativePaths(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath, C_Uti::h_GetExePath());
@@ -133,7 +133,7 @@ C_FlaUpListItemWidget::~C_FlaUpListItemWidget()
 /*! \brief  Get Hex File Information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListItemWidget::GetHexFileInformation(void)
+void C_FlaUpListItemWidget::m_GetHexFileInformation(void)
 {
    const QFileInfo & rc_FileInfo(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath);
 
@@ -243,18 +243,6 @@ void C_FlaUpListItemWidget::EnableSettings(const bool oq_Enabled)
    this->mpc_Ui->pc_DeleteButton->setEnabled(oq_Enabled);
    this->mpc_Ui->pc_BrowseButton->setEnabled(oq_Enabled);
    this->mpc_ContextMenu->setEnabled(oq_Enabled);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get File size information
-
-   \return
-   QString
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_FlaUpListItemWidget::GetFileSizeInformation() const
-{
-   return pc_HexFileInfo->c_HexFileInfo.c_NumberOfBytes;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -17,6 +17,7 @@
 #include "C_OscDataLoggerJob.hpp"
 #include "C_OscDataLoggerJobProperties.hpp"
 #include "C_PuiSdHandler.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_core;
@@ -72,7 +73,7 @@ C_SdNdeDalLogJobsWidget::~C_SdNdeDalLogJobsWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobsWidget::InitStaticNames() const
 {
-   this->mpc_Ui->pc_BtnLogJobs->setText("Log Jobs");
+   this->mpc_Ui->pc_BtnLogJobs->setText(C_GtGetText::h_GetText("Log Jobs"));
    this->mpc_Ui->pc_ChkBoxLogJob->setText("LogJob1");
 }
 
@@ -105,9 +106,29 @@ void C_SdNdeDalLogJobsWidget::SaveUserSettings() const
 void C_SdNdeDalLogJobsWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
+
+   this->ReloadLogJobs();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload log jobs on data change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::ReloadLogJobs(void) const
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                                                                   mhu32_STATIC_LOG_JOB_INDEX);
-   this->mpc_Ui->pc_ChkBoxLogJob->setChecked(pc_Retval->q_IsEnabled);
+
+   if (pc_Retval != NULL)
+   {
+      this->mpc_Ui->pc_ChkBoxLogJob->setChecked(pc_Retval->q_IsEnabled);
+   }
+
+   if (pc_Node != NULL)
+   {
+      this->mpc_Ui->pc_ChkBoxLogJob->setVisible(pc_Node->c_Properties.q_XappSupport);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -120,9 +141,12 @@ void C_SdNdeDalLogJobsWidget::m_OnLogJobStateChanged()
       this->mu32_NodeIndex,
       mhu32_STATIC_LOG_JOB_INDEX);
 
-   if (this->mpc_Ui->pc_ChkBoxLogJob->isChecked() != pc_Retval->q_IsEnabled)
+   if (pc_Retval != NULL)
    {
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerEnabled(mu32_NodeIndex, mhu32_STATIC_LOG_JOB_INDEX,
-                                                            this->mpc_Ui->pc_ChkBoxLogJob->isChecked());
+      if (this->mpc_Ui->pc_ChkBoxLogJob->isChecked() != pc_Retval->q_IsEnabled)
+      {
+         C_PuiSdHandler::h_GetInstance()->SetDataLoggerEnabled(mu32_NodeIndex, mhu32_STATIC_LOG_JOB_INDEX,
+                                                               this->mpc_Ui->pc_ChkBoxLogJob->isChecked());
+      }
    }
 }

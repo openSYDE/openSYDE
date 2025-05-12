@@ -41,7 +41,8 @@ using namespace stw::opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscDcBasicSequences::C_OscDcBasicSequences(void)
+C_OscDcBasicSequences::C_OscDcBasicSequences(void) :
+   mpc_CanDispatcher(NULL)
 {
 }
 
@@ -51,41 +52,20 @@ C_OscDcBasicSequences::C_OscDcBasicSequences(void)
 //----------------------------------------------------------------------------------------------------------------------
 C_OscDcBasicSequences::~C_OscDcBasicSequences()
 {
-   try
-   {
-      mc_TpCan.SetDispatcher(NULL);
-   }
-   catch (...)
-   {
-   }
-   try
-   {
-      if (mc_CanDispatcher.DLL_Close() == C_NO_ERR)
-      {
-         osc_write_log_info("Teardown", "CAN DLL closed.");
-      }
-      else
-      {
-         osc_write_log_info("Teardown", "Failed to close CAN DLL.");
-      }
-   }
-   catch (...)
-   {
-   }
+   this->mpc_CanDispatcher = NULL; //do not delete ! not owned by us
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Initialize transport protocol, openSYDE protocol driver and CAN with given parameters.
+/*! \brief  Initialize transport protocol and openSYDE protocol driver.
 
-   \param[in]  orc_CanDllPath    Path to CAN DLL file
-   \param[in]  os32_CanBitrate   CAN Bitrate in kBit/s
+   \param[in]  opc_CanDispatcher Pointer to concrete CAN dispatcher
 
    \return
    C_NO_ERR    everything ok
    else        error occurred, see log file for details
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscDcBasicSequences::Init(const C_SclString & orc_CanDllPath, const int32_t os32_CanBitrate)
+int32_t C_OscDcBasicSequences::Init(stw::can::C_CanDispatcher * const opc_CanDispatcher)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -93,31 +73,17 @@ int32_t C_OscDcBasicSequences::Init(const C_SclString & orc_CanDllPath, const in
 
    m_ReportProgress(s32_Return, "Starting the initialization of CAN driver and protocol ... ");
 
-   osc_write_log_info(c_LogActivity, "CAN DLL path used: " + orc_CanDllPath);
+   this->mpc_CanDispatcher = opc_CanDispatcher;
 
-   mc_CanDispatcher.SetDLLName(orc_CanDllPath);
-   s32_Return = mc_CanDispatcher.DLL_Open();
-   if (s32_Return == C_NO_ERR)
+   if (this->mpc_CanDispatcher == NULL)
    {
-      osc_write_log_info(c_LogActivity, "CAN DLL loaded.");
-      s32_Return = mc_CanDispatcher.CAN_Init(os32_CanBitrate);
-      if (s32_Return == C_NO_ERR)
-      {
-         osc_write_log_info(c_LogActivity, "CAN interface initialized.");
-      }
-      else
-      {
-         osc_write_log_error(c_LogActivity, "Could not initialize the CAN interface!");
-      }
-   }
-   else
-   {
-      osc_write_log_error(c_LogActivity, "Could not load the CAN DLL!");
+      s32_Return = C_COM;
+      osc_write_log_error(c_LogActivity, "Could not used CAN! CAN Dispatcher is invalid.");
    }
 
    if (s32_Return == C_NO_ERR)
    {
-      s32_Return = mc_TpCan.SetDispatcher(&mc_CanDispatcher);
+      s32_Return = mc_TpCan.SetDispatcher(this->mpc_CanDispatcher);
       if (s32_Return != C_NO_ERR)
       {
          osc_write_log_error(c_LogActivity, "Setting CAN dispatcher for CAN transport protocol failed!");
@@ -260,9 +226,12 @@ int32_t C_OscDcBasicSequences::ScanEnterFlashloader(const uint32_t ou32_Flashloa
    }
    while (TglGetTickCount() < (u32_WaitTime + u32_StartTime));
 
-   //Previous broadcasts might have caused responses placed in the receive queues of the device
-   // specific driver instances. Dump them.
-   (void)mc_CanDispatcher.DispatchIncoming();
+   if (this->mpc_CanDispatcher != NULL)
+   {
+      //Previous broadcasts might have caused responses placed in the receive queues of the device
+      // specific driver instances. Dump them.
+      (void)this->mpc_CanDispatcher->DispatchIncoming();
+   }
    mc_TpCan.ClearDispatcherQueue();
 
    m_ReportProgress(s32_Return, "Scan for flashloader activation finished. ");
@@ -645,6 +614,17 @@ C_SclString C_OscDcBasicSequences::h_DevicesInfoToString(
    }
 
    return c_Information;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare for shutting down class
+
+   To be called by child classes on shutdown, before they destroy all owned class instances
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscDcBasicSequences::PrepareForDestruction(void)
+{
+   mc_TpCan.SetDispatcher(NULL); //we are about to destroy the dispatcher; make sure TP disconnects from it
 }
 
 //----------------------------------------------------------------------------------------------------------------------

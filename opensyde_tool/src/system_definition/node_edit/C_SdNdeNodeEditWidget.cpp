@@ -604,7 +604,7 @@ void C_SdNdeNodeEditWidget::m_OnDpChanged(void)
 {
    this->m_ReloadCommMessages();
    this->m_ReloadHalc();
-   this->m_ReloadDataLoggerDataElements();
+   this->m_ReloadDataLogger();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -681,12 +681,27 @@ void C_SdNdeNodeEditWidget::m_ReloadHalc(void) const
    Necessary if data elements could have changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_ReloadDataLoggerDataElements() const
+void C_SdNdeNodeEditWidget::m_ReloadDataLogger() const
 {
    if (this->mpc_DataLoggerWidget != NULL)
    {
-      this->mpc_DataLoggerWidget->ReloadDataLoggerDataElements();
+      this->mpc_DataLoggerWidget->ReloadDataLogger();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload all applications (e.g. after some got deleted because of X-App support flag change)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_ReloadApplications(void) const
+{
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->SetNodeIndex(this->mu32_NodeIndex);
+   }
+
+   // reload Datapools because Data Block assignment might have changed
+   this->m_ReloadDataPools();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -733,7 +748,11 @@ void C_SdNdeNodeEditWidget::m_CreatePropertiesTab(const bool oq_AdaptCursor)
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged, this,
               &C_SdNdeNodeEditWidget::m_ReloadCanOpenConfig);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged, this,
-              &C_SdNdeNodeEditWidget::m_ReloadDataLoggerDataElements);
+              &C_SdNdeNodeEditWidget::m_ReloadDataLogger);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodeXappSupportChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadDataLogger);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodeXappSupportChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadApplications);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange, this,
               &C_SdNdeNodeEditWidget::SigErrorChange);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigOwnedDataPoolsChanged, this,

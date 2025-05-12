@@ -463,7 +463,6 @@ int32_t C_CieUtil::h_GetDeviceInfo(const uint32_t ou32_DeviceNodeIndex, const ui
                orc_NodeAssignment.u32_OsyInterfaceIndex = u32_InterfaceIndex;
                orc_InvalidNodeAssignment.u32_OsyInterfaceIndex = u32_InterfaceIndex;
             }
-
             orc_NodeAssignment.c_ImportData =
                C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEdsFileImport(c_OscRxMessageData,
                                                                                c_OscTxMessageData,
@@ -545,11 +544,13 @@ void C_CieUtil::h_ReportEdsImportError(QWidget * const opc_ParentWidget, const i
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get message name
 
-   \param[in]  orc_Node                   Node
-   \param[in]  oq_IsTx                    Flag if message is tx
-   \param[in]  ou32_MessageIndex          Message index
-   \param[in]  oe_ProtocolType            Protocol type
-   \param[in]  opc_NodeNameReplacement    Node name replacement
+   \param[in]      orc_Node                  Node
+   \param[in]      oq_IsTx                   Flag if message is tx
+   \param[in]      ou32_MessageIndex         Message index
+   \param[in]      oe_ProtocolType           Protocol type
+   \param[in]      opc_NodeNameReplacement   Node name replacement
+   \param[in]      oq_IsSrdo                 Flag if message is SRDO
+   \param[in,out]  oru32_SrdoIndex           SRDO index
 
    \return
    Message name
@@ -557,7 +558,8 @@ void C_CieUtil::h_ReportEdsImportError(QWidget * const opc_ParentWidget, const i
 //----------------------------------------------------------------------------------------------------------------------
 QString C_CieUtil::h_GetMessageName(const C_OscNode & orc_Node, const bool oq_IsTx, const uint32_t ou32_MessageIndex,
                                     const C_OscCanProtocol::E_Type oe_ProtocolType,
-                                    const stw::scl::C_SclString * const opc_NodeNameReplacement)
+                                    const stw::scl::C_SclString * const opc_NodeNameReplacement, const bool oq_IsSrdo,
+                                    uint32_t & oru32_SrdoIndex)
 {
    QString c_Retval;
 
@@ -589,9 +591,46 @@ QString C_CieUtil::h_GetMessageName(const C_OscNode & orc_Node, const bool oq_Is
          c_TpdoRpdo = "TPDO";
       }
    }
-   c_Retval = static_cast<QString>((c_Nodename + "_" + c_TpdoRpdo + "%1").c_str()).
-              arg(QString::number(ou32_MessageIndex + 1));
+   if (oq_IsSrdo)
+   {
+      c_TpdoRpdo = "SRDO";
+      c_Retval = C_CieUtil::mh_ConstructMessageName(c_Nodename, c_TpdoRpdo, oru32_SrdoIndex);
+      ++oru32_SrdoIndex;
+   }
+   else
+   {
+      c_Retval = C_CieUtil::mh_ConstructMessageName(c_Nodename, c_TpdoRpdo, ou32_MessageIndex);
+   }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get is SRDO flag from message is SRDO vector
+
+   \param[in]  orc_MessageIsSrdo    Message is SRDO
+   \param[in]  ou32_MessageIndex    Message index
+
+   \return
+   Flags
+
+   \retval   True    Message is SRDO
+   \retval   False   Message is not SRDO
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CieUtil::h_GetIsSrdoFromMessageIsSrdoVector(const std::vector<uint8_t> & orc_MessageIsSrdo,
+                                                   const uint32_t ou32_MessageIndex)
+{
+   bool q_IsSrdo;
+
+   if ((ou32_MessageIndex < orc_MessageIsSrdo.size()) && (orc_MessageIsSrdo[ou32_MessageIndex] == 1U))
+   {
+      q_IsSrdo = true;
+   }
+   else
+   {
+      q_IsSrdo = false;
+   }
+   return q_IsSrdo;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1226,4 +1265,24 @@ int32_t C_CieUtil::mh_InsertMessages(const uint32_t ou32_NodeIndex, const C_OscC
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Construct message name
+
+   \param[in]  orc_Nodename         Node name
+   \param[in]  orc_TpdoRpdo         TPDO/RPDO/SRDO suffix
+   \param[in]  ou32_MessageIndex    Message index
+
+   \return
+   Constructed message name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_CieUtil::mh_ConstructMessageName(const stw::scl::C_SclString & orc_Nodename,
+                                           const stw::scl::C_SclString & orc_TpdoRpdo, const uint32_t ou32_MessageIndex)
+{
+   const QString c_Retval = static_cast<QString>((orc_Nodename + "_" + orc_TpdoRpdo + "%1").c_str()).
+                            arg(QString::number(ou32_MessageIndex + 1));
+
+   return c_Retval;
 }

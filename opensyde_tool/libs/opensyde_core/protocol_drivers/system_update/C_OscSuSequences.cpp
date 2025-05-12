@@ -4236,6 +4236,7 @@ void C_OscSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
    orc_Text.Add("Number of applications: " + C_SclString::IntToStr(orc_Info.c_Applications.size()));
    for (uint8_t u8_Application = 0U; u8_Application < orc_Info.c_Applications.size(); u8_Application++)
    {
+      orc_Text.Add("");
       orc_Text.Add("Application " + C_SclString::IntToStr(u8_Application));
       orc_Text.Add(" Name: " + orc_Info.c_Applications[u8_Application].c_ApplicationName);
       orc_Text.Add(" Version: " + orc_Info.c_Applications[u8_Application].c_ApplicationVersion);

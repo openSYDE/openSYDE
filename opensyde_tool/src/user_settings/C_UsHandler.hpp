@@ -98,6 +98,9 @@ public:
    QString GetLastKnownRamViewProjectPath(void) const;
    QString GetLastKnownJ1939CatalogPath(void) const;
    QString GetLastKnownCsvExportPath(void) const;
+   QString GetLastKnownPemFilePath(void) const;
+   QStringList GetLastKnownUpdatePemFilePaths(void) const;
+   QStringList GetPemFilePathsAsRelativeOrAbsolute(void) const;
    QString GetLastKnownPrivateKeyPath(void) const;
    C_UsNode GetProjSdNode(const QString & orc_NodeName) const;
    C_UsCommunication GetProjSdBus(const QString & orc_BusName) const;
@@ -162,6 +165,9 @@ public:
    void SetLastKnownRamViewProjectPath(const QString & orc_NewPath);
    void SetLastKnownJ1939CatalogPath(const QString & orc_NewPath);
    void SetLastKnownCsvExportPath(const QString & orc_NewPath);
+   void SetLastKnownPemFilePath(const QString & orc_NewPath);
+   void SetLastKnownUpdatePemFilePaths(const QStringList & orc_PemFilePaths);
+   void SetPemFilePathsAsRelativeOrAbsolute(const QStringList & orc_PemFilePathsAsRelativeOrAbsolute);
    void SetLastKnownPrivateKeyPath(const QString & orc_NewPath);
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
    void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
@@ -329,6 +335,9 @@ private:
    QString mc_LastKnownCsvExportPath;                    ///< History of last known CSV export path
    QString mc_LastKnownPrivateKeyPath;                   ///< History of last known private key path (PEM file for
    ///< secure update)
+   QString mc_LastKnownPemFilePath;                  ///< History of last known CSV export path
+   QStringList mc_PemFilePaths;                      ///< History of last known Pem file paths
+   QStringList mc_PemFilePathsAsRelativeOrAbsolute;  ///< History of last known Pem file paths as relative or absolute
    QMap<QString, C_UsSystemView> mc_ProjSvSetupView; ///< History of last known view user settings
    QMap<QString, C_UsNode> mc_ProjSdNode;            ///< History of last known node user settings
    QMap<QString, C_UsCommunication> mc_ProjSdBus;    ///< History of last known bus user settings

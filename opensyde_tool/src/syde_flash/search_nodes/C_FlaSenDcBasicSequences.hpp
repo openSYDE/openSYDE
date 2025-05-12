@@ -10,6 +10,8 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
+#include "C_SclString.hpp"
+#include "C_Can.hpp"
 #include "C_OscDcBasicSequences.hpp"
 #include "C_SyvComDriverThread.hpp"
 
@@ -32,6 +34,7 @@ public:
    C_FlaSenDcBasicSequences(void);
    ~C_FlaSenDcBasicSequences(void) noexcept override;
 
+   int32_t InitDcSequences(const stw::scl::C_SclString & orc_CanDllPath, const int32_t os32_CanBitrate);
    int32_t StartScanEnterFlashloader(const uint32_t ou32_FlashloaderResetWaitTime);
    int32_t StartScanGetInfo(void);
    int32_t StartResetSystem(void);
@@ -78,6 +81,7 @@ private:
 
    // Sequence execution parameter
    E_Sequence me_Sequence;
+   stw::can::C_Can mc_CanDispatcher;
 
    // Input parameter for sequence
    uint32_t mu32_FlashloaderResetWaitTime;

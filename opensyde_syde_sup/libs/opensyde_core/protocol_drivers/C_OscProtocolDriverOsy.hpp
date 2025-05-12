@@ -158,6 +158,7 @@ private:
    static const uint16_t mhu16_OSY_DI_SECURITY_ACTIVATION              = 0xA821U;
    static const uint16_t mhu16_OSY_DI_DEBUGGER_ACTIVATION              = 0xA822U;
    static const uint16_t mhu16_OSY_DI_SECURITY_KEY                     = 0xA823U;
+   static const uint16_t mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER_L7     = 0xA824U;
    //routine identifiers
    static const uint16_t mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION     = 0x0202U;
    static const uint16_t mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                  = 0x0203U;
@@ -391,7 +392,7 @@ public:
                               uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestFileTransfer(const stw::scl::C_SclString & orc_FilePath, const uint32_t ou32_FileSize,
                                   uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL);
-   int32_t OsyTransferData(const uint8_t ou8_BlockSequenceCounter, std::vector<uint8_t> & orc_Data,
+   int32_t OsyTransferData(const uint8_t ou8_BlockSequenceCounter, const std::vector<uint8_t> & orc_Data,
                            uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestTransferExitAddressBased(const bool oq_SendSignatureBlockAddress,
                                               const uint32_t ou32_SignatureBlockAddress,
@@ -404,6 +405,8 @@ public:
 
    //Security
    int32_t OsyReadCertificateSerialNumber(std::vector<uint8_t> & orc_SerialNumber, uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyReadCertificateSerialNumberL7(std::vector<uint8_t> & orc_SerialNumber,
+                                            uint8_t * const opu8_NrCode = NULL);
    int32_t OsyWriteSecurityKey(const std::vector<uint8_t> & orc_PublicKeyModulus,
                                const std::vector<uint8_t> & orc_PublicKeyExponent,
                                const std::vector<uint8_t> & orc_CertificateSerialNumber,

@@ -23,7 +23,7 @@
 
 #include "stwtypes.hpp"
 
-#include "C_NagToolTip.hpp"
+#include "C_NagToolTipWithImage.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -58,7 +58,8 @@ public:
 
    // tool tip
    void ShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading, const QString & orc_Content,
-                    const C_NagToolTip::E_Type oe_Type);
+                    const C_NagToolTipWithImage::E_Type oe_Type, const QString & orc_ImagePath = "",
+                    const QString & orc_ImageCaption = "");
    void HideToolTip(void);
 
    //Dark mode
@@ -130,7 +131,7 @@ private:
    static const QColor mhc_GRADIENT_COLOR_DARK;
 
    // tool tip
-   C_NagToolTip mc_ToolTip;
+   C_NagToolTipWithImage mc_ToolTip;
 
    // cursor handling
    bool mq_OverrideCursorActive;

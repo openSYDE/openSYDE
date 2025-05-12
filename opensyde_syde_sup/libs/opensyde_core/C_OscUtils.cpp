@@ -563,15 +563,23 @@ C_SclString C_OscUtils::h_PosSerialNumberToString(const uint8_t * const opu8_Ser
       {
          //format up to and including 2019. E.g: 05.123456.1001
          c_Result.PrintFormatted("%02X.%02X%02X%02X.%02X%02X",
-                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
-                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+                                 static_cast<uint32_t>(opu8_SerialNumber[0]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[1]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[2]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[3]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[4]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[5]));
       }
       else
       {
          //format from 2020. E.g: 200012345678
          c_Result.PrintFormatted("%02X%02X%02X%02X%02X%02X",
-                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
-                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+                                 static_cast<uint32_t>(opu8_SerialNumber[0]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[1]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[2]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[3]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[4]),
+                                 static_cast<uint32_t>(opu8_SerialNumber[5]));
       }
    }
 

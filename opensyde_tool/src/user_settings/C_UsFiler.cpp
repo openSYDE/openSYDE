@@ -1037,6 +1037,9 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       uint32_t u32_SysViewIndex;
       uint32_t u32_SysViewFlag;
 
+      const QStringList c_PemFilePaths = orc_UserSettings.GetLastKnownUpdatePemFilePaths();
+      const QStringList c_PemFilePathsAsRelativeOrAbsolute = orc_UserSettings.GetPemFilePathsAsRelativeOrAbsolute();
+
       // project specific settings
       // Mode
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjMode", orc_UserSettings.GetProjLastMode());
@@ -1176,6 +1179,24 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
 
          //Important iterator step
          ++s32_ItView;
+      }
+
+      // PEM File Path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_pem_file_path",
+                          orc_UserSettings.GetLastKnownPemFilePath().toStdString().c_str());
+
+      // Values from Update widget
+      orc_Ini.WriteInteger("Update", "PemFileCount", c_PemFilePaths.size());
+      for (int32_t s32_SectionCounter = 0; s32_SectionCounter < static_cast<int32_t>(c_PemFilePaths.size());
+           ++s32_SectionCounter)
+      {
+         const std::string c_PemFilePath = c_PemFilePaths[s32_SectionCounter].toStdString();
+         orc_Ini.WriteString("Update", "PemFiles[" + std::to_string(s32_SectionCounter) + "]",
+                             c_PemFilePath);
+         const std::string c_PemFilePathAsRelativeOrAbsolute =
+            c_PemFilePathsAsRelativeOrAbsolute[s32_SectionCounter].toStdString();
+         orc_Ini.WriteString("Update", "PemFilesAsRelativeOrAbsolute[" + std::to_string(s32_SectionCounter) + "]",
+                             c_PemFilePathAsRelativeOrAbsolute);
       }
    }
 }
@@ -2157,6 +2178,8 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       int32_t s32_SysViewSubMode;
       uint32_t u32_SysViewIndex;
       uint32_t u32_SysViewFlag;
+      QStringList c_PemFilePaths;
+      QStringList c_PemFilePathsAsRelativeOrAbsolute;
 
       // Mode
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjMode", 0);
@@ -2263,6 +2286,11 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
                                                     orc_ActiveProject.toStdString().c_str(),
                                                     "ProjSd_last_known_csv_export_path", "").c_str());
 
+      // Pem file path
+      orc_UserSettings.SetLastKnownPemFilePath(orc_Ini.ReadString(
+                                                  orc_ActiveProject.toStdString().c_str(),
+                                                  "ProjSd_last_known_pem_file_path", "").c_str());
+
       // Last tab index in system definition
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);
       orc_UserSettings.SetProjLastSysDefNodeTabIndex(s32_Value);
@@ -2313,6 +2341,20 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
             mh_LoadView(orc_Ini, orc_ActiveProject, c_ViewIdBase, c_ViewName, orc_UserSettings);
          }
       }
+
+      // Values from Update widget
+      s32_Value = orc_Ini.ReadInteger("Update", "PemFileCount", 0);
+      for (int32_t s32_SectionCounter = 0; s32_SectionCounter < s32_Value; ++s32_SectionCounter)
+      {
+         c_PemFilePaths.append(
+            orc_Ini.ReadString("Update", "PemFiles[" + C_SclString::IntToStr(s32_SectionCounter) + "]", "").c_str());
+         c_PemFilePathsAsRelativeOrAbsolute.append(
+            orc_Ini.ReadString("Update",
+                               "PemFilesAsRelativeOrAbsolute[" + C_SclString::IntToStr(s32_SectionCounter) + "]",
+                               "").c_str());
+      }
+      orc_UserSettings.SetLastKnownUpdatePemFilePaths(c_PemFilePaths);
+      orc_UserSettings.SetPemFilePathsAsRelativeOrAbsolute(c_PemFilePathsAsRelativeOrAbsolute);
    }
    else
    {

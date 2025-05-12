@@ -104,6 +104,11 @@ public:
    //lint -e{1960,1916}  signature to stay compatible with AnsiString;
    int32_t cat_printf(const char_t * const opcn_Format, ...);
 
+   //let PC-lint know the functions behave like printf, so it can perform parameter checks)
+   //lint -printf(1, stw::scl::C_SclString::PrintFormatted, stw::scl::C_SclString::StringPrintFormatted)
+   //lint -printf(1, stw::scl::C_SclString::printf, stw::scl::C_SclString::sprintf)
+   //lint -printf(1, stw::scl::C_SclString::cat_sprintf, stw::scl::C_SclString::cat_printf)
+
    //constructors:
    C_SclString(void);
    C_SclString(const C_SclString & orc_InitValue);

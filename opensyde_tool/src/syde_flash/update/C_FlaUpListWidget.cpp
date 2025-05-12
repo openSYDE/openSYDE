@@ -186,7 +186,7 @@ void C_FlaUpListWidget::m_AddNewHexFile(const QString & orc_DialogCaption, const
    \param[in]          oq_NeedToUpdateListIndex           Need to update list indexes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::DeleteItem(const int32_t os32_CurrentHexFileIndex, const bool oq_NeedToUpdateListIndex)
+void C_FlaUpListWidget::m_DeleteItem(const int32_t os32_CurrentHexFileIndex, const bool oq_NeedToUpdateListIndex)
 {
    QListWidgetItem * const pc_CurrentItem = this->item(os32_CurrentHexFileIndex);
 
@@ -230,7 +230,7 @@ void C_FlaUpListWidget::DeleteItem(const int32_t os32_CurrentHexFileIndex, const
 /*! \brief  Delete  all item from the list
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::DeleteAllItem()
+void C_FlaUpListWidget::m_DeleteAllItem()
 {
    C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eQUESTION);
 
@@ -252,7 +252,7 @@ void C_FlaUpListWidget::DeleteAllItem()
    \param[in]  os32_CurrentHexFileIndex      Current hex file widget index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::SelectFile(const int32_t os32_CurrentHexFileIndex)
+void C_FlaUpListWidget::m_SelectFile(const int32_t os32_CurrentHexFileIndex)
 {
    this->AddFileAction(true, os32_CurrentHexFileIndex, true);
 }
@@ -447,7 +447,7 @@ void C_FlaUpListWidget::EnableSettings(const bool oq_Enabled)
    \param[in]  opc_HexFileInfo               hex file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::ReloadCurrentFile(const QString & orc_File, C_FlaUpHexFileInfo * const opc_HexFileInfo)
+void C_FlaUpListWidget::m_ReloadCurrentFile(const QString & orc_File, C_FlaUpHexFileInfo * const opc_HexFileInfo)
 {
    bool q_HexFile = false;
 
@@ -659,18 +659,6 @@ uint32_t C_FlaUpListWidget::GetHexFileSize(const uint32_t & oru32_HexFileIndex) 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get amount of flashable files
-
-   \return
-   int32_t
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_FlaUpListWidget::GetAmountOfFlashableFiles() const
-{
-   return this->count();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set file status update
 
    \param[in]       ors32_FileIndex     Flashed file index
@@ -793,20 +781,20 @@ void C_FlaUpListWidget::m_AddFile(const QString & orc_File, const bool oq_IsActi
          }
          else
          {
-            this->DeleteItem(os32_CurrentHexFileIndex, false);
+            this->m_DeleteItem(os32_CurrentHexFileIndex, false);
             this->insertItem(os32_CurrentHexFileIndex, pc_Item);
          }
          this->setItemWidget(pc_Item, pc_FileWidget);
          this->show();
 
-         connect(pc_FileWidget, &C_FlaUpListItemWidget::SigDeleteItemWidget, this, &C_FlaUpListWidget::DeleteItem);
+         connect(pc_FileWidget, &C_FlaUpListItemWidget::SigDeleteItemWidget, this, &C_FlaUpListWidget::m_DeleteItem);
 
-         connect(pc_FileWidget, &C_FlaUpListItemWidget::SigSelectFile, this, &C_FlaUpListWidget::SelectFile);
+         connect(pc_FileWidget, &C_FlaUpListItemWidget::SigSelectFile, this, &C_FlaUpListWidget::m_SelectFile);
 
-         connect(pc_FileWidget, &C_FlaUpListItemWidget::SigDeleteAllItems, this, &C_FlaUpListWidget::DeleteAllItem);
+         connect(pc_FileWidget, &C_FlaUpListItemWidget::SigDeleteAllItems, this, &C_FlaUpListWidget::m_DeleteAllItem);
 
          connect(pc_FileWidget, &C_FlaUpListItemWidget::SigReloadCurrentFile, this,
-                 &C_FlaUpListWidget::ReloadCurrentFile);
+                 &C_FlaUpListWidget::m_ReloadCurrentFile);
          Q_EMIT (this->SigFileAdded());
       } //lint !e429  //no memory leak of pc_HexFileInfo, pc_FileWidget, pc_Item because of handling in
         // "this->DeleteItem()"
@@ -925,7 +913,7 @@ void C_FlaUpListWidget::m_SetupContextMenu()
       C_GtGetText::h_GetText("Add file(s)"), this,  &C_FlaUpListWidget::m_AddFilesFromContextMenu);
    this->mpc_ContextMenu->addSeparator();
    this->mpc_ContextMenu->addAction(
-      C_GtGetText::h_GetText("Remove all Files"), this, &C_FlaUpListWidget::DeleteAllItem);
+      C_GtGetText::h_GetText("Remove all Files"), this, &C_FlaUpListWidget::m_DeleteAllItem);
    this->setContextMenuPolicy(Qt::CustomContextMenu);
 
    connect(this, &C_FlaUpListWidget::customContextMenuRequested, this,

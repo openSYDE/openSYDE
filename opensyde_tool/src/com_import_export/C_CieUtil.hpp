@@ -57,7 +57,10 @@ public:
    static QString h_GetMessageName(const stw::opensyde_core::C_OscNode & orc_Node, const bool oq_IsTx,
                                    const uint32_t ou32_MessageIndex,
                                    const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType,
-                                   const stw::scl::C_SclString * const opc_NodeNameReplacement);
+                                   const stw::scl::C_SclString * const opc_NodeNameReplacement, const bool oq_IsSrdo,
+                                   uint32_t & oru32_SrdoIndex);
+   static bool h_GetIsSrdoFromMessageIsSrdoVector(const std::vector<uint8_t> & orc_MessageIsSrdo,
+                                                  const uint32_t ou32_MessageIndex);
 
 private:
    static int32_t mh_ImportDbcFile(const uint32_t ou32_BusIndex,
@@ -85,6 +88,8 @@ private:
                                     std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalData, const
                                     std::vector<stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UiSignalData, const
                                     std::vector<std::pair<int32_t, int32_t> > & orc_MessageOverrideIndices, const bool oq_UniqueAddRequested);
+   static QString mh_ConstructMessageName(const stw::scl::C_SclString & orc_Nodename,
+                                          const stw::scl::C_SclString & orc_TpdoRpdo, const uint32_t ou32_MessageIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

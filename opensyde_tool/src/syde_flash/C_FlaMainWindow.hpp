@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QWinTaskbarProgress>
 
+#include "C_Can.hpp"
 #include "C_FlaSenDcBasicSequences.hpp"
 #include "C_FlaUpSequences.hpp"
 
@@ -90,6 +91,7 @@ private:
    bool m_ShowErrorMessage(void);
 
    stw::opensyde_gui_logic::C_FlaUpSequences * mpc_UpSequences;
+   stw::can::C_Can * mpc_CanDispatcher;
    QTimer mc_TimerUpdate;
    QTimer mc_SecTimer;
    QElapsedTimer mc_ElapsedTimer;

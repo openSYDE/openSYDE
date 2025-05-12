@@ -150,28 +150,28 @@ else()
    message("OPENSYDE_CORE_SKIP_CODE_GENERATION not detected ... dragging in package")
 
    set(OPENSYDE_CORE_CODE_GENERATION_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportCommunicationStack.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportCanOpenConfig.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportCanOpenInit.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportDataPool.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportHalc.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportNode.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportOsyInit.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportParamSet.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportUti.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportCommunicationStack.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportCanOpenConfig.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportCanOpenInit.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportDataPool.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportHalc.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportNode.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportOsyInit.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportParamSet.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OscExportUti.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportCommunicationStack.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportCanOpenConfig.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportCanOpenInit.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportDataPool.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportHalc.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportNode.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportOsyInit.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportUti.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportParamSet.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportCommunicationStack.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportCanOpenConfig.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportCanOpenInit.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportDataPool.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportHalc.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportNode.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportOsyInit.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportUti.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation/C_OscExportParamSet.hpp
    )
 
    set(OPENSYDE_CORE_CODE_GENERATION_INCLUDE_DIRECTORIES
-      ${CMAKE_CURRENT_SOURCE_DIR}/exports
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/code_generation
    )
 endif()
 
@@ -245,6 +245,10 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJob.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNode.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeSquad.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeSquadFiler.cpp
@@ -259,6 +263,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolList.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElement.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListId.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeOpenSydeServerSettings.cpp
@@ -343,6 +348,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolList.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElement.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementId.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListId.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeOpenSydeServerSettings.hpp
@@ -360,6 +366,10 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJob.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobProperties.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.hpp
@@ -387,6 +397,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view
    )
@@ -453,6 +464,77 @@ else()
    )
 endif()
 
+# optional: system package base functionality
+if(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING)
+   message("OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING detected ... skipping package")
+else()
+   message("OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING not detected ... dragging in package")
+
+   set(OPENSYDE_CORE_SYSTEM_PACKAGE_HANDLING_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_package_handling/C_OscSpaServicePackageCreateUtil.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_package_handling/C_OscSpaServicePackageLoadUtil.cpp
+
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_package_handling/C_OscSpaServicePackageCreateUtil.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_package_handling/C_OscSpaServicePackageLoadUtil.hpp
+   )
+
+   set(OPENSYDE_CORE_SYSTEM_PACKAGE_HANDLING_INCLUDE_DIRECTORIES
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_package_handling
+   )
+endif()
+
+# optional: system package base functionality
+if(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION)
+   message("OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION detected ... skipping package")
+else()
+   message("OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION not detected ... dragging in package")
+
+   set(OPENSYDE_CORE_X_CERTIFICATES_GENERATION_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceManifest.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceManifestFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceUpdatePackageParameters.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceCreate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceLoad.cpp
+
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceManifest.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceManifestFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceUpdatePackageParameters.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceCreate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation/C_OscXceLoad.hpp
+   )
+
+   set(OPENSYDE_CORE_X_CERTIFICATES_GENERATION_INCLUDE_DIRECTORIES
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_certificates_package_generation
+   )
+endif()
+
+# optional: x-config generation functionality
+if(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION)
+   message("OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION detected ... skipping package")
+else()
+   message("OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION not detected ... dragging in package")
+
+   set(OPENSYDE_CORE_X_CONFIG_GENERATION_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoCreate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoLoad.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoManifest.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoManifestFiler.cpp
+
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoCreate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoLoad.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoManifest.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation/C_OscXcoManifestFiler.hpp
+   )
+
+   set(OPENSYDE_CORE_X_CONFIG_GENERATION_INCLUDE_DIRECTORIES
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/x_config_generation
+   )
+endif()
+
 #communication protocol drivers system update (openSYDE, STW Flashloader, KEFEX, Data Dealer, Dispatcher interface)
 if(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM)
    message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM detected ... skipping package")
@@ -462,15 +544,15 @@ else()
    set(OPENSYDE_CORE_PROTOCOL_DRIVERS_SYSTEM_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequences.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageV1.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageCreate.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageLoad.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageBase.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupSignatureFiler.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinition.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinitionFiler.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinition.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinitionFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageV1.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageCreate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageLoad.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupSignatureFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupDefinition.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupDefinitionFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupNodeDefinition.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupNodeDefinitionFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealer.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvm.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvmSafe.cpp
@@ -491,15 +573,15 @@ else()
 
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequences.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageV1.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageCreate.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageLoad.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupServiceUpdatePackageBase.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupSignatureFiler.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinition.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupDefinitionFiler.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinition.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package/C_OscSupNodeDefinitionFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageV1.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageCreate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageLoad.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupServiceUpdatePackageBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupSignatureFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupDefinition.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupDefinitionFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupNodeDefinition.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package/C_OscSupNodeDefinitionFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealer.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvm.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OscDataDealerNvmSafe.hpp
@@ -523,10 +605,10 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer
       ${CMAKE_CURRENT_SOURCE_DIR}/security
+      ${CMAKE_CURRENT_SOURCE_DIR}/system_update_package
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update
-      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/package
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/cmonprotocol
    )
@@ -642,14 +724,14 @@ else()
    message("OPENSYDE_CORE_SKIP_WINDOWS_TARGET not detected ... dragging in package")
 
    set (OPENSYDE_CORE_WINDOWS_TARGET_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLFile.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLTasks.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLTime.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLUtils.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLFile.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLTasks.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLTime.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TGLUtils.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglFile.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglTasks.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglTime.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglUtils.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglFile.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglTasks.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglTime.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/tgl_windows/TglUtils.hpp
    )
 
    set(OPENSYDE_CORE_WINDOWS_TARGET_INCLUDE_DIRECTORIES
@@ -718,6 +800,9 @@ set(OPENSYDE_CORE_SOURCES
    ${OPENSYDE_CORE_PROJECT_HANDLING_SOURCES}
    ${OPENSYDE_CORE_PARAM_SET_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_BASIC_SOURCES}
+   ${OPENSYDE_CORE_SYSTEM_PACKAGE_HANDLING_SOURCES}
+   ${OPENSYDE_CORE_X_CERTIFICATES_GENERATION_SOURCES}
+   ${OPENSYDE_CORE_X_CONFIG_GENERATION_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_SYSTEM_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_COMMON_SOURCES}
    ${OPENSYDE_CORE_WINDOWS_DRIVERS_SOURCES}
@@ -733,11 +818,21 @@ set(OPENSYDE_CORE_INCLUDE_DIRECTORIES
    ${OPENSYDE_CORE_PROJECT_HANDLING_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PARAM_SET_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_BASIC_INCLUDE_DIRECTORIES}
+   ${OPENSYDE_CORE_SYSTEM_PACKAGE_HANDLING_INCLUDE_DIRECTORIES}
+   ${OPENSYDE_CORE_X_CERTIFICATES_GENERATION_INCLUDE_DIRECTORIES}
+   ${OPENSYDE_CORE_X_CONFIG_GENERATION_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_SYSTEM_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_COMMON_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_WINDOWS_DRIVERS_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_WINDOWS_TARGET_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_LOGGING_INCLUDE_DIRECTORIES}
+)
+
+#deactivate warnings for miniz due to external component
+set_source_files_properties(
+  ${CMAKE_CURRENT_SOURCE_DIR}/miniz/miniz.c
+  PROPERTIES
+  COMPILE_FLAGS "-w"
 )
 
 # define library target including all sources

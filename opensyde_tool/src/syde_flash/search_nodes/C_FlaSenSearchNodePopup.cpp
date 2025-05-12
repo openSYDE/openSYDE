@@ -210,7 +210,7 @@ int32_t C_FlaSenSearchNodePopup::m_InitDcSequence(const QString & orc_CanDllPath
               this, &C_FlaSenSearchNodePopup::m_DeviceInfoReceived);
    }
 
-   s32_Return = this->mpc_DcSequences->Init(orc_CanDllPath.toStdString(), os32_CanBitrate);
+   s32_Return = this->mpc_DcSequences->InitDcSequences(orc_CanDllPath.toStdString(), os32_CanBitrate);
 
    if (s32_Return != C_NO_ERR)
    {
@@ -394,6 +394,7 @@ void C_FlaSenSearchNodePopup::m_Timer(void)
       case C_FlaSenDcBasicSequences::eRESET_SYSTEM:
          //stop reset sequence
          this->mc_Timer.stop();
+         this->m_CleanupDcSequence();
          break;
       //those sequences are irrelevant here
       case C_FlaSenDcBasicSequences::eCONF_DEVICES:

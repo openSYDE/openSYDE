@@ -264,7 +264,8 @@ int32_t C_OscDataDealerNvm::m_NvmReadListRaw(const C_OscNodeDataPoolList & orc_L
    C_CHECKSUM  Checksum of read datapool list is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscDataDealerNvm::m_SaveDumpToList(std::vector<uint8_t> & orc_Values, C_OscNodeDataPoolList & orc_List) const
+int32_t C_OscDataDealerNvm::m_SaveDumpToList(const std::vector<uint8_t> & orc_Values,
+                                             C_OscNodeDataPoolList & orc_List) const
 {
    int32_t s32_Return = this->m_SaveDumpValuesToListValues(orc_Values, orc_List);
 
@@ -319,7 +320,7 @@ int32_t C_OscDataDealerNvm::m_SaveDumpToList(std::vector<uint8_t> & orc_Values, 
    C_RD_WR     Datapool element size configuration does not match with count of read bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8_t> & orc_Values,
+int32_t C_OscDataDealerNvm::m_SaveDumpValuesToListValues(const std::vector<uint8_t> & orc_Values,
                                                          C_OscNodeDataPoolList & orc_List) const
 {
    int32_t s32_Return = C_NO_ERR;

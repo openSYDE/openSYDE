@@ -14,7 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QString>
-#include "C_NagToolTip.hpp"
+#include "C_NagToolTipWithImage.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -33,12 +33,18 @@ public:
    void RestoreDefaultToolTip(void);
    void SetDefaultToolTipHeading(const QString & orc_Text);
    void SetDefaultToolTipContent(const QString & orc_Text);
-   void SetDefaultToolTipType(const C_NagToolTip::E_Type oe_Type);
+   void SetDefaultToolTipType(const C_NagToolTipWithImage::E_Type oe_Type);
    void SetTemporaryToolTipHeading(const QString & orc_TemporaryToolTip);
    void SetTemporaryToolTipContent(const QString & orc_TemporaryToolTip);
+   void SetDefaultToolTipImagePath(const QString & orc_ImagePath);
+   void SetDefaultToolTipImageCaption(const QString & orc_ImageCaption);
+
    QString GetCurrentToolTipHeading(void) const;
    QString GetCurrentToolTipContent(void) const;
-   C_NagToolTip::E_Type GetCurrentToolTipType(void) const;
+   C_NagToolTipWithImage::E_Type GetCurrentToolTipType(void) const;
+   QString GetCurrentToolTipImagePath(void) const;
+   QString GetCurrentToolTipImageCaption(void) const;
+
    bool NotEmpty(void) const;
    virtual void GenerateHint(void) = 0;
    void DeactivateToolTipTemporarily(void);
@@ -48,10 +54,13 @@ protected:
    ///< special is happening)
    QString mc_DefaultToolTipContent; ///< Default tool tip content (Displayed in most situations, e.g. nothing
    ///< special is happening)
-   C_NagToolTip::E_Type me_DefaultToolTipType; ///< Current tool tip type (Displayed currently)
-   QString mc_CurrentToolTipHeading;           ///< Current tool tip heading (Displayed currently)
-   QString mc_CurrentToolTipContent;           ///< Current tool tip content (Displayed currently)
-   C_NagToolTip::E_Type me_CurrentToolTipType; ///< Current tool tip type (Displayed currently)
+   C_NagToolTipWithImage::E_Type me_DefaultToolTipType; ///< Current tool tip type (Displayed currently)
+   QString mc_CurrentToolTipHeading;                    ///< Current tool tip heading (Displayed currently)
+   QString mc_CurrentToolTipContent;                    ///< Current tool tip content (Displayed currently)
+   C_NagToolTipWithImage::E_Type me_CurrentToolTipType; ///< Current tool tip type (Displayed currently)
+
+   QString mc_DefaultToolTipImagePath;
+   QString mc_DefaultToolTipImageCaption;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -74,6 +74,7 @@ public:
    C_OscNodeOpenSydeServerSettings c_OpenSydeServerSettings;   ///< Optional openSYDE server settings
    C_OscNodeStwFlashloaderSettings c_StwFlashloaderSettings;   ///< Optional STW flashloader settings
    C_OscNodeCodeExportSettings c_CodeExportSettings;           ///< Optional code export settings
+   bool q_XappSupport;                                         ///< Flag to indicate X_App support of node
 
 private:
    std::vector<C_OscNodeComInterfaceSettings> m_GetInterfaces(const C_OscSystemBus::E_Type oe_Type) const;

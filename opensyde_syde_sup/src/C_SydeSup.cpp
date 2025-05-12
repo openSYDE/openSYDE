@@ -105,6 +105,9 @@ C_SydeSup::~C_SydeSup(void)
    * -s for openSYDE project file path
    * -d for device definition file path
    * -w for view name
+   * -k for PEM file
+   * -x for password
+   * -c for certificate files
 
    \param[in]  os32_Argc   number of command line arguments
    \param[in]  oppcn_Argv  command line arguments
@@ -901,40 +904,63 @@ void C_SydeSup::m_PrintInformation(const bool oq_Detailed) const
    }
 
    // show parameter help
-   std::cout << "\nCommand line parameters:\n\n"
+   std::cout << "\nCommand Line Parameters:\n--------------------------------\n\n"
       "Flag   Alternative         Description                                     Default         Example\n"
       "---------------------------------------------------------------------------------------------------------------\n"
+      "General\n"
+      "---------------------\n"
       "-h     --help              Print help                                                      -h\n"
       "-m     --manpage           Print manual page                                               -m\n"
       "-v     --version           Print version                                                   -v\n"
       "-q     --quiet             Print less console output                                       -q\n"
-      "-o     --operationmode     Set mode: \"update\" or \"createpackage\"           update          -o createpackage\n"
-      "-n     --necessaryfiles    Only transfer files if necessary.                               -n\n"
-      "                           Files already on address based target will \n"
-      "                           be skipped.            \n"
-      "-p     --packagefile       Path to Service Update Package file             <none>          -p ." <<
-      c_PathDelimiter.c_str() << "MyPackage.syde_sup\n"
-      "-i     --caninterface      CAN interface                                   <none>          " <<
-      this->m_GetCanInterfaceUsageExample().c_str() << "\n"
-      "-z     --unzipdir          Existing directory for temporary files          <packagefile>   -z "  <<
-      this->m_GetUnzipLocationDefaultExample().c_str() << "\n" <<
       "-l     --logdir            Directory for log files                         " <<
-      this->m_GetDefaultLogLocation().c_str() <<      "          -l ." << c_PathDelimiter.c_str() << "MyLogDir\n"
-      "-c     --certificatesdir   Directory for certificates (PEM-files)          <none>          -c ." <<
-      c_PathDelimiter.c_str() << "MyCertificatesDir\n"
+      this->m_GetDefaultLogLocation().c_str() <<
+  //for fitting into table layout pad the log path to length 16 (if it is longer than 16 just leave as it is):
+      std::string(static_cast<uint32_t>(
+                     (this->m_GetDefaultLogLocation().Length() < 16) ?
+                     (16 - this->m_GetDefaultLogLocation().Length()) : 0), ' ') <<
+      "-l ." << c_PathDelimiter.c_str() << "MyLogDir\n"
+      "-o     --operationmode     Set mode: \"update\" or \"createpackage\"           update          -o createpackage\n\n"
+      "Package Creation\n"
+      "---------------------\n"
       "-s     --opensydeproject   Path to openSYDE project file (SYDE file)       <none>          -s ." <<
       c_PathDelimiter.c_str() << "MyProject.syde\n"
       "-d     --devicedefinition  Path to device definitions file                 <none>          -d ." <<
       c_PathDelimiter.c_str() << "openSYDE" << c_PathDelimiter.c_str() << "devices" << c_PathDelimiter.c_str() <<
       "devices.ini\n"
       "-w     --systemview        Name of view in openSYDE project                <none>          -w ViewCAN1\n"
-      "-k     --publickey         Path to pem file with public key                <none>          -k public_crt.pem\n"
-      "-x     --password          Password for the encrypted Update Package       <none>          -x unh4ckab1e\n"
-      "The package file parameter \"-p\" is mandatory, all others are optional.\n"
-      "If in update mode the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n"
-      "In createpackage mode the parameters opensydeproject, systemview and devicedefinition are mandatory.\n"
-      "If a Secure Update Package shall be loaded the parameter \"-k\" is mandatory."
-      "The parameter \"-x\" for a password is not allowed without the parameter \"-k\"." << &std::endl;
+      "-p     --packagefile       Path for resulting Service Update Package file  <none>          -p ." <<
+      c_PathDelimiter.c_str() << "MyPackage.syde_sup\n\n"
+      "In createpackage mode the parameters packagefile \"-p\", opensydeproject \"-s\",\n"
+      "systemview \"-w\" and devicedefinition \"-d\" are mandatory.\n\n"
+      "Update\n"
+      "---------------------\n"
+      "-n     --necessaryfiles    Only transfer files if necessary.                               -n\n"
+      "                           Files already on address based target will \n"
+      "                           be skipped.            \n"
+      "-p     --packagefile       Path to existing Service Update Package file    <none>          -p ." <<
+      c_PathDelimiter.c_str() << "MyPackage.syde_sup\n"
+      "-i     --caninterface      CAN interface                                   <none>          " <<
+      this->m_GetCanInterfaceUsageExample().c_str() << "\n"
+      "-z     --unzipdir          Existing directory for temporary files          <packagefile>   -z "  <<
+      this->m_GetUnzipLocationDefaultExample().c_str() << "\n\n"
+      "In update mode the package file parameter \"-p\" is mandatory, all others are optional.\n"
+      "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n\n"
+      "Secure Authentication\n"
+      "---------------------\n"
+      "-c     --certificatesdir   Directory for certificates (PEM files) for      <none>          -c ." <<
+      c_PathDelimiter.c_str() << "MyCertificatesDir\n"
+      "                           secure authentication with the openSYDE server\n\n"
+      "Secure Update\n"
+      "---------------------\n"
+      "-k     --publickey         Path to PEM file holding the public key for     <none>          -k public_crt.pem\n"
+      "                           verifying the authenticity of a signed\n"
+      "                           Service Update Package\n"
+      "-x     --password          Password for the encrypted Service Update       <none>          -x unh4ckab1e\n"
+      "                           Package. Needed for secure update.\n\n"
+      "If a signed Service Update Package shall be loaded the parameter publickey \"-k\" is mandatory.\n"
+      "The parameter password \"-x\" is only used in combination with the parameter publickey \"-k\".\n"
+      "Both parameters must match the provided Service Update Package.\n" << &std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1042,7 +1068,8 @@ void C_SydeSup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_PACKAGE_INVALID: //C_CONFIG
       c_Activity = "Unzip Package";
-      c_Error = "Either could not find Service Update Package or System Definition content is invalid or incomplete.";
+      c_Error = "Either could not find Service Update Package, Service Update Package file version is unknown or System"
+                " Definition content is invalid or incomplete.";
       break;
    case eERR_PACKAGE_WRONG_EXTENSION:
       c_Activity = "Unzip Package";

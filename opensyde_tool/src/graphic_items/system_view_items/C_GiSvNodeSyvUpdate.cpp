@@ -518,7 +518,7 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
    }
    else
    {
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
       this->SetDefaultToolTipHeading(C_PuiSdUtil::h_GetNodeBaseNameOrName(static_cast<uint32_t>(this->GetIndex())));
 
       if (this->mq_ViewConnected == true)
@@ -613,6 +613,32 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
       else
       {
          this->SetDefaultToolTipContent(C_GtGetText::h_GetText("Inactive node."));
+      }
+      QFileInfo c_FileInfoDevImg;
+      const C_OscNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(static_cast<uint32_t>(this->GetIndex()));
+      if (pc_Node != NULL)
+      {
+         const C_OscDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         bool q_FileExists;
+
+         // Set tooltip image
+         //load device picture
+         c_FileInfoDevImg.setFile(pc_Device->c_ImagePath.c_str());
+         q_FileExists = (c_FileInfoDevImg.exists() && c_FileInfoDevImg.isFile());
+
+         //check if file exists
+         if (q_FileExists == true)
+         {
+            this->SetDefaultToolTipImagePath(pc_Device->c_ImagePath.c_str());
+         }
+         else
+         {
+            //no image available
+            this->SetDefaultToolTipImagePath("://images/system_definition/Image_Grey.svg");
+         }
+
+         this->SetDefaultToolTipImageCaption(pc_Device->GetDisplayName().c_str());
       }
    }
 }

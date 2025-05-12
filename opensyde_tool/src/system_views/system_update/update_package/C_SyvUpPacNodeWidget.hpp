@@ -145,6 +145,10 @@ private:
                     C_SyvUpPacListNodeItemWidget ** const oppc_App = NULL) const;
 
    static const int32_t mhs32_LAYOUT_THRESHOLD;
+
+   void m_AddSecurityCertificatePacakege(void);
+   void m_OnCreatePackage(const QString & orc_PrivateKeyPath, const QString & orc_Password,
+                          const std::vector<stw::scl::C_SclString> & orc_CertificatesPath);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

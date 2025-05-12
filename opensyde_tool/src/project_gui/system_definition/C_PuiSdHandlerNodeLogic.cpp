@@ -455,6 +455,64 @@ int32_t C_PuiSdHandlerNodeLogic::SetNodeCodeExportSettings(const uint32_t ou32_I
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node property X-App support and handle dependencies
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oq_XappSupport    New property X-App support
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerNodeLogic::SetOscNodePropertyXappSupport(const uint32_t ou32_NodeIndex, const bool oq_XappSupport)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_Node.c_Properties.q_XappSupport = oq_XappSupport;
+
+      //Delete existing programmable Data Blocks
+      uint32_t u32_NonProgrammableCounter = 0;
+      while (rc_Node.c_Applications.size() > u32_NonProgrammableCounter)
+      {
+         if (rc_Node.c_Applications[u32_NonProgrammableCounter].e_Type !=
+             C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
+         {
+            u32_NonProgrammableCounter++;
+         }
+         else
+         {
+            // as the vector gets smaller, we just remove the first element that is not programmable, till it'sempty
+            tgl_assert(this->RemoveApplication(ou32_NodeIndex, u32_NonProgrammableCounter) == C_NO_ERR);
+         }
+      }
+
+      //Initialize data logger when necessary
+      if (rc_Node.c_Properties.q_XappSupport)
+      {
+         rc_Node.c_DataLoggerJobs.resize(1UL);
+      }
+      //Disable the one existing log job (in future: delete all log jobs)
+      else
+      {
+         if (rc_Node.c_DataLoggerJobs.size() > 0)
+         {
+            rc_Node.c_DataLoggerJobs[0].q_IsEnabled = false;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply node properties
 
    \param[in]  ou32_NodeIndex    Node index
@@ -488,8 +546,11 @@ void C_PuiSdHandlerNodeLogic::SetOscNodeProperties(const uint32_t ou32_NodeIndex
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::SetOscNodePropertiesDetailed(const uint32_t ou32_NodeIndex, const QString & orc_Name,
-                                                           const QString & orc_Comment,
-                                                           const C_OscNodeProperties::E_DiagnosticServerProtocol oe_DiagnosticServer, const C_OscNodeProperties::E_FlashLoaderProtocol oe_FlashLoader, const std::vector<uint8_t> & orc_NodeIds, const std::vector<bool> & orc_UpdateFlags, const std::vector<bool> & orc_RoutingFlags,
+                                                           const QString & orc_Comment, const C_OscNodeProperties::E_DiagnosticServerProtocol
+                                                           oe_DiagnosticServer, const C_OscNodeProperties::E_FlashLoaderProtocol
+                                                           oe_FlashLoader, const std::vector<uint8_t> & orc_NodeIds,
+                                                           const std::vector<bool> & orc_UpdateFlags,
+                                                           const std::vector<bool> & orc_RoutingFlags,
                                                            const std::vector<bool> & orc_DiagnosisFlags)
 {
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())

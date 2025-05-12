@@ -123,7 +123,7 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
                u32_StartId = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_RX_PDO;
             }
             s32_Retval = mh_ParseMessages(u32_StartId,
-                                          ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
+                                          ou8_NodeId, c_Dictionary.c_OdObjects, c_Dummies,
                                           orc_AllRxMessageData,
                                           q_Eds, orc_ImportMessagesPerMessage, false,
                                           oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN, false,
@@ -140,7 +140,7 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
                   u32_StartId = C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_TX_PDO;
                }
                s32_Retval = mh_ParseMessages(u32_StartId,
-                                             ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
+                                             ou8_NodeId, c_Dictionary.c_OdObjects, c_Dummies,
                                              orc_AllTxMessageData,
                                              q_Eds, orc_ImportMessagesPerMessage, true,
                                              oe_ImportForProtocol == C_OscCanProtocol::eCAN_OPEN, false,
@@ -153,7 +153,7 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
                {
                   s32_Retval = mh_ParseMessages(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_SRDO,
                                                 ou8_NodeId,
-                                                c_Dictionary.c_Objects, c_Dummies,
+                                                c_Dictionary.c_OdObjects, c_Dummies,
                                                 orc_AllTxMessageData,
                                                 q_Eds, orc_ImportMessagesPerMessage, true,
                                                 false, true,
@@ -163,7 +163,7 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
                   {
                      s32_Retval = mh_ParseMessages(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_SRDO,
                                                    ou8_NodeId,
-                                                   c_Dictionary.c_Objects, c_Dummies,
+                                                   c_Dictionary.c_OdObjects, c_Dummies,
                                                    orc_AllRxMessageData,
                                                    q_Eds, orc_ImportMessagesPerMessage, false,
                                                    false, true,
@@ -210,7 +210,8 @@ int32_t C_OscImportEdsDcf::h_Import(const C_SclString & orc_FilePath, const uint
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
+int32_t C_OscImportEdsDcf::h_ParseSignalContent(const std::map<uint16_t,
+                                                               C_OscCanOpenObject> & orc_CoObjects,
                                                 const uint32_t ou32_CoSignalObjectIndex,
                                                 const uint32_t ou32_CoSignalObjectSubIndex,
                                                 const uint32_t ou32_StartBitCounter,
@@ -220,7 +221,7 @@ int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArra
                                                 bool & orq_DefaultMinMax)
 {
    int32_t s32_Retval = C_NO_ERR;
-   const C_OscCanOpenObject * pc_CoSignalObject;
+   const C_OscCanOpenObjectData * pc_CoSignalObject;
 
    if (ou32_CoSignalObjectSubIndex == 0)
    {
@@ -256,41 +257,41 @@ int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArra
       //Get length
       switch (pc_CoSignalObject->u8_DataType)
       {
-      case C_OscCanOpenObject::hu8_DATA_TYPE_BOOLEAN:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_BOOLEAN:
          orc_CurSignal.u16_ComBitLength = 1U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED8:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER8:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED8:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER8:
          orc_CurSignal.u16_ComBitLength = 8U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER16:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED16:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER16:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED16:
          orc_CurSignal.u16_ComBitLength = 16U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER24:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED24:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER24:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED24:
          orc_CurSignal.u16_ComBitLength = 24U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_REAL32:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER32:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED32:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_REAL32:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER32:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED32:
          orc_CurSignal.u16_ComBitLength = 32U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER40:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED40:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER40:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED40:
          orc_CurSignal.u16_ComBitLength = 40U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER48:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED48:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER48:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED48:
          orc_CurSignal.u16_ComBitLength = 48U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER56:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED56:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER56:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED56:
          orc_CurSignal.u16_ComBitLength = 56U;
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER64:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED64:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_REAL64:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER64:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED64:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_REAL64:
          orc_CurSignal.u16_ComBitLength = 64U;
          break;
       default:
@@ -300,14 +301,14 @@ int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArra
       //Data type (automatic calculation based on set type)
       switch (pc_CoSignalObject->u8_DataType)
       {
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER8:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER16:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER32:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER64:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER24:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER40:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER48:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_INTEGER56:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER8:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER16:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER32:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER64:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER24:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER40:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER48:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_INTEGER56:
          if (orc_CurSignal.u16_ComBitLength <= 8U)
          {
             orc_CurDataPoolSignal.SetType(C_OscNodeDataPoolContent::eSINT8);
@@ -325,15 +326,15 @@ int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArra
             orc_CurDataPoolSignal.SetType(C_OscNodeDataPoolContent::eSINT64);
          }
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_BOOLEAN:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED8:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED16:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED32:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED64:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED24:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED40:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED48:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_UNSIGNED56:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_BOOLEAN:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED8:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED16:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED32:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED64:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED24:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED40:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED48:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_UNSIGNED56:
          if (orc_CurSignal.u16_ComBitLength <= 8U)
          {
             orc_CurDataPoolSignal.SetType(C_OscNodeDataPoolContent::eUINT8);
@@ -351,8 +352,8 @@ int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArra
             orc_CurDataPoolSignal.SetType(C_OscNodeDataPoolContent::eUINT64);
          }
          break;
-      case C_OscCanOpenObject::hu8_DATA_TYPE_REAL32:
-      case C_OscCanOpenObject::hu8_DATA_TYPE_REAL64:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_REAL32:
+      case C_OscCanOpenObjectData::hu8_DATA_TYPE_REAL64:
          if (orc_CurSignal.u16_ComBitLength <= 32U)
          {
             orc_CurDataPoolSignal.SetType(C_OscNodeDataPoolContent::eFLOAT32);
@@ -400,7 +401,7 @@ int32_t C_OscImportEdsDcf::h_ParseSignalContent(const stw::scl::C_SclDynamicArra
    Object name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_OscImportEdsDcf::h_GetObjectName(const C_OscCanOpenObject & orc_CoObject)
+C_SclString C_OscImportEdsDcf::h_GetObjectName(const C_OscCanOpenObjectData & orc_CoObject)
 {
    C_SclString c_Retval;
 
@@ -425,7 +426,7 @@ C_SclString C_OscImportEdsDcf::h_GetObjectName(const C_OscCanOpenObject & orc_Co
    CO object value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_OscImportEdsDcf::h_GetCoObjectValue(const C_OscCanOpenObject & orc_CoObject, const bool oq_IsEds)
+C_SclString C_OscImportEdsDcf::h_GetCoObjectValue(const C_OscCanOpenObjectData & orc_CoObject, const bool oq_IsEds)
 {
    C_SclString c_Retval;
 
@@ -468,21 +469,31 @@ C_OscImportEdsDcf::C_OscImportEdsDcf(void)
    Else Valid object
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OscCanOpenObject * C_OscImportEdsDcf::mh_GetCoObject(
-   const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const uint32_t ou32_Id,
-   const int32_t os32_SubIndex)
+const C_OscCanOpenObjectData * C_OscImportEdsDcf::mh_GetCoObject(const std::map<uint16_t,
+                                                                                C_OscCanOpenObject> & orc_CoObjects,
+                                                                 const uint32_t ou32_Id, const int32_t os32_SubIndex)
 {
-   const C_OscCanOpenObject * pc_Retval = NULL;
+   const C_OscCanOpenObjectData * pc_Retval = NULL;
 
-   for (int32_t s32_ItObject = 0; s32_ItObject < orc_CoObjects.GetLength(); ++s32_ItObject)
+   //use "find" as "at" is not available in C++98
+   const std::map<uint16_t,
+                  C_OscCanOpenObject>::const_iterator c_Element = orc_CoObjects.find(static_cast<uint16_t>(ou32_Id));
+
+   if (c_Element != orc_CoObjects.end())
    {
-      const C_OscCanOpenObject & rc_CurObject = orc_CoObjects[s32_ItObject];
-      if ((rc_CurObject.u16_Index == ou32_Id) &&
-          ((os32_SubIndex < 0) ||
-           ((rc_CurObject.u8_NumSubs == 255) && (rc_CurObject.u8_SubIndex == static_cast<uint8_t>(os32_SubIndex)))))
+      if (os32_SubIndex < 0)
       {
-         pc_Retval = &rc_CurObject;
-         break;
+         pc_Retval = &c_Element->second;
+      }
+      else
+      {
+         const std::map<uint8_t,
+                        C_OscCanOpenObjectData>::const_iterator c_SubElement = c_Element->second.c_SubObjects.find(
+            static_cast<uint8_t>(os32_SubIndex));
+         if (c_SubElement != c_Element->second.c_SubObjects.end())
+         {
+            pc_Retval = &c_SubElement->second;
+         }
       }
    }
    return pc_Retval;
@@ -510,7 +521,7 @@ const C_OscCanOpenObject * C_OscImportEdsDcf::mh_GetCoObject(
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, const uint8_t ou8_NodeId,
-                                            const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
+                                            const std::map<uint16_t, C_OscCanOpenObject> & orc_CoObjects,
                                             const std::vector<uint32_t> & orc_Dummies,
                                             C_OscEdsDcfImportMessageGroup & orc_AllMessageData, const bool oq_IsEds,
                                             std::vector<std::vector<C_SclString> > & orc_ImportMessages,
@@ -525,11 +536,12 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
                                     C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_COB_ID :
                                     C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID;
 
-   for (int32_t s32_ItObject = 0; (s32_ItObject < orc_CoObjects.GetLength()) && (s32_Retval == C_NO_ERR);
-        ++s32_ItObject)
+   for (std::map<uint16_t, C_OscCanOpenObject>::const_iterator c_Element = orc_CoObjects.begin();
+        c_Element != orc_CoObjects.end();
+        ++c_Element)
    {
       //Main section
-      const C_OscCanOpenObject & rc_CoMessageMainObject = orc_CoObjects[s32_ItObject];
+      const C_OscCanOpenObjectData & rc_CoMessageMainObject = c_Element->second;
       //Check if relevant object
       if ((rc_CoMessageMainObject.u8_NumSubs != 255) &&
           ((rc_CoMessageMainObject.u16_Index >= ou32_StartingId) &&
@@ -538,13 +550,26 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
          const uint32_t u32_ItMessage = rc_CoMessageMainObject.u16_Index - ou32_StartingId;
          //COB-ID section
          //--------------
-         const C_OscCanOpenObject * const pc_CoMessageCobIdObject =
-            mh_GetCoObject(orc_CoObjects, ou32_StartingId + u32_ItMessage, u8_CobIdSubIndex);
-         if (pc_CoMessageCobIdObject != NULL)
+         const C_OscCanOpenObjectData * pc_SubObject = NULL;
+
+         const std::map<uint16_t, C_OscCanOpenObject>::const_iterator c_Object = orc_CoObjects.find(
+            static_cast<uint16_t>(ou32_StartingId + u32_ItMessage));
+         if (c_Object != orc_CoObjects.end())
+         {
+            const std::map<uint8_t,
+                           C_OscCanOpenObjectData>::const_iterator c_SubObject = c_Object->second.c_SubObjects.find(
+               u8_CobIdSubIndex);
+            if (c_SubObject != c_Object->second.c_SubObjects.end())
+            {
+               pc_SubObject = &c_SubObject->second;
+            }
+         }
+
+         if (pc_SubObject != NULL)
          {
             bool q_CobIdIncludesNodeId;
             uint32_t u32_CobId;
-            if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageCobIdObject, oq_IsEds), ou8_NodeId,
+            if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_SubObject, oq_IsEds), ou8_NodeId,
                                    u32_CobId, &q_CobIdIncludesNodeId) == C_NO_ERR)
             {
                //Check if message active
@@ -650,7 +675,8 @@ int32_t C_OscImportEdsDcf::mh_ParseMessages(const uint32_t ou32_StartingId, cons
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::mh_DoesInformationDirectionMatchToParsedMessages(const uint32_t ou32_StartingId,
                                                                             const uint8_t ou8_NodeId,
-                                                                            const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_IsTx, const uint32_t ou32_MessageIndex,
+                                                                            const std::map<uint16_t,
+                                                                                           C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_IsTx, const uint32_t ou32_MessageIndex,
                                                                             bool & orq_Matches)
 {
    int32_t s32_Retval = C_NO_ERR;
@@ -658,7 +684,7 @@ int32_t C_OscImportEdsDcf::mh_DoesInformationDirectionMatchToParsedMessages(cons
    orq_Matches = false;
    //Information direction section
    //-----------------------------
-   const C_OscCanOpenObject * const pc_CoMessageInfoDirObject =
+   const C_OscCanOpenObjectData * const pc_CoMessageInfoDirObject =
       mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_MessageIndex,
                      C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_INFORMATION_DIRECTION);
    if (pc_CoMessageInfoDirObject != NULL)
@@ -719,14 +745,14 @@ int32_t C_OscImportEdsDcf::mh_DoesInformationDirectionMatchToParsedMessages(cons
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId, const uint8_t ou8_NodeId,
-                                                  const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
+                                                  const std::map<uint16_t, C_OscCanOpenObject> & orc_CoObjects,
                                                   const std::vector<uint32_t> & orc_Dummies,
                                                   C_OscEdsDcfImportMessageGroup & orc_AllMessageData,
                                                   const bool oq_IsEds,
                                                   std::vector<std::vector<C_SclString> > & orc_ImportMessages,
                                                   const bool oq_IsTx, const bool oq_RestrictForCanOpenUsage,
                                                   const bool oq_ImportSrdoUseCase,
-                                                  const C_OscCanOpenObject & orc_CoMessageMainObject,
+                                                  const C_OscCanOpenObjectData & orc_CoMessageMainObject,
                                                   const uint32_t ou32_ItMessage, const uint32_t ou32_CobId,
                                                   C_OscEdsDcfImportMessageGroup & orc_AllInvalidMessageData,
                                                   std::vector<std::vector<stw::scl::C_SclString> > & orc_InvalidImportMessages,
@@ -853,12 +879,14 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
       {
          //Should be in sync
          orc_AllInvalidMessageData.c_OscMessageData.push_back(c_Message);
+         orc_AllInvalidMessageData.c_MessageIsSrdo.push_back(static_cast<uint8_t>(oq_ImportSrdoUseCase));
          orc_InvalidImportMessages.push_back(c_CurMessages);
       }
       else
       {
          //Should be in sync
          orc_AllMessageData.c_OscMessageData.push_back(c_Message);
+         orc_AllMessageData.c_MessageIsSrdo.push_back(static_cast<uint8_t>(oq_ImportSrdoUseCase));
          orc_ImportMessages.push_back(c_CurMessages);
       }
    }
@@ -885,15 +913,15 @@ int32_t C_OscImportEdsDcf::mh_ParseMessageContent(const uint32_t ou32_StartingId
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::mh_LoadMessageTransmissionType(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
-                                                          const uint8_t ou8_NodeId,
-                                                          const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_ImportSrdoUseCase, std::vector<C_SclString> & orc_CurMessages,
+                                                          const uint8_t ou8_NodeId, const std::map<uint16_t,
+                                                                                                   C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_ImportSrdoUseCase, std::vector<C_SclString> & orc_CurMessages,
                                                           C_OscCanMessage & orc_Message)
 {
    int32_t s32_Retval = C_NO_ERR;
    const uint8_t u8_ActualSubIndex =
       oq_ImportSrdoUseCase ? C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_TRANSMISSION_TYPE :
       C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE;
-   const C_OscCanOpenObject * const pc_CoMessageTransTypeObject =
+   const C_OscCanOpenObjectData * const pc_CoMessageTransTypeObject =
       mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage, u8_ActualSubIndex);
 
    if (pc_CoMessageTransTypeObject != NULL)
@@ -955,10 +983,13 @@ int32_t C_OscImportEdsDcf::mh_LoadMessageTransmissionType(const uint32_t ou32_St
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscImportEdsDcf::mh_LoadMessageTransmissionTypeCanOpen(const uint32_t ou32_StartingId,
                                                               const uint32_t ou32_ItMessage, const uint8_t ou8_NodeId,
-                                                              const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, bool & orq_AddToSkippedMessages, std::vector<C_SclString> & orc_CurMessages,
+                                                              const std::map<uint16_t,
+                                                                             C_OscCanOpenObject> & orc_CoObjects,
+                                                              const bool oq_IsEds, bool & orq_AddToSkippedMessages,
+                                                              std::vector<C_SclString> & orc_CurMessages,
                                                               C_OscCanMessage & orc_Message)
 {
-   const C_OscCanOpenObject * const pc_CoMessageTransTypeObject =
+   const C_OscCanOpenObjectData * const pc_CoMessageTransTypeObject =
       mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
                      C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE);
 
@@ -1045,10 +1076,8 @@ void C_OscImportEdsDcf::mh_LoadMessageTransmissionTypeCanOpen(const uint32_t ou3
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscImportEdsDcf::mh_LoadEventTimerSection(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
-                                                 const uint8_t ou8_NodeId,
-                                                 const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
-                                                 const bool oq_IsEds, const bool oq_IsTx,
-                                                 std::vector<C_SclString> & orc_CurMessages,
+                                                 const uint8_t ou8_NodeId, const std::map<uint16_t,
+                                                                                          C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_IsTx, std::vector<C_SclString> & orc_CurMessages,
                                                  C_OscCanMessage & orc_Message)
 {
    if (oq_IsTx == false)
@@ -1057,7 +1086,7 @@ void C_OscImportEdsDcf::mh_LoadEventTimerSection(const uint32_t ou32_StartingId,
       C_SclString c_Reason;
 
       // Event-timer only relevant for Rx because it equals the timeout time
-      const C_OscCanOpenObject * const pc_CoMessageEventTimerObject =
+      const C_OscCanOpenObjectData * const pc_CoMessageEventTimerObject =
          mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
                         C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_EVENT_TIMER);
       if (pc_CoMessageEventTimerObject != NULL)
@@ -1129,15 +1158,14 @@ void C_OscImportEdsDcf::mh_LoadEventTimerSection(const uint32_t ou32_StartingId,
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscImportEdsDcf::mh_LoadSrdoCyclicSection(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
-                                                 const uint8_t ou8_NodeId,
-                                                 const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
-                                                 const bool oq_IsEds, std::vector<C_SclString> & orc_CurMessages,
+                                                 const uint8_t ou8_NodeId, const std::map<uint16_t,
+                                                                                          C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, std::vector<C_SclString> & orc_CurMessages,
                                                  C_OscCanMessage & orc_Message)
 {
    bool q_UseDefault = false;
    C_SclString c_Reason;
 
-   const C_OscCanOpenObject * const pc_CoMessageCycleTimeObject =
+   const C_OscCanOpenObjectData * const pc_CoMessageCycleTimeObject =
       mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
                      C_OscCanOpenObjectDictionary::hu8_OD_SRDO_SUB_INDEX_CYCLE_TIME);
 
@@ -1211,11 +1239,11 @@ void C_OscImportEdsDcf::mh_LoadSrdoCyclicSection(const uint32_t ou32_StartingId,
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscImportEdsDcf::mh_LoadEventTimerSectionCanOpen(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
-                                                        const uint8_t ou8_NodeId,
-                                                        const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_IsTx,
+                                                        const uint8_t ou8_NodeId, const std::map<uint16_t,
+                                                                                                 C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, const bool oq_IsTx,
                                                         C_OscCanMessage & orc_Message)
 {
-   const C_OscCanOpenObject * const pc_CoMessageEventTimerObject =
+   const C_OscCanOpenObjectData * const pc_CoMessageEventTimerObject =
       mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
                      C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_EVENT_TIMER);
 
@@ -1270,18 +1298,18 @@ void C_OscImportEdsDcf::mh_LoadEventTimerSectionCanOpen(const uint32_t ou32_Star
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscImportEdsDcf::mh_LoadInhibitTimeSectionCanOpen(const uint32_t ou32_StartingId, const uint32_t ou32_ItMessage,
-                                                         const uint8_t ou8_NodeId,
-                                                         const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, std::vector<C_SclString> & orc_CurMessages,
+                                                         const uint8_t ou8_NodeId, const std::map<uint16_t,
+                                                                                                  C_OscCanOpenObject> & orc_CoObjects, const bool oq_IsEds, std::vector<C_SclString> & orc_CurMessages,
                                                          C_OscCanMessage & orc_Message)
 {
-   const C_OscCanOpenObject * const pc_CoMessageInhibitTimeObjec =
+   const C_OscCanOpenObjectData * const pc_CoMessageInhibitTimeObject =
       mh_GetCoObject(orc_CoObjects, ou32_StartingId + ou32_ItMessage,
                      C_OscCanOpenObjectDictionary::hu8_OD_SUB_INDEX_INHIBIT_TIME);
 
-   if (pc_CoMessageInhibitTimeObjec != NULL)
+   if (pc_CoMessageInhibitTimeObject != NULL)
    {
       uint32_t u32_InhibitTime;
-      if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageInhibitTimeObjec, oq_IsEds),
+      if (mh_GetIntegerValue(h_GetCoObjectValue(*pc_CoMessageInhibitTimeObject, oq_IsEds),
                              ou8_NodeId,
                              u32_InhibitTime) == C_NO_ERR)
       {
@@ -1333,8 +1361,8 @@ void C_OscImportEdsDcf::mh_LoadInhibitTimeSectionCanOpen(const uint32_t ou32_Sta
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, const uint16_t ou16_MappingOffset,
-                                           const uint8_t ou8_NodeId,
-                                           const stw::scl::C_SclDynamicArray<C_OscCanOpenObject> & orc_CoObjects,
+                                           const uint8_t ou8_NodeId, const std::map<uint16_t,
+                                                                                    C_OscCanOpenObject> & orc_CoObjects,
                                            const std::vector<uint32_t> & orc_Dummies,
                                            C_OscCanMessage & orc_OscMessageData,
                                            std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
@@ -1346,7 +1374,7 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
    int32_t s32_Retval = C_NO_ERR;
    //PDO mapping parameter
    //---------------------
-   const C_OscCanOpenObject * const pc_CoMessageMappingObject =
+   const C_OscCanOpenObjectData * const pc_CoMessageMappingObject =
       mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset, 0);
 
    // Adapt the DLC automatically
@@ -1371,7 +1399,7 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
                if ((oq_ImportSrdoUseCase && ((u32_ItSignal % 2) == 0)) == false)
                {
                   //Skip first section because this is just the number of sub segments
-                  const C_OscCanOpenObject * const pc_CoMessageMappingSubObject =
+                  const C_OscCanOpenObjectData * const pc_CoMessageMappingSubObject =
                      mh_GetCoObject(orc_CoObjects, ou32_CoMessageId + ou16_MappingOffset,
                                     static_cast<int32_t>(u32_ItSignal + 1UL));
 
@@ -1780,7 +1808,7 @@ C_SclString C_OscImportEdsDcf::mh_GetNumberAsHex(const uint32_t ou32_Number)
    C_CONFIG Operation failure: Element invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscImportEdsDcf::mh_CalcMinMaxInit(const C_OscCanOpenObject * const opc_CoSignalObject,
+int32_t C_OscImportEdsDcf::mh_CalcMinMaxInit(const C_OscCanOpenObjectData * const opc_CoSignalObject,
                                              C_OscNodeDataPoolListElement & orc_Element, const uint16_t ou16_NumberBits,
                                              const bool oq_IsEds, bool & orq_DefaultMinMax)
 {

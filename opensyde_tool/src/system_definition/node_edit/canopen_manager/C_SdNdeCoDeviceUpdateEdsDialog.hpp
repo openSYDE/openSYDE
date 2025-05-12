@@ -140,8 +140,9 @@ private:
    const;
    void m_InitMessageNames(C_CieImportDataAssignment & orc_Messages) const;
    static void mh_InitMessageVectorNames(std::vector<stw::opensyde_core::C_OscCanMessage> & orc_Messages,
-                                         const stw::opensyde_core::C_OscNode & orc_Node,
-                                         const bool oq_MessageIsTxInEds);
+                                         std::vector<uint8_t> & orc_MessageIsSrdo,
+                                         const stw::opensyde_core::C_OscNode & orc_Node, const bool oq_MessageIsTxInEds,
+                                         uint32_t & oru32_SrdoIndex);
 
    //Avoid call
    C_SdNdeCoDeviceUpdateEdsDialog(const C_SdNdeCoDeviceUpdateEdsDialog &);

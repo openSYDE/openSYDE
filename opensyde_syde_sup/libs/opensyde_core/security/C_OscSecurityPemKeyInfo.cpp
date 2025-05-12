@@ -235,7 +235,7 @@ void C_OscSecurityPemKeyInfo::SetX509CertificateData(const std::vector<uint8_t> 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set certificate serial number
 
-   Format: binary array
+   Format: binary array describing a large integer (big endian; without leading zeroes)
 
    \param[in]  orc_Value   Value
 */

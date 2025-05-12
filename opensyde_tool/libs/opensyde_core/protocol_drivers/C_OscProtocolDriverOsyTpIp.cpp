@@ -1487,12 +1487,13 @@ void C_OscProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults::ParseF
    u8_SerialNumberLength = orc_Data[static_cast<size_t>(ou8_DataStartIndex) + 34];
    if (u8_SerialNumberLength <= 29)
    {
-      std::vector<uint8_t> c_SerialNumber;
+      std::vector<uint8_t> c_CurSerialNumber;
       //defensive approach: variable length, so set all to 0 first
-      c_SerialNumber.resize(u8_SerialNumberLength);
-      (void)std::memcpy(&c_SerialNumber[0], &orc_Data[static_cast<size_t>(ou8_DataStartIndex) + 35U],
+      c_CurSerialNumber.resize(u8_SerialNumberLength);
+      (void)std::memcpy(&c_CurSerialNumber[0], &orc_Data[static_cast<size_t>(ou8_DataStartIndex) + 35U],
                         u8_SerialNumberLength);
 
-      this->c_SerialNumber.SetExtSerialNumber(c_SerialNumber, orc_Data[static_cast<size_t>(ou8_DataStartIndex) + 33]);
+      this->c_SerialNumber.SetExtSerialNumber(c_CurSerialNumber,
+                                              orc_Data[static_cast<size_t>(ou8_DataStartIndex) + 33]);
    }
 }

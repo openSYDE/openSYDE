@@ -327,6 +327,7 @@ void C_NagUnUsedProjectFilesTableView::m_SetupContextMenu()
                                     this,
                                     &C_NagUnUsedProjectFilesTableView::m_SelectAllFiles,
                                     static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
+   this->mpc_ContextMenu->addSeparator();
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete selected"),
                                     this,
                                     &C_NagUnUsedProjectFilesTableView::m_DeleteSelectedFiles,

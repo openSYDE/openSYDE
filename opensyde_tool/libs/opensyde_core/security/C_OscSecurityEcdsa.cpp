@@ -281,40 +281,55 @@ int32_t C_OscSecurityEcdsa::h_ExtractPublicKeyFromX509Certificate(const std::vec
                EC_POINT * const pc_PublicKey = EC_POINT_new(pc_EcGroup);
                if (pc_PublicKey != NULL)
                {
-                  uint8_t au8_PublicKeyOctets[C_OscSecurityEcdsa::hu32_SECP256R1_PUBLIC_KEY_LENGTH];
+                  std::vector<uint8_t> c_PublicKeyOctets;
                   size_t x_NumBytesPublicKey; //lint !e970 !e8080 //use API type
 
                   //get public key as octet string
-                  const int x_ResultGetPublicKey = //lint !e970 !e8080 //use API type
-                                                   EVP_PKEY_get_octet_string_param(pc_EvpKey,
-                                                                                   OSSL_PKEY_PARAM_PUB_KEY,
-                                                                                   au8_PublicKeyOctets,
-                                                                                   sizeof(au8_PublicKeyOctets),
-                                                                                   &x_NumBytesPublicKey);
-                  //convert from octet string to EC_POINT
-                  const int x_ResultOct2Point = //lint !e970 !e8080 //use API type
-                                                EC_POINT_oct2point(pc_EcGroup, pc_PublicKey, au8_PublicKeyOctets,
-                                                                   x_NumBytesPublicKey, NULL);
-                  if ((x_ResultGetPublicKey == 1)  && (x_ResultOct2Point == 1))
+                  //Whether this is compressed or uncompressed is up to the OpenSSL library.
+                  //So first ask the library about the required buffer size.
+                  int x_ResultGetPublicKey; //lint !e970 !e8080 //use API type
+
+                  x_ResultGetPublicKey = EVP_PKEY_get_octet_string_param(pc_EvpKey,
+                                                                         OSSL_PKEY_PARAM_PUB_KEY,
+                                                                         NULL,
+                                                                         0,
+                                                                         &x_NumBytesPublicKey);
+                  if (x_ResultGetPublicKey == 1)
                   {
-                     BIGNUM * const pc_Xpart = BN_new();
-                     BIGNUM * const pc_Ypart = BN_new();
-                     //get unencoded x and y parts:
-                     int x_Result = //lint !e970 !e8080 //use API type
-                                    EC_POINT_get_affine_coordinates(
-                        pc_EcGroup, pc_PublicKey, pc_Xpart, pc_Ypart,
-                        NULL);
-                     if ((x_Result == 1) && (BN_num_bytes(pc_Xpart) == 32) && (BN_num_bytes(pc_Ypart) == 32))
+                     c_PublicKeyOctets.resize(x_NumBytesPublicKey);
+                     x_ResultGetPublicKey =  EVP_PKEY_get_octet_string_param(pc_EvpKey,
+                                                                             OSSL_PKEY_PARAM_PUB_KEY,
+                                                                             &c_PublicKeyOctets[0],
+                                                                             c_PublicKeyOctets.size(),
+                                                                             &x_NumBytesPublicKey);
+                  }
+                  if ((x_ResultGetPublicKey == 1) && (x_NumBytesPublicKey == c_PublicKeyOctets.size()))
+                  {
+                     //convert from octet string to EC_POINT
+                     const int x_ResultOct2Point = //lint !e970 !e8080 //use API type
+                                                   EC_POINT_oct2point(pc_EcGroup, pc_PublicKey, &c_PublicKeyOctets[0],
+                                                                      x_NumBytesPublicKey, NULL);
+                     if (x_ResultOct2Point == 1)
                      {
-                        //put x and y into array:
-                        x_Result = BN_bn2bin(pc_Xpart, &orau8_Binary[0]);
-                        tgl_assert(x_Result == 32); //size already checked; this would be unexpected
-                        x_Result = BN_bn2bin(pc_Ypart, &orau8_Binary[32]);
-                        tgl_assert(x_Result == 32); //size already checked; this would be unexpected
-                        s32_Result = C_NO_ERR;
+                        BIGNUM * const pc_Xpart = BN_new();
+                        BIGNUM * const pc_Ypart = BN_new();
+                        //get unencoded x and y parts:
+                        int x_Result = //lint !e970 !e8080 //use API type
+                                       EC_POINT_get_affine_coordinates(
+                           pc_EcGroup, pc_PublicKey, pc_Xpart, pc_Ypart,
+                           NULL);
+                        if ((x_Result == 1) && (BN_num_bytes(pc_Xpart) == 32) && (BN_num_bytes(pc_Ypart) == 32))
+                        {
+                           //put x and y into array:
+                           x_Result = BN_bn2bin(pc_Xpart, &orau8_Binary[0]);
+                           tgl_assert(x_Result == 32); //size already checked; this would be unexpected
+                           x_Result = BN_bn2bin(pc_Ypart, &orau8_Binary[32]);
+                           tgl_assert(x_Result == 32); //size already checked; this would be unexpected
+                           s32_Result = C_NO_ERR;
+                        }
+                        BN_clear_free(pc_Xpart);
+                        BN_clear_free(pc_Ypart);
                      }
-                     BN_clear_free(pc_Xpart);
-                     BN_clear_free(pc_Ypart);
                   }
                   EC_POINT_clear_free(pc_PublicKey);
                }

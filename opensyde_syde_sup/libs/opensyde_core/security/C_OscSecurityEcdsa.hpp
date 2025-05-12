@@ -53,7 +53,7 @@ public:
    };
 
    C_OscSecurityEcdsa();
-   ~C_OscSecurityEcdsa();
+   virtual ~C_OscSecurityEcdsa();
 
    static int32_t h_ExtractPublicKeyFromX509Certificate(const std::vector<uint8_t> &orc_X509,
                                                         uint8_t(&orau8_Binary)[hu32_SECP256R1_PUBLIC_KEY_LENGTH]);

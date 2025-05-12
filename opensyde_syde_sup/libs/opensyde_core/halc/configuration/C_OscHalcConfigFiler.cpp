@@ -425,7 +425,7 @@ int32_t C_OscHalcConfigFiler::h_LoadIoDomain(C_OscHalcConfigDomain & orc_IoDomai
             if (u32_ExpectedCount != u32_ActualCount)
             {
                C_SclString c_Tmp;
-               c_Tmp.PrintFormatted("Unexpected channel count, expected: %i, got %i", u32_ExpectedCount,
+               c_Tmp.PrintFormatted("Unexpected channel count, expected: %u, got %u", u32_ExpectedCount,
                                     u32_ActualCount);
                orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
             }
@@ -916,7 +916,7 @@ int32_t C_OscHalcConfigFiler::mh_LoadIoDomains(C_OscHalcConfig & orc_IoData, C_O
          if (u32_ExpectedCount != u32_ActualCount)
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected domain count, expected: %i, got %i", u32_ExpectedCount, u32_ActualCount);
+            c_Tmp.PrintFormatted("Unexpected domain count, expected: %u, got %u", u32_ExpectedCount, u32_ActualCount);
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
          }
       }

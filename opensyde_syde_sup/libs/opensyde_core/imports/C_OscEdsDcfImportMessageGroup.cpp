@@ -46,4 +46,5 @@ void C_OscEdsDcfImportMessageGroup::Clear()
    this->c_OscMessageData.clear();
    this->c_OscSignalData.clear();
    this->c_SignalDefaultMinMaxValuesUsed.clear();
+   this->c_MessageIsSrdo.clear();
 }

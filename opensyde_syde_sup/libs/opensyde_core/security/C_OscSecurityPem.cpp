@@ -17,6 +17,7 @@
 
 #include "openssl/x509.h"
 #include "openssl/pem.h"
+#include "openssl/core_names.h"
 
 #include "TglFile.hpp"
 #include "stwtypes.hpp"
@@ -115,16 +116,23 @@ int32_t C_OscSecurityPem::h_ExtractModulusAndExponent(const std::vector<uint8_t>
       EVP_PKEY * const pc_PubKey = X509_get0_pubkey(pc_X509Key);
       if (pc_PubKey != NULL)
       {
-         const RSA * const pc_RsaKey = EVP_PKEY_get0_RSA(pc_PubKey);
-         if (pc_RsaKey != NULL)
+         BIGNUM * pc_Modulus = NULL;
+         BIGNUM * pc_Exponent = NULL;
+
+         const int x_ResultEn = //lint !e970 !e8080 //use API type
+                                EVP_PKEY_get_bn_param(pc_PubKey, OSSL_PKEY_PARAM_RSA_N, &pc_Modulus);
+         const int x_ResultEe = //lint !e970 !e8080 //use API type
+                                EVP_PKEY_get_bn_param(pc_PubKey, OSSL_PKEY_PARAM_RSA_E, &pc_Exponent);
+
+         if ((x_ResultEn == 1) && (x_ResultEe == 1))
          {
-            const BIGNUM * const pc_Modulus = RSA_get0_n(pc_RsaKey);
-            const BIGNUM * const pc_Exponent = RSA_get0_e(pc_RsaKey);
             orc_Modulus.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
             orc_Exponent.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
             {
                const int32_t s32_SizeModulus = BN_bn2bin(pc_Modulus, &orc_Modulus[0]);
                const int32_t s32_SizeExponent = BN_bn2bin(pc_Exponent, &orc_Exponent[0]);
+               BN_clear_free(pc_Modulus);  //not needed any more
+               BN_clear_free(pc_Exponent); //not needed any more
                if ((s32_SizeModulus > 0) && (s32_SizeExponent > 0))
                {
                   orc_Modulus.resize(s32_SizeModulus);
@@ -140,7 +148,7 @@ int32_t C_OscSecurityPem::h_ExtractModulusAndExponent(const std::vector<uint8_t>
          else
          {
             s32_Retval = C_CHECKSUM;
-            orc_ErrorMessage = "Could not get RSA part from public key";
+            orc_ErrorMessage = "Could not get modulus and exponent part from public key";
          }
       }
       else

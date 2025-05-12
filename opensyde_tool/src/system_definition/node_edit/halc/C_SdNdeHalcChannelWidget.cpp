@@ -80,6 +80,7 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LabViewDatapools->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
    this->mpc_Ui->pc_LabViewDatapools->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LabViewDatapools->setFocusPolicy(Qt::NoFocus);
+   this->mpc_Ui->pc_LabViewDatapools->setContextMenuPolicy(Qt::NoContextMenu);
    this->mpc_Ui->pc_LabDomainName->SetForegroundColor(7);
    this->mpc_Ui->pc_LabDomainName->SetFontPixel(36, true);
 
@@ -88,7 +89,9 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_PubLinkedIcon->setVisible(false);
    this->mpc_Ui->pc_LabLinkedChannel->setText("");
    this->mpc_Ui->pc_LabLinkedChannel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+   this->mpc_Ui->pc_LabLinkedChannel->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LabLinkedChannel->setFocusPolicy(Qt::NoFocus);
+   this->mpc_Ui->pc_LabLinkedChannel->setContextMenuPolicy(Qt::NoContextMenu);
 
    // remove strings
    this->mpc_Ui->pc_LabChannelCurrent->setText("");

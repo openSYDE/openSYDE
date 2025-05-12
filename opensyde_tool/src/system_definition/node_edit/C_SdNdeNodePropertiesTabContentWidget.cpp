@@ -61,6 +61,8 @@ C_SdNdeNodePropertiesTabContentWidget::C_SdNdeNodePropertiesTabContentWidget(QWi
            this, &C_SdNdeNodePropertiesTabContentWidget::SigBusBitrateClicked);
    connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNodePropChanged,
            this, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged);
+   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNodeXappSupportChanged,
+           this, &C_SdNdeNodePropertiesTabContentWidget::SigNodeXappSupportChanged);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigErrorChange, this,
            &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged, this,

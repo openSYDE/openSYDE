@@ -74,7 +74,7 @@ private:
    const stw::opensyde_core::C_OscCanOpenObjectDictionary * m_GetEdsDictionary(void) const;
    const std::vector<stw::opensyde_core::C_OscCanOpenManagerMappableSignal> * m_GetMappableSignals(void) const;
    const stw::opensyde_core::C_OscCanOpenManagerDeviceInfo * m_GetDeviceInfo(void) const;
-   static const stw::opensyde_core::C_OscCanOpenObject * mh_GetCanOpenObject(
+   static const stw::opensyde_core::C_OscCanOpenObjectData * mh_GetCanOpenObject(
       const stw::opensyde_core::C_OscCanOpenObjectDictionary & orc_Dictionary, const uint32_t ou32_ObjectIndex,
       const uint32_t ou32_SignalIndex);
    bool m_CheckSignalRelevant(const stw::opensyde_core::C_OscCanOpenManagerMappableSignal & orc_Signal,

@@ -75,6 +75,7 @@ C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(con
    this->mpc_Ui->pc_LinkToManagerLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
    this->mpc_Ui->pc_LinkToManagerLabel->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LinkToManagerLabel->setFocusPolicy(Qt::NoFocus);
+   this->mpc_Ui->pc_LinkToManagerLabel->setContextMenuPolicy(Qt::NoContextMenu);
 
    connect(this->mpc_Ui->pc_LinkToManagerLabel, &QLabel::linkActivated, this,
            &C_SdBueNodeSelectorCheckBoxItemWidget::m_OnLinkSwitchToManager);

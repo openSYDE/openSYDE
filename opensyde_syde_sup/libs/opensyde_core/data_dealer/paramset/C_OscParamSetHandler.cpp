@@ -61,7 +61,7 @@ C_OscParamSetHandler::C_OscParamSetHandler(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscParamSetHandler::CreateCleanFileWithoutCrc(const C_SclString & orc_FilePath,
-                                                        const bool oq_InterpretedDataOnly)
+                                                        const bool oq_InterpretedDataOnly) const
 {
    int32_t s32_Return = C_NO_ERR;
 

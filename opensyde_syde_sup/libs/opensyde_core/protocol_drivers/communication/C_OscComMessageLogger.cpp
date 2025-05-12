@@ -1909,7 +1909,6 @@ void C_OscComMessageLogger::m_HandleEcosInvertedMessage()
    if (this->mc_EcosMessage.c_MessageData.size() > 0)
    {
       uint8_t au8_InvertedData[8U];
-      std::vector<uint8_t> c_InvertedData;
       this->mc_HandledCanMessage.c_Status = "";
 
       const uint8_t u8_DataSize = static_cast<uint8_t>(this->mc_EcosMessage.c_MessageData.size());
@@ -1918,6 +1917,8 @@ void C_OscComMessageLogger::m_HandleEcosInvertedMessage()
       if (((this->mc_HandledCanMessage.c_CanMsg.u32_ID - 1) == (this->mc_EcosMessage.u32_CanId)) &&
           (this->mc_HandledCanMessage.c_CanMsg.u8_DLC == u8_DataSize))
       {
+         std::vector<uint8_t> c_InvertedData;
+
          // Set message name
          this->mc_HandledCanMessage.c_Name = (this->mc_EcosMessage.c_MessageName) + " (Inverted Frame)";
 

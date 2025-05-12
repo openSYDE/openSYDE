@@ -44,6 +44,7 @@ using namespace stw::opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OscBuSequences::C_OscBuSequences(void) :
+   mpc_CanDispatcher(NULL),
    ms32_CanBitrate(125)
 {
 }
@@ -54,33 +55,13 @@ C_OscBuSequences::C_OscBuSequences(void) :
 //----------------------------------------------------------------------------------------------------------------------
 C_OscBuSequences::~C_OscBuSequences()
 {
-   try
-   {
-      mc_TpCan.SetDispatcher(NULL);
-   }
-   catch (...)
-   {
-   }
-   try
-   {
-      if (mc_CanDispatcher.DLL_Close() == C_NO_ERR)
-      {
-         osc_write_log_info("Teardown", "CAN DLL closed.");
-      }
-      else
-      {
-         osc_write_log_info("Teardown", "Failed to close CAN DLL.");
-      }
-   }
-   catch (...)
-   {
-   }
+   this->mpc_CanDispatcher = NULL; //do not delete ! not owned by us
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Initialize transport protocol, openSYDE protocol driver and CAN with given parameters.
+/*! \brief  Initialize transport protocol and openSYDE protocol driver.
 
-   \param[in]  orc_CanDllPath    Path to CAN DLL file
+   \param[in]  opc_CanDispatcher Pointer to concrete CAN dispatcher
    \param[in]  os32_CanBitrate   CAN Bitrate in kBit/s
    \param[in]  ou8_NodeId        Server node ID
 
@@ -89,7 +70,7 @@ C_OscBuSequences::~C_OscBuSequences()
    else        error occured, see log file for details
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscBuSequences::Init(const C_SclString & orc_CanDllPath, const int32_t os32_CanBitrate,
+int32_t C_OscBuSequences::Init(stw::can::C_CanDispatcher * const opc_CanDispatcher, const int32_t os32_CanBitrate,
                                const uint8_t ou8_NodeId)
 {
    int32_t s32_Return = C_NO_ERR;
@@ -100,33 +81,20 @@ int32_t C_OscBuSequences::Init(const C_SclString & orc_CanDllPath, const int32_t
    const uint8_t u8_MINIMUM_PERCENTAGE = 0;
    m_ReportProgressPercentage(u8_MINIMUM_PERCENTAGE);
 
-   osc_write_log_info(c_LogActivity, "CAN DLL path used: " + orc_CanDllPath);
-
+   // Save for timeout calculation
    ms32_CanBitrate = os32_CanBitrate;
 
-   mc_CanDispatcher.SetDLLName(orc_CanDllPath);
-   s32_Return = mc_CanDispatcher.DLL_Open();
-   if (s32_Return == C_NO_ERR)
+   this->mpc_CanDispatcher = opc_CanDispatcher;
+
+   if (this->mpc_CanDispatcher == NULL)
    {
-      osc_write_log_info(c_LogActivity, "CAN DLL loaded.");
-      s32_Return = mc_CanDispatcher.CAN_Init(ms32_CanBitrate);
-      if (s32_Return == C_NO_ERR)
-      {
-         osc_write_log_info(c_LogActivity, "CAN interface initialized.");
-      }
-      else
-      {
-         osc_write_log_error(c_LogActivity, "Could not initialize the CAN interface!");
-      }
-   }
-   else
-   {
-      osc_write_log_error(c_LogActivity, "Could not load the CAN DLL!");
+      s32_Return = C_COM;
+      osc_write_log_error(c_LogActivity, "Could not used CAN! CAN Dispatcher is invalid.");
    }
 
    if (s32_Return == C_NO_ERR)
    {
-      s32_Return = mc_TpCan.SetDispatcher(&mc_CanDispatcher);
+      s32_Return = mc_TpCan.SetDispatcher(this->mpc_CanDispatcher);
       if (s32_Return != C_NO_ERR)
       {
          osc_write_log_error(c_LogActivity, "Setting CAN dispatcher for CAN transport protocol failed!");
@@ -248,9 +216,12 @@ int32_t C_OscBuSequences::ActivateFlashLoader(const uint32_t ou32_FlashloaderRes
    }
    while (TglGetTickCount() < (u32_WaitTime + u32_StartTime));
 
-   //Previous broadcasts might have caused responses placed in the receive queues of the device
-   // specific driver instances. Dump them.
-   (void)mc_CanDispatcher.DispatchIncoming();
+   if (this->mpc_CanDispatcher != NULL)
+   {
+      //Previous broadcasts might have caused responses placed in the receive queues of the device
+      // specific driver instances. Dump them.
+      (void)this->mpc_CanDispatcher->DispatchIncoming();
+   }
    mc_TpCan.ClearDispatcherQueue();
 
    if (s32_Return != C_NO_ERR)
@@ -765,7 +736,7 @@ int32_t C_OscBuSequences::ResetSystem(void)
    }
    else
    {
-      Sleep(500); //wait a little to make sure the device has performed the reset
+      TglSleep(500); //wait a little to make sure the device has performed the reset
       osc_write_log_error(c_LogActivity, "Successfully sent reset to target device!");
    }
 
@@ -839,6 +810,17 @@ int32_t C_OscBuSequences::h_ReadHexFile(const C_SclString & orc_HexFilePath, C_O
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare for shutting down class
+
+   To be called by child classes on shutdown, before they destroy all owned class instances
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscBuSequences::PrepareForDestruction(void)
+{
+   mc_TpCan.SetDispatcher(NULL); //we are about to destroy the dispatcher; make sure TP disconnects from it
 }
 
 //----------------------------------------------------------------------------------------------------------------------

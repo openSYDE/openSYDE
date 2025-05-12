@@ -12,7 +12,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <unistd.h>
-#include <signal.h>
+#include <csignal>
 #include "stwtypes.hpp"
 #include "TglTasks.hpp"
 
@@ -34,21 +34,21 @@ using namespace stw::tgl;
 
 C_TglCriticalSection::C_TglCriticalSection(void)
 {
-   pthread_mutex_init(&mt_mutex, NULL);
+   pthread_mutex_init(&mu_Mutex, NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 C_TglCriticalSection::~C_TglCriticalSection(void)
 {
-   pthread_mutex_destroy(&mt_mutex);
+   pthread_mutex_destroy(&mu_Mutex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 //block until the section is released, then claim it and return
 void C_TglCriticalSection::Acquire(void)
 {
-   pthread_mutex_lock(&mt_mutex);
+   pthread_mutex_lock(&mu_Mutex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,17 +61,17 @@ void C_TglCriticalSection::Acquire(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_TglCriticalSection::TryAcquire(void)
 {
-   int sn_Ret;
+   const int x_Ret = //lint !e8080 !e970  //using type to match library interface
+                     pthread_mutex_trylock(&mu_Mutex);
 
-   sn_Ret = pthread_mutex_trylock(&mt_mutex);
-   return (sn_Ret == 0) ? true : false;
+   return (x_Ret == 0) ? true : false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 //release claimed section
 void C_TglCriticalSection::Release(void)
 {
-   pthread_mutex_unlock(&mt_mutex);
+   pthread_mutex_unlock(&mu_Mutex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

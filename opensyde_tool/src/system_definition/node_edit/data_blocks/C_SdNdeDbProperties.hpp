@@ -90,6 +90,7 @@ private:
    void m_OnClickGenerator(void);
    void m_OnDroppedGenerator(void);
    void m_OnClickCodeGeneration(void);
+   void m_OnUpdateOutputFilePath(void);
    void m_OnDroppedCodeGeneration(void);
    void m_OnClickFileGeneration(void);
    void m_OnDroppedFileGeneration(void);

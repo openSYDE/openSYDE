@@ -58,12 +58,12 @@ void C_GiSvTextElementBus::GenerateHint(void)
    {
       this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Invalid Bus Content"));
       this->SetDefaultToolTipContent(C_GtGetText::h_GetText("For further details switch to SYSTEM DEFINITION"));
-      this->SetDefaultToolTipType(C_NagToolTip::eERROR);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eERROR);
    }
    else
    {
       this->SetDefaultToolTipHeading("");
       this->SetDefaultToolTipContent("");
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
    }
 }

@@ -36,7 +36,8 @@ public:
 
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
-   void ReloadDataLoggerDataElements(void);
+   void InitStaticNames(void) const;
+   void ReloadDataLogger(void);
    void SetNode(const uint32_t ou32_NodeIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -47,8 +48,11 @@ Q_SIGNALS:
 
 private:
    Ui::C_SdNdeDalTabContentWidget * mpc_Ui;
+   uint32_t mu32_NodeIndex;
 
    static const uint32_t mhu32_STATIC_LOG_JOB_INDEX;
+
+   void m_UpdateUi(void);
 
    //Avoid call
    C_SdNdeDalTabContentWidget(const C_SdNdeDalTabContentWidget &);

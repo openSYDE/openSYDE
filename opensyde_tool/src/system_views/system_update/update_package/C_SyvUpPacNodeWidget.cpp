@@ -32,6 +32,10 @@
 #include "C_ImpUtil.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_UsHandler.hpp"
+#include "C_SyvUpPacSecurityCertificatePackageDialog.hpp"
+#include "C_OscXceBase.hpp"
+#include "C_OscXceUpdatePackageParameters.hpp"
+#include "C_OscXceCreate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -95,6 +99,14 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
 
    this->m_Init();
 
+   this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(false); //Set to InVisible for Now - Akhil challa
+   this->mpc_Ui->pc_PbAddSecurityPackage->SetCustomIcons("://images/IconAddEnabled.svg",
+                                                         "://images/IconAddHovered.svg",
+                                                         "://images/IconAddClicked.svg",
+                                                         "://images/IconAddDisabled.svg");
+   this->mpc_Ui->pc_PbAddSecurityPackage->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
+                                                                C_GtGetText::h_GetText("Create Package."));
+
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_WidgetTitle->SetColorReserved(mc_STYLE_GUIDE_COLOR_10);
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -152,6 +164,9 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
    this->mpc_Ui->pc_ScrollArea->setVisible(false);
    this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(25);
    this->mpc_Ui->pc_FrameSepTop->setVisible(false);
+
+   connect(this->mpc_Ui->pc_PbAddSecurityPackage, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
+           &C_SyvUpPacNodeWidget::m_AddSecurityCertificatePacakege);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1691,4 +1706,77 @@ bool C_SyvUpPacNodeWidget::m_CheckMime(const QMimeData * const opc_Mime, const Q
    }
 
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add a new Security Certificate Pacakege
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_AddSecurityCertificatePacakege()
+{
+   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
+   C_SyvUpPacSecurityCertificatePackageDialog * const pc_SecurityCertificatePackageDialog =
+      new C_SyvUpPacSecurityCertificatePackageDialog(*c_PopUpDialog);
+
+   //Resize
+   c_PopUpDialog->SetSize(QSize(1152, 853));
+
+   Q_UNUSED(pc_SecurityCertificatePackageDialog)
+
+   // "Create" clicked
+   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      const QString c_Password = pc_SecurityCertificatePackageDialog->GetPassword();
+      const QString c_PrivateKeyPath = pc_SecurityCertificatePackageDialog->GetPrivateKeyPath();
+      const std::vector<stw::scl::C_SclString> c_PemFiles = pc_SecurityCertificatePackageDialog->GetPemFiles();
+      this->m_OnCreatePackage(c_PrivateKeyPath, c_Password, c_PemFiles);
+   }
+   if (c_PopUpDialog != NULL)
+   {
+      c_PopUpDialog->HideOverlay();
+      c_PopUpDialog->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of c_PopUpDialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creates the security certificate package
+
+   \param[in]  orc_PrivateKeyPath           pem file path
+   \param[in]  orc_Password                 security password
+   \param[in, out]  orc_CertificatesPath    list of pem files added
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_OnCreatePackage(const QString & orc_PrivateKeyPath, const QString & orc_Password,
+                                             const std::vector<stw::scl::C_SclString> & orc_CertificatesPath)
+{
+   const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   tgl_assert(pc_ViewData != NULL);
+
+   QString c_FilterName;
+   QString c_DefaultFilename;
+   QString c_SelectedFilterName;
+   std::vector<C_OscXceUpdatePackageParameters> orc_UpdatePackageParameters;
+   C_SclStringList c_Warnings;
+   C_SclString c_Error;
+
+   if (pc_ViewData != NULL)
+   {
+      c_DefaultFilename = pc_ViewData->GetName().c_str();
+   }
+   c_FilterName = C_OscXceBase::h_GetPackageExtension().c_str();
+   c_DefaultFilename += C_GtGetText::h_GetText("_SecurityCertificatePackage");
+   c_DefaultFilename += C_GtGetText::h_GetText("_Secure");
+   c_DefaultFilename += static_cast<QString>(C_OscXceBase::h_GetPackageExtension().c_str());
+
+   const QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
+   const QString c_FullPackagePath =
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Directory for Secure Certificate Package"),
+                                     c_Folder, c_FilterName, c_DefaultFilename,
+                                     QFileDialog::Options(), &c_SelectedFilterName);
+   orc_UpdatePackageParameters.resize(1);
+   orc_UpdatePackageParameters.at(0).c_AuthenticationKeyPath = orc_PrivateKeyPath.toStdString().c_str();
+   orc_UpdatePackageParameters.at(0).c_Password = orc_Password.toStdString().c_str();
+   C_OscXceCreate::h_CreatePackage(
+      c_FullPackagePath.toStdString().c_str(), orc_CertificatesPath, orc_UpdatePackageParameters, c_Warnings, c_Error);
 }

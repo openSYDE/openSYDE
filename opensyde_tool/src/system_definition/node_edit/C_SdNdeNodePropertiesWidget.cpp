@@ -94,6 +94,9 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    this->mpc_Ui->pc_LabSubNodeName->SetForegroundColor(1);
    this->mpc_Ui->pc_LabSubNodeName->SetFontPixel(13);
 
+   //allow to open link to manufacturer page in system standard browser
+   this->mpc_Ui->pc_LabelProductPageLink->setOpenExternalLinks(true);
+
    //Options buttons
    this->mpc_Ui->pc_PushButtonFlashloaderOptions->SetCustomIcon("://images/SettingsIcon.svg",
                                                                 "://images/SettingsIconDisabled.svg");
@@ -204,6 +207,9 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    connect(this->mpc_Ui->pc_ComboBoxProtocol,
            static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange);
+   connect(this->mpc_Ui->pc_ComboBoxXAppSupport,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
+           &C_SdNdeNodePropertiesWidget::m_XappSupportChange);
 
    // see m_BusBitrateClicked for details
    this->mc_Timer.setSingleShot(true);
@@ -245,8 +251,8 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelConfiguration->setText(C_GtGetText::h_GetText("Configuration"));
    this->mpc_Ui->pc_LabelProtocol->setText(C_GtGetText::h_GetText("Protocol Support"));
    this->mpc_Ui->pc_LabelProgramming->setText(C_GtGetText::h_GetText("Programming Support"));
+   this->mpc_Ui->pc_LabelXAppSupport->setText(C_GtGetText::h_GetText("X-App Support"));
    this->mpc_Ui->pc_LabelComIfSettings->setText(C_GtGetText::h_GetText("Communication Interfaces Settings"));
-   this->mpc_Ui->pc_LabelProductPageLink->setText(C_GtGetText::h_GetText("Visit product page"));
 
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("openSYDE"));
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("KEFEX"));
@@ -254,6 +260,9 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
 
    this->mpc_Ui->pc_ComboBoxProgramming->addItem(C_GtGetText::h_GetText("Disabled"));
    this->mpc_Ui->pc_ComboBoxProgramming->addItem(C_GtGetText::h_GetText("Enabled"));
+
+   this->mpc_Ui->pc_ComboBoxXAppSupport->addItem(C_GtGetText::h_GetText("Disabled"));
+   this->mpc_Ui->pc_ComboBoxXAppSupport->addItem(C_GtGetText::h_GetText("Enabled"));
 
    //Add space because of spacing issue between icon and text
    this->mpc_Ui->pc_PushButtonFlashloaderOptions->setText(static_cast<QString>(' ') +
@@ -306,6 +315,9 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                "\nDefined in read only *.syde_devdef file."
                                                                "\n\nIf enabled, the source code generation feature can "
                                                                "be activated for Data Blocks ."));
+   this->mpc_Ui->pc_LabelXAppSupport->SetToolTipInformation(C_GtGetText::h_GetText("X-App Support"),
+                                                            C_GtGetText::h_GetText(
+                                                               "Node properties option, available only for File Based Targets."));
 
    this->mpc_Ui->pc_LabelProtocol->SetToolTipInformation(C_GtGetText::h_GetText("Protocol Support"),
                                                          C_GtGetText::h_GetText(
@@ -424,6 +436,9 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    disconnect(this->mpc_Ui->pc_ComboBoxProtocol,
               static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange);
+   disconnect(this->mpc_Ui->pc_ComboBoxXAppSupport,
+              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
+              &C_SdNdeNodePropertiesWidget::m_XappSupportChange);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
@@ -523,6 +538,28 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                   C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_DISABLED);
             }
 
+            //X-App Support
+            if (pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased == true)
+            {
+               this->mpc_Ui->pc_LabelXAppSupport->setVisible(true);
+               this->mpc_Ui->pc_ComboBoxXAppSupport->setVisible(true);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LabelXAppSupport->setVisible(false);
+               this->mpc_Ui->pc_ComboBoxXAppSupport->setVisible(false);
+            }
+
+            if (pc_Node->c_Properties.q_XappSupport == true)
+            {
+               this->mpc_Ui->pc_ComboBoxXAppSupport->setCurrentIndex(C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_ENABLED);
+            }
+            else
+            {
+               this->mpc_Ui->pc_ComboBoxXAppSupport->setCurrentIndex(
+                  C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_DISABLED);
+            }
+
             //load device picture
             c_FileInfoDevImg.setFile(pc_DevDef->c_ImagePath.c_str());
             q_FileExists = (c_FileInfoDevImg.exists() && c_FileInfoDevImg.isFile());
@@ -545,8 +582,9 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                this->mpc_Ui->pc_DatapoolTypeImage->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
             }
 
-            //load company logo
-            if (pc_DevDef->c_ManufacturerDisplayValue != "Sensor-Technik Wiedemann GmbH")
+            //company logo and product page link
+            if ((pc_DevDef->c_ManufacturerDisplayValue.IsEmpty() == false) &&
+                (pc_DevDef->c_ManufacturerDisplayValue != "Sensor-Technik Wiedemann GmbH"))
             {
                QFileInfo c_FileInfoCompLogo;
                c_FileInfoCompLogo.setFile(pc_DevDef->c_CompanyLogoLink.c_str());
@@ -561,15 +599,17 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                                                        Qt::SmoothTransformation);
                   this->mpc_Ui->pc_CompanyLogo->setPixmap(c_ImgCompLogo);
                }
+
+               this->mpc_Ui->pc_LabelProductPageLink->SetLink(
+                  C_GtGetText::h_GetText("Visit Product Page"), pc_DevDef->c_ProductPageLink.c_str());
+               this->mpc_Ui->pc_LabelProductPageLink->SetToolTipInformation(
+                  pc_DevDef->c_ManufacturerDisplayValue.c_str(), pc_DevDef->c_ProductPageLink.c_str());
+               this->mpc_Ui->pc_WidgetCompLogo->setVisible(true);
             }
             else
             {
-               this->mpc_Ui->pc_CompanyLogo->setVisible(false);
-               this->mpc_Ui->pc_LabelProductPageLink->setVisible(false);
+               this->mpc_Ui->pc_WidgetCompLogo->setVisible(false);
             }
-
-            //init hyperlink
-            this->m_InitHyperlinkLabel(static_cast<QString>(pc_DevDef->c_ProductPageLink.c_str()));
 
             this->mpc_Ui->pc_DatapoolTypeImage->setPixmap(c_ImgNode);
 
@@ -878,10 +918,9 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                }
 
                //connect to RegisterChange
-               connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                         ->cellWidget(u8_ComIfCnt,
-                                                                      s32_COL_DIAGNOSTIC)), &QCheckBox::stateChanged, this,
-                       &C_SdNdeNodePropertiesWidget::m_RegisterChange);
+               connect(dynamic_cast<C_OgeChxTristate *> (
+                          this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, s32_COL_DIAGNOSTIC)),
+                       &QCheckBox::stateChanged, this, &C_SdNdeNodePropertiesWidget::m_RegisterChange);
 
                //hide rows if they are not connected (necessary for sub nodes)
 
@@ -890,13 +929,9 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                {
                   //ETH
                   q_InterfaceIsConnected =
-                     pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsConnected(C_OscSystemBus::eETHERNET,
-                                                                             static_cast<uint8_t>(u8_ComIfCnt
-                                                                                                  -
-                                                                                                  static_cast<int32_t>
-                                                                                                  (
-                                                                                                     pc_DevDef->
-                                                                                                     u8_NumCanBusses)));
+                     pc_DevDef->c_SubDevices[u32_SubDeviceIndex].
+                     IsConnected(C_OscSystemBus::eETHERNET,
+                                 static_cast<uint8_t>(u8_ComIfCnt - static_cast<int32_t>(pc_DevDef->u8_NumCanBusses)));
                }
                else
                {
@@ -932,6 +967,9 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    connect(this->mpc_Ui->pc_ComboBoxProtocol,
            static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange);
+   connect(this->mpc_Ui->pc_ComboBoxXAppSupport,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
+           &C_SdNdeNodePropertiesWidget::m_XappSupportChange);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1038,11 +1076,9 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void)
                const bool q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
                   rc_CurInterface.e_InterfaceType);
                //node id
-               c_NodeIds.push_back(static_cast<uint8_t> ((this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt,
-                                                                                                          s32_COL_NODE_ID)
-                                                          ->
-                                                          text()
-                                                          .toInt())));
+               c_NodeIds.push_back(
+                  static_cast<uint8_t>((this->mpc_Ui->pc_TableWidgetComIfSettings->
+                                        item(u16_ComIfCnt, s32_COL_NODE_ID)->text().toInt())));
 
                //update
                if (q_IsUpdateAvailable == true)
@@ -1113,8 +1149,8 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void)
 
             //save new node
             C_PuiSdHandler::h_GetInstance()->SetOscNodePropertiesDetailed(this->mu32_NodeIndex, c_Name, c_Comment,
-                                                                          e_DiagnosticServer, e_FlashLoader, c_NodeIds,
-                                                                          c_UpdateFlags, c_RoutingFlags,
+                                                                          e_DiagnosticServer, e_FlashLoader,
+                                                                          c_NodeIds, c_UpdateFlags, c_RoutingFlags,
                                                                           c_DiagnosisFlags);
 
             //send signal SigNodePropChanged (trigger to adapt canopen config)
@@ -1766,25 +1802,108 @@ void C_SdNdeNodePropertiesWidget::m_FlashloaderOptions(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Initializes the "Visit product page" label as a clickable hyperlink and offers the functionality that
-            the system's standard browser is called
+/*! \brief   Slot for X-App Support index change and registering the change
 
-   \param[in]       orc_Url     Detailed input parameter description
+   \param[in]  os32_Index  Combobox index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesWidget::m_InitHyperlinkLabel(const QString & orc_Url)
+void C_SdNdeNodePropertiesWidget::m_XappSupportChange(const int32_t os32_Index)
 {
-   const QString c_Hyperlink = orc_Url;
-   const QString c_Color = "rgb(86, 86, 104)";
-   const QString c_Font = "Segoe UI";
+   const bool q_IsXappSupported = (os32_Index == mhs32_PR_INDEX_ENABLED);
+   bool q_Continue = true;
+   const int32_t s32_ResetIndex =
+      (os32_Index == mhs32_PR_INDEX_DISABLED) ? mhs32_PR_INDEX_ENABLED : mhs32_PR_INDEX_DISABLED;
+   QStringList c_ConcernedDataBlocks;
+   QStringList c_ConcernedLogJobs;
+   bool q_FileGenDatablockExists = false;
+   bool q_LogJobExists = false;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
-   this->mpc_Ui->pc_LabelProductPageLink->setText(
-      static_cast<QString>(
-         "<a href=\"%1\"><span style=\"color: %2; font-family: '%3'; font-size: %4px;\">Visit product page</span></a>")
-      .arg(c_Hyperlink)
-      .arg(c_Color)
-      .arg(c_Font)
-      .arg(13));
+   // Check if file generation Data Blocks exist
+   if (pc_Node != NULL)
+   {
+      for (uint32_t u32_ItApp = 0; u32_ItApp < pc_Node->c_Applications.size(); ++u32_ItApp)
+      {
+         const C_OscNodeApplication & rc_App = pc_Node->c_Applications[u32_ItApp];
+         if (rc_App.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
+         {
+            q_FileGenDatablockExists = true;
+            c_ConcernedDataBlocks.append(rc_App.c_Name.c_str());
+         }
+      }
+   }
 
-   this->mpc_Ui->pc_LabelProductPageLink->setOpenExternalLinks(true);
+   // If disabling, check if active log jobs exist
+   if ((os32_Index == mhs32_PR_INDEX_DISABLED) && (pc_Node != NULL))
+   {
+      if (pc_Node->c_DataLoggerJobs.size() > 0)
+      {
+         q_LogJobExists = true;
+         for (uint32_t u32_ItLogJobs = 0; u32_ItLogJobs < pc_Node->c_DataLoggerJobs.size(); ++u32_ItLogJobs)
+         {
+            c_ConcernedLogJobs.append(pc_Node->c_DataLoggerJobs[u32_ItLogJobs].c_Properties.c_Name.c_str());
+         }
+      }
+   }
+
+   // Ask user
+   if ((q_FileGenDatablockExists == true) || (q_LogJobExists == true))
+   {
+      QString c_Description;
+      QString c_Details;
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
+      const QString c_EnableDisable =
+         (os32_Index == mhs32_PR_INDEX_ENABLED) ? C_GtGetText::h_GetText("Enable") : C_GtGetText::h_GetText("Disable");
+
+      c_Description = C_GtGetText::h_GetText("Do you really want to ") + c_EnableDisable.toLower() +
+                      C_GtGetText::h_GetText(" X-App Support?");
+
+      if (q_FileGenDatablockExists == true)
+      {
+         c_Description += C_GtGetText::h_GetText(" All existing Data Blocks with enabled file "
+                                                 "generation will be deleted.");
+         c_Details += C_GtGetText::h_GetText("The following Data Blocks will be deleted:\n") +
+                      c_ConcernedDataBlocks.join("\n") + "\n\n";
+      }
+
+      if (q_LogJobExists == true)
+      {
+         c_Description += C_GtGetText::h_GetText(" All log jobs will be deleted.");
+         c_Details += C_GtGetText::h_GetText("The following log jobs will be deleted:\n") +
+                      c_ConcernedLogJobs.join("\n");
+      }
+
+      c_Message.SetHeading(c_EnableDisable + C_GtGetText::h_GetText(" X-App Support"));
+      c_Message.SetDescription(c_Description);
+      c_Message.SetDetails(c_Details);
+
+      c_Message.SetOkButtonText(c_EnableDisable + C_GtGetText::h_GetText(" X-App Support"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
+
+      if (c_Message.Execute() != C_OgeWiCustomMessage::eYES)
+      {
+         q_Continue = false;
+      }
+   }
+
+   if (q_Continue == true)
+   {
+      // Save new flag and trigger Data Block / Log Job deletion
+      tgl_assert(C_PuiSdHandler::h_GetInstance()->SetOscNodePropertyXappSupport(
+                    this->mu32_NodeIndex, q_IsXappSupported) == C_NO_ERR);
+
+      // Trigger adaption of data logger and Data Blocks
+      Q_EMIT (this->SigNodeXappSupportChanged());
+   }
+   else
+   {
+      // Reset combobox (disconnect to not call this method again)
+      disconnect(this->mpc_Ui->pc_ComboBoxXAppSupport,
+                 static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
+                 &C_SdNdeNodePropertiesWidget::m_XappSupportChange);
+      this->mpc_Ui->pc_ComboBoxXAppSupport->setCurrentIndex(s32_ResetIndex);
+      connect(this->mpc_Ui->pc_ComboBoxXAppSupport,
+              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
+              &C_SdNdeNodePropertiesWidget::m_XappSupportChange);
+   }
 }

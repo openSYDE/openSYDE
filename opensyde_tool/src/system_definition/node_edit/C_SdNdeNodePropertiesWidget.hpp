@@ -73,7 +73,7 @@ private:
    void m_OpenBus(void);
    void m_LoadFromData(void);
    void m_FlashloaderOptions(void) const;
-   void m_InitHyperlinkLabel(const QString & orc_Url);
+   void m_XappSupportChange(const int32_t os32_Index);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -86,6 +86,7 @@ Q_SIGNALS:
                        const bool oq_CombineItemAndSubSubName);
    void SigBusBitrateClicked(const uint32_t & oru32_BusIndex, const QString & orc_BusName);
    void SigNodePropChanged(void);
+   void SigNodeXappSupportChanged(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

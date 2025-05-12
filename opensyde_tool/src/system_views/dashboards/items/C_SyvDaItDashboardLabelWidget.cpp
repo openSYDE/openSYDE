@@ -93,7 +93,7 @@ void C_SyvDaItDashboardLabelWidget::ResetFont(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::SetCaption(const QString & orc_Text) const
 {
-   this->mpc_Ui->pc_LabelCaption->setText(orc_Text.toUpper());
+   this->mpc_Ui->pc_LabelCaption->setText(orc_Text);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

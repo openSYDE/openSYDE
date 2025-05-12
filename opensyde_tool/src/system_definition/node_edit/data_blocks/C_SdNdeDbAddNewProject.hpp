@@ -92,6 +92,7 @@ private:
                                     stw::opensyde_core::C_OscNode & orc_NewCoreNode,
                                     const stw::opensyde_gui_logic::C_PuiSdNode & orc_PreviousUiNode,
                                     stw::opensyde_gui_logic::C_PuiSdNode & orc_NewUiNode);
+   void m_ApplyV2PathAdaptationToV3(void);
 
    //Avoid call
    C_SdNdeDbAddNewProject(const C_SdNdeDbAddNewProject &);

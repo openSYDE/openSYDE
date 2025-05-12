@@ -87,8 +87,17 @@ extern T_stwtypes_hpp_undefined_type gt_stwtypes_hpp_FailBuild;
 typedef signed __int64 int64_t;
 typedef unsigned __int64 uint64_t;
 #elif defined __GNUC__
+
+//with GNU GCC the definition of 64 bit types depends of the 32 bit or 64 bit compiler configuration
+//using limits.h mechanisms with stable defines to check for the current configuration
+#if ((ULONG_MAX) == (UINT_MAX))
 typedef signed long long int64_t;
 typedef unsigned long long uint64_t;
+#else
+typedef signed long int64_t;
+typedef unsigned long uint64_t;
+#endif
+
 #else
 //stwtypes.hpp type for 64bit integer not known
 extern T_stwtypes_hpp_undefined_type gt_stwtypes_hpp_FailBuild;

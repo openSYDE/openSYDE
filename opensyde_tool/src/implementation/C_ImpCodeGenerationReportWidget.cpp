@@ -131,8 +131,15 @@ const
       c_MessageResultText += C_GtGetText::h_GetText("File Structure:");
       c_MessageResultText += "</td>";
       c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-      c_MessageResultText += C_GtGetText::h_GetText("Version ");
-      c_MessageResultText += QString::number(rc_ReportData.u16_CodeVersion);
+      if (rc_ReportData.q_CodeVersionRelevant == true)
+      {
+         c_MessageResultText += C_GtGetText::h_GetText("Version ");
+         c_MessageResultText += QString::number(rc_ReportData.u16_CodeVersion);
+      }
+      else
+      {
+         c_MessageResultText += "-";
+      }
       c_MessageResultText += "</td>";
       c_MessageResultText += "</tr>";
 

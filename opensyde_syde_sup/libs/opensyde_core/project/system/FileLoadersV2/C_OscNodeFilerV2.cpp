@@ -200,8 +200,8 @@ int32_t C_OscNodeFilerV2::h_LoadNodeComProtocols(std::vector<C_OscCanProtocol> &
       if (u32_ExpectedSize != orc_NodeComProtocols.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComProtocols.size());
+         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComProtocols.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -366,8 +366,8 @@ int32_t C_OscNodeFilerV2::h_LoadNodeComMessageContainers(
       if (u32_ExpectedSize != orc_NodeComMessageContainers.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm message container count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComMessageContainers.size());
+         c_Tmp.PrintFormatted("Unexpected comm message container count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComMessageContainers.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -544,8 +544,8 @@ int32_t C_OscNodeFilerV2::h_LoadNodeComMessages(std::vector<C_OscCanMessage> & o
       if (u32_ExpectedSize != orc_NodeComMessages.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected messages count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComMessages.size());
+         c_Tmp.PrintFormatted("Unexpected messages count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComMessages.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -750,8 +750,8 @@ int32_t C_OscNodeFilerV2::h_LoadNodeComSignals(std::vector<C_OscCanSignal> & orc
       if (u32_ExpectedSize != orc_NodeComSignals.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm signal count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComSignals.size());
+         c_Tmp.PrintFormatted("Unexpected comm signal count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComSignals.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -1575,8 +1575,8 @@ int32_t C_OscNodeFilerV2::mh_LoadApplications(std::vector<C_OscNodeApplication> 
          if (u32_ExpectedSize != orc_NodeApplications.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected application count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_NodeApplications.size());
+            c_Tmp.PrintFormatted("Unexpected application count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_NodeApplications.size()));
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
@@ -1695,8 +1695,8 @@ int32_t C_OscNodeFilerV2::mh_LoadDataPools(const uint16_t ou16_XmlFormatVersion,
             if (u32_ExpectedSize != orc_Node.c_DataPools.size())
             {
                C_SclString c_Tmp;
-               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %i, got %i", u32_ExpectedSize,
-                                    orc_Node.c_DataPools.size());
+               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %u, got %u", u32_ExpectedSize,
+                                    static_cast<uint32_t>(orc_Node.c_DataPools.size()));
                osc_write_log_warning("Load file", c_Tmp.c_str());
             }
          }

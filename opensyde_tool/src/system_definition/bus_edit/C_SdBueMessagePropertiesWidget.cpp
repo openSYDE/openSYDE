@@ -13,6 +13,7 @@
 #include "precomp_headers.hpp"
 
 #include <limits>
+#include <QTimer>
 #include <QSpinBox>
 #include <QComboBox>
 #include <QListView>
@@ -841,6 +842,18 @@ void C_SdBueMessagePropertiesWidget::m_OnNameChanged(void)
    this->m_TrimmMessageName();
    m_OnPropertiesChanged();
    m_CheckMessageName();
+   QTimer::singleShot(0, this, &C_SdBueMessagePropertiesWidget::m_DelayedNameUpdateTrigger);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delayed name update trigger
+
+   Necessary for name and ID as this triggers tree resorting so all queued events need to be processed first
+   to ensure all tree related actions affect the correct tree item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::m_DelayedNameUpdateTrigger()
+{
    Q_EMIT (this->SigMessageNameChanged());
    Q_EMIT (this->SigRecheckError());
 }
@@ -854,8 +867,7 @@ void C_SdBueMessagePropertiesWidget::m_OnIdChanged(void)
    this->m_UpdateJ1939PgInfo();
    m_OnPropertiesChanged();
    m_CheckMessageId();
-   Q_EMIT this->SigMessageNameChanged();
-   Q_EMIT this->SigRecheckError();
+   QTimer::singleShot(0, this, &C_SdBueMessagePropertiesWidget::m_DelayedNameUpdateTrigger);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -866,8 +878,7 @@ void C_SdBueMessagePropertiesWidget::m_OnCobIdChanged(void)
 {
    m_OnPropertiesChanged();
    m_CheckMessageId();
-   Q_EMIT this->SigMessageNameChanged();
-   Q_EMIT this->SigRecheckError();
+   QTimer::singleShot(0, this, &C_SdBueMessagePropertiesWidget::m_DelayedNameUpdateTrigger);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

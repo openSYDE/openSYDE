@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1100</width>
-    <height>1027</height>
+    <height>1035</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -824,6 +824,12 @@ p, li { white-space: pre-wrap; }
                   </property>
                   <item row="2" column="0">
                    <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCodeGenerate">
+                    <property name="minimumSize">
+                     <size>
+                      <width>85</width>
+                      <height>0</height>
+                     </size>
+                    </property>
                     <property name="text">
                      <string>Code Generate</string>
                     </property>
@@ -926,6 +932,12 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item row="1" column="0">
                    <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProcessID">
+                    <property name="minimumSize">
+                     <size>
+                      <width>85</width>
+                      <height>0</height>
+                     </size>
+                    </property>
                     <property name="focusPolicy">
                      <enum>Qt::NoFocus</enum>
                     </property>
@@ -1231,8 +1243,8 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>466</width>
-                   <height>264</height>
+                   <width>460</width>
+                   <height>257</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="pc_VerticalLayoutDataPools">
@@ -1293,6 +1305,9 @@ p, li { white-space: pre-wrap; }
        <spacer name="verticalSpacer_5">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

@@ -327,6 +327,7 @@ void C_SdNdeDbAddNewProject::ApplyV3Content()
       if ((pc_Core != NULL) && (pc_Ui != NULL))
       {
          C_SdNdeDbAddNewProject::mh_KeepTspProperties(*pc_Core, this->mc_OscNode, *pc_Ui, this->mc_UiNode);
+         m_ApplyV2PathAdaptationToV3();
          C_PuiSdHandler::h_GetInstance()->ReplaceNode(this->mu32_NodeIndex, this->mc_OscNode,
                                                       this->mc_UiNode);
       }
@@ -1013,11 +1014,31 @@ void C_SdNdeDbAddNewProject::mh_KeepTspProperties(const C_OscNode & orc_Previous
       {
          const C_OscNodeComInterfaceSettings & rc_PrevIntf =
             orc_PreviousCoreNode.c_Properties.c_ComInterfaces[u32_ItIntf];
+         C_OscNodeComInterfaceSettings & rc_NewIntf = orc_NewCoreNode.c_Properties.c_ComInterfaces[u32_ItIntf];
          if (rc_PrevIntf.GetBusConnectedRawValue())
          {
-            C_OscNodeComInterfaceSettings & rc_NewIntf = orc_NewCoreNode.c_Properties.c_ComInterfaces[u32_ItIntf];
             rc_NewIntf.AddConnection(rc_PrevIntf.u32_BusIndex);
          }
+         else
+         {
+            rc_NewIntf.RemoveConnection();
+         }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply v2 path adaptation to v3
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbAddNewProject::m_ApplyV2PathAdaptationToV3()
+{
+   for (uint32_t u32_ItDb = 0UL; u32_ItDb < this->mc_OscNode.c_Applications.size(); ++u32_ItDb)
+   {
+      C_OscNodeApplication & rc_App = this->mc_OscNode.c_Applications[u32_ItDb];
+      const QString c_ProjectPath =
+         C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetPath(),
+                                        rc_App.c_ProjectPath.c_str());
+      rc_App.c_ProjectPath = c_ProjectPath.toStdString().c_str();
    }
 }

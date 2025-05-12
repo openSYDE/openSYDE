@@ -37,7 +37,8 @@ using namespace stw::scl;
 /*! \brief   Default constructor.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SupSuSequences::C_SupSuSequences(void)
+C_SupSuSequences::C_SupSuSequences(void) :
+   C_OscSuSequences()
 {
    mq_Quiet = false;
 }

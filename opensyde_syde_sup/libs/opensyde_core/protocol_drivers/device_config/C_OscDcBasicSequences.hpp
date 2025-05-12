@@ -10,7 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"
-#include "C_Can.hpp"
+#include "C_CanDispatcher.hpp"
 #include "C_OscProtocolDriverOsyTpCan.hpp"
 #include "C_OscProtocolDriverOsy.hpp"
 #include "C_OscDcDeviceInformation.hpp"
@@ -30,7 +30,7 @@ public:
    C_OscDcBasicSequences(void);
    virtual ~C_OscDcBasicSequences(void);
 
-   int32_t Init(const stw::scl::C_SclString & orc_CanDllPath, const int32_t os32_CanBitrate);
+   int32_t Init(stw::can::C_CanDispatcher * const opc_CanDispatcher);
    int32_t ScanEnterFlashloader(const uint32_t ou32_FlashloaderResetWaitTime);
    int32_t ScanGetInfo(void);
    int32_t ResetSystem(void);
@@ -40,6 +40,8 @@ public:
    static stw::scl::C_SclString h_DevicesInfoToString(
       const std::vector<C_OscDcDeviceInformation> & orc_DeviceInfoResult, const bool oq_SecurityFeatureUsed);
 
+   void PrepareForDestruction(void);
+
 protected:
    virtual void m_ReportProgress(const int32_t os32_Result, const stw::scl::C_SclString & orc_Information);
    virtual void m_ReportDevicesInfoRead(const std::vector<C_OscDcDeviceInformation> & orc_DeviceInfoResult,
@@ -47,7 +49,7 @@ protected:
 
 private:
    // driver instances:
-   stw::can::C_Can mc_CanDispatcher;
+   stw::can::C_CanDispatcher * mpc_CanDispatcher;
    stw::opensyde_core::C_OscProtocolDriverOsyTpCan mc_TpCan;
    stw::opensyde_core::C_OscProtocolDriverOsy mc_OsyProtocol;
 };

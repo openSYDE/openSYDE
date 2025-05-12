@@ -1069,7 +1069,7 @@ void C_SdNdeCoConfigTreeView::mh_InitMappableSignals(
       for (uint32_t u32_ItSig = 0UL; u32_ItSig < c_It->second.size(); ++u32_ItSig)
       {
          C_OscCanOpenManagerMappableSignal c_Entry;
-         if (C_OscImportEdsDcf::h_ParseSignalContent(orc_EdsDictionary.c_Objects, c_It->first,
+         if (C_OscImportEdsDcf::h_ParseSignalContent(orc_EdsDictionary.c_OdObjects, c_It->first,
                                                      c_It->second[u32_ItSig], 0UL,
                                                      true, oq_IsEds, c_Entry.c_SignalData,
                                                      c_Entry.c_DatapoolData,
@@ -1177,7 +1177,7 @@ void C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(C_OscCanOpenManagerDeviceI
       int32_t s32_HeartbeatProducerTimeMs = s32_DefaultHeartbeatProducerTimeMs;
 
       // get heartbeat producer time from EDS
-      const C_OscCanOpenObject * const pc_OscCanOpenObject = orc_Device.c_EdsFileContent.GetCanOpenObject(
+      const C_OscCanOpenObjectData * const pc_OscCanOpenObject = orc_Device.c_EdsFileContent.GetCanOpenObject(
          C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_PRODUCER);
       if (pc_OscCanOpenObject != NULL)
       {
@@ -1240,7 +1240,7 @@ void C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(C_OscCanOpenManagerDeviceI
          // get heartbeat consumer time from EDS
          // Checking the first consumer because this is the entry which will be used for the user specified
          // value when it is not read-only too
-         const C_OscCanOpenObject * const pc_OscCanOpenObject =
+         const C_OscCanOpenObjectData * const pc_OscCanOpenObject =
             orc_Device.c_EdsFileContent.GetCanOpenSubIndexObject(
                C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_CONSUMER, 1);
          if (pc_OscCanOpenObject != NULL)

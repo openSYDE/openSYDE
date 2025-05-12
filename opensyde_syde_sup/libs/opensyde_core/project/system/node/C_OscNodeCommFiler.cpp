@@ -321,8 +321,8 @@ int32_t C_OscNodeCommFiler::h_LoadNodeComMessageContainers(
       if (u32_ExpectedSize != orc_NodeComMessageContainers.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm message container count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComMessageContainers.size());
+         c_Tmp.PrintFormatted("Unexpected comm message container count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComMessageContainers.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -504,8 +504,8 @@ int32_t C_OscNodeCommFiler::h_LoadNodeComMessages(std::vector<C_OscCanMessage> &
       if (u32_ExpectedSize != orc_NodeComMessages.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected messages count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComMessages.size());
+         c_Tmp.PrintFormatted("Unexpected messages count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComMessages.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -723,8 +723,8 @@ int32_t C_OscNodeCommFiler::h_LoadNodeComSignals(std::vector<C_OscCanSignal> & o
       if (u32_ExpectedSize != orc_NodeComSignals.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm signal count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComSignals.size());
+         c_Tmp.PrintFormatted("Unexpected comm signal count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComSignals.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -1155,8 +1155,8 @@ int32_t C_OscNodeCommFiler::mh_LoadNodeOwnerIndices(C_OscCanInterfaceId & orc_Ow
          if (u32_ExpectedSize != 1)
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected node owner indices count, expected: %i, got %i", u32_ExpectedSize,
-                                 1);
+            c_Tmp.PrintFormatted("Unexpected node owner indices count, expected: %u, got %u", u32_ExpectedSize,
+                                 1U);
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
          //Return

@@ -293,6 +293,51 @@ int32_t C_OscDeviceDefinitionFiler::mh_Load(C_OscDeviceDefinition & orc_DeviceDe
                   tgl_assert(c_Text == "manufacturer-string");
                }
             }
+            if (s32_Return == C_NO_ERR)
+            {
+               //look up mh_LoadSubDevice "protocol-diagnostics"
+               //if (SelectNodeChild != "toolbox-node-image") { //optional } else { orc_DeviceDefinition.c_ToolboxIcon =
+               // orc_Parser.GetNodeContent(); }
+
+               if (orc_Parser.SelectNodeChild("toolbox-node-image") != "toolbox-node-image")
+               {
+                  //optional: do nothing
+               }
+               else
+               {
+                  orc_DeviceDefinition.c_ToolboxIcon = orc_Parser.GetNodeContent();
+                  //expand the potentially relative image path to an absolute path
+                  // we will need it later to open the image in the UI
+                  orc_DeviceDefinition.c_ToolboxIcon = TglExpandFileName(orc_DeviceDefinition.c_ToolboxIcon,
+                                                                         TglExtractFilePath(orc_Path));
+                  c_Text = orc_Parser.SelectNodeParent(); //back to parent of parent ...
+                  tgl_assert(c_Text == "manufacturer-string");
+               }
+               if (orc_Parser.SelectNodeChild("company-logo") != "company-logo")
+               {
+                  //optional tag: do nothing
+               }
+               else
+               {
+                  orc_DeviceDefinition.c_CompanyLogoLink = orc_Parser.GetNodeContent();
+                  //expand the potentially relative image path to an absolute path
+                  // we will need it later to open the image in the UI
+                  orc_DeviceDefinition.c_CompanyLogoLink = TglExpandFileName(orc_DeviceDefinition.c_CompanyLogoLink,
+                                                                             TglExtractFilePath(orc_Path));
+                  c_Text = orc_Parser.SelectNodeParent(); //back to parent of parent ...
+                  tgl_assert(c_Text == "manufacturer-string");
+               }
+               if (orc_Parser.SelectNodeChild("web-link") != "web-link")
+               {
+                  //optional tag: do nothing
+               }
+               else
+               {
+                  orc_DeviceDefinition.c_ProductPageLink = orc_Parser.GetNodeContent();
+                  c_Text = orc_Parser.SelectNodeParent(); //back to parent of parent ...
+                  tgl_assert(c_Text == "manufacturer-string");
+               }
+            }
             c_Text = orc_Parser.SelectNodeParent(); //back to parent of parent ...
             tgl_assert(c_Text == "global");
          }
@@ -1383,6 +1428,9 @@ int32_t C_OscDeviceDefinitionFiler::h_Save(const C_OscDeviceDefinition & orc_Dev
       c_Xml.SetAttributeUint32("value", orc_DeviceDefinition.u8_ManufacturerId);
       c_Xml.SelectNodeParent();
       c_Xml.CreateNodeChild("display-value", orc_DeviceDefinition.c_ManufacturerDisplayValue);
+      c_Xml.CreateNodeChild("toolbox-node-image", orc_DeviceDefinition.c_ToolboxIcon);
+      c_Xml.CreateNodeChild("company-logo", orc_DeviceDefinition.c_CompanyLogoLink);
+      c_Xml.CreateNodeChild("web-link", orc_DeviceDefinition.c_ProductPageLink);
       c_Xml.SelectNodeParent();
       c_Xml.SelectNodeParent();
       c_Xml.CreateAndSelectNodeChild("sub-devices");

@@ -177,13 +177,13 @@ void C_GiTextElementBus::GenerateHint(void)
       C_SdUtil::h_GetErrorToolTipBus(this->ms32_Index, c_Content);
       this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Invalid Bus Content"));
       this->SetDefaultToolTipContent(c_Content);
-      this->SetDefaultToolTipType(C_NagToolTip::eERROR);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eERROR);
    }
    else
    {
       this->SetDefaultToolTipHeading("");
       this->SetDefaultToolTipContent("");
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
    }
 }
 

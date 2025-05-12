@@ -289,7 +289,6 @@ void C_SdNdeDbWidget::m_LoadData(void)
          this->mpc_Ui->pc_LabFileGenActive->setDisabled(true);
          this->mpc_Ui->pc_LabOwned->setDisabled(true);
          this->mpc_Ui->pc_LabFileGenActive->SetForegroundColor(9);
-         this->mpc_Ui->pc_LabOwned->SetForegroundColor(9);
          this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(9);
          this->mpc_Ui->pc_LabFileGenIcon->SetSvg("://images/system_definition/IconGenerateCodeSmallDisabled.svg");
          this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwnedDisabled.svg");
@@ -298,19 +297,32 @@ void C_SdNdeDbWidget::m_LoadData(void)
       {
          if (pc_Application->e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
          {
-            this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Source Code"));
+            if (pc_Node->c_Properties.q_XappSupport == true)
+            {
+               this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: X-App Configuration"));
+               this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwnedDisabled.svg");
+               this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(9);
+               this->mpc_Ui->pc_LabOwned->SetForegroundColor(9);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Source Code"));
+               this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwned.svg");
+               this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(4);
+               this->mpc_Ui->pc_LabOwned->SetForegroundColor(6);
+            }
          }
          else
          {
             this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Parameter Set Image"));
+            this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwned.svg");
+            this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(4);
+            this->mpc_Ui->pc_LabOwned->SetForegroundColor(6);
          }
          this->mpc_Ui->pc_LabFileGenActive->setDisabled(false);
          this->mpc_Ui->pc_LabOwned->setDisabled(false);
          this->mpc_Ui->pc_LabFileGenActive->SetForegroundColor(6);
-         this->mpc_Ui->pc_LabOwned->SetForegroundColor(6);
-         this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(4);
          this->mpc_Ui->pc_LabFileGenIcon->SetSvg("://images/system_definition/IconGenerateCodeSmall.svg");
-         this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwned.svg");
       }
 
       // File count
@@ -342,6 +354,7 @@ void C_SdNdeDbWidget::m_OnEdit(void)
 {
    const C_OscNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Application != NULL)
    {
@@ -356,7 +369,15 @@ void C_SdNdeDbWidget::m_OnEdit(void)
       }
       else
       {
-         c_New->SetSize(C_SdNdeDbProperties::h_GetDefaultWindowSize());
+         if (pc_Node->c_Properties.q_XappSupport)
+         {
+            const QSize c_SIZE(1152, 853);
+            c_New->SetSize(c_SIZE);
+         }
+         else
+         {
+            c_New->SetSize(C_SdNdeDbProperties::h_GetDefaultWindowSize());
+         }
       }
 
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))

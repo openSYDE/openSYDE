@@ -186,6 +186,7 @@ private:
    stw::opensyde_gui_logic::C_SdBueUnoManager mc_UndoManager;
    stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager mc_MessageSyncManager;
    bool mq_SkipLoadUserSettings;
+   bool mq_InitialLoadUserSettings;
 };
 }
 }

@@ -21,6 +21,9 @@ RC_FILE = ../src/can_monitor/cam_resources.rc
 #include relevant openSYDE core modules
 opensyde_core_skip_modules += opensyde_core_skip_zipping
 opensyde_core_skip_modules += opensyde_core_skip_code_generation
+opensyde_core_skip_modules += opensyde_core_skip_x_config_generation
+opensyde_core_skip_modules += opensyde_core_skip_system_package_handling
+opensyde_core_skip_modules += opensyde_core_skip_x_certificates_generation
 opensyde_core_skip_modules += opensyde_core_skip_protocol_drivers_common
 opensyde_core_skip_modules += opensyde_core_skip_protocol_drivers_basic
 opensyde_core_skip_modules += opensyde_core_skip_protocol_drivers_system

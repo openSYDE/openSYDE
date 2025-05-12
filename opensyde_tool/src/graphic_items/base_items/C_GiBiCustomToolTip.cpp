@@ -35,8 +35,8 @@ using namespace stw::opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiCustomToolTip::C_GiBiCustomToolTip() :
-   me_DefaultToolTipType(C_NagToolTip::eDEFAULT),
-   me_CurrentToolTipType(C_NagToolTip::eDEFAULT)
+   me_DefaultToolTipType(C_NagToolTipWithImage::eDEFAULT),
+   me_CurrentToolTipType(C_NagToolTipWithImage::eDEFAULT)
 {
 }
 
@@ -89,7 +89,7 @@ void C_GiBiCustomToolTip::SetDefaultToolTipContent(const QString & orc_Text)
    \param[in] oe_Type Tool tip type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiCustomToolTip::SetDefaultToolTipType(const C_NagToolTip::E_Type oe_Type)
+void C_GiBiCustomToolTip::SetDefaultToolTipType(const C_NagToolTipWithImage::E_Type oe_Type)
 {
    this->me_CurrentToolTipType = oe_Type;
    this->me_DefaultToolTipType = oe_Type;
@@ -115,6 +115,28 @@ void C_GiBiCustomToolTip::SetTemporaryToolTipHeading(const QString & orc_Tempora
 void C_GiBiCustomToolTip::SetTemporaryToolTipContent(const QString & orc_TemporaryToolTip)
 {
    this->mc_CurrentToolTipContent = orc_TemporaryToolTip;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set default tool tip image path
+
+   \param[in] orc_ImagePath Tool tip path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiCustomToolTip::SetDefaultToolTipImagePath(const QString & orc_ImagePath)
+{
+   this->mc_DefaultToolTipImagePath = orc_ImagePath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set default tool tip image caption
+
+   \param[in] orc_ImageCaption Tool tip caption
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiCustomToolTip::SetDefaultToolTipImageCaption(const QString & orc_ImageCaption)
+{
+   this->mc_DefaultToolTipImageCaption = orc_ImageCaption;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,9 +170,33 @@ QString C_GiBiCustomToolTip::GetCurrentToolTipContent(void) const
    Current tool tip type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagToolTip::E_Type C_GiBiCustomToolTip::GetCurrentToolTipType(void) const
+C_NagToolTipWithImage::E_Type C_GiBiCustomToolTip::GetCurrentToolTipType(void) const
 {
    return this->me_CurrentToolTipType;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default tool tip image path
+ *
+ *   \return
+   Current tool tip image path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_GiBiCustomToolTip::GetCurrentToolTipImagePath() const
+{
+   return this->mc_DefaultToolTipImagePath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default tool tip image caption
+ *
+ *   \return
+   Current tool tip image caption
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_GiBiCustomToolTip::GetCurrentToolTipImageCaption() const
+{
+   return this->mc_DefaultToolTipImageCaption;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

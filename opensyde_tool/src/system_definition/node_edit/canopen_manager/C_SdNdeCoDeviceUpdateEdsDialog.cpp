@@ -1420,10 +1420,13 @@ void C_SdNdeCoDeviceUpdateEdsDialog::m_InitMessageNames(C_CieImportDataAssignmen
 
    if (pc_Node != NULL)
    {
+      uint32_t u32_SrdoIndex = 0UL;
       C_SdNdeCoDeviceUpdateEdsDialog::mh_InitMessageVectorNames(orc_Messages.c_ImportData.c_Core.c_OscRxMessageData,
-                                                                *pc_Node, true);
+                                                                orc_Messages.c_ImportData.c_Core.c_EdsOscRxMessageIsSrdo,
+                                                                *pc_Node, true, u32_SrdoIndex);
       C_SdNdeCoDeviceUpdateEdsDialog::mh_InitMessageVectorNames(orc_Messages.c_ImportData.c_Core.c_OscTxMessageData,
-                                                                *pc_Node, false);
+                                                                orc_Messages.c_ImportData.c_Core.c_EdsOscTxMessageIsSrdo,
+                                                                *pc_Node, false, u32_SrdoIndex);
    }
 }
 
@@ -1431,18 +1434,25 @@ void C_SdNdeCoDeviceUpdateEdsDialog::m_InitMessageNames(C_CieImportDataAssignmen
 /*! \brief  Init message vector names
 
    \param[in,out]  orc_Messages           Messages
+   \param[in,out]  orc_MessageIsSrdo      Flag if message is SRDO
    \param[in]      orc_Node               Node
    \param[in]      oq_MessageIsTxInEds    Message is tx in eds
+   \param[in,out]  oru32_SrdoIndex        SRDO index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoDeviceUpdateEdsDialog::mh_InitMessageVectorNames(std::vector<C_OscCanMessage> & orc_Messages,
+                                                               std::vector<uint8_t> & orc_MessageIsSrdo,
                                                                const C_OscNode & orc_Node,
-                                                               const bool oq_MessageIsTxInEds)
+                                                               const bool oq_MessageIsTxInEds,
+                                                               uint32_t & oru32_SrdoIndex)
 {
    for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
    {
       C_OscCanMessage & rc_Message = orc_Messages[u32_ItMessage];
+      const bool q_IsSrdo =
+         ((u32_ItMessage < orc_MessageIsSrdo.size()) && (orc_MessageIsSrdo[u32_ItMessage] == 1U)) ? true : false;
       rc_Message.c_Name = C_CieUtil::h_GetMessageName(orc_Node, !oq_MessageIsTxInEds, u32_ItMessage,
-                                                      C_OscCanProtocol::eCAN_OPEN, NULL).toStdString();
+                                                      C_OscCanProtocol::eCAN_OPEN, NULL, q_IsSrdo,
+                                                      oru32_SrdoIndex).toStdString();
    }
 }

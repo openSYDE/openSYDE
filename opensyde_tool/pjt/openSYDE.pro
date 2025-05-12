@@ -23,6 +23,7 @@ RC_FILE = ../src/resources.rc
 #   we have a special handling for miniz.c due to compiler warnings, so we refer to those files manually)
 opensyde_core_skip_modules += opensyde_core_skip_zipping
 opensyde_core_skip_modules += opensyde_core_skip_code_generation
+opensyde_core_skip_modules += opensyde_core_skip_x_config_generation
 include(../libs/opensyde_core/opensyde_core.pri)
 
 SOURCES += ../src/main.cpp \
@@ -39,6 +40,7 @@ SOURCES += ../src/main.cpp \
     ../src/navigable_gui/C_NagProjectSettingsPopupDialog.cpp \
     ../src/navigable_gui/C_NagToolSettingsPopupDialog.cpp \
     ../src/navigable_gui/C_NagServiceModeInfo.cpp \
+    ../src/navigable_gui/C_NagToolTipWithImage.cpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
     ../src/navigable_gui/C_NagTopTreeModel.cpp \
     ../src/navigable_gui/C_NagTopTreeView.cpp \
@@ -121,12 +123,15 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfo.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoComparisonDescription.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesListWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSecurityCertificatePackageDialog.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacServiceUpdatePackageDialog.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.cpp \
     ../src/table_base/tree_base/C_TblTreMultiColumnLeafSortFilter.cpp \
@@ -883,6 +888,7 @@ SOURCES += ../src/main.cpp \
     ../src/table_base/tree_base/C_TblTreDataElementItem.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubPrevNavigation.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabElided.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabExternalLink.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.cpp \
     ../src/system_definition/C_SdCodeGenerationDialog.cpp \
     ../src/system_definition/C_SdCodeGenerationModel.cpp \
@@ -963,6 +969,7 @@ HEADERS  += \
     ../src/navigable_gui/C_NagProjectSettingsPopupDialog.hpp \
     ../src/navigable_gui/C_NagToolSettingsPopupDialog.hpp \
     ../src/navigable_gui/C_NagServiceModeInfo.hpp \
+    ../src/navigable_gui/C_NagToolTipWithImage.hpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.hpp \
     ../src/navigable_gui/C_NagTopTreeModel.hpp \
     ../src/navigable_gui/C_NagTopTreeView.hpp \
@@ -1045,12 +1052,15 @@ HEADERS  += \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfo.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoComparisonDescription.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.hpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.hpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesListWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.hpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSecurityCertificatePackageDialog.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacServiceUpdatePackageDialog.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.hpp \
     ../src/table_base/tree_base/C_TblTreMultiColumnLeafSortFilter.hpp \
@@ -1825,6 +1835,7 @@ HEADERS  += \
     ../src/table_base/tree_base/C_TblTreDataElementItem.hpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubPrevNavigation.hpp \
     ../src/opensyde_gui_elements/label/C_OgeLabElided.hpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabExternalLink.hpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.hpp \
     ../src/system_definition/C_SdCodeGenerationDialog.hpp \
     ../src/system_definition/C_SdCodeGenerationModel.hpp \
@@ -1851,6 +1862,7 @@ FORMS    += \
     ../src/navigable_gui/C_NagProjectSettingsPopupDialog.ui \
     ../src/navigable_gui/C_NagToolSettingsPopupDialog.ui \
     ../src/navigable_gui/C_NagServiceModeInfo.ui \
+    ../src/navigable_gui/C_NagToolTipWithImage.ui \
     ../src/navigable_gui/unused_project_files/C_NagUnUsedProjectFilesPopUpDialog.ui \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
@@ -2013,10 +2025,12 @@ FORMS    += \
     ../src/system_views/system_update/update_package/C_SyvUpPacNodeWidget.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileAddPopUp.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSecurityCertificatePackageDialog.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacServiceUpdatePackageDialog.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.ui
 

@@ -214,7 +214,10 @@ void C_SebScene::DisplayToolTip(const QPointF & orc_ScenePos)
          {
             mpc_CurrentHoverItem = pc_ToolTip;
             Q_EMIT this->SigShowToolTip(orc_ScenePos, pc_ToolTip->GetCurrentToolTipHeading(),
-                                        pc_ToolTip->GetCurrentToolTipContent(), pc_ToolTip->GetCurrentToolTipType());
+                                        pc_ToolTip->GetCurrentToolTipContent(),
+                                        pc_ToolTip->GetCurrentToolTipType(),
+                                        pc_ToolTip->GetCurrentToolTipImagePath(),
+                                        pc_ToolTip->GetCurrentToolTipImageCaption());
          }
       }
    }

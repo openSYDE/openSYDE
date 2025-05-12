@@ -72,7 +72,6 @@ C_SyvDaPeLabel::C_SyvDaPeLabel(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMod
    connect(this->mpc_Ui->pc_CheckBoxCaption, &QCheckBox::toggled, this, &C_SyvDaPeLabel::m_UpdatePreview);
    connect(this->mpc_Ui->pc_CheckBoxUnit, &QCheckBox::toggled, this, &C_SyvDaPeLabel::m_UpdatePreview);
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeLabel::m_UpdatePreview);
-   connect(this->mpc_Ui->pc_LineEditCaption, &C_OgeLeProperties::editingFinished, this, &C_SyvDaPeLabel::m_ToUpper);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -255,12 +254,3 @@ void C_SyvDaPeLabel::m_UpdatePreview(void)
    this->mrc_ParentDialog.GetPreviewScene()->addItem(pc_Item);
    this->mrc_ParentDialog.GetPreviewScene()->clearSelection();
 } //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set line edit text always upper case
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeLabel::m_ToUpper(void) const
-{
-   this->mpc_Ui->pc_LineEditCaption->setText(this->mpc_Ui->pc_LineEditCaption->text().toUpper());
-}

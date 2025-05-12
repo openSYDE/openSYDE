@@ -54,7 +54,6 @@ private:
    C_SyvDaPeLabel & operator =(const C_SyvDaPeLabel &) &;
 
    void m_UpdatePreview(void);
-   void m_ToUpper(void) const;
 
    Ui::C_SyvDaPeLabel * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed

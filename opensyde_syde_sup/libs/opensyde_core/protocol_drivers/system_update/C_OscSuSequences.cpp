@@ -495,13 +495,13 @@ int32_t C_OscSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SclString> 
                   if (s32_Return != C_NO_ERR)
                   {
                      C_SclString c_ErrorText;
-                     c_ErrorText.PrintFormatted("Could not get confirmation about flash memory availability. (File: %s" \
-                                                " Offset: 0x%08x Size: 0x%08x). Details: %s",
-                                                orc_FilesToFlash[u32_File].c_str(),
-                                                pc_HexDump->at_Blocks[u16_Area].u32_AddressOffset,
-                                                pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength(),
-                                                C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
-                                                                                                         u8_NrCode).c_str());
+                     c_ErrorText.PrintFormatted(
+                        "Could not get confirmation about flash memory availability. (File: %s" \
+                        " Offset: 0x%08x Size: 0x%08x). Details: %s",
+                        orc_FilesToFlash[u32_File].c_str(),
+                        pc_HexDump->at_Blocks[u16_Area].u32_AddressOffset,
+                        static_cast<uint32_t>(pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength()),
+                        C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode).c_str());
                      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK, s32_Return, 20U,
                                             mc_CurrentNode, c_ErrorText);
                      s32_Return = C_COM;
@@ -644,7 +644,7 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeHex(const stw::hex_file::C_HexDa
             c_Error.PrintFormatted("Erasing flash memory for area %d failed (Offset: 0x%08X Size: 0x%08X). Details: %s",
                                    s32_Area + 1,
                                    orc_HexDataDump.at_Blocks[s32_Area].u32_AddressOffset,
-                                   orc_HexDataDump.at_Blocks[s32_Area].au8_Data.GetLength(),
+                                   static_cast<uint32_t>(orc_HexDataDump.at_Blocks[s32_Area].au8_Data.GetLength()),
                                    C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
                                                                                             u8_NrCode).c_str());
             (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR, s32_Return,
@@ -674,7 +674,7 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeHex(const stw::hex_file::C_HexDa
          while (u32_RemainingBytes > 0U)
          {
             C_SclString c_Text;
-            c_Text.PrintFormatted("Writing data for area %02d/%02d  byte %08d/%08d ...",
+            c_Text.PrintFormatted("Writing data for area %02d/%02d  byte %08u/%08u ...",
                                   s32_Area + 1, orc_HexDataDump.at_Blocks.GetLength(),
                                   u32_AreaSize - u32_RemainingBytes, u32_AreaSize);
             q_Abort = m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START, C_NO_ERR,
@@ -743,7 +743,7 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeHex(const stw::hex_file::C_HexDa
          //area transferred ...
          //report "final" status:
          C_SclString c_Text;
-         c_Text.PrintFormatted("Writing data for area %02d/%02d  byte %08d/%08d ...",
+         c_Text.PrintFormatted("Writing data for area %02d/%02d  byte %08u/%08u ...",
                                s32_Area + 1, orc_HexDataDump.at_Blocks.GetLength(), u32_AreaSize, u32_AreaSize);
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START, C_NO_ERR,
                                 u8_ProgressPercentage, mc_CurrentNode, c_Text);
@@ -1044,7 +1044,7 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeFile(const C_SclString & orc_Fil
          u8_ProgressPercentage = static_cast<uint8_t>((static_cast<uint64_t>(u32_TotalNumberOfBytesFlashed) * 100ULL) /
                                                       static_cast<uint64_t>(u32_TotalNumberOfBytes));
 
-         c_Text.PrintFormatted("Writing data byte %08d/%08d ...", u32_TotalNumberOfBytesFlashed,
+         c_Text.PrintFormatted("Writing data byte %08u/%08u ...", u32_TotalNumberOfBytesFlashed,
                                u32_TotalNumberOfBytes);
          q_Abort = m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START, C_NO_ERR,
                                     u8_ProgressPercentage, mc_CurrentNode, c_Text);
@@ -1130,7 +1130,7 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeFile(const C_SclString & orc_Fil
       //report "final" status:
       C_SclString c_Text;
       bool q_RejectedByTargetLayer = false;
-      c_Text.PrintFormatted("Writing data byte %08d/%08d ...", u32_TotalNumberOfBytes,
+      c_Text.PrintFormatted("Writing data byte %08u/%08u ...", u32_TotalNumberOfBytes,
                             u32_TotalNumberOfBytes);
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START, C_NO_ERR,
                              u8_ProgressPercentage, mc_CurrentNode, c_Text);
@@ -4236,6 +4236,7 @@ void C_OscSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
    orc_Text.Add("Number of applications: " + C_SclString::IntToStr(orc_Info.c_Applications.size()));
    for (uint8_t u8_Application = 0U; u8_Application < orc_Info.c_Applications.size(); u8_Application++)
    {
+      orc_Text.Add("");
       orc_Text.Add("Application " + C_SclString::IntToStr(u8_Application));
       orc_Text.Add(" Name: " + orc_Info.c_Applications[u8_Application].c_ApplicationName);
       orc_Text.Add(" Version: " + orc_Info.c_Applications[u8_Application].c_ApplicationVersion);
@@ -4319,10 +4320,10 @@ void C_OscSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
    if (orc_Info.c_BasicInformation.q_ProtocolVersionValid == true)
    {
       c_Line.PrintFormatted("V%x.%x%xr%x\n",
-                            static_cast<uint8_t>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 12U) & 0x0FU),
-                            static_cast<uint8_t>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 8U) & 0x0FU),
-                            static_cast<uint8_t>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 4U) & 0x0FU),
-                            static_cast<uint8_t>((orc_Info.c_BasicInformation.u16_ProtocolVersion) & 0x0FU));
+                            (static_cast<uint16_t>(orc_Info.c_BasicInformation.u16_ProtocolVersion >> 12U) & 0x0FU),
+                            (static_cast<uint16_t>(orc_Info.c_BasicInformation.u16_ProtocolVersion >> 8U) & 0x0FU),
+                            (static_cast<uint16_t>(orc_Info.c_BasicInformation.u16_ProtocolVersion >> 4U) & 0x0FU),
+                            (static_cast<uint16_t>(orc_Info.c_BasicInformation.u16_ProtocolVersion) & 0x0FU));
    }
    else
    {
@@ -4462,7 +4463,7 @@ void C_OscSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
             s32_Index,
             rc_FlashInfo.c_ICs[s32_Index].u32_TotalSize,
             rc_FlashInfo.c_ICs[s32_Index].u32_Sector0Offset,
-            rc_FlashInfo.c_ICs[s32_Index].c_Regions.GetLength(),
+            static_cast<uint32_t>(rc_FlashInfo.c_ICs[s32_Index].c_Regions.GetLength()),
             rc_FlashInfo.c_ICs[s32_Index].u32_SectorEraseTime,
             rc_FlashInfo.c_ICs[s32_Index].u32_ProgrammingTime);
          orc_Text.Add(c_Line);
@@ -4471,10 +4472,10 @@ void C_OscSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
          {
             c_Line.PrintFormatted("  IC %03d, region 0x%02X: blocksize: 0x%08X; numblocks: 0x%04X",
                                   s32_Index,
-                                  static_cast<int32_t>(s32_RegionIndex),
-                                  static_cast<int32_t>(rc_FlashInfo.c_ICs[s32_Index].c_Regions[s32_RegionIndex].
-                                                       u32_BlockSize),
-                                  rc_FlashInfo.c_ICs[s32_Index].c_Regions[s32_RegionIndex].u16_NumBlocks);
+                                  static_cast<uint32_t>(s32_RegionIndex),
+                                  rc_FlashInfo.c_ICs[s32_Index].c_Regions[s32_RegionIndex].u32_BlockSize,
+                                  static_cast<uint32_t>(rc_FlashInfo.c_ICs[s32_Index].c_Regions[s32_RegionIndex].
+                                                        u16_NumBlocks));
             orc_Text.Add(c_Line);
          }
       }

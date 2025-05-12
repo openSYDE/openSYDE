@@ -1574,7 +1574,8 @@ int32_t C_OscProtocolDriverOsy::OsyFactoryMode(const uint8_t ou8_Operation, uint
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
-   Serial number is a byte array with maximum length of 20 Bytes.
+   Serial number is a byte array with maximum length of 20 Bytes. Leading zeroes will be stripped and only
+    the remainder be reported to the caller.
 
    \param[out] orc_SerialNumber             read certificate serial number
    \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
@@ -1603,6 +1604,11 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
                                        u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
+      //Strip leading zeroes for compatibility (see #100795 for details)
+      while ((orc_SerialNumber.size() > 0) && (orc_SerialNumber[0] == 0x00U))
+      {
+         orc_SerialNumber.erase(orc_SerialNumber.begin());
+      }
       if (orc_SerialNumber.size() > 20)
       {
          orc_SerialNumber.clear();
@@ -1615,6 +1621,62 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
    }
 
    m_LogServiceError("ReadDataByIdentifier::CertificateSerialNumber", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadCertificateSerialNumberL7 service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+   Serial number is a byte array with maximum length of 20 Bytes. Leading zeroes will be stripped and only
+    the remainder be reported to the caller.
+
+   \param[out] orc_SerialNumber             read certificate serial number
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumberL7(std::vector<uint8_t> & orc_SerialNumber,
+                                                                 uint8_t * const opu8_NrCode)
+{
+   int32_t s32_Return;
+
+   uint8_t u8_NrErrorCode = 0U;
+
+   orc_SerialNumber.clear();
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER_L7, 1U, false, orc_SerialNumber,
+                                       u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      //Strip leading zeroes for compatibility (see #100795 for details)
+      while ((orc_SerialNumber.size() > 0) && (orc_SerialNumber[0] == 0x00U))
+      {
+         orc_SerialNumber.erase(orc_SerialNumber.begin());
+      }
+      if (orc_SerialNumber.size() > 20)
+      {
+         orc_SerialNumber.clear();
+         s32_Return = C_RANGE;
+      }
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::CertificateSerialNumberL7", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
@@ -2334,8 +2396,9 @@ int32_t C_OscProtocolDriverOsy::OsyWriteDataPoolData(const uint8_t ou8_DataPoolI
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("WriteDataPoolData(Client indexes: Datapool: %d, List: %d, Element: %d, Size: %d)",
-                                 ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, orc_DataToWrite.size());
+      c_ErrorText.PrintFormatted("WriteDataPoolData(Client indexes: Datapool: %d, List: %d, Element: %d, Size: %u)",
+                                 ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex,
+                                 static_cast<uint32_t>(orc_DataToWrite.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
    return s32_Return;
@@ -2367,11 +2430,11 @@ int32_t C_OscProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8_t ou8_
 {
    int32_t s32_Return = C_RANGE;
 
-   std::vector<uint8_t> c_Data;
    uint8_t u8_NrErrorCode = 0U;
 
    if (ou8_TransmissionRail <= 2)
    {
+      std::vector<uint8_t> c_Data;
       uint16_t u16_DataIdentifier;
 
       // Get the correct data identifier
@@ -2738,45 +2801,50 @@ int32_t C_OscProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8_t ou8_DataPo
          {
             for (uint32_t u32_ItSegment = 0; u32_ItSegment < 2; ++u32_ItSegment)
             {
-               //Segment start
-               switch (c_ReceiveData[u32_ItReceivedData])
+               if (u32_ItReceivedData < c_ReceiveData.size())
                {
-               case 1UL:
-                  //Iterate to version segment
-                  ++u32_ItReceivedData;
-                  for (uint32_t u32_ItVersion = 0; (u32_ItReceivedData < c_ReceiveData.size()) && (u32_ItVersion < 3);
-                       ++u32_ItVersion)
+                  //Segment start
+                  switch (c_ReceiveData[u32_ItReceivedData])
                   {
-                     orc_MetaData.au8_Version[u32_ItVersion] = c_ReceiveData[u32_ItReceivedData];
-
-                     //Iterate segment
+                  case 1UL:
+                     //Iterate to version segment
                      ++u32_ItReceivedData;
-                  }
-                  break;
-               case 2UL:
-                  //Iterate to byte count
-                  ++u32_ItReceivedData;
-                  if (u32_ItReceivedData < c_ReceiveData.size())
-                  {
-                     const uint32_t u32_Count = c_ReceiveData[u32_ItReceivedData];
-                     orc_MetaData.c_Name = "";
-                     //Iterate to name segment
-                     ++u32_ItReceivedData;
-                     for (uint32_t u32_ItName =
-                             0; (u32_ItReceivedData < c_ReceiveData.size()) && (u32_ItName < u32_Count);
-                          ++u32_ItName)
+                     for (uint32_t u32_ItVersion =
+                             0; (u32_ItReceivedData < c_ReceiveData.size()) && (u32_ItVersion < 3);
+                          ++u32_ItVersion)
                      {
-                        orc_MetaData.c_Name += static_cast<char_t>(c_ReceiveData[u32_ItReceivedData]);
+                        orc_MetaData.au8_Version[u32_ItVersion] = c_ReceiveData[u32_ItReceivedData];
+
                         //Iterate segment
                         ++u32_ItReceivedData;
                      }
+                     break;
+                  case 2UL:
+                     //Iterate to byte count
+                     ++u32_ItReceivedData;
+                     if (u32_ItReceivedData < c_ReceiveData.size())
+                     {
+                        const uint32_t u32_Count = c_ReceiveData[u32_ItReceivedData];
+                        orc_MetaData.c_Name = "";
+                        //Iterate to name segment
+                        ++u32_ItReceivedData;
+                        for (uint32_t u32_ItName =
+                                0; (u32_ItReceivedData < c_ReceiveData.size()) && (u32_ItName < u32_Count);
+                             ++u32_ItName)
+                        {
+                           orc_MetaData.c_Name += static_cast<char_t>(c_ReceiveData[u32_ItReceivedData]);
+                           //Iterate segment
+                           ++u32_ItReceivedData;
+                        }
+                     }
+                     break;
+                  default:
+                     m_LogErrorWithHeader("Synchronous communication",
+                                          "Unknown data pool meta data ID received. Parsing stopped.",
+                                          TGL_UTIL_FUNC_ID);
+                     q_Stop = true;
+                     break;
                   }
-                  break;
-               default:
-                  m_LogErrorWithHeader("Synchronous communication",
-                                       "Unknown data pool meta data ID received. Parsing stopped.", TGL_UTIL_FUNC_ID);
-                  q_Stop = true;
-                  break;
                }
             }
          }
@@ -3149,9 +3217,6 @@ int32_t C_OscProtocolDriverOsy::OsySendCanMessage(const uint8_t ou8_ChannelIndex
    int32_t s32_Return;
    uint8_t u8_NrErrorCode = 0U;
 
-   std::vector<uint8_t> c_ReceiveData;
-   std::vector<uint8_t> c_SendData;
-
    if ((orc_CanMessage.u8_RTR != 0U) || (orc_CanMessage.u8_XTD > 1U) ||
        ((orc_CanMessage.u8_XTD == 0U) && (orc_CanMessage.u32_ID > 0x7FFU)) ||
        ((orc_CanMessage.u8_XTD == 1U) && (orc_CanMessage.u32_ID > 0x3FFFFFFFU)) ||
@@ -3161,6 +3226,8 @@ int32_t C_OscProtocolDriverOsy::OsySendCanMessage(const uint8_t ou8_ChannelIndex
    }
    else
    {
+      std::vector<uint8_t> c_SendData;
+      std::vector<uint8_t> c_ReceiveData;
       uint32_t u32_Id;
       c_SendData.resize(14);
       u32_Id = orc_CanMessage.u32_ID;
@@ -4116,7 +4183,8 @@ int32_t C_OscProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataEvent(
 {
    int32_t s32_Return = C_RANGE;
 
-   if (orc_ReceivedService.c_Data.size() > 3)
+   //only if there is at least one byte of payload
+   if (orc_ReceivedService.c_Data.size() > 4)
    {
       uint8_t u8_DataPoolIndex;
       uint16_t u16_ListIndex;
@@ -4466,7 +4534,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("RequestDownload(Address: 0x%08X, Size: 0x%08X, MaxBlockLength: %d)",
+      c_ErrorText.PrintFormatted("RequestDownload(Address: 0x%08X, Size: 0x%08X, MaxBlockLength: %u)",
                                  ou32_StartAddress,
                                  ou32_Size, oru32_MaxBlockLength);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
@@ -4584,7 +4652,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestFileTransfer(const C_SclString & orc_F
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("RequestFileTransfer(Path: %s, Size: %d, MaxBlockLength: %d)", orc_FilePath.c_str(),
+      c_ErrorText.PrintFormatted("RequestFileTransfer(Path: %s, Size: %u, MaxBlockLength: %u)", orc_FilePath.c_str(),
                                  ou32_FileSize, oru32_MaxBlockLength);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
@@ -4617,8 +4685,8 @@ int32_t C_OscProtocolDriverOsy::OsyRequestFileTransfer(const C_SclString & orc_F
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsyTransferData(const uint8_t ou8_BlockSequenceCounter, std::vector<uint8_t> & orc_Data,
-                                                uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsyTransferData(const uint8_t ou8_BlockSequenceCounter,
+                                                const std::vector<uint8_t> & orc_Data, uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
    uint8_t u8_NrErrorCode = 0U;
@@ -4668,7 +4736,8 @@ int32_t C_OscProtocolDriverOsy::OsyTransferData(const uint8_t ou8_BlockSequenceC
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("TransferData(Sequence: %d, Size: %d)", ou8_BlockSequenceCounter, orc_Data.size());
+      c_ErrorText.PrintFormatted("TransferData(Sequence: %d, Size: %u)", ou8_BlockSequenceCounter,
+                                 static_cast<uint32_t>(orc_Data.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -4961,7 +5030,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
    {
       C_SclString c_ErrorText;
       c_ErrorText.PrintFormatted("ReadMemoryByAddress(Address: 0x%08X, Size: 0x%08X)", ou32_MemoryAddress,
-                                 orc_DataRecord.size());
+                                 static_cast<uint32_t>(orc_DataRecord.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -5096,7 +5165,7 @@ int32_t C_OscProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32_t ou32_Memo
    {
       C_SclString c_ErrorText;
       c_ErrorText.PrintFormatted("WriteMemoryByAddress(Address: 0x%08X, Size: 0x%08X)", ou32_MemoryAddress,
-                                 orc_DataRecord.size());
+                                 static_cast<uint32_t>(orc_DataRecord.size()));
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -5304,7 +5373,7 @@ int32_t C_OscProtocolDriverOsy::OsyEcuReset(const uint8_t ou8_ResetType)
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("EcuReset(Type: %d, List: %d)", ou8_ResetType);
+      c_ErrorText.PrintFormatted("EcuReset(Type: %d)", ou8_ResetType);
       m_LogServiceError(c_ErrorText, s32_Return, 0);
    }
    return s32_Return;
@@ -5428,7 +5497,7 @@ int32_t C_OscProtocolDriverOsy::OsySetBitrate(const uint8_t ou8_ChannelType, con
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("RoutineControl::SetBitrate(Type: %d, Index: %d, Bitrate: %d)",
+      c_ErrorText.PrintFormatted("RoutineControl::SetBitrate(Type: %d, Index: %d, Bitrate: %u)",
                                  ou8_ChannelType, ou8_ChannelIndex, ou32_Bitrate);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }

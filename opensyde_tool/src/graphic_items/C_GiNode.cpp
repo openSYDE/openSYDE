@@ -14,6 +14,7 @@
 
 #include <limits>
 #include <QGraphicsSceneMouseEvent>
+#include <QFileInfo>
 
 #include "stwerrors.hpp"
 #include "constants.hpp"
@@ -604,13 +605,13 @@ void C_GiNode::GenerateHint(void)
    {
       this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Node has invalid content"));
       this->SetDefaultToolTipContent(this->mc_ErrorText);
-      this->SetDefaultToolTipType(C_NagToolTip::eERROR);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eERROR);
    }
    else
    {
       const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->ms32_Index);
 
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
 
       if (pc_Node != NULL)
       {
@@ -622,12 +623,13 @@ void C_GiNode::GenerateHint(void)
             QString c_Entry;
             QString c_BusName;
             QString c_Title;
+
+            QFileInfo c_FileInfoDevImg;
+            bool q_FileExists;
+
             //Translation: 1 = bus name
             //tooltip title
             c_Title = this->GetText();
-            c_Title.append(static_cast<QString>(" (Type: %1)").arg(
-                              pc_Node->pc_DeviceDefinition->GetDisplayName().c_str()));
-
             this->SetDefaultToolTipHeading(c_Title);
 
             //comment
@@ -750,6 +752,24 @@ void C_GiNode::GenerateHint(void)
             }
 
             this->SetDefaultToolTipContent(c_ToolTip);
+
+            // Set tooltip image
+            //load device picture
+            c_FileInfoDevImg.setFile(pc_Device->c_ImagePath.c_str());
+            q_FileExists = (c_FileInfoDevImg.exists() && c_FileInfoDevImg.isFile());
+
+            //check if file exists
+            if (q_FileExists == true)
+            {
+               this->SetDefaultToolTipImagePath(pc_Device->c_ImagePath.c_str());
+            }
+            else
+            {
+               //no image available
+               this->SetDefaultToolTipImagePath("://images/system_definition/Image_Grey.svg");
+            }
+
+            this->SetDefaultToolTipImageCaption(pc_Device->GetDisplayName().c_str());
          }
       }
    }

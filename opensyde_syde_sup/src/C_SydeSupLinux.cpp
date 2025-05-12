@@ -332,11 +332,12 @@ C_SclString C_SydeSupLinux::m_GetApplicationVersion(const C_SclString & orc_Appl
 
    c_Version.PrintFormatted("V%d.%02dr%d",
                             PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR,
-                            PROJECT_VERSION_RELEASE, PROJECT_VERSION_BUILD);
+                            PROJECT_VERSION_RELEASE);
 
    return c_Version;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get default log location
 
    \return

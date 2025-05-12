@@ -159,6 +159,7 @@ stw--opensyde_gui_elements--C_OgeLabProgressLogHeading,
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView,
 stw--opensyde_gui_elements--C_OgeLabDashboardChart,
 stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu,
+stw--opensyde_gui_elements--C_OgeLabExternalLink,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView

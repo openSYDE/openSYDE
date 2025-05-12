@@ -51,6 +51,7 @@ public:
                                          const stw::opensyde_core::C_OscNodeOpenSydeServerSettings & orc_Settings);
    int32_t SetNodeCodeExportSettings(const uint32_t ou32_Index,
                                      const stw::opensyde_core::C_OscNodeCodeExportSettings & orc_Settings);
+   int32_t SetOscNodePropertyXappSupport(const uint32_t ou32_NodeIndex, const bool oq_XappSupport);
    void SetOscNodeProperties(const uint32_t ou32_NodeIndex,
                              const stw::opensyde_core::C_OscNodeProperties & orc_Properties);
    void SetOscNodePropertiesDetailed(const uint32_t ou32_NodeIndex, const QString & orc_Name,

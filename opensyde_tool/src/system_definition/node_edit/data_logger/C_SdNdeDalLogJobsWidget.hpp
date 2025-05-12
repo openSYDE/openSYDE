@@ -38,6 +38,7 @@ public:
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
    void SetNode(const uint32_t ou32_NodeIndex);
+   void ReloadLogJobs(void) const;
 
 private:
    Ui::C_SdNdeDalLogJobsWidget * mpc_Ui;

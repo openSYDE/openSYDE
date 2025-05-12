@@ -21,6 +21,9 @@ RC_FILE = ../src/syde_flash/fla_resources.rc
 #include relevant openSYDE core modules
 opensyde_core_skip_modules += opensyde_core_skip_zipping
 opensyde_core_skip_modules += opensyde_core_skip_code_generation
+opensyde_core_skip_modules += opensyde_core_skip_x_config_generation
+opensyde_core_skip_modules += opensyde_core_skip_system_package_handling
+opensyde_core_skip_modules += opensyde_core_skip_x_certificates_generation
 opensyde_core_skip_modules += opensyde_core_skip_protocol_drivers_system
 opensyde_core_skip_modules += opensyde_core_skip_imports
 include(../libs/opensyde_core/opensyde_core.pri)

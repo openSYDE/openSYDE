@@ -60,6 +60,7 @@ C_SdNdeCoPdoWidget::C_SdNdeCoPdoWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LinkToBusLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
    this->mpc_Ui->pc_LinkToBusLabel->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LinkToBusLabel->setFocusPolicy(Qt::NoFocus);
+   this->mpc_Ui->pc_LinkToBusLabel->setContextMenuPolicy(Qt::NoContextMenu);
    connect(this->mpc_Ui->pc_LinkToBusLabel, &QLabel::linkActivated, this,
            &C_SdNdeCoPdoWidget::m_OnLinkSwitchToBus);
    connect(this->mpc_Ui->pc_PdoTableView, &C_SdNdeCoPdoTableView::SigSwitchToBusProtocolMessage, this,

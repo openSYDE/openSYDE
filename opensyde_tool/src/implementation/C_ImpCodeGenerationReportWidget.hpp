@@ -41,6 +41,7 @@ public:
       QString c_AppName;            ///< Data Block name
       QString c_CodeGeneratorPath;  ///< Path of used file generator
       uint16_t u16_CodeVersion;     ///< File structure version
+      bool q_CodeVersionRelevant;   ///< Flag if file structure version is relevant
       QString c_Directory;          ///< Directory where generated files were saved at
       QStringList c_GeneratedFiles; ///< List absolute file paths of all generated files
    };

@@ -35,8 +35,8 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="stw::opensyde_gui::C_SdNdeDalLogJobsWidget" name="pc_LogJobsWidget" native="true"/>
-     <widget class="QWidget" name="widget_2" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+     <widget class="QWidget" name="pc_LogJobContentWidget" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -56,6 +56,16 @@
         <widget class="stw::opensyde_gui::C_SdNdeDalLogJobPropertiesWidget" name="pc_LogJobPropertiesWidget" native="true"/>
        </item>
        <item>
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNoData">
+         <property name="text">
+          <string>No Data Here</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="stw::opensyde_gui::C_SdNdeDalLogJobDataSelectionWidget" name="pc_LogJobDataSelectionWidget" native="true"/>
        </item>
       </layout>
@@ -65,6 +75,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>

@@ -206,7 +206,9 @@ stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
-stw--opensyde_gui--C_NagUnUsedProjectFilesPopUpDialog
+stw--opensyde_gui--C_NagUnUsedProjectFilesPopUpDialog,
+stw--opensyde_gui--C_SyvUpPacSecurityCertificatePackageDialog,
+stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item
 {
 background-color: transparent;
 }
@@ -238,7 +240,8 @@ stw--opensyde_gui--C_SdNdeDpListDataSetView QTableCornerButton::section,
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][BackgroundChecked="false"],
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
+stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item
 {
 border-color: transparent;
 }

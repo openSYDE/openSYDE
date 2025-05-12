@@ -77,12 +77,7 @@ void C_OscNode::Initialize(void)
    c_ComProtocols.resize(0);
    c_HalcConfig.Clear();
    c_CanOpenManagers.clear();
-   //Add one default item
    c_DataLoggerJobs.clear();
-   if (C_OscDataLoggerJob::hq_AllowDataloggerFeature)
-   {
-      c_DataLoggerJobs.resize(1);
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -406,3 +406,55 @@ int32_t C_OscSystemFilerUtil::h_StringToCodeExportScalingType(const C_SclString 
 
    return s32_Retval;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check version
+
+   \param[in,out]  orc_XmlParser             Xml parser
+   \param[in]      ou16_ExpectedFileVersion  Expected file version
+   \param[in]      orc_TagName               Tag name
+   \param[in]      orc_UseCase               Use case
+
+   \return
+   C_NO_ERR   no error
+   C_CONFIG   Version error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscSystemFilerUtil::h_CheckVersion(C_OscXmlParserBase & orc_XmlParser,
+                                             const uint16_t ou16_ExpectedFileVersion, const C_SclString & orc_TagName,
+                                             const C_SclString & orc_UseCase)
+{
+   int32_t s32_Retval = orc_XmlParser.SelectNodeChildError(orc_TagName);
+
+   //File version
+   if (s32_Retval == C_NO_ERR)
+   {
+      uint16_t u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16_t>(orc_XmlParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         orc_XmlParser.ReportErrorForNodeContentStartingWithXmlContext("could not be converted to a number");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info(orc_UseCase, "Value of \"" + orc_TagName + "\": " +
+                            C_SclString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != ou16_ExpectedFileVersion)
+         {
+            orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext(orc_TagName, "Unsupported version defined");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      orc_XmlParser.SelectNodeParent();
+   }
+   return s32_Retval;
+}

@@ -284,7 +284,7 @@ int32_t C_FlaConNodeConfigPopup::m_InitDcSequence(void)
               this, &C_FlaConNodeConfigPopup::m_DeviceInfoRead);
    }
 
-   s32_Return = this->mpc_DcSequences->Init(this->mc_CanDllPath.toStdString(), this->mu32_CurrentBitrate);
+   s32_Return = this->mpc_DcSequences->InitDcSequences(this->mc_CanDllPath.toStdString(), this->mu32_CurrentBitrate);
 
    if (s32_Return != C_NO_ERR)
    {

@@ -111,7 +111,8 @@ private:
    void m_ReloadCommMessages(void) const;
    void m_ReloadCommDatapools(void) const;
    void m_ReloadHalc(void) const;
-   void m_ReloadDataLoggerDataElements(void) const;
+   void m_ReloadDataLogger(void) const;
+   void m_ReloadApplications(void) const;
    void m_HalcLoadedFromTsp(void) const;
    void m_CreatePropertiesTab(const bool oq_AdaptCursor);
    void m_CreateDpTab(const bool oq_AdaptCursor);

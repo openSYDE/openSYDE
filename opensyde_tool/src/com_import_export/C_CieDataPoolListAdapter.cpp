@@ -109,6 +109,8 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDcfAndEds
    c_Retval.c_Core.c_OscRxSignalData = orc_OscRxMessageData.c_OscSignalData;
    c_Retval.c_Core.c_OscTxMessageData = orc_OscTxMessageData.c_OscMessageData;
    c_Retval.c_Core.c_OscTxSignalData = orc_OscTxMessageData.c_OscSignalData;
+   c_Retval.c_Core.c_EdsOscRxMessageIsSrdo = orc_OscRxMessageData.c_MessageIsSrdo;
+   c_Retval.c_Core.c_EdsOscTxMessageIsSrdo = orc_OscTxMessageData.c_MessageIsSrdo;
 
    //Check the flags
    tgl_assert(orc_OscRxMessageData.c_SignalDefaultMinMaxValuesUsed.size() ==

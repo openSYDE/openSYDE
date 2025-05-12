@@ -20,7 +20,7 @@
 #include "stwtypes.hpp"
 
 #include "C_SebUtil.hpp"
-#include "C_NagToolTip.hpp"
+#include "C_NagToolTipWithImage.hpp"
 #include "C_GiBiCustomToolTip.hpp"
 #include "C_SebUnoBaseManager.hpp"
 #include "C_SebBaseContextMenuManager.hpp"
@@ -93,7 +93,8 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading, const QString & orc_Content,
-                       const stw::opensyde_gui::C_NagToolTip::E_Type oe_Type);
+                       const stw::opensyde_gui::C_NagToolTipWithImage::E_Type oe_Type,
+                       const QString & orc_ImagePath = "", const QString & orc_ImageCaption = "");
    void SigHideToolTip(void);
    void SigTriggerUpdateTransform(void);
    void SigChanged(void);

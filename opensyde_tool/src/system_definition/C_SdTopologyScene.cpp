@@ -3838,6 +3838,15 @@ void C_SdTopologyScene::m_InitNodeData(C_OscNode & orc_OscNode, const QString & 
             orc_OscNode.c_Properties.c_Name = "Third_Party";
          }
 
+         //Deactivated in #107989
+         //Maybe relevant later when data loggers are created by user
+         //Default for new filebased items
+         //if (orc_OscNode.pc_DeviceDefinition->c_SubDevices[orc_OscNode.u32_SubDeviceIndex].
+         //    q_FlashloaderOpenSydeIsFileBased)
+         //{
+         //   orc_OscNode.c_Properties.q_XappSupport = true;
+         //}
+
          if (orc_MainDevice.isEmpty())
          {
             orc_OscNode.c_DeviceType = orc_NodeType.toStdString().c_str();

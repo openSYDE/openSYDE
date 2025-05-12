@@ -738,6 +738,42 @@ QString C_UsHandler::GetLastKnownCsvExportPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known Pem file path
+
+   \return
+   Last known Pem file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownPemFilePath() const
+{
+   return this->mc_LastKnownPemFilePath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known Update Pem  File Paths
+
+   \return
+   std::vector<QString>
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QStringList C_UsHandler::GetLastKnownUpdatePemFilePaths() const
+{
+   return this->mc_PemFilePaths;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known Update Pem File Paths as relative or absolute
+
+   \return
+   std::vector<QString>
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QStringList C_UsHandler::GetPemFilePathsAsRelativeOrAbsolute() const
+{
+   return this->mc_PemFilePathsAsRelativeOrAbsolute;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get last known private key path (PEM file for secure update)
 
    \return
@@ -1430,6 +1466,39 @@ void C_UsHandler::SetLastKnownJ1939CatalogPath(const QString & orc_NewPath)
 void C_UsHandler::SetLastKnownCsvExportPath(const QString & orc_NewPath)
 {
    this->mc_LastKnownServiceProjectPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known Pem file path
+
+   \param[in]  orc_NewPath    Pem file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownPemFilePath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownPemFilePath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known Update Pem File Paths
+
+   \param[in]  orc_PemFilePaths   vector of pem file paths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownUpdatePemFilePaths(const QStringList & orc_PemFilePaths)
+{
+   this->mc_PemFilePaths = orc_PemFilePaths;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known Update PEM File Paths as relative or absolute
+
+   \param[in]  orc_PemFilePathsAsRelativeOrAbsolute   vector of pem file paths as relative or absolute
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetPemFilePathsAsRelativeOrAbsolute(const QStringList & orc_PemFilePathsAsRelativeOrAbsolute)
+{
+   this->mc_PemFilePathsAsRelativeOrAbsolute = orc_PemFilePathsAsRelativeOrAbsolute;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

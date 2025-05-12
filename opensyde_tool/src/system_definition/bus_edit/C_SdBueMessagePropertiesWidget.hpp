@@ -108,6 +108,7 @@ private:
    static int32_t mh_TxMethodToIndex(const stw::opensyde_core::C_OscCanMessage::E_TxMethodType & ore_TxMethod);
    static stw::opensyde_core::C_OscCanMessage::E_TxMethodType mh_IndexToTxMethod(const int32_t & ors32_Index);
    void m_OnNameChanged(void);
+   void m_DelayedNameUpdateTrigger(void);
    void m_OnIdChanged(void);
    void m_OnCobIdChanged(void);
    uint8_t m_GetCoNodeId(const stw::opensyde_core::C_OscCanMessage & orc_MessageData);

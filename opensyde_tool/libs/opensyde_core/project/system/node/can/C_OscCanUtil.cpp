@@ -179,17 +179,20 @@ void C_OscCanUtil::h_GetSignalValue(const uint8_t (&orau8_CanDb)[8], const C_Osc
                   static_cast<uint16_t>(static_cast<uint16_t>(u16_LengthInMessage + u16_StartByte) - u16_CurByte) - 1U;
                tgl_assert(u16_MessageIndex < sizeof(orau8_CanDb));
 
-               // This is the MSB part of the byte, right shifting to get it byte aligned
-               orc_DataPoolData[u16_CurByte] = orau8_CanDb[u16_MessageIndex] >> u16_LsbBitOffset;
-
-               if ((u16_MessageIndex > 0U) && (u16_MessageIndex < sizeof(orau8_CanDb)))
+               if (u16_MessageIndex < sizeof(orau8_CanDb))
                {
-                  // If the byte is spread over two bytes of the message bytes
-                  // This is the MSB 'part' of the byte, left shifting over the LSB 'part'
-                  // Casting to 32 bit because of lint warning 701
-                  orc_DataPoolData[u16_CurByte] +=
-                     static_cast<uint8_t>(static_cast<uint32_t>(orau8_CanDb[u16_MessageIndex - 1U]) <<
-                                          (8U - u16_LsbBitOffset));
+                  // This is the MSB part of the byte, right shifting to get it byte aligned
+                  orc_DataPoolData[u16_CurByte] = orau8_CanDb[u16_MessageIndex] >> u16_LsbBitOffset;
+
+                  if (u16_MessageIndex > 0U)
+                  {
+                     // If the byte is spread over two bytes of the message bytes
+                     // This is the MSB 'part' of the byte, left shifting over the LSB 'part'
+                     // Casting to 32 bit because of lint warning 701
+                     orc_DataPoolData[u16_CurByte] +=
+                        static_cast<uint8_t>(static_cast<uint32_t>(orau8_CanDb[u16_MessageIndex - 1U]) <<
+                                             (8U - u16_LsbBitOffset));
+                  }
                }
             }
          }

@@ -11,7 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"
-#include "C_Can.hpp"
+#include "C_CanDispatcher.hpp"
 #include "C_OscProtocolDriverOsyTpCan.hpp"
 #include "C_OscProtocolDriverOsy.hpp"
 #include "C_OscComFlashloaderInformation.hpp"
@@ -31,7 +31,8 @@ class C_OscBuSequences
 public:
    C_OscBuSequences(void);
    virtual ~C_OscBuSequences(void);
-   int32_t Init(const stw::scl::C_SclString & orc_CanDllPath, const int32_t os32_CanBitrate, const uint8_t ou8_NodeId);
+   int32_t Init(stw::can::C_CanDispatcher * const opc_CanDispatcher, const int32_t os32_CanBitrate,
+                const uint8_t ou8_NodeId);
    int32_t ActivateFlashLoader(const uint32_t ou32_FlashloaderResetWaitTime);
    int32_t ReadDeviceInformation(void);
    int32_t UpdateNode(const stw::scl::C_SclString & orc_HexFilePath, const uint32_t ou32_RequestDownloadTimeout,
@@ -41,6 +42,8 @@ public:
    static int32_t h_ReadHexFile(const stw::scl::C_SclString & orc_HexFilePath, C_OscHexFile & orc_HexFile,
                                 uint32_t & oru32_SignatureBlockAddress);
 
+   void PrepareForDestruction(void);
+
 protected:
    virtual void m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage);
    virtual void m_ReportProgress(const int32_t os32_Result, const stw::scl::C_SclString & orc_Information);
@@ -49,7 +52,7 @@ protected:
 
 private:
    // driver instances:
-   stw::can::C_Can mc_CanDispatcher;
+   stw::can::C_CanDispatcher * mpc_CanDispatcher;
    stw::opensyde_core::C_OscProtocolDriverOsyTpCan mc_TpCan;
    stw::opensyde_core::C_OscProtocolDriverOsy mc_OsyProtocol;
 

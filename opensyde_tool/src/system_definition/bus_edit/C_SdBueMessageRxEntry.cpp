@@ -108,6 +108,7 @@ void C_SdBueMessageRxEntry::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelTimeoutLink->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
    this->mpc_Ui->pc_LabelTimeoutLink->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LabelTimeoutLink->setFocusPolicy(Qt::NoFocus);
+   this->mpc_Ui->pc_LabelTimeoutLink->setContextMenuPolicy(Qt::NoContextMenu);
 
    this->mpc_Ui->pc_LabelTimeoutLink->SetToolTipInformation(
       C_GtGetText::h_GetText("Timeout"),

@@ -235,7 +235,7 @@ C_SclString C_SydeSupWindows::m_GetApplicationVersion(const C_SclString & orc_Ap
                             reinterpret_cast<PVOID *>(&pc_Info), //lint !e929 !e9176
                             &u32_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+            c_Version.PrintFormatted("V%lu.%02lur%lu", (pc_Info->dwFileVersionMS >> 16U),
                                      pc_Info->dwFileVersionMS & 0x0000FFFFUL,
                                      (pc_Info->dwFileVersionLS >> 16U));
          }

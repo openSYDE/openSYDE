@@ -1938,7 +1938,7 @@ void C_OscHalcDefFiler::mh_GetAllNames(const std::vector<C_OscHalcDefStruct> & o
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscHalcDefFiler::mh_CheckDuplicateNames(const C_SclString & orc_Section,
                                                   const C_SclString & orc_DomainSingularName,
-                                                  std::vector<C_SclString> & orc_Names)
+                                                  const std::vector<C_SclString> & orc_Names)
 {
    int32_t s32_Retval = C_NO_ERR;
 

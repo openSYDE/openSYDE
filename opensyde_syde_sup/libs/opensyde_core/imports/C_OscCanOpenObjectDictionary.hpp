@@ -112,7 +112,10 @@ public:
 class C_OscCanOpenObjectDictionary
 {
 private:
-   int32_t m_AppendEdsBlock(const stw::scl::C_SclString & orc_Blockname, stw::scl::C_SclIniFile & orc_IniFile);
+   static int32_t mh_FindValue(const uint32_t ou32_Value, const std::vector<uint32_t> & orc_AllValues);
+   int32_t m_AppendEdsBlock(const stw::scl::C_SclString & orc_Blockname,
+                            const std::vector<uint32_t> & orc_ExistingEntrySections,
+                            stw::scl::C_SclIniFile & orc_IniFile);
    int32_t m_GetObjectDescription(const uint16_t ou16_Index, const uint8_t ou8_SubIndex, const bool oq_IsSubIndex,
                                   const stw::scl::C_SclStringList & orc_SectionValues, C_OscCanOpenObject & orc_Object);
 
@@ -129,7 +132,7 @@ public:
    static const uint16_t hu16_OD_INDEX_EMCY = 0x1014U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_CONSUMER = 0x1016U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_PRODUCER = 0x1017U;
-   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1300U;
+   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1301U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO = 0x1400U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO = 0x1800U;
    static const uint8_t hu8_OD_SUB_INDEX_COB_ID = 0x1U;
@@ -147,7 +150,7 @@ public:
    static const uint16_t hu16_OD_PDO_MAPPING_OFFSET = 0x200U;
 
    C_OscCanOpenEdsInfoBlock c_InfoBlock;
-   stw::scl::C_SclDynamicArray<C_OscCanOpenObject> c_Objects;
+   std::vector<C_OscCanOpenObject> c_Objects;
 
    int32_t LoadFromFile(const stw::scl::C_SclString & orc_File);
    stw::scl::C_SclString GetLastErrorText(void) const;

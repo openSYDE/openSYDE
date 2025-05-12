@@ -250,12 +250,15 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_LoadDataElements()
       C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
          this->mu32_NodeIndex, this->mu32_DataLoggerJobIndex);
 
-   this->mc_DataElements.clear();
-   this->mc_DataElements.reserve(pc_DataLoggerJob->c_ConfiguredDataElements.size());
-
-   for (uint32_t u32_Counter = 0U; u32_Counter < pc_DataLoggerJob->c_ConfiguredDataElements.size(); ++u32_Counter)
+   if (pc_DataLoggerJob != NULL)
    {
-      this->mc_DataElements.push_back(pc_DataLoggerJob->c_ConfiguredDataElements[u32_Counter]);
+      this->mc_DataElements.clear();
+      this->mc_DataElements.reserve(pc_DataLoggerJob->c_ConfiguredDataElements.size());
+
+      for (uint32_t u32_Counter = 0U; u32_Counter < pc_DataLoggerJob->c_ConfiguredDataElements.size(); ++u32_Counter)
+      {
+         this->mc_DataElements.push_back(pc_DataLoggerJob->c_ConfiguredDataElements[u32_Counter]);
+      }
    }
 }
 

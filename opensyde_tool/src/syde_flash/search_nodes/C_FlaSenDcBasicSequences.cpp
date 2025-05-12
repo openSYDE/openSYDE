@@ -16,6 +16,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
+using namespace stw::scl;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
 
@@ -71,6 +72,68 @@ C_FlaSenDcBasicSequences::~C_FlaSenDcBasicSequences(void) noexcept
       delete mpc_Thread;
       mpc_Thread = NULL;
    }
+
+   this->PrepareForDestruction();
+   try
+   {
+      if (mc_CanDispatcher.DLL_Close() == C_NO_ERR)
+      {
+         osc_write_log_info("Teardown", "CAN DLL closed.");
+      }
+      else
+      {
+         osc_write_log_info("Teardown", "Failed to close CAN DLL.");
+      }
+   }
+   catch (...)
+   {
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize transport protocol, openSYDE protocol driver and CAN with given parameters.
+
+   \param[in]  orc_CanDllPath    Path to CAN DLL file
+   \param[in]  os32_CanBitrate   CAN Bitrate in kBit/s
+
+   \return
+   C_NO_ERR    everything ok
+   else        error occurred, see log file for details
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_FlaSenDcBasicSequences::InitDcSequences(const C_SclString & orc_CanDllPath, const int32_t os32_CanBitrate)
+{
+   int32_t s32_Return;
+   const C_SclString c_LogActivity = "Initialization";
+
+   osc_write_log_info(c_LogActivity, "CAN DLL path used: " + orc_CanDllPath);
+
+   mc_CanDispatcher.SetDLLName(orc_CanDllPath);
+   s32_Return = mc_CanDispatcher.DLL_Open();
+   if (s32_Return == C_NO_ERR)
+   {
+      osc_write_log_info(c_LogActivity, "CAN DLL loaded.");
+      s32_Return = mc_CanDispatcher.CAN_Init(os32_CanBitrate);
+      if (s32_Return == C_NO_ERR)
+      {
+         osc_write_log_info(c_LogActivity, "CAN interface initialized.");
+      }
+      else
+      {
+         osc_write_log_error(c_LogActivity, "Could not initialize the CAN interface!");
+      }
+   }
+   else
+   {
+      osc_write_log_error(c_LogActivity, "Could not load the CAN DLL!");
+   }
+
+   if (s32_Return == C_NO_ERR)
+   {
+      s32_Return = this->Init(&this->mc_CanDispatcher);
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

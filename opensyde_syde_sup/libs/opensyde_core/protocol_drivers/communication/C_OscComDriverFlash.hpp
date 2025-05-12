@@ -113,10 +113,11 @@ public:
    int32_t SendOsyReadDeviceName(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                  stw::scl::C_SclString & orc_DeviceName, uint8_t * const opu8_NrCode = NULL);
    int32_t SendOsyReadSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                   C_OscProtocolSerialNumber & orc_SerialNumberExt, uint8_t * const opu8_NrCode = NULL);
+                                   C_OscProtocolSerialNumber & orc_SerialNumberExt,
+                                   uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyReadSerialNumberExt(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                       C_OscProtocolSerialNumber & orc_SerialNumberExt,
-                                      uint8_t * const opu8_NrCode = NULL);
+                                      uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyReadActiveDiagnosticSession(const C_OscProtocolDriverOsyNode & orc_ServerId, uint8_t & oru8_SessionId,
                                               uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyReadAllFlashBlockData(const C_OscProtocolDriverOsyNode & orc_ServerId,
@@ -140,7 +141,7 @@ public:
                                       uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL) const;
 
    int32_t SendOsyTransferData(const C_OscProtocolDriverOsyNode & orc_ServerId, const uint8_t ou8_BlockSequenceCounter,
-                               std::vector<uint8_t> & orc_Data, uint8_t * const opu8_NrCode = NULL) const;
+                               const std::vector<uint8_t> & orc_Data, uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyRequestTransferExitAddressBased(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                                   const bool oq_SendSignatureBlockAddress,
                                                   const uint32_t ou32_SignatureBlockAddress,
@@ -173,7 +174,7 @@ public:
    int32_t SendOsySetIpAddressForChannel(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                          const uint8_t ou8_ChannelIndex, const uint8_t (&orau8_IpAddress)[4],
                                          const uint8_t (&orau8_NetMask)[4], const uint8_t (&orau8_DefaultGateway)[4],
-                                         uint8_t * const opu8_NrCode = NULL);
+                                         uint8_t * const opu8_NrCode = NULL) const;
    static int32_t h_SendOsySetNodeIdForChannel(C_OscProtocolDriverOsy & orc_Protocol, const uint8_t ou8_ChannelType,
                                                const uint8_t ou8_ChannelIndex,
                                                const C_OscProtocolDriverOsyNode & orc_NewNodeId,
@@ -189,6 +190,9 @@ public:
    int32_t SendOsyReadCertificateSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                               std::vector<uint8_t> & orc_SerialNumber,
                                               uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyReadCertificateSerialNumberL7(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                std::vector<uint8_t> & orc_SerialNumber,
+                                                uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyWriteSecurityKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                    const std::vector<uint8_t> & orc_PublicKeyModulus,
                                    const std::vector<uint8_t> & orc_PublicKeyExponent,

@@ -64,6 +64,7 @@ void C_OscNodeProperties::Initialize(void)
    c_OpenSydeServerSettings.Initialize();
    c_StwFlashloaderSettings.Initialize();
    c_CodeExportSettings.Initialize();
+   q_XappSupport = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,6 +93,7 @@ void C_OscNodeProperties::CalcHash(uint32_t & oru32_HashValue) const
    this->c_OpenSydeServerSettings.CalcHash(oru32_HashValue);
    this->c_StwFlashloaderSettings.CalcHash(oru32_HashValue);
    this->c_CodeExportSettings.CalcHash(oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_XappSupport, sizeof(this->q_XappSupport), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -61,6 +61,7 @@ C_FlaMainWindow::C_FlaMainWindow(QWidget * const opc_Parent) :
    QMainWindow(opc_Parent),
    mpc_Ui(new Ui::C_FlaMainWindow),
    mpc_UpSequences(NULL),
+   mpc_CanDispatcher(NULL),
    ms32_NextHexFile(0),
    mq_ContinueUpdate(false),
    mu32_FlashedFilesCounter(0),
@@ -124,6 +125,9 @@ C_FlaMainWindow::~C_FlaMainWindow()
    delete this->mpc_Progress;
    delete this->mpc_UpSequences;
    this->mpc_UpSequences = NULL;
+
+   delete this->mpc_CanDispatcher;
+   this->mpc_CanDispatcher = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -782,7 +786,35 @@ void C_FlaMainWindow::m_ResetFileIcons() const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_FlaMainWindow::m_InitUpdateSequence(void)
 {
-   int32_t s32_Return;
+   int32_t s32_Return = C_NO_ERR;
+
+   if (this->mpc_CanDispatcher == NULL)
+   {
+      const std::string c_DllPath = this->mpc_Ui->pc_SettingsWidget->GetCanDllPath().toStdString();
+      this->mpc_CanDispatcher = new stw::can::C_Can();
+
+      osc_write_log_info("Initialization", "CAN DLL path used: " + c_DllPath);
+
+      this->mpc_CanDispatcher->SetDLLName(c_DllPath);
+      s32_Return = this->mpc_CanDispatcher->DLL_Open();
+      if (s32_Return == C_NO_ERR)
+      {
+         osc_write_log_info("Initialization", "CAN DLL loaded.");
+         s32_Return = this->mpc_CanDispatcher->CAN_Init(this->mpc_Ui->pc_GeneralPropertiesWidget->GetBitrate());
+         if (s32_Return == C_NO_ERR)
+         {
+            osc_write_log_info("Initialization", "CAN interface initialized.");
+         }
+         else
+         {
+            osc_write_log_error("Initialization", "Could not initialize the CAN interface!");
+         }
+      }
+      else
+      {
+         osc_write_log_error("Initialization", "Could not load the CAN DLL!");
+      }
+   }
 
    if (this->mpc_UpSequences == NULL)
    {
@@ -802,10 +834,13 @@ int32_t C_FlaMainWindow::m_InitUpdateSequence(void)
    this->mpc_Ui->pc_UpdateWidget->EnableSettings(false);
    this->mpc_Ui->pc_SettingsWidget->EnableSettings(false);
 
-   // initialize sequence
-   s32_Return = this->mpc_UpSequences->Init(this->mpc_Ui->pc_SettingsWidget->GetCanDllPath().toStdString(),
-                                            this->mpc_Ui->pc_GeneralPropertiesWidget->GetBitrate(),
-                                            this->mpc_Ui->pc_GeneralPropertiesWidget->GetNodeId());
+   if (s32_Return == C_NO_ERR)
+   {
+      // initialize sequence
+      s32_Return = this->mpc_UpSequences->Init(this->mpc_CanDispatcher,
+                                               this->mpc_Ui->pc_GeneralPropertiesWidget->GetBitrate(),
+                                               this->mpc_Ui->pc_GeneralPropertiesWidget->GetNodeId());
+   }
 
    if (s32_Return != C_NO_ERR)
    {
@@ -847,6 +882,21 @@ void C_FlaMainWindow::m_CleanupUpdateSequence(void)
 
    delete this->mpc_UpSequences;
    this->mpc_UpSequences = NULL;
+
+   if (this->mpc_CanDispatcher != NULL)
+   {
+      if (this->mpc_CanDispatcher->DLL_Close() == C_NO_ERR)
+      {
+         osc_write_log_info("Teardown", "CAN DLL closed.");
+      }
+      else
+      {
+         osc_write_log_info("Teardown", "Failed to close CAN DLL.");
+      }
+
+      delete this->mpc_CanDispatcher;
+      this->mpc_CanDispatcher = NULL;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

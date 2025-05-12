@@ -35,6 +35,8 @@ public:
    // containers for openSYDE core data pool list structure
    std::vector<stw::opensyde_core::C_OscCanMessage> c_OscRxMessageData;
    std::vector<stw::opensyde_core::C_OscCanMessage> c_OscTxMessageData;
+   std::vector<uint8_t> c_EdsOscRxMessageIsSrdo;
+   std::vector<uint8_t> c_EdsOscTxMessageIsSrdo;
    std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> c_OscRxSignalData;
    std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> c_OscTxSignalData;
    // warning messages for each message element

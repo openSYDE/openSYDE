@@ -505,6 +505,8 @@ int32_t C_OscNodeFiler::mh_LoadProperties(C_OscNodeProperties & orc_NodeProperti
 
    if (orc_XmlParser.SelectNodeChild("properties") == "properties")
    {
+      //XAppSupport
+      orc_NodeProperties.q_XappSupport = orc_XmlParser.GetAttributeBool("x-app-support", false);
       //Name
       if (orc_XmlParser.SelectNodeChild("name") == "name")
       {
@@ -670,6 +672,7 @@ void C_OscNodeFiler::mh_SaveProperties(const C_OscNodeProperties & orc_NodePrope
                                        C_OscXmlParserBase & orc_XmlParser)
 {
    orc_XmlParser.CreateAndSelectNodeChild("properties");
+   orc_XmlParser.SetAttributeBool("x-app-support", orc_NodeProperties.q_XappSupport);
    orc_XmlParser.CreateNodeChild("name", orc_NodeProperties.c_Name);
    orc_XmlParser.CreateNodeChild("comment", orc_NodeProperties.c_Comment);
    orc_XmlParser.CreateNodeChild("diagnostic-server",
@@ -1728,15 +1731,6 @@ int32_t C_OscNodeFiler::mh_LoadDataLoggers(std::vector<C_OscDataLoggerJob> & orc
       }
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
-   }
-   else
-   {
-      //Ignore
-      if (C_OscDataLoggerJob::hq_AllowDataloggerFeature)
-      {
-         //Default entry necessary
-         orc_Config.resize(1);
-      }
    }
 
    return s32_Retval;

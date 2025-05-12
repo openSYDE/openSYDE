@@ -183,12 +183,16 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const uint32_t ou32_NodeIndex, const in
            this->mpc_Ui->pc_LineEditCodeGenerator, &C_OgeLeFilePath::InsertVariable);
    connect(this->mpc_Ui->pc_PubMenuIDE, &C_OgePubPathVariables::SigVariableSelected,
            this->mpc_Ui->pc_LineEditIDE, &C_OgeLePlaceholderVar::InsertVariable);
+   connect(this->mpc_Ui->pc_PubMenuCodeGenerate, &C_OgePubPathVariables::SigVariableSelected,
+           this, &C_SdNdeDbProperties::m_OnUpdateOutputFilePath);
 
    // connect for updating paths that are relative to project path
    connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePath::editingFinished,
            this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToProject);
    connect(this->mpc_Ui->pc_LineEditFileGenerate, &C_OgeLeFilePath::editingFinished,
            this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir);
+   connect(this->mpc_Ui->pc_LineEditCodeGenerate, &QLineEdit::editingFinished,
+           this, &C_SdNdeDbProperties::m_OnUpdateOutputFilePath);
 
    // connect for drag and drop path handling
    connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePath::SigPathDropped,
@@ -780,6 +784,8 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
 {
    QString c_Return = "";
 
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
    //Project Path
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditProject->GetPath());
 
@@ -788,6 +794,13 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
 
    // Source Code Generation Directory
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditCodeGenerate->GetPath());
+   // empty path not allowed for X-App config generation
+   if ((this->me_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION) && (pc_Node != NULL) &&
+       (pc_Node->c_Properties.q_XappSupport == true) &&
+       (this->mpc_Ui->pc_LineEditCodeGenerate->GetPath().isEmpty() == true))
+   {
+      c_Return += C_GtGetText::h_GetText("Generation directory path must not be empty.\n");
+   }
 
    // PSI File Generation Directory
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditFileGenerate->GetPath());
@@ -1010,16 +1023,24 @@ void C_SdNdeDbProperties::m_LoadData(void)
 
          this->mpc_Ui->pc_CheckBoxFileGen->setEnabled(q_FileGenEnabled);
 
-         if (q_FileGenEnabled == true)
+         if (q_FileGenEnabled)
          {
-            if (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport == true)
+            const bool q_ProgrammingSupport =
+               pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport;
+            const bool q_XappSupport = pc_Node->c_Properties.q_XappSupport;
+
+            if ((q_ProgrammingSupport == true) && (q_XappSupport == true))
+            {
+               this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText(
+                                                            "File Generation (X - App Configuration)"));
+            }
+            else if ((q_ProgrammingSupport == true) && (!q_XappSupport == true))
             {
                this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText("File Generation (Source Code)"));
             }
             else
             {
-               this->mpc_Ui->pc_CheckBoxFileGen->setText(
-                  C_GtGetText::h_GetText("File Generation (Parameter Set Image)"));
+               this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText("File Generation (Parameter Set Image)"));
             }
          }
          else
@@ -1068,12 +1089,13 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    this->mpc_Ui->pc_SpinBoxProcessID->setValue(rc_Application.u8_ProcessId);
    this->mpc_Ui->pc_LineEditOutputFile->SetDbProjectPath(c_ProjectPath);
+   this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
+   this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(rc_Application.c_GeneratePath.c_str(), c_ProjectPath);
    this->m_LoadOutputFilePaths(rc_Application, c_ProjectPath);
    this->mpc_Ui->pc_LineEditIDE->setText(rc_Application.c_IdeCall.c_str());
    this->mpc_Ui->pc_LineEditCodeGenerator->SetDbProjectPath(c_ProjectPath);
-   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(rc_Application.c_CodeGeneratorPath.c_str(), C_Uti::h_GetExePath());
-   this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
-   this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(rc_Application.c_GeneratePath.c_str(), c_ProjectPath);
+   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(rc_Application.c_CodeGeneratorPath.c_str(),
+                                                   C_Uti::h_GetExePath());
    this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath(c_ProjectPath);
    this->m_UpdatePathsRelativeToGeneratedDir(); // after setting output labels text and file generation directory!
    switch (rc_Application.u16_GenCodeVersion)
@@ -1124,14 +1146,37 @@ void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OscNodeApplication & orc
 {
    // get HALC information (necessary for PSI file generation)
    const C_OscHalcConfig * const pc_Halc = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    switch (orc_Application.e_Type)
    {
    case C_OscNodeApplication::eBINARY:
    case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
-      if (orc_Application.c_ResultPaths.size() > 0) // defensive check
+      if (pc_Node != NULL)
       {
-         this->mpc_Ui->pc_LineEditOutputFile->SetPath(orc_Application.c_ResultPaths[0].c_str(), orc_ProjectPath);
+         if (pc_Node->c_Properties.q_XappSupport == true)
+         {
+            if (this->mpc_Ui->pc_CheckBoxFileGen->isChecked())
+            {
+               this->mpc_Ui->pc_LineEditOutputFile->SetPath("x_app.syde_xcfg",
+                                                            C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->
+                                                                                                       pc_LineEditCodeGenerate
+                                                                                                       ->GetPath()));
+               this->mpc_Ui->pc_LineEditOutputFile->setDisabled(true);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LineEditOutputFile->SetPath("", "");
+               this->mpc_Ui->pc_LineEditOutputFile->setDisabled(false);
+            }
+         }
+         else
+         {
+            if (orc_Application.c_ResultPaths.size() > 0) // defensive check
+            {
+               this->mpc_Ui->pc_LineEditOutputFile->SetPath(orc_Application.c_ResultPaths[0].c_str(), orc_ProjectPath);
+            }
+         }
       }
       break;
    case C_OscNodeApplication::ePARAMETER_SET_HALC:
@@ -1183,16 +1228,67 @@ void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OscNodeApplication & orc
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OscNodeApplication::E_Type & ore_Type) const
 {
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
    // first set all invisible and then all visible items
    switch (ore_Type)
    {
    case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
-      this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
-      this->mpc_Ui->pc_WidgetPsiFiles->setVisible(false);
-      this->mpc_Ui->pc_PushButtonAddDataPool->setVisible(true);
-      this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
-      this->mpc_Ui->pc_WidgetFileGenContent->setVisible(true);
-      this->mpc_Ui->pc_WidgetCode->setVisible(true);
+      if (pc_Node != NULL)
+      {
+         if (pc_Node->c_Properties.q_XappSupport)
+         {
+            this->mpc_Ui->pc_WidgetFileGenContent->setVisible(true);
+            this->mpc_Ui->pc_WidgetCode->setVisible(true);
+            this->mpc_Ui->pc_LabelCodeStructure->setVisible(false);
+            this->mpc_Ui->pc_ComboBoxCode->setVisible(false);
+            this->mpc_Ui->pc_LabelProcessID->setVisible(false);
+            this->mpc_Ui->pc_SpinBoxProcessID->setVisible(false);
+            this->mpc_Ui->pc_Frame_3->setVisible(false);
+            this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
+            this->mpc_Ui->pc_WidgetPsiFiles->setVisible(false);
+            this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
+            if (this->mpc_Ui->pc_CheckBoxFileGen->isChecked())
+            {
+               this->mpc_Ui->pc_LineEditProject->setDisabled(true);
+               this->mpc_Ui->pc_LineEditOutputFile->setDisabled(true);
+               this->mpc_Ui->pc_PubMenuProject->setDisabled(true);
+               this->mpc_Ui->pc_PushButtonProject->setDisabled(true);
+               this->mpc_Ui->pc_PubMenuOutputFile->setDisabled(true);
+               this->mpc_Ui->pc_PushButtonOutputFile->setDisabled(true);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LineEditProject->setDisabled(false);
+               this->mpc_Ui->pc_LineEditOutputFile->setDisabled(false);
+               this->mpc_Ui->pc_PubMenuProject->setDisabled(false);
+               this->mpc_Ui->pc_PushButtonProject->setDisabled(false);
+               this->mpc_Ui->pc_PubMenuOutputFile->setDisabled(false);
+               this->mpc_Ui->pc_PushButtonOutputFile->setDisabled(false);
+            }
+
+            this->mpc_Ui->pc_LabelHeadingDatapools->setVisible(false);
+            this->mpc_Ui->pc_PushButtonAddDataPool->setVisible(false);
+            this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setVisible(false);
+            this->mpc_Ui->pc_LabelDataPoolsEmpty->setVisible(false);
+            this->mpc_Ui->horizontalSpacer_14->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+            this->mpc_Ui->horizontalSpacer_13->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+            this->mpc_Ui->horizontalSpacer_8->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+            this->mpc_Ui->horizontalSpacer_5->changeSize(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed);
+            const QSize c_SIZE(1152, 853);
+            mrc_ParentDialog.SetSize(c_SIZE);
+         }
+         else
+         {
+            this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
+            this->mpc_Ui->pc_WidgetPsiFiles->setVisible(false);
+            this->mpc_Ui->pc_PushButtonAddDataPool->setVisible(true);
+            this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
+            this->mpc_Ui->pc_WidgetFileGenContent->setVisible(true);
+            this->mpc_Ui->pc_WidgetCode->setVisible(true);
+            this->mpc_Ui->pc_LineEditProject->setDisabled(false);
+         }
+      }
       break;
    case C_OscNodeApplication::eBINARY:
       this->mpc_Ui->pc_WidgetFileGenContent->setVisible(false);
@@ -1221,6 +1317,8 @@ void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OscNodeApplica
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnFileGenerationChanged(const int32_t os32_State)
 {
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
    // reset
    if (this->me_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
    {
@@ -1235,8 +1333,6 @@ void C_SdNdeDbProperties::m_OnFileGenerationChanged(const int32_t os32_State)
 
    if (static_cast<Qt::CheckState>(os32_State) == Qt::Checked)
    {
-      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-
       if (pc_Node != NULL)
       {
          // file generation depends on programmable flag and loaded hardware configuration
@@ -1308,6 +1404,44 @@ void C_SdNdeDbProperties::m_OnFileGenerationChanged(const int32_t os32_State)
                   this->m_HandleRevertCodeGenerator();
                }
             }
+         }
+      }
+   }
+
+   if (pc_Node != NULL)
+   {
+      if (pc_Node->c_Properties.q_XappSupport)
+      {
+         if (this->mpc_Ui->pc_CheckBoxFileGen->isChecked())
+         {
+            this->mpc_Ui->pc_LineEditProject->setDisabled(true);
+            this->mpc_Ui->pc_LineEditOutputFile->setDisabled(true);
+            this->mpc_Ui->pc_PubMenuProject->setDisabled(true);
+            this->mpc_Ui->pc_PushButtonProject->setDisabled(true);
+            this->mpc_Ui->pc_PubMenuOutputFile->setDisabled(true);
+            this->mpc_Ui->pc_PushButtonOutputFile->setDisabled(true);
+            if (this->mpc_Ui->pc_LineEditCodeGenerate->GetPath().isEmpty() == true)
+            {
+               // for X-App config generation: set default generation directory if empty
+               this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(
+                  C_ImpUtil::h_GetDefaultGeneratedDir(this->mpc_Ui->pc_LineEditName->text().toStdString().c_str(),
+                                                      pc_Node->c_Properties.c_Name));
+            }
+            this->mpc_Ui->pc_LineEditOutputFile->SetPath("x_app.syde_xcfg",
+                                                         C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->
+                                                                                                    pc_LineEditCodeGenerate
+                                                                                                    ->GetPath()));
+         }
+         else
+         {
+            this->mpc_Ui->pc_LineEditProject->setDisabled(false);
+            this->mpc_Ui->pc_LineEditOutputFile->setDisabled(false);
+            this->mpc_Ui->pc_PubMenuProject->setDisabled(false);
+            this->mpc_Ui->pc_PushButtonProject->setDisabled(false);
+            this->mpc_Ui->pc_PubMenuOutputFile->setDisabled(false);
+            this->mpc_Ui->pc_PushButtonOutputFile->setDisabled(false);
+            this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("");
+            this->mpc_Ui->pc_LineEditOutputFile->SetPath("", "");
          }
       }
    }
@@ -1441,6 +1575,27 @@ void C_SdNdeDbProperties::m_OnClickCodeGeneration(void)
                                         c_FolderName, QFileDialog::ShowDirsOnly);
 
    this->m_AskUserToSaveRelativePath(c_Path, c_ProjectPath, this->mpc_Ui->pc_LineEditCodeGenerate);
+   this->m_OnUpdateOutputFilePath();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update Output file path on update on code generate path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnUpdateOutputFilePath()
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      if (pc_Node->c_Properties.q_XappSupport == true)
+      {
+         this->mpc_Ui->pc_LineEditOutputFile->SetPath("x_app.syde_xcfg",
+                                                      C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->
+                                                                                                 pc_LineEditCodeGenerate
+                                                                                                 ->GetPath()));
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1684,13 +1839,15 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
 {
    m_CleanUpDataPoolWidgets();
    int32_t s32_Count = 0;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    for (std::set<uint32_t>::const_iterator c_It = this->mc_SelectedDataPools.begin();
         c_It != this->mc_SelectedDataPools.end(); ++c_It)
    {
       const uint32_t u32_Val = *c_It;
       C_SdNdeDbDataPoolEntry * const pc_Entry = new C_SdNdeDbDataPoolEntry(this->mu32_NodeIndex, u32_Val, this);
 
-      connect(pc_Entry, &C_SdNdeDbDataPoolEntry::SigDeleteDataPool, this, &C_SdNdeDbProperties::m_HandleDeleteDataPool);
+      connect(pc_Entry, &C_SdNdeDbDataPoolEntry::SigDeleteDataPool, this,
+              &C_SdNdeDbProperties::m_HandleDeleteDataPool);
 
       this->mpc_Ui->pc_VerticalLayoutDataPools->insertWidget(s32_Count, pc_Entry);
       ++s32_Count;
@@ -1704,7 +1861,10 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
    else
    {
       this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setVisible(false);
-      this->mpc_Ui->pc_LabelDataPoolsEmpty->setVisible(true);
+      if (!pc_Node->c_Properties.q_XappSupport)
+      {
+         this->mpc_Ui->pc_LabelDataPoolsEmpty->setVisible(true);
+      }
    }
 
    //update owned dp count
@@ -1751,7 +1911,19 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleRevertCodeGenerator(void) const
 {
-   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(C_ImpUtil::h_GetSydeCoderCePath(), C_Uti::h_GetExePath());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      if (pc_Node->c_Properties.q_XappSupport)
+      {
+         this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(C_ImpUtil::h_GetSydeXgenPath(), C_Uti::h_GetExePath());
+      }
+      else
+      {
+         this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(C_ImpUtil::h_GetSydeCoderCePath(), C_Uti::h_GetExePath());
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1797,20 +1969,11 @@ void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Short function description
+/*! \brief  Ask user to save relative path
 
-   Detailed function description (optional). The function shall be described detailed if it is not described completely
-   by short function description and parameter description.
-
-   \param[in]       ou8_Aa     Detailed input parameter description
-   \param[out]      opu32_Bb   Detailed output parameter description
-   \param[in,out]   opu16_Cc   Detailed input/output parameter description
-
-   \return
-   Type of return values, e.g. STW error codes
-
-   \retval   Return value 1   Detailed description of 1st return value
-   \retval   Return value 2   Detailed description of 2nd return value
+   \param[in]      orc_Path                  Path
+   \param[in]      orc_AbsoluteReferenceDir  Absolute reference directory
+   \param[in,out]  opc_PathLineEdit          Pointer to path line edit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_AskUserToSaveRelativePath(const QString & orc_Path,

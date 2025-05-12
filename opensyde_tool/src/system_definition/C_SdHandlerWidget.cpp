@@ -39,6 +39,7 @@
 #include "C_SdCodeGenerationDialog.hpp"
 #include "C_SdBueImportCommMessagesWidget.hpp"
 #include "C_PuiSdUtil.hpp"
+#include "C_PopSaveAsDialogWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -1380,30 +1381,50 @@ void C_SdHandlerWidget::m_TspImport(const bool oq_IsNodeNew)
 {
    if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
    {
-      C_OgeWiCustomMessage pc_MessageBox(this);
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Save Project"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                     "This project is not saved yet. TSP import might cause "
+                                     "problems with file or directory paths."));
+      c_MessageBox.SetDetails(C_GtGetText::h_GetText(
+                                 "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Save and Continue"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_MessageBox.SetCustomMinHeight(200, 280);
 
-      pc_MessageBox.SetType(C_OgeWiCustomMessage::eWARNING);
+      const C_OgeWiCustomMessage::E_Outputs e_Output = c_MessageBox.Execute();
+      const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> c_New =
+         new stw::opensyde_gui_elements::C_OgePopUpDialog(this, this);
+      const C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
 
-      pc_MessageBox.SetHeading(C_GtGetText::h_GetText("Import TSP"));
-      pc_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                      "This project is not saved yet. Adding Data Blocks might cause "
-                                      "problems with file or directory paths."));
-      pc_MessageBox.SetDetails(C_GtGetText::h_GetText(
-                                  "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
-      pc_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
-      pc_MessageBox.SetCustomMinHeight(230, 270);
-      pc_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-
-      const C_OgeWiCustomMessage::E_Outputs e_Output = pc_MessageBox.Execute();
-
-      if (e_Output == C_OgeWiCustomMessage::eOK)
+      const QSize c_SIZE(906, 415);
+      c_New->SetSize(c_SIZE);
+      switch (e_Output)
       {
-         if (mpc_ActNodeEdit != NULL)
+      case C_OgeWiCustomMessage::eYES:
+         // open save as dialog
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
-            mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
+            if (mpc_ActNodeEdit != NULL)
+            {
+               mpc_ActNodeEdit->AddFromTsp(oq_IsNodeNew);
+            }
+            if (c_New != NULL)
+            {
+               pc_Dialog->SaveUserSettings();
+               c_New->HideOverlay();
+            }
          }
+         break;
+      case C_OgeWiCustomMessage::eNO:
+         c_New->HideOverlay();
+         break;
+      case C_OgeWiCustomMessage::eCANCEL:
+         break;
+      default:
+         break;
       }
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    else
    {
       if (mpc_ActNodeEdit != NULL)

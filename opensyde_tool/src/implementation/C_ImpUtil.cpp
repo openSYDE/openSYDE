@@ -110,48 +110,9 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32_t> & orc_NodeIndices,
       q_Continue = false;
    }
 
-   // check if all datapools are assigned
    if (q_Continue == true)
    {
-      QString c_DataPoolErrorMessage;
-      //Check data pools
-      for (uint32_t u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
-      {
-         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
-            orc_NodeIndices[u32_ItInNode]);
-         if (pc_Node != NULL)
-         {
-            //Only check nodes that really have programmable applications (assignment not mandatory for PSI generation)
-            if (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(orc_NodeIndices[u32_ItInNode]).size() > 0)
-            {
-               for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
-               {
-                  const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
-                  if (rc_DataPool.s32_RelatedDataBlockIndex < 0L)
-                  {
-                     q_Continue = false;
-                     c_DataPoolErrorMessage += "- " + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
-                                               ", Datapool \"" +
-                                               rc_DataPool.c_Name.c_str() + "\"\n";
-                  }
-               }
-            }
-         }
-      }
-
-      // pop up error info if there are unassigned datapools
-      if (q_Continue == false)
-      {
-         c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("File Generation"));
-         c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Cannot generate files. Assign all Datapools and retry."));
-         c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
-                                                      "The following Datapools have no assigned application:\n%1")).arg(
-                                 c_DataPoolErrorMessage));
-         c_Message.SetCustomMinHeight(180, 250);
-         c_Message.Execute();
-      }
+      q_Continue = C_ImpUtil::mh_CheckDatapoolsAssignmentForExportCode(orc_NodeIndices, opc_Parent);
    }
 
    // check for system definition errors
@@ -457,6 +418,7 @@ int32_t C_ImpUtil::mh_ExportCodeNode(const uint32_t ou32_NodeIndex, const std::v
                c_ReportInfo.c_AppName = pc_Application->c_Name.c_str();
                c_ReportInfo.c_CodeGeneratorPath = c_CompleteCodeGenerator;
                c_ReportInfo.u16_CodeVersion = pc_Application->u16_GenCodeVersion;
+               c_ReportInfo.q_CodeVersionRelevant = !c_Node.c_Properties.q_XappSupport;
                c_ReportInfo.c_Directory = c_CompleteExportFolderName;
 
                s32_Retval = mh_ExecuteCodeGenerator(c_ReportInfo.c_NodeName, c_ReportInfo.c_AppName,
@@ -594,6 +556,18 @@ int32_t C_ImpUtil::h_OpenIde(const QString & orc_IdeExeCall)
 QString C_ImpUtil::h_GetSydeCoderCePath()
 {
    return "../connectors/syde_coder_c/osy_syde_coder_c.exe";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get location of X-App Support generator path (standard file generator)
+
+   \return
+   Connectors directory location
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_ImpUtil::h_GetSydeXgenPath(void)
+{
+   return "../connectors/syde_x_gen/syde_x_gen.exe";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -940,6 +914,88 @@ QString C_ImpUtil::h_FormatSourceFileInfoForReport(const QString & orc_FilePath,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check datapools assignment for export code
+
+   \param[in]      orc_NodeIndices  Node indices
+   \param[in,out]  opc_Parent       Parent
+
+   \return
+   Flags
+
+   \retval   True    Continue
+   \retval   False   Do not continue
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_ImpUtil::mh_CheckDatapoolsAssignmentForExportCode(const std::vector<uint32_t> & orc_NodeIndices,
+                                                         QWidget * const opc_Parent)
+{
+   bool q_Continue = true;
+
+   // check if all datapools are assigned
+   QString c_DataPoolErrorMessage;
+
+   //Check data pools
+   for (uint32_t u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
+   {
+      C_ImpUtil::mh_CheckNodeDatapoolsAssignmentForExportCode(orc_NodeIndices[u32_ItInNode], q_Continue,
+                                                              c_DataPoolErrorMessage);
+   }
+
+   // pop up error info if there are unassigned datapools
+   if (q_Continue == false)
+   {
+      C_OgeWiCustomMessage c_Message(opc_Parent);
+      c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+      c_Message.SetHeading(C_GtGetText::h_GetText("File Generation"));
+      c_Message.SetDescription(C_GtGetText::h_GetText(
+                                  "Cannot generate files. Assign all Datapools and retry."));
+      c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
+                                                   "The following Datapools have no assigned application:\n%1")).arg(
+                              c_DataPoolErrorMessage));
+      c_Message.SetCustomMinHeight(180, 250);
+      c_Message.Execute();
+   }
+   return q_Continue;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check node datapools assignment for export code
+
+   \param[in]      ou32_NodeIndex            Node index
+   \param[in,out]  orq_Continue              Flag, if continue possible
+   \param[in,out]  orc_DataPoolErrorMessage  Data pool error message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_ImpUtil::mh_CheckNodeDatapoolsAssignmentForExportCode(const uint32_t ou32_NodeIndex, bool & orq_Continue,
+                                                             QString & orc_DataPoolErrorMessage)
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      //Skip X-App nodes
+      if (pc_Node->c_Properties.q_XappSupport == false)
+      {
+         //Only check nodes that really have programmable applications (assignment not mandatory for PSI generation)
+         if (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(ou32_NodeIndex).size() > 0)
+         {
+            for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+            {
+               const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+               if (rc_DataPool.s32_RelatedDataBlockIndex < 0L)
+               {
+                  orq_Continue = false;
+                  orc_DataPoolErrorMessage += "- " + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
+                                              ", Datapool \"" +
+                                              rc_DataPool.c_Name.c_str() + "\"\n";
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get active window handle if already existing
 
    \param[in]      orc_ExeName   Name of executable without path (e.g. LogiCAD3.exe)
@@ -1098,6 +1154,9 @@ int32_t C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const Q
    }
 
    // call file generation exe with arguments
+   osc_write_log_info("Generate Files",
+                      "Calling file generator \"" + c_CodeGenFileInfo.absoluteFilePath().toStdString() +
+                      "\" with arguments \"" + c_Arguments.join(" ").toStdString() + "\"");
    pc_Process->start(c_CodeGenFileInfo.absoluteFilePath(), c_Arguments);
    bool q_Tmp = pc_Process->waitForStarted();
    if (q_Tmp == true)

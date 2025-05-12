@@ -40,6 +40,7 @@ public:
    static void h_ExportCodeNodes(const std::vector<uint32_t> & orc_NodeIndices, QWidget * const opc_Parent);
    static int32_t h_OpenIde(const QString & orc_IdeExeCall);
    static QString h_GetSydeCoderCePath(void);
+   static QString h_GetSydeXgenPath(void);
    static QString h_GetAbsoluteGeneratedDir(const stw::opensyde_core::C_OscNodeApplication & orc_Application,
                                             const stw::scl::C_SclString & orc_NodeName);
    static QString h_GetDefaultGeneratedDir(const stw::scl::C_SclString & orc_ApplicationName,
@@ -59,6 +60,10 @@ private:
       HWND pc_WindowHandle;
    };
 
+   static bool mh_CheckDatapoolsAssignmentForExportCode(const std::vector<uint32_t> & orc_NodeIndices,
+                                                        QWidget * const opc_Parent);
+   static void mh_CheckNodeDatapoolsAssignmentForExportCode(const uint32_t ou32_NodeIndex, bool & orq_Continue,
+                                                            QString & orc_DataPoolErrorMessage);
    static void mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName, std::vector<HWND> & orc_Windows);
    static int32_t mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
                                           const QString & orc_ExportFolder, QStringList & orc_ExportedFiles,

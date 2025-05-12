@@ -1520,7 +1520,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
       }
       this->SetDefaultToolTipHeading("");
       this->SetDefaultToolTipContent(c_Text);
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
    }
    else if ((this->mpc_SendIcon != NULL) && (this->mpc_SendIcon->isVisible() == true) &&
             (this->mpc_SendIcon->contains(this->mpc_SendIcon->mapFromScene(opc_Event->scenePos())) == true))
@@ -1540,7 +1540,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
       }
       this->SetDefaultToolTipHeading("");
       this->SetDefaultToolTipContent(c_Text);
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
    }
    else if (((this->mpc_WarningIcon != NULL) && (this->mpc_WarningIcon->isVisible() == true)) &&
             (this->mpc_WarningIcon->contains(this->mpc_WarningIcon->mapFromScene(opc_Event->scenePos())) == true))
@@ -1598,7 +1598,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
       }
       this->SetDefaultToolTipHeading(c_Heading);
       this->SetDefaultToolTipContent(c_Content);
-      this->SetDefaultToolTipType(C_NagToolTip::eWARNING);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eWARNING);
    }
    else if (((this->mpc_ConflictIcon != NULL) && (this->mpc_ConflictIcon->isVisible() == true)) &&
             (this->mpc_ConflictIcon->contains(this->mpc_ConflictIcon->mapFromScene(opc_Event->scenePos())) == true))
@@ -1639,7 +1639,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
 
       this->SetDefaultToolTipHeading(c_Heading);
       this->SetDefaultToolTipContent(c_NewContent);
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      this->SetDefaultToolTipType(C_NagToolTipWithImage::eDEFAULT);
    }
 }
 
@@ -2031,7 +2031,7 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
    }
    this->SetDefaultToolTipHeading(c_Heading);
    this->SetDefaultToolTipContent(c_Content);
-   this->SetDefaultToolTipType(C_NagToolTip::eERROR);
+   this->SetDefaultToolTipType(C_NagToolTipWithImage::eERROR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

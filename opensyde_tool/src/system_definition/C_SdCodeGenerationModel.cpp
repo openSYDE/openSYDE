@@ -110,8 +110,15 @@ int32_t C_SdCodeGenerationModel::Init(const std::vector<uint32_t> & orc_ElementI
                stw::scl::C_SclString c_ToolTip;
                if (rc_Application.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
                {
-                  pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (Source Code; Structure Version: " +
-                                                rc_Application.u16_GenCodeVersion + ")").c_str();
+                  if (rc_Node.c_Properties.q_XappSupport == true)
+                  {
+                     pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (X-App Configuration)").c_str();
+                  }
+                  else
+                  {
+                     pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (Source Code; Structure Version: " +
+                                                   rc_Application.u16_GenCodeVersion + ")").c_str();
+                  }
                }
                else if (rc_Application.e_Type == C_OscNodeApplication::ePARAMETER_SET_HALC)
                {

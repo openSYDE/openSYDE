@@ -75,7 +75,8 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    mu8_CoManagerNodeIndexIntfNumber(0U),
    mq_IndexValid(false),
    mc_UndoManager(NULL),
-   mq_SkipLoadUserSettings(false)
+   mq_SkipLoadUserSettings(false),
+   mq_InitialLoadUserSettings(true)
 {
    mpc_Ui->setupUi(this);
 
@@ -101,6 +102,7 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    this->mpc_Ui->pc_LinkToBusLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
    this->mpc_Ui->pc_LinkToBusLabel->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LinkToBusLabel->setFocusPolicy(Qt::NoFocus);
+   this->mpc_Ui->pc_LinkToBusLabel->setContextMenuPolicy(Qt::NoContextMenu);
    connect(this->mpc_Ui->pc_LinkToBusLabel, &QLabel::linkActivated, this,
            &C_SdBueComIfDescriptionWidget::m_OnLinkSwitchToBus);
    connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigSwitchToCoManager, this,
@@ -827,9 +829,13 @@ void C_SdBueComIfDescriptionWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::showEvent(QShowEvent * const opc_Event)
 {
-   //Redundant call in bus edit but necessary for node edit
-   TriggerLoadOfSplitterUserSettings();
-   LoadUserSettings();
+   if (mq_InitialLoadUserSettings)
+   {
+      this->mq_InitialLoadUserSettings = false;
+      //Redundant call in bus edit but necessary for node edit
+      TriggerLoadOfSplitterUserSettings();
+      LoadUserSettings();
+   }
    QWidget::showEvent(opc_Event);
 }
 

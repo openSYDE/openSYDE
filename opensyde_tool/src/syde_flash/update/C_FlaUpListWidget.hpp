@@ -39,23 +39,17 @@ public:
 
    void AddFileAction(const bool oq_IsActionForExistingFile, const int32_t os32_CurrentHexFileIndex,
                       const bool oq_IsFileToReplace);
-   void DeleteItem(const int32_t os32_CurrentHexFileIndex, const bool oq_NeedToUpdateListIndex);
-   void DeleteAllItem(void);
-   void SelectFile(const int32_t os32_CurrentHexFileIndex);
    void SetLastKnownHexFilePaths(void);
    QStringList GetHexFilePaths(void) const;
    QStringList GetHexFileDeviceNames(void) const;
    bool AreAllFilesValid(void) const;
    void EnableSettings(const bool oq_Enabled);
-   void ReloadCurrentFile(const QString & orc_File, C_FlaUpHexFileInfo * const opc_HexFileInfo);
    void DropEvent(QDropEvent * const opc_Event);
    void DragEnterEvent(QDragEnterEvent * const opc_Event);
    void DragMoveEvent(QDragMoveEvent * const opc_Event);
    uint32_t GetTotalHexFileSize(void) const;
    uint32_t GetHexFileSize(const uint32_t & oru32_HexFileIndex) const;
-   int32_t GetAmountOfFlashableFiles() const;
    void SetStatusIcon(const int32_t & ors32_FileIndex, const uint8_t & oru8_State);
-
    void ResetStatusIcons(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -83,6 +77,10 @@ private:
                         const bool oq_IsFileToReplace);
    QStringList m_GetHexFilePathsAsRelativeOrAbsolute(void) const;
    QString m_LastSuffixOfFileName(const QString & orc_File) const;
+   void m_DeleteItem(const int32_t os32_CurrentHexFileIndex, const bool oq_NeedToUpdateListIndex);
+   void m_DeleteAllItem(void);
+   void m_SelectFile(const int32_t os32_CurrentHexFileIndex);
+   void m_ReloadCurrentFile(const QString & orc_File, C_FlaUpHexFileInfo * const opc_HexFileInfo);
 
    stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    bool mq_EnableSettings;

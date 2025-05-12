@@ -619,10 +619,11 @@ void C_SdBueCoAddSignalsModel::m_GetData(const E_Columns oe_Column, const uint32
                         pc_EdsDictionary = this->m_GetEdsDictionary();
                         if (pc_EdsDictionary != NULL)
                         {
-                           const C_OscCanOpenObject * const pc_Object = C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
-                              *pc_EdsDictionary,
-                              ou32_ObjectIndex,
-                              ou32_SignalIndex);
+                           const C_OscCanOpenObjectData * const pc_Object =
+                              C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
+                                 *pc_EdsDictionary,
+                                 ou32_ObjectIndex,
+                                 ou32_SignalIndex);
                            if (pc_Object != NULL)
                            {
                               orc_Output = C_OscImportEdsDcf::h_GetObjectName(*pc_Object).c_str();
@@ -653,7 +654,7 @@ void C_SdBueCoAddSignalsModel::m_GetData(const E_Columns oe_Column, const uint32
             pc_EdsDictionary = this->m_GetEdsDictionary();
             if (pc_EdsDictionary != NULL)
             {
-               const C_OscCanOpenObject * const pc_Object =
+               const C_OscCanOpenObjectData * const pc_Object =
                   pc_EdsDictionary->GetCanOpenObject(static_cast<uint16_t>(ou32_ObjectIndex));
                if (pc_Object != NULL)
                {
@@ -749,21 +750,21 @@ const C_OscCanOpenManagerDeviceInfo * C_SdBueCoAddSignalsModel::m_GetDeviceInfo(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get CANopen object
+/*! \brief  Get CANopen object data
 
    \param[in]  orc_Dictionary    Dictionary
    \param[in]  ou32_ObjectIndex  Object index
    \param[in]  ou32_SignalIndex  Signal index
 
    \return
-   CANopen object
+   CANopen object data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OscCanOpenObject * C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
+const C_OscCanOpenObjectData * C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
    const C_OscCanOpenObjectDictionary & orc_Dictionary, const uint32_t ou32_ObjectIndex,
    const uint32_t ou32_SignalIndex)
 {
-   const C_OscCanOpenObject * pc_Object;
+   const C_OscCanOpenObjectData * pc_Object;
 
    if (ou32_SignalIndex == 0U)
    {
@@ -796,7 +797,7 @@ bool C_SdBueCoAddSignalsModel::m_CheckSignalRelevant(const C_OscCanOpenManagerMa
                                                      const C_OscCanOpenObjectDictionary & orc_Dictionary) const
 {
    bool q_Retval = false;
-   const C_OscCanOpenObject * const pc_Object = C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
+   const C_OscCanOpenObjectData * const pc_Object = C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
       orc_Dictionary,
       static_cast<uint32_t>(orc_Signal.c_SignalData.u16_CanOpenManagerObjectDictionaryIndex),
       static_cast<uint32_t>(orc_Signal.c_SignalData.u8_CanOpenManagerObjectDictionarySubIndex));
