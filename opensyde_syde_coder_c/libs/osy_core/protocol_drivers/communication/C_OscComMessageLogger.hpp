@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCOMMESSAGELOGGER_H
-#define C_OSCCOMMESSAGELOGGER_H
+#ifndef C_OSCCOMMESSAGELOGGER_HPP
+#define C_OSCCOMMESSAGELOGGER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -25,6 +25,7 @@
 #include "C_OscComMessageLoggerData.hpp"
 #include "C_OscComMessageLoggerFileBase.hpp"
 #include "C_OscCanSignal.hpp"
+#include "C_OscComAutoSupport.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -93,6 +94,9 @@ public:
    virtual void UpdateTxErrors(const uint32_t ou32_TxErrors);
    virtual void UpdateTxCounter(const uint32_t ou32_TxCount);
 
+   // Handle ECeS messages
+   virtual void ResetEcesMessages(void);
+
 protected:
    const C_OscComMessageLoggerData & m_GetHandledCanMessage(void) const;
 
@@ -146,6 +150,11 @@ private:
    static void mh_PostProcessSysDef(stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition);
    static void mh_AddSpecialEcesSignals(C_OscNode & orc_Node, const C_OscCanMessageIdentificationIndices & orc_Id,
                                         const uint32_t ou32_SignalIndex);
+   void m_CheckAndHandleEcesMessage();
+   void m_ResetEcesMessages();
+   void m_SaveEcosMessage();
+   bool m_CheckIfEcosMessage(const stw::can::T_STWCAN_Msg_RX & orc_Msg);
+   void m_HandleEcosInvertedMessage();
 
    C_OscComMessageLoggerData mc_HandledCanMessage;
    uint64_t mu64_FirstTimeStampStart;
@@ -167,6 +176,28 @@ private:
    // Message counting
    std::vector<uint32_t> mc_MsgCounterStandardId;
    std::map<uint32_t, uint32_t> mc_MsgCounterExtendedId;
+   std::map<uint32_t, stw::scl::C_SclString> mc_EcesMessages;
+   C_OscComAutoSupport * mpc_AutoSupportProtocol;
+
+   class C_EcosMessage
+   {
+   public:
+      uint32_t u32_CanId;
+      stw::scl::C_SclString c_MessageName;
+      std::vector<uint8_t> c_MessageData;
+
+      C_EcosMessage() :
+         u32_CanId(0),
+         c_MessageName("")
+      {
+      }
+   };
+
+   C_EcosMessage mc_EcosMessage;
+
+   static const stw::scl::C_SclString mhc_ECES_MESSAGE_COUNTER;
+   static const stw::scl::C_SclString mhc_ECES_CHECKSUM;
+   static const uint32_t mhu32_ECES_MAX_MESSAGE_COUNTER;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

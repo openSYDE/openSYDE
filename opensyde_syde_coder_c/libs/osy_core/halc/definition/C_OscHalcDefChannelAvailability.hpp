@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCDEFCHANNELAVAILABILITY_H
-#define C_OSCHALCDEFCHANNELAVAILABILITY_H
+#ifndef C_OSCHALCDEFCHANNELAVAILABILITY_HPP
+#define C_OSCHALCDEFCHANNELAVAILABILITY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

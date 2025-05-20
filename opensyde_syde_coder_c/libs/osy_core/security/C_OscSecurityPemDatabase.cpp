@@ -74,7 +74,7 @@ const C_OscSecurityPemKeyInfo * C_OscSecurityPemDatabase::GetPemFileBySerialNumb
    for (uint32_t u32_ItFile = 0UL; u32_ItFile < this->mc_StoredPemFiles.size(); ++u32_ItFile)
    {
       const C_OscSecurityPemKeyInfo & rc_KeyFile = this->mc_StoredPemFiles[u32_ItFile];
-      const std::vector<uint8_t> & rc_CurSerialNumber = rc_KeyFile.GetPubKeySerialNumber();
+      const std::vector<uint8_t> & rc_CurSerialNumber = rc_KeyFile.GetCertificateSerialNumber();
       if (rc_CurSerialNumber.size() == orc_SerialNumber.size())
       {
          bool q_Matches = true;
@@ -245,11 +245,11 @@ int32_t C_OscSecurityPemDatabase::m_TryAddKey(const C_OscSecurityPemKeyInfo & or
 {
    int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_NewKey.CheckValidKey(orc_ErrorMessage, oq_AddToList))
+   if (orc_NewKey.AreKeysAvailable(orc_ErrorMessage, oq_AddToList))
    {
       if (oq_AddToList)
       {
-         if (this->GetPemFileBySerialNumber(orc_NewKey.GetPubKeySerialNumber()) == NULL)
+         if (this->GetPemFileBySerialNumber(orc_NewKey.GetCertificateSerialNumber()) == NULL)
          {
             this->mc_StoredPemFiles.push_back(orc_NewKey);
          }

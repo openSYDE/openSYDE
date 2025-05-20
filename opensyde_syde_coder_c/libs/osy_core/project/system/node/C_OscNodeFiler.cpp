@@ -22,6 +22,7 @@
 #include "C_OscNodeDataPoolFiler.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscHalcConfigFiler.hpp"
+#include "C_OscDataLoggerJobFiler.hpp"
 #include "C_OscCanOpenManagerFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -182,6 +183,10 @@ int32_t C_OscNodeFiler::h_LoadNode(C_OscNode & orc_Node, C_OscXmlParserBase & or
                      //Return
                      tgl_assert(orc_XmlParser.SelectNodeParent() == "node"); //back up to node
                      s32_Retval = mh_LoadCanOpenManagers(orc_Node.c_CanOpenManagers, orc_XmlParser, orc_BasePath);
+                     if (s32_Retval == C_NO_ERR)
+                     {
+                        s32_Retval = mh_LoadDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath);
+                     }
                   }
                }
                else
@@ -290,6 +295,10 @@ int32_t C_OscNodeFiler::h_SaveNode(const C_OscNode & orc_Node, C_OscXmlParserBas
       s32_Retval = mh_SaveCanOpenManagers(orc_Node.c_CanOpenManagers, orc_XmlParser, orc_BasePath, opc_CreatedFiles,
                                           orc_NodeIndicesToNameMap);
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath, opc_CreatedFiles);
+   }
    return s32_Retval;
 }
 
@@ -370,8 +379,8 @@ int32_t C_OscNodeFiler::h_LoadNodeComProtocols(std::vector<C_OscCanProtocol> & o
       if (u32_ExpectedSize != orc_NodeComProtocols.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComProtocols.size());
+         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComProtocols.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -496,6 +505,8 @@ int32_t C_OscNodeFiler::mh_LoadProperties(C_OscNodeProperties & orc_NodeProperti
 
    if (orc_XmlParser.SelectNodeChild("properties") == "properties")
    {
+      //XAppSupport
+      orc_NodeProperties.q_XappSupport = orc_XmlParser.GetAttributeBool("x-app-support", false);
       //Name
       if (orc_XmlParser.SelectNodeChild("name") == "name")
       {
@@ -661,6 +672,7 @@ void C_OscNodeFiler::mh_SaveProperties(const C_OscNodeProperties & orc_NodePrope
                                        C_OscXmlParserBase & orc_XmlParser)
 {
    orc_XmlParser.CreateAndSelectNodeChild("properties");
+   orc_XmlParser.SetAttributeBool("x-app-support", orc_NodeProperties.q_XappSupport);
    orc_XmlParser.CreateNodeChild("name", orc_NodeProperties.c_Name);
    orc_XmlParser.CreateNodeChild("comment", orc_NodeProperties.c_Comment);
    orc_XmlParser.CreateNodeChild("diagnostic-server",
@@ -870,26 +882,18 @@ int32_t C_OscNodeFiler::mh_LoadComInterface(std::vector<C_OscNodeComInterfaceSet
       {
          C_OscNodeComInterfaceSettings c_ComInterface;
 
-         c_ComInterface.u8_InterfaceNumber =
-            static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("interface-number"));
+         if (s32_Retval == C_NO_ERR)
+         {
+            s32_Retval = C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(c_ComInterface.e_InterfaceType,
+                                                                        c_ComInterface.u8_InterfaceNumber,
+                                                                        orc_XmlParser, "communication-interface",
+                                                                        "Loading node definition");
+         }
+
          c_ComInterface.u8_NodeId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("node-id"));
          c_ComInterface.q_IsUpdateEnabled = orc_XmlParser.GetAttributeBool("update-available");
          c_ComInterface.q_IsRoutingEnabled = orc_XmlParser.GetAttributeBool("routing-available");
          c_ComInterface.q_IsDiagnosisEnabled = orc_XmlParser.GetAttributeBool("diagnosis-available");
-         //Type
-         if ((orc_XmlParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
-         {
-            s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(
-               orc_XmlParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
-            //Return
-            tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
-         }
-         else
-         {
-            osc_write_log_error("Loading node definition",
-                                "Could not find \"communication-interface\".\"type\" node.");
-            s32_Retval = C_CONFIG;
-         }
 
          //IP address
          if ((orc_XmlParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
@@ -1004,14 +1008,12 @@ void C_OscNodeFiler::mh_SaveComInterface(const std::vector<C_OscNodeComInterface
       const C_OscNodeComInterfaceSettings & rc_CurComInterface = orc_ComInterfaces[u32_ItComInterface];
 
       orc_XmlParser.CreateAndSelectNodeChild("communication-interface");
-      orc_XmlParser.SetAttributeUint32("interface-number",
-                                       static_cast<uint32_t>(rc_CurComInterface.u8_InterfaceNumber));
+      C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(rc_CurComInterface.e_InterfaceType,
+                                                     rc_CurComInterface.u8_InterfaceNumber, orc_XmlParser);
       orc_XmlParser.SetAttributeUint32("node-id", static_cast<uint32_t>(rc_CurComInterface.u8_NodeId));
       orc_XmlParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
       orc_XmlParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
       orc_XmlParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
-      orc_XmlParser.CreateNodeChild("type",
-                                    C_OscSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
       if (rc_CurComInterface.e_InterfaceType == C_OscSystemBus::eETHERNET)
       {
          orc_XmlParser.CreateAndSelectNodeChild("ip-address");
@@ -1242,8 +1244,9 @@ int32_t C_OscNodeFiler::mh_LoadApplications(std::vector<C_OscNodeApplication> & 
                      if (u32_ExpectedOutputfileNumber != c_CurApplication.c_ResultPaths.size())
                      {
                         C_SclString c_Tmp;
-                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %i, got %i",
-                                             u32_ExpectedOutputfileNumber, c_CurApplication.c_ResultPaths.size());
+                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %u, got %u",
+                                             u32_ExpectedOutputfileNumber,
+                                             static_cast<uint32_t>(c_CurApplication.c_ResultPaths.size()));
                         osc_write_log_warning("Load file", c_Tmp.c_str());
                      }
                   }
@@ -1279,8 +1282,8 @@ int32_t C_OscNodeFiler::mh_LoadApplications(std::vector<C_OscNodeApplication> & 
          if (u32_ExpectedSize != orc_NodeApplications.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected application count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_NodeApplications.size());
+            c_Tmp.PrintFormatted("Unexpected application count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_NodeApplications.size()));
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
@@ -1417,8 +1420,8 @@ int32_t C_OscNodeFiler::mh_LoadDataPools(C_OscNode & orc_Node, C_OscXmlParserBas
             if (u32_ExpectedSize != orc_Node.c_DataPools.size())
             {
                C_SclString c_Tmp;
-               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %i, got %i", u32_ExpectedSize,
-                                    orc_Node.c_DataPools.size());
+               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %u, got %u", u32_ExpectedSize,
+                                    static_cast<uint32_t>(orc_Node.c_DataPools.size()));
                osc_write_log_warning("Load file", c_Tmp.c_str());
             }
          }
@@ -1675,6 +1678,101 @@ int32_t C_OscNodeFiler::mh_SaveCanOpenManagers(const std::map<uint8_t, C_OscCanO
          //Save datapool file
          s32_Retval = C_OscCanOpenManagerFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath,
                                                            opc_CreatedFiles, orc_NodeIndicesToNameMap);
+         //Set file reference
+         orc_XmlParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load data loggers
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_LoadDataLoggers(std::vector<C_OscDataLoggerJob> & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.clear();
+   if (orc_XmlParser.SelectNodeChild("data-loggers-file") == "data-loggers-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OscDataLoggerJobFiler::h_LoadData(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         s32_Retval =
+            C_OscDataLoggerJobFiler::h_LoadFile(orc_Config,
+                                                C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                     orc_XmlParser.
+                                                                                     GetNodeContent()));
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save data loggers
+
+   \param[in]      orc_Config          Config
+   \param[in,out]  orc_XmlParser       XML parser
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Created files
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob> & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath,
+                                           std::vector<C_SclString> * const opc_CreatedFiles)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_Config.size() > 0)
+   {
+      orc_XmlParser.CreateAndSelectNodeChild("data-loggers-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         C_OscDataLoggerJobFiler::h_SaveData(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         // const C_SclString c_FileName = C_OscNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SclString c_FileName = "data_loggers.xml";
+         const C_SclString c_CombinedFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval = C_OscDataLoggerJobFiler::h_SaveFile(orc_Config, c_CombinedFileName);
          //Set file reference
          orc_XmlParser.SetNodeContent(c_FileName);
          //Store if necessary

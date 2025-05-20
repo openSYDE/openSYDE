@@ -120,6 +120,10 @@ int32_t C_OscSystemBusFiler::h_LoadBus(C_OscSystemBus & orc_Bus, C_OscXmlParserB
          s32_Retval = C_CONFIG;
       }
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_LoadCanFdProperties(orc_Bus, orc_XmlParser);
+   }
    //Bus id
    if (s32_Retval == C_NO_ERR)
    {
@@ -209,6 +213,7 @@ void C_OscSystemBusFiler::h_SaveBus(const C_OscSystemBus & orc_Bus, C_OscXmlPars
    orc_XmlParser.SetAttributeString("number", c_BitRate);
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
+   mh_SaveCanFdProperties(orc_Bus, orc_XmlParser);
    //Bus id
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("bus-id") == "bus-id");
    orc_XmlParser.SetAttributeUint32("number", orc_Bus.u8_BusId);
@@ -221,4 +226,57 @@ void C_OscSystemBusFiler::h_SaveBus(const C_OscSystemBus & orc_Bus, C_OscXmlPars
    tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
    //Useable for routing
    orc_XmlParser.SetAttributeBool("useable-for-routing", orc_Bus.q_UseableForRouting);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load can fd properties
+
+   \param[in,out]  orc_Bus          Bus
+   \param[in,out]  orc_XmlParser    Xml parser
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete (content of orc_Bus is undefined)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscSystemBusFiler::mh_LoadCanFdProperties(C_OscSystemBus & orc_Bus, C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.SelectNodeChild("can-fd") == "can-fd")
+   {
+      s32_Retval = orc_XmlParser.GetAttributeBoolError("active", orc_Bus.q_UseCanFd);
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XmlParser.GetAttributeUint64Error("bitrate", orc_Bus.u64_CanFdBitRate);
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Return
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
+      }
+   }
+   else
+   {
+      orc_Bus.q_UseCanFd = false;
+      orc_Bus.u64_CanFdBitRate = 2000000ULL;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save can fd properties
+
+   \param[in]      orc_Bus          Bus
+   \param[in,out]  orc_XmlParser    Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemBusFiler::mh_SaveCanFdProperties(const C_OscSystemBus & orc_Bus, C_OscXmlParserBase & orc_XmlParser)
+{
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("can-fd") == "can-fd");
+   orc_XmlParser.SetAttributeBool("active", orc_Bus.q_UseCanFd);
+   orc_XmlParser.SetAttributeUint64("bitrate", orc_Bus.u64_CanFdBitRate);
+   //Return
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
 }

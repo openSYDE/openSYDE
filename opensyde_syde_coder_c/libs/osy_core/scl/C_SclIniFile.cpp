@@ -44,6 +44,11 @@ static const char_t mcn_EqualIndicator = '=';
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
+C_SclIniSection::C_SclIniSection() :
+   ms32_PreviousKeyIndex(0)
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Constructor
 
@@ -56,7 +61,6 @@ static const char_t mcn_EqualIndicator = '=';
 C_SclIniFile::C_SclIniFile(const C_SclString & orc_FileName) :
    mq_Dirty(false),
    ms32_PreviousSectionIndex(0),
-   ms32_PreviousKeyIndex(0),
    FileName(orc_FileName)
 {
    if (orc_FileName == "")
@@ -293,7 +297,7 @@ bool C_SclIniFile::m_SetValue(const C_SclString & orc_Section, const C_SclString
    {
       if (oq_ForceAppend == false)
       {
-         pc_Key = m_GetKey(orc_Key, pc_Section);
+         pc_Key = pc_Section->GetKey(orc_Key);
       }
    }
    else
@@ -695,7 +699,6 @@ void C_SclIniFile::EraseSection(const C_SclString & orc_Section)
          mc_Sections.Delete(s32_Index);
          mq_Dirty = true;
          ms32_PreviousSectionIndex = 0;
-         ms32_PreviousKeyIndex = 0;
          return;
       }
    }
@@ -735,8 +738,17 @@ void C_SclIniFile::DeleteKey(const C_SclString & orc_Section, const C_SclString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///Given a section name, this function creates the new section and assigns
-///an empty comment.
+/*! \brief   Create a new .ini section
+
+   Given a section name, this function creates the new section and assigns
+    an empty comment.
+
+   \param[in]     orc_Section    section to create
+
+   \return
+   Pointer to new section
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_SclIniSection * C_SclIniFile::m_CreateSection(const C_SclString & orc_Section)
 {
    mc_Sections.IncLength();
@@ -744,7 +756,6 @@ C_SclIniSection * C_SclIniFile::m_CreateSection(const C_SclString & orc_Section)
    mc_Sections[mc_Sections.GetHigh()].c_Comment = "";
    mq_Dirty = true;
    ms32_PreviousSectionIndex = 0;
-   ms32_PreviousKeyIndex = 0;
 
    return &mc_Sections[mc_Sections.GetHigh()];
 }
@@ -800,12 +811,12 @@ C_SclIniKey * C_SclIniFile::m_GetKey(const C_SclString & orc_Key, const C_SclStr
       return NULL;
    }
 
-   return m_GetKey(orc_Key, pt_Section);
+   return pt_Section->GetKey(orc_Key);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-C_SclIniKey * C_SclIniFile::m_GetKey(const C_SclString & orc_Key, C_SclIniSection * const opc_Section)
+C_SclIniKey * C_SclIniSection::GetKey(const C_SclString & orc_Key)
 {
    int32_t s32_Index;
    int32_t s32_LastIndex;
@@ -813,26 +824,40 @@ C_SclIniKey * C_SclIniFile::m_GetKey(const C_SclString & orc_Key, C_SclIniSectio
    s32_LastIndex = ms32_PreviousKeyIndex;
 
    //Search from last successful point to the end
-   for (s32_Index = s32_LastIndex; s32_Index < opc_Section->c_Keys.GetLength(); s32_Index++)
+   for (s32_Index = s32_LastIndex; s32_Index < this->c_Keys.GetLength(); s32_Index++)
    {
-      if (opc_Section->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
+      if (this->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
       {
          ms32_PreviousKeyIndex = s32_Index;
-         return &opc_Section->c_Keys[s32_Index];
+         return &this->c_Keys[s32_Index];
       }
    }
 
    //Not found yet -> Search from beginning to last successful point
    for (s32_Index = 0; s32_Index < s32_LastIndex; s32_Index++)
    {
-      if (opc_Section->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
+      if (this->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
       {
          ms32_PreviousKeyIndex = s32_Index;
-         return &opc_Section->c_Keys[s32_Index];
+         return &this->c_Keys[s32_Index];
       }
    }
 
    return NULL;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+C_SclString C_SclIniSection::GetValue(const C_SclString & orc_Key)
+{
+   C_SclString c_Result;
+   C_SclIniKey * const pc_Key = this->GetKey(orc_Key);
+
+   if (pc_Key != NULL)
+   {
+      c_Result = pc_Key->c_Value;
+   }
+   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -867,10 +892,6 @@ C_SclIniSection * C_SclIniFile::m_GetSection(const C_SclString & orc_Section)
       if (mc_Sections[s32_Index].c_Name.AnsiCompareIc(orc_Section) == 0)
       {
          ms32_PreviousSectionIndex = s32_Index;
-         if (s32_Index != s32_LastIndex) //section changed: restart from 1st key
-         {
-            ms32_PreviousKeyIndex = 0;
-         }
          return &mc_Sections[s32_Index];
       }
    }
@@ -881,7 +902,6 @@ C_SclIniSection * C_SclIniFile::m_GetSection(const C_SclString & orc_Section)
       if (mc_Sections[s32_Index].c_Name.AnsiCompareIc(orc_Section) == 0)
       {
          ms32_PreviousSectionIndex = s32_Index;
-         ms32_PreviousKeyIndex = 0; //section changed: restart from 1st key
          return &mc_Sections[s32_Index];
       }
    }
@@ -1021,9 +1041,15 @@ void C_SclIniFile::ReadSections(C_SclStringList * const opc_Strings, const bool 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function for parsing file
 
-///GetNextPair
-///Given a key +delimiter+ value string, pulls the key name and value from the string.
+   Given a key + delimiter + value string, pulls the key name and value from the string.
+
+   \param[in]   orc_CommandLine    string in "<key>=<value>" format
+   \param[out]  orc_Key            extracted key (empty string if input format is not correct)
+   \param[out]  orc_Value          extracted value (empty string if input format is not correct)
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SclIniFile::mh_GetNextPair(const C_SclString & orc_CommandLine, C_SclString & orc_Key, C_SclString & orc_Value)
 {
    const uint32_t u32_Pos = orc_CommandLine.Pos(mcn_EqualIndicator);

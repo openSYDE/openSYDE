@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIGSTANDALONE_H
-#define C_OSCHALCCONFIGSTANDALONE_H
+#ifndef C_OSCHALCCONFIGSTANDALONE_HPP
+#define C_OSCHALCCONFIGSTANDALONE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscHalcConfigStandaloneDomain.hpp"

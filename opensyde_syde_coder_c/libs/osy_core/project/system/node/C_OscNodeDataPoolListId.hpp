@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODEDATAPOOLLISTID_H
-#define C_OSCNODEDATAPOOLLISTID_H
+#ifndef C_OSCNODEDATAPOOLLISTID_HPP
+#define C_OSCNODEDATAPOOLLISTID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

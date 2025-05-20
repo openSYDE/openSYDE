@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODEDATAPOOL_H
-#define C_OSCNODEDATAPOOL_H
+#ifndef C_OSCNODEDATAPOOL_HPP
+#define C_OSCNODEDATAPOOL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -54,6 +54,8 @@ public:
                        bool * const opq_UsageInvalid, bool * const opq_OutOfDataPool, bool * const opq_DataSetsInvalid,
                        bool * const opq_ElementsInvalid, std::vector<uint32_t> * const opc_InvalidDataSetIndices,
                        std::vector<uint32_t> * const opc_InvalidElementIndices) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    enum E_Type ///< Type of data pool
    {

@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODEPROPERTIES_H
-#define C_OSCNODEPROPERTIES_H
+#ifndef C_OSCNODEPROPERTIES_HPP
+#define C_OSCNODEPROPERTIES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -47,6 +47,9 @@ public:
    void DisconnectComInterface(const C_OscSystemBus::E_Type oe_InterfaceType, const uint8_t ou8_InterfaceNumber);
    void CreateComInterfaces(const C_OscDeviceDefinition & orc_Device, const uint32_t ou32_SubDeviceIndex);
 
+   std::vector<C_OscNodeComInterfaceSettings> GetCanInterfaces() const;
+   std::vector<C_OscNodeComInterfaceSettings> GetEthernetInterfaces() const;
+
    ///possible types of diagnostic protocols
    enum E_DiagnosticServerProtocol
    {
@@ -71,6 +74,10 @@ public:
    C_OscNodeOpenSydeServerSettings c_OpenSydeServerSettings;   ///< Optional openSYDE server settings
    C_OscNodeStwFlashloaderSettings c_StwFlashloaderSettings;   ///< Optional STW flashloader settings
    C_OscNodeCodeExportSettings c_CodeExportSettings;           ///< Optional code export settings
+   bool q_XappSupport;                                         ///< Flag to indicate X_App support of node
+
+private:
+   std::vector<C_OscNodeComInterfaceSettings> m_GetInterfaces(const C_OscSystemBus::E_Type oe_Type) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

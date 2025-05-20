@@ -12,8 +12,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCIPDISPATCHERWINSOCKHPP
-#define C_OSCIPDISPATCHERWINSOCKHPP
+#ifndef C_OSCIPDISPATCHERWINSOCK_HPP
+#define C_OSCIPDISPATCHERWINSOCK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

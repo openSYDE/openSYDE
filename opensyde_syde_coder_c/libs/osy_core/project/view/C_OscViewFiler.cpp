@@ -152,8 +152,8 @@ int32_t C_OscViewFiler::h_LoadViewsOsc(std::vector<C_OscViewData> & orc_Views,
          if (u32_ExpectedSize != orc_Views.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected view count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_Views.size());
+            c_Tmp.PrintFormatted("Unexpected view count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_Views.size()));
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }

@@ -80,6 +80,10 @@ public:
 
 private:
    static std::map<uint32_t, stw::scl::C_SclString> mh_MapNodeIndicesToName(const std::vector<C_OscNode> & orc_Nodes);
+   static int32_t mh_LoadSystemDefinitionProperties(C_OscSystemDefinition & orc_SystemDefinition,
+                                                    C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveSystemDefinitionProperties(const C_OscSystemDefinition & orc_SystemDefinition,
+                                                 C_OscXmlParserBase & orc_XmlParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

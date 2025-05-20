@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCOMDRIVERPROTOCOLH
-#define C_OSCCOMDRIVERPROTOCOLH
+#ifndef C_OSCCOMDRIVERPROTOCOL_HPP
+#define C_OSCCOMDRIVERPROTOCOL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

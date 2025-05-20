@@ -77,6 +77,7 @@ void C_OscNode::Initialize(void)
    c_ComProtocols.resize(0);
    c_HalcConfig.Clear();
    c_CanOpenManagers.clear();
+   c_DataLoggerJobs.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -855,6 +856,36 @@ void C_OscNode::CalcHash(uint32_t & oru32_HashValue) const
       stw::scl::C_SclChecksums::CalcCRC32(&u8_Value, sizeof(u8_Value), oru32_HashValue);
       c_It->second.CalcHash(oru32_HashValue);
    }
+
+   for (u32_Counter = 0U; u32_Counter < this->c_DataLoggerJobs.size(); ++u32_Counter)
+   {
+      this->c_DataLoggerJobs[u32_Counter].CalcHash(oru32_HashValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all HEX applications
+
+   This returns a vector of all applications that are not of type ePARAMETER_SET_HALC, i.e. those that on system
+   commissioning side are handled as HEX files.
+
+   \return
+   Vector of HEX applications (i.e. all but parameter set applications)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OscNodeApplication> C_OscNode::GetHexApplications(void) const
+{
+   std::vector<C_OscNodeApplication> c_HexApps;
+
+   for (uint32_t u32_Index = 0U; u32_Index < this->c_Applications.size(); ++u32_Index)
+   {
+      if (this->c_Applications[u32_Index].e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
+      {
+         c_HexApps.push_back(this->c_Applications[u32_Index]);
+      }
+   }
+
+   return c_HexApps;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1558,7 +1589,6 @@ void C_OscNode::CheckErrorCanProtocol(const uint32_t ou32_InterfaceIndex, const 
           (ou32_InterfaceIndex < pc_Prot->c_ComMessages.size()) &&
           (oq_ComProtocolUsedByInterface == pc_Prot->c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface))
       {
-         orq_InvalidMinSignalCount = true;
          // Check Rx and RPDOs
          mh_CheckErrorCanProtocolDirection(pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_RxMessages,
                                            oe_ComProtocol,
@@ -1570,11 +1600,6 @@ void C_OscNode::CheckErrorCanProtocol(const uint32_t ou32_InterfaceIndex, const 
                                            oe_ComProtocol,
                                            orq_InvalidMaxTxSignalCount, orq_InvalidCoTxPdoCount,
                                            orq_InvalidMinSignalCount);
-         if ((pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_RxMessages.size() == 0UL) &&
-             (pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_TxMessages.size() == 0UL))
-         {
-            orq_InvalidMinSignalCount = false;
-         }
       }
    }
 }
@@ -1585,25 +1610,28 @@ void C_OscNode::CheckErrorCanProtocol(const uint32_t ou32_InterfaceIndex, const 
    Goes through the data pool lists and element and check whether the number are within the supported range.
    The valid range is limited by the openSYDE communication protocol.
 
-   \param[in]   ou32_DataPoolIndex                    Data pool index
-   \param[out]  orq_InvalidNumberOfListsOrElements    true: number of lists or elements of at least one list out of range
+   \param[in]   ou32_DataPoolIndex           Data pool index
+   \param[out]  orq_TooFewListsOrElements    true: number of lists or elements of at least one list too low
+   \param[out]  orq_TooManyListsOrElements   true: number of lists or elements of at least one list too high
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscNode::CheckErrorDataPoolNumListsAndElements(const uint32_t ou32_DataPoolIndex,
-                                                      bool & orq_InvalidNumberOfListsOrElements) const
+                                                      bool & orq_TooFewListsOrElements,
+                                                      bool & orq_TooManyListsOrElements) const
 {
-   orq_InvalidNumberOfListsOrElements = true;
+   orq_TooFewListsOrElements = true;
+   orq_TooManyListsOrElements = true;
    if (ou32_DataPoolIndex < this->c_DataPools.size())
    {
       const C_OscNodeDataPool & rc_CheckedDataPool = this->c_DataPools[ou32_DataPoolIndex];
 
-      orq_InvalidNumberOfListsOrElements = false;
+      orq_TooManyListsOrElements = false;
 
       //number of lists ok ?
       if (rc_CheckedDataPool.c_Lists.size() > hu32_MAX_NUMBER_OF_LISTS_PER_DATA_POOL)
       {
          //no
-         orq_InvalidNumberOfListsOrElements = true;
+         orq_TooManyListsOrElements = true;
       }
       else
       {
@@ -1612,11 +1640,13 @@ void C_OscNode::CheckErrorDataPoolNumListsAndElements(const uint32_t ou32_DataPo
          {
             if (rc_CheckedDataPool.c_Lists[u32_Index].c_Elements.size() > hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST)
             {
-               orq_InvalidNumberOfListsOrElements = true;
+               orq_TooManyListsOrElements = true;
                break;
             }
          }
       }
+
+      orq_TooFewListsOrElements = this->m_CheckErrorTooFewElements(ou32_DataPoolIndex);
    }
 }
 
@@ -1631,20 +1661,21 @@ void C_OscNode::CheckErrorDataPoolNumListsAndElements(const uint32_t ou32_DataPo
    * naming conflict: multiple lists have the same name
    * naming conflict: multiple elements within one list have the same name
 
-   \param[in]   ou32_DataPoolIndex                    Data pool index
-   \param[out]  opq_NameConflict                      Name conflict
-   \param[out]  opq_NameInvalid                       Name not usable as variable
-   \param[out]  opq_IsErrorInListOrMessage            true: conflict in any list or message was detected
-   \param[out]  opq_InvalidNumberOfListsOrElements    true: invalid number of lists or elements
-   \param[out]  opc_InvalidListIndices                Optional storage for list of invalid list indices
-                                                      (see opq_IsErrorInListOrMessage)
-                                                      If COMM: interface index
-                                                      Else: list index
+   \param[in]   ou32_DataPoolIndex           Data pool index
+   \param[out]  opq_NameConflict             Name conflict
+   \param[out]  opq_NameInvalid              Name not usable as variable
+   \param[out]  opq_IsErrorInListOrMessage   true: conflict in any list or message was detected
+   \param[out]  opq_TooFewListsOrElements    true: too few lists or elements
+   \param[out]  opq_TooManyListsOrElements   true: too many lists or elements
+   \param[out]  opc_InvalidListIndices       Optional storage for list of invalid list indices
+                                             (see opq_IsErrorInListOrMessage)
+                                             If COMM: interface index
+                                             Else: list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscNode::CheckErrorDataPool(const uint32_t ou32_DataPoolIndex, bool * const opq_NameConflict,
                                    bool * const opq_NameInvalid, bool * const opq_IsErrorInListOrMessage,
-                                   bool * const opq_InvalidNumberOfListsOrElements,
+                                   bool * const opq_TooFewListsOrElements, bool * const opq_TooManyListsOrElements,
                                    std::vector<uint32_t> * const opc_InvalidListIndices) const
 {
    if (ou32_DataPoolIndex < this->c_DataPools.size())
@@ -1687,9 +1718,19 @@ void C_OscNode::CheckErrorDataPool(const uint32_t ou32_DataPoolIndex, bool * con
          *opq_IsErrorInListOrMessage = false;
 
          //Are number of lists and elements within range ?
-         if (opq_InvalidNumberOfListsOrElements != NULL)
+         if ((opq_TooManyListsOrElements != NULL) || (opq_TooFewListsOrElements != NULL))
          {
-            CheckErrorDataPoolNumListsAndElements(ou32_DataPoolIndex, *opq_InvalidNumberOfListsOrElements);
+            bool q_TooFew;
+            bool q_TooMany;
+            CheckErrorDataPoolNumListsAndElements(ou32_DataPoolIndex, q_TooFew, q_TooMany);
+            if (opq_TooFewListsOrElements != NULL)
+            {
+               *opq_TooFewListsOrElements = q_TooFew;
+            }
+            if (opq_TooManyListsOrElements != NULL)
+            {
+               *opq_TooManyListsOrElements = q_TooMany;
+            }
          }
 
          if (rc_CheckedDataPool.e_Type == C_OscNodeDataPool::eCOM)
@@ -2194,6 +2235,61 @@ void C_OscNode::RecalculateAddress(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Count all local messages
+
+   \return
+   Total number of local messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t C_OscNode::CountAllLocalMessages(void) const
+{
+   uint32_t u32_MessageCount = 0UL;
+
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < this->c_ComProtocols.size(); ++u32_ItProt)
+   {
+      const C_OscCanProtocol & rc_Prot = this->c_ComProtocols[u32_ItProt];
+      for (uint32_t u32_ItCont = 0UL; u32_ItCont < rc_Prot.c_ComMessages.size(); ++u32_ItCont)
+      {
+         const C_OscCanMessageContainer & rc_Cont = rc_Prot.c_ComMessages[u32_ItCont];
+         u32_MessageCount += static_cast<uint32_t>(rc_Cont.c_RxMessages.size());
+         u32_MessageCount += static_cast<uint32_t>(rc_Cont.c_TxMessages.size());
+      }
+   }
+   return u32_MessageCount;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNode::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                       std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItDp = 0UL; u32_ItDp < this->c_DataPools.size(); ++u32_ItDp)
+   {
+      C_OscNodeDataPool & rc_Dp = this->c_DataPools[u32_ItDp];
+      rc_Dp.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < this->c_ComProtocols.size(); ++u32_ItProt)
+   {
+      C_OscCanProtocol & rc_Prot = this->c_ComProtocols[u32_ItProt];
+      rc_Prot.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   this->c_HalcConfig.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   for (uint32_t u32_ItDatablock = 0UL; u32_ItDatablock < this->c_Applications.size(); ++u32_ItDatablock)
+   {
+      C_OscNodeApplication & rc_Datablock = this->c_Applications[u32_ItDatablock];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "node-datablock-name",
+                                                                                rc_Datablock.c_Name,
+                                                                                opc_ChangedItems);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Utility: get specific data pool element
 
    Returns pointer to specific data pool element.
@@ -2433,10 +2529,6 @@ void C_OscNode::mh_CheckErrorCanProtocolDirection(const std::vector<C_OscCanMess
       {
          orq_InvalidMaxSignalCount = true;
       }
-      if (u32_SignalCount > 0)
-      {
-         orq_InvalidMinSignalCount = false;
-      }
 
       // Check active PDO count, which is only relevant for CANopen
       if (oe_ComProtocol == C_OscCanProtocol::eCAN_OPEN)
@@ -2451,4 +2543,52 @@ void C_OscNode::mh_CheckErrorCanProtocolDirection(const std::vector<C_OscCanMess
          }
       }
    }
+   if ((u32_SignalCount == 0UL) && (orc_Messages.size() > 0UL))
+   {
+      orq_InvalidMinSignalCount = true;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check error too few elements
+
+   \param[in]  ou32_DataPoolIndex   Data pool index
+
+   \return
+   Flags
+
+   \retval   True    Too few element error
+   \retval   False   No error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscNode::m_CheckErrorTooFewElements(const uint32_t ou32_DataPoolIndex) const
+{
+   bool orq_TooFewListsOrElements = false;
+
+   if (ou32_DataPoolIndex < this->c_DataPools.size())
+   {
+      const C_OscNodeDataPool & rc_CheckedDataPool = this->c_DataPools[ou32_DataPoolIndex];
+      const C_OscCanProtocol * const pc_Protocol = this->GetRelatedCanProtocolConst(ou32_DataPoolIndex);
+      if (pc_Protocol != NULL)
+      {
+         //number of lists ok ?
+         if (rc_CheckedDataPool.c_Lists.size() == 0UL)
+         {
+            //no
+            orq_TooFewListsOrElements = true;
+         }
+         else
+         {
+            for (uint32_t u32_ItContainer = 0UL; u32_ItContainer < pc_Protocol->c_ComMessages.size(); ++u32_ItContainer)
+            {
+               const C_OscCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[u32_ItContainer];
+               if (rc_Container.CheckMinSignalError())
+               {
+                  orq_TooFewListsOrElements = true;
+               }
+            }
+         }
+      }
+   }
+   return orq_TooFewListsOrElements;
 }

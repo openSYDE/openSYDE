@@ -64,7 +64,7 @@ namespace scl
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-///This structure stores the definition of a key.
+///Stores the definition of a key.
 /// A key is a named identifier that is associated with a value. It may or may not have a comment.
 /// All comments must PRECEDE the key on the line in the config file.
 class C_SclIniKey
@@ -72,34 +72,41 @@ class C_SclIniKey
 public:
    C_SclString c_Key;     ///< key (text before the "=")
    C_SclString c_Value;   ///< value (text after the "=")
-   C_SclString c_Comment; ///< comment preceeding the key
+   C_SclString c_Comment; ///< comment preceding the key
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-///This structure stores the definition of a section.
+///Stores the definition of a section.
 /// A section contains any number of keys, and may or may not have a comment.
 /// Like keys, all comments must precede the section.
 class C_SclIniSection
 {
+protected:
+   int32_t ms32_PreviousKeyIndex; ///< for speeding up searching for a key
+
 public:
+   C_SclIniSection();
+
+   //Returns the requested key (if found) from the Section. Returns NULL otherwise.
+   C_SclIniKey * GetKey(const C_SclString & orc_Key);
+   //Return value of specified key (or empty string if not found)
+   C_SclString GetValue(const C_SclString & orc_Key);
+
    C_SclString c_Name;                    ///< name (text within "[""]")
-   C_SclString c_Comment;                 ///< comment preceeding the section
-   C_SclDynamicArray<C_SclIniKey> c_Keys; ///< key/value pairs contains in this section
+   C_SclString c_Comment;                 ///< comment preceding the section
+   C_SclDynamicArray<C_SclIniKey> c_Keys; ///< key/value pairs contained in this section
 };
 
 //----------------------------------------------------------------------------------------------------------------------
 ///INI file handling
 class C_SclIniFile
 {
-private:
+protected:
    // Utility Methods
    static void mh_GetNextPair(const C_SclString & orc_CommandLine, C_SclString & orc_Key, C_SclString & orc_Value);
 
    // Returns the requested key (if found) from the requested Section. Returns NULL otherwise.
    C_SclIniKey * m_GetKey(const C_SclString & orc_Key, const C_SclString & orc_Section);
-
-   //shortcut if we already have a valid section
-   C_SclIniKey * m_GetKey(const C_SclString & orc_Key, C_SclIniSection * const opc_Section);
 
    // Returns the requested section (if found), NULL otherwise.
    C_SclIniSection * m_GetSection(const C_SclString & orc_Section);
@@ -130,9 +137,6 @@ private:
    C_SclDynamicArray<C_SclIniSection> mc_Sections; ///< Our list of sections
    bool mq_Dirty;                                  ///< Tracks whether or not data has changed.
    int32_t ms32_PreviousSectionIndex;              ///< for speeding up searching for a section
-   int32_t ms32_PreviousKeyIndex;                  ///< for speeding up searching for a key
-
-   // Methods
 
 public:
    // Constructors & Destructors

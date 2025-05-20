@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCDEVICEGROUPH
-#define C_OSCDEVICEGROUPH
+#ifndef C_OSCDEVICEGROUP_HPP
+#define C_OSCDEVICEGROUP_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -40,7 +40,7 @@ public:
    void SetGroupName(const stw::scl::C_SclString & orc_GroupName);
    stw::scl::C_SclString GetGroupName(void) const;
 
-   std::vector<C_OscDeviceDefinition> GetDevices(void) const;
+   const std::vector<C_OscDeviceDefinition> & GetDevices(void) const;
 
 private:
    stw::scl::C_SclString mc_GroupName;            ///< Group name

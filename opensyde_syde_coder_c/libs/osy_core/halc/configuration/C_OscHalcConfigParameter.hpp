@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIGPARAMETER_H
-#define C_OSCHALCCONFIGPARAMETER_H
+#ifndef C_OSCHALCCONFIGPARAMETER_HPP
+#define C_OSCHALCCONFIGPARAMETER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

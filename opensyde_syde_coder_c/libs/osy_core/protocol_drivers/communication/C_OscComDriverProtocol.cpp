@@ -1513,12 +1513,12 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
                else
                {
                   const uint32_t u32_KEY = 23U; // fixed in UDS stack for non secure mode
+                  // Seed should be a fixed value too
                   if (u64_Seed != 42U)
                   {
-                     C_SclString c_Tmp;
-                     c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
-                                          "expected value, expected: 42, got %i", u64_Seed);
-                     // Should be a fixed value too
+                     const C_SclString c_Tmp =
+                        "Received seed in non secure mode does not match the expected value, expected: 42, got " +
+                        C_SclString::IntToStr(u64_Seed);
                      osc_write_log_warning("Security Access", c_Tmp.c_str());
                   }
 
@@ -1568,7 +1568,7 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
                      c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
 
                      //get private key from PEM file
-                     c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
+                     c_PrivKey = pc_PemKeyInfo->GetPrivateKey();
 
                      //calculate RSA signature with private key and random value from server (u64_Seed)
                      s32_Return = C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);

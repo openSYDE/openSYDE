@@ -36,8 +36,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCHECKSUMMEDINIFILEHPP
-#define C_OSCCHECKSUMMEDINIFILEHPP
+#ifndef C_OSCCHECKSUMMEDINIFILE_HPP
+#define C_OSCCHECKSUMMEDINIFILE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

@@ -20,8 +20,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCZIPDATAH
-#define C_OSCZIPDATAH
+#ifndef C_OSCZIPDATA_HPP
+#define C_OSCZIPDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

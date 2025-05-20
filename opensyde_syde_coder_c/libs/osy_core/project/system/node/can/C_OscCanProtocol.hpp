@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANPROTOCOL_H
-#define C_OSCCANPROTOCOL_H
+#ifndef C_OSCCANPROTOCOL_HPP
+#define C_OSCCANPROTOCOL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -61,6 +61,8 @@ public:
                                                     const uint32_t ou32_InterfaceIndex, const bool oq_IsTx,
                                                     const uint32_t ou32_MessageIndex,
                                                     const uint32_t ou32_SignalIndex) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
    static bool h_ListIsComTx(const C_OscNodeDataPoolList & orc_List);
    static uint32_t h_GetCanMessageValidSignalsDlcOffset(const E_Type oe_Type);
    static bool h_GetCanMessageSignalGapsValid(const E_Type oe_Type);

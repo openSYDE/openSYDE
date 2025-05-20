@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIGSTANDALONEFILER_H
-#define C_OSCHALCCONFIGSTANDALONEFILER_H
+#ifndef C_OSCHALCCONFIGSTANDALONEFILER_HPP
+#define C_OSCHALCCONFIGSTANDALONEFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscXmlParser.hpp"

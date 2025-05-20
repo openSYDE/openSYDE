@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCROUTINGCALCULATION_H
-#define C_OSCROUTINGCALCULATION_H
+#ifndef C_OSCROUTINGCALCULATION_HPP
+#define C_OSCROUTINGCALCULATION_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
@@ -40,7 +40,7 @@ public:
    C_OscRoutingCalculation(const std::vector<C_OscNode> & orc_AllNodes, const std::vector<uint8_t> & orc_ActiveNodes,
                            const uint32_t ou32_StartBusIndex, const uint32_t ou32_TargetNodeIndex,
                            const E_Mode oe_Mode);
-   ~C_OscRoutingCalculation();
+   virtual ~C_OscRoutingCalculation();
 
    const std::vector<C_OscRoutingRoute> * GetRoutes(void) const;
    const C_OscRoutingRoute * GetBestRoute(void) const;

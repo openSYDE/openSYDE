@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANOPENOBJECTDICTIONARYHPP
-#define C_OSCCANOPENOBJECTDICTIONARYHPP
+#ifndef C_OSCCANOPENOBJECTDICTIONARY_HPP
+#define C_OSCCANOPENOBJECTDICTIONARY_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <set>
@@ -29,8 +29,8 @@ namespace opensyde_core
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-///container for on object dictionary entry
-class C_OscCanOpenObject
+///container for on object dictionary entry (or sub-entry)
+class C_OscCanOpenObjectData
 {
 private:
    uint16_t mu16_Size; //size in bytes
@@ -83,7 +83,7 @@ public:
    stw::scl::C_SclString c_Denotation;
    bool q_IsMappableIntoPdo;
 
-   C_OscCanOpenObject();
+   C_OscCanOpenObjectData();
 
    bool IsReadable(void) const;  //do the access rights permit reading ?
    bool IsWriteable(void) const; //do the access rights permit writing ?
@@ -103,7 +103,16 @@ public:
    void CalcHash(uint32_t & oru32_HashValue) const;
 
    //less than operator for sorting:
-   bool operator < (const C_OscCanOpenObject & orc_Object) const;
+   bool operator < (const C_OscCanOpenObjectData & orc_Object) const;
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+class C_OscCanOpenObject :
+   public C_OscCanOpenObjectData
+{
+public:
+   std::map<uint8_t, C_OscCanOpenObjectData> c_SubObjects;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,9 +121,10 @@ public:
 class C_OscCanOpenObjectDictionary
 {
 private:
-   int32_t m_AppendEdsBlock(const stw::scl::C_SclString & orc_Blockname, stw::scl::C_SclIniFile & orc_IniFile);
+   static int32_t mh_FindValue(const uint32_t ou32_Value, const std::vector<uint32_t> & orc_AllValues);
+   int32_t m_CheckForExistingObjects(const stw::scl::C_SclString & orc_Blockname, stw::scl::C_SclIniFile & orc_IniFile);
    int32_t m_GetObjectDescription(const uint16_t ou16_Index, const uint8_t ou8_SubIndex, const bool oq_IsSubIndex,
-                                  const stw::scl::C_SclStringList & orc_SectionValues, C_OscCanOpenObject & orc_Object);
+                                  stw::scl::C_SclIniSection & orc_Section, C_OscCanOpenObjectData & orc_Object);
 
    stw::scl::C_SclString mc_LastError;
 
@@ -129,6 +139,7 @@ public:
    static const uint16_t hu16_OD_INDEX_EMCY = 0x1014U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_CONSUMER = 0x1016U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_PRODUCER = 0x1017U;
+   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1301U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO = 0x1400U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO = 0x1800U;
    static const uint8_t hu8_OD_SUB_INDEX_COB_ID = 0x1U;
@@ -136,12 +147,19 @@ public:
    static const uint8_t hu8_OD_SUB_INDEX_INHIBIT_TIME = 0x3U;
    static const uint8_t hu8_OD_SUB_INDEX_EVENT_TIMER = 0x5U;
    static const uint8_t hu8_OD_SUB_INDEX_SYNC_START_VALUE = 0x6U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_INFORMATION_DIRECTION = 0x1U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_CYCLE_TIME = 0x2U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_SRVT = 0x3U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_TRANSMISSION_TYPE = 0x4U;
+   static const uint8_t hu8_OD_SRDO_SUB_INDEX_COB_ID = 0x5U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO_MAPPING = 0x1600U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO_MAPPING = 0x1A00U;
    static const uint16_t hu16_OD_PDO_MAPPING_OFFSET = 0x200U;
 
    C_OscCanOpenEdsInfoBlock c_InfoBlock;
-   stw::scl::C_SclDynamicArray<C_OscCanOpenObject> c_Objects;
+
+   //all objects loaded from file; key = object index
+   std::map<uint16_t, C_OscCanOpenObject> c_OdObjects;
 
    int32_t LoadFromFile(const stw::scl::C_SclString & orc_File);
    stw::scl::C_SclString GetLastErrorText(void) const;
@@ -168,8 +186,9 @@ public:
    int32_t IsPdoMappingRo(const uint16_t ou16_PdoIndex, const bool oq_MessageIsTx, bool & orq_IsRo) const;
 
    //Util
-   const C_OscCanOpenObject * GetCanOpenObject(const uint16_t ou16_OdIndex) const;
-   const C_OscCanOpenObject * GetCanOpenSubIndexObject(const uint16_t ou16_OdIndex, const uint8_t ou8_OdSubIndex) const;
+   const C_OscCanOpenObjectData * GetCanOpenObject(const uint16_t ou16_OdIndex) const;
+   const C_OscCanOpenObjectData * GetCanOpenSubIndexObject(const uint16_t ou16_OdIndex,
+                                                           const uint8_t ou8_OdSubIndex) const;
    bool CheckObjectPresentByIndex(const uint16_t ou16_OdIndex, const uint8_t ou8_OdSubIndex) const;
    void GetMappableObjects(std::map<uint32_t, std::vector<uint32_t> > & orc_SubIndices)
    const;

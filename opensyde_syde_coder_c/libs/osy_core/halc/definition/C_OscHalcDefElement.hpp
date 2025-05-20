@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCDEFELEMENT_H
-#define C_OSCHALCDEFELEMENT_H
+#ifndef C_OSCHALCDEFELEMENT_HPP
+#define C_OSCHALCDEFELEMENT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

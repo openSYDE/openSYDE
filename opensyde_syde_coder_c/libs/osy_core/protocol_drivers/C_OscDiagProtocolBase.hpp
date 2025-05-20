@@ -13,8 +13,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCDIAGPROTOCOLBASEH
-#define C_OSCDIAGPROTOCOLBASEH
+#ifndef C_OSCDIAGPROTOCOLBASE_HPP
+#define C_OSCDIAGPROTOCOLBASE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

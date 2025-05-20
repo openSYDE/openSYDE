@@ -203,8 +203,8 @@ int32_t C_OscCanOpenManagerFiler::h_LoadData(std::map<uint8_t, C_OscCanOpenManag
          if (u32_ExpectedSize != orc_Config.size())
          {
             stw::scl::C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected CANopen manager count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_Config.size());
+            c_Tmp.PrintFormatted("Unexpected CANopen manager count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_Config.size()));
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
          }
       }
@@ -561,8 +561,8 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevices(std::map<C_OscCanInte
          if (u32_ExpectedSize != orc_Config.size())
          {
             stw::scl::C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected can open device count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_Config.size());
+            c_Tmp.PrintFormatted("Unexpected can open device count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_Config.size()));
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
          }
       }
@@ -887,7 +887,7 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDeviceEdsPart(const C_OscCanO
          "Saving CANopen manager data");
       if (opc_CreatedFiles != NULL)
       {
-         opc_CreatedFiles->push_back(c_CompleteFileName);
+         opc_CreatedFiles->push_back(c_FileNameWithPrefix);
       }
    }
    return s32_Retval;
@@ -937,8 +937,8 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerMappedSignals(
          if (u32_ExpectedSize != orc_Config.size())
          {
             stw::scl::C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected mappable signal count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_Config.size());
+            c_Tmp.PrintFormatted("Unexpected mappable signal count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_Config.size()));
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
          }
       }

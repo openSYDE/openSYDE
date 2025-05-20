@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -33,9 +34,11 @@ using namespace stw::opensyde_core;
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 bool C_OscLoggingHandler::mhq_WriteToFile = false;
+bool C_OscLoggingHandler::mhq_AutoFlushFile = false;
 bool C_OscLoggingHandler::mhq_WriteToConsole = true;
 bool C_OscLoggingHandler::mhq_MeasureTime = false;
-std::map<uint16_t, uint32_t> C_OscLoggingHandler::mhc_StartTimes = std::map<uint16_t, uint32_t>();
+bool C_OscLoggingHandler::mhq_LogInitErrorsToConsole = false;
+std::map<uint16_t, uint32_t> C_OscLoggingHandler::mhc_StartTimes = std::map<uint16_t, uint32_t> ();
 C_SclString C_OscLoggingHandler::mhc_FileName = "";
 C_TglCriticalSection C_OscLoggingHandler::mhc_ConsoleCriticalSection;
 C_TglCriticalSection C_OscLoggingHandler::mhc_FileCriticalSection;
@@ -48,16 +51,22 @@ std::ofstream C_OscLoggingHandler::mhc_File;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set write to file active flag
 
-   \param[in] oq_Active New write to file active flag
+   \param[in] oq_Active     New write to file active flag
+   \param[in] oq_AutoFlush  true: flush output file after each write
+                            false: do not automatically flush (= default)
+   \param[in] oq_LogInitErrorsToConsole  true: if opening log file fails print a log entry to console
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
+void C_OscLoggingHandler::h_SetWriteToFileActive(const bool oq_Active, const bool oq_AutoFlush,
+                                                 const bool oq_LogInitErrorsToConsole)
 {
    if (C_OscLoggingHandler::mhc_File.is_open() == true)
    {
       C_OscLoggingHandler::mhc_File.close();
    }
    C_OscLoggingHandler::mhq_WriteToFile = oq_Active;
+   C_OscLoggingHandler::mhq_AutoFlushFile = oq_AutoFlush;
+   C_OscLoggingHandler::mhq_LogInitErrorsToConsole = oq_LogInitErrorsToConsole;
    mh_OpenFile();
 }
 
@@ -172,7 +181,7 @@ void C_OscLoggingHandler::h_WriteLogPerformance(const uint16_t ou16_TimerId, con
 {
    if (mhq_MeasureTime == true)
    {
-      const std::map<uint16_t, uint32_t>::iterator c_StartTime = mhc_StartTimes.find(ou16_TimerId);
+      const std::map< uint16_t, uint32_t >::iterator c_StartTime = mhc_StartTimes.find(ou16_TimerId);
       if (c_StartTime != mhc_StartTimes.end())
       {
          C_OscLoggingHandler::mh_WriteLog(
@@ -198,7 +207,7 @@ void C_OscLoggingHandler::h_WriteLogPerformance(const uint16_t ou16_TimerId, con
 //----------------------------------------------------------------------------------------------------------------------
 uint16_t C_OscLoggingHandler::h_StartPerformanceTimer(void)
 {
-   const uint16_t u16_Id = static_cast<uint16_t>(rand());
+   const uint16_t u16_Id = static_cast< uint16_t > (rand());
 
    mhc_StartTimes[u16_Id] = stw::tgl::TglGetTickCount();
 
@@ -307,12 +316,15 @@ std::string C_OscLoggingHandler::h_UtilConvertDateTimeToString(const C_TglDateTi
    std::stringstream c_Stream;
 
    c_Stream << &std::right << std::setw(4) << std::setfill('0') << orc_DateTime.mu16_Year << "-";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Month) << "-";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Day) << " ";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Hour) << ":";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Minute) <<
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast< uint16_t > (orc_DateTime.mu8_Month) <<
+      "-";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast< uint16_t > (orc_DateTime.mu8_Day) <<
+      " ";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast< uint16_t > (orc_DateTime.mu8_Hour) <<
       ":";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Second) <<
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast< uint16_t > (orc_DateTime.mu8_Minute) <<
+      ":";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast< uint16_t > (orc_DateTime.mu8_Second) <<
       ".";
    c_Stream << &std::right << std::setw(3) << std::setfill('0') << orc_DateTime.mu16_MilliSeconds;
    return c_Stream.str();
@@ -404,6 +416,10 @@ void C_OscLoggingHandler::mh_WriteLog(const C_SclString & orc_Type, const C_SclS
 
       //TGL critical section -> file
       C_OscLoggingHandler::mhc_File.write(c_Message.c_str(), c_Message.size());
+      if (mhq_AutoFlushFile == true)
+      {
+         C_OscLoggingHandler::mhc_File.flush();
+      }
 
       //Critical section
       C_OscLoggingHandler::mhc_FileCriticalSection.Release();
@@ -425,7 +441,19 @@ void C_OscLoggingHandler::mh_OpenFile(void)
       {
          TglCreateDirectory(c_FilePath);
       }
+
       C_OscLoggingHandler::mhc_File.open(C_OscLoggingHandler::mhc_FileName.c_str(), std::ios::app);
+
+      //if opening the file fails then at least try to write an info to console once (if configured so)
+      if (C_OscLoggingHandler::mhc_File.is_open() == false)
+      {
+         if (C_OscLoggingHandler::mhq_LogInitErrorsToConsole == true)
+         {
+            const C_SclString c_ErrorText = "Could not open log file \"" + C_OscLoggingHandler::mhc_FileName +
+                                            "\" for appending.";
+            osc_write_log_warning("openSYDE logging engine", c_ErrorText);
+         }
+      }
    }
 }
 

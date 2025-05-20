@@ -449,6 +449,24 @@ void C_OscHalcConfigDomain::HandleFileLoadPostProcessing(const C_OscHalcDefBase:
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscHalcConfigDomain::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                                   std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_It = 0UL; u32_It < this->c_ChannelConfigs.size(); ++u32_It)
+   {
+      this->c_ChannelConfigs[u32_It].HandleNameMaxCharLimit(ou32_NameMaxCharLimit, "hal-channel-name",
+                                                            opc_ChangedItems);
+   }
+   this->c_DomainConfig.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, "hal-domain-name", opc_ChangedItems);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add parameters
 
    \param[in]      orc_Parameters   Parameters

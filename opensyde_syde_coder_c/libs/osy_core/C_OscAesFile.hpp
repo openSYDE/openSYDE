@@ -12,10 +12,11 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCAESFILEHPP
-#define C_OSCAESFILEHPP
+#ifndef C_OSCAESFILE_HPP
+#define C_OSCAESFILE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <set>
 #include "stwtypes.hpp"
 #include "C_SclString.hpp"
 
@@ -38,7 +39,7 @@ public:
                                 const stw::scl::C_SclString & orc_OutFilePath);
 
    static int32_t h_CreateEncryptedZipFile(const stw::scl::C_SclString & orc_FolderPathToZip,
-                                           const std::vector<stw::scl::C_SclString> & orc_FilesToZip,
+                                           const std::set<stw::scl::C_SclString> & orc_SupFiles,
                                            const stw::scl::C_SclString & orc_PathForZipFile,
                                            const stw::scl::C_SclString & orc_Key,
                                            stw::scl::C_SclString * const opc_ErrorMessage);

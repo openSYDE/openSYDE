@@ -8,12 +8,13 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSYSTEMFILERUTIL_H
-#define C_OSCSYSTEMFILERUTIL_H
+#ifndef C_OSCSYSTEMFILERUTIL_HPP
+#define C_OSCSYSTEMFILERUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscXmlParser.hpp"
 #include "C_OscSystemBus.hpp"
+#include "C_OscXmlParserLog.hpp"
 #include "C_OscNodeCodeExportSettings.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -49,6 +50,8 @@ public:
                                                                 ore_Scaling);
    static int32_t h_StringToCodeExportScalingType(const stw::scl::C_SclString & orc_String,
                                                   C_OscNodeCodeExportSettings::E_Scaling & ore_Scaling);
+   static int32_t h_CheckVersion(C_OscXmlParserBase & orc_XmlParser, const uint16_t ou16_ExpectedFileVersion,
+                                 const stw::scl::C_SclString & orc_TagName, const stw::scl::C_SclString & orc_UseCase);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

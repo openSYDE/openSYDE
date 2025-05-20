@@ -22,6 +22,7 @@
 #include "C_OscSystemDefinition.hpp"
 #include "TglUtils.hpp"
 #include "C_OscUtils.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_core;
@@ -47,7 +48,8 @@ C_OscDeviceManager C_OscSystemDefinition::hc_Devices;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscSystemDefinition::C_OscSystemDefinition(void)
+C_OscSystemDefinition::C_OscSystemDefinition(void) :
+   u32_NameMaxCharLimit(31UL)
 {
 }
 
@@ -73,6 +75,8 @@ C_OscSystemDefinition::~C_OscSystemDefinition(void)
 void C_OscSystemDefinition::CalcHash(uint32_t & oru32_HashValue) const
 {
    uint32_t u32_Counter;
+
+   C_SclChecksums::CalcCRC32(&this->u32_NameMaxCharLimit, sizeof(this->u32_NameMaxCharLimit), oru32_HashValue);
 
    // check all subelements
    for (u32_Counter = 0U; u32_Counter < this->c_Nodes.size(); ++u32_Counter)
@@ -430,17 +434,13 @@ int32_t C_OscSystemDefinition::GetNextFreeBusId(uint8_t & oru8_BusId) const
          q_Continue = false;
       }
    }
+   //Revert last ++
+   --oru8_BusId;
    //Check result
    if (q_Continue == true)
    {
       s32_Retval = C_NOACT;
    }
-   else
-   {
-      //Revert last ++
-      --oru8_BusId;
-   }
-
    return s32_Retval;
 }
 
@@ -622,7 +622,8 @@ const
          bool q_DataPoolNameConflict;
          bool q_DataPoolNameInvalid;
          bool q_DataPoolListError;
-         bool q_DataPoolListOrElementLengthError;
+         bool q_DataPoolTooFewListsOrElementsError;
+         bool q_DataPoolTooManyListsOrElementsError;
          bool q_ResultError = false;
          static std::map<std::vector<uint32_t>, bool> hc_PreviousCommChecks;
          static std::map<uint32_t, bool> hc_PreviousCommonChecks;
@@ -652,8 +653,10 @@ const
                   c_Hashes.push_back(u32_ProtocolHash);
 
                   //check basic: list and element count:
-                  rc_CheckedNode.CheckErrorDataPoolNumListsAndElements(u32_Counter, q_DataPoolListOrElementLengthError);
-                  if (q_DataPoolListOrElementLengthError == true)
+                  rc_CheckedNode.CheckErrorDataPoolNumListsAndElements(u32_Counter,
+                                                                       q_DataPoolTooFewListsOrElementsError,
+                                                                       q_DataPoolTooManyListsOrElementsError);
+                  if ((q_DataPoolTooFewListsOrElementsError == true) || (q_DataPoolTooManyListsOrElementsError == true))
                   {
                      q_ResultError = true;
                      q_AlreadyAdded = true;
@@ -739,10 +742,12 @@ const
                if (c_It == hc_PreviousCommonChecks.end())
                {
                   rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, &q_DataPoolNameInvalid,
-                                                    &q_DataPoolListError, &q_DataPoolListOrElementLengthError, NULL);
+                                                    &q_DataPoolListError, &q_DataPoolTooFewListsOrElementsError,
+                                                    &q_DataPoolTooManyListsOrElementsError, NULL);
 
                   if (((q_DataPoolNameConflict == true) || (q_DataPoolNameInvalid == true)) ||
-                      (q_DataPoolListError == true) || (q_DataPoolListOrElementLengthError == true))
+                      (q_DataPoolListError == true) || (q_DataPoolTooFewListsOrElementsError == true) ||
+                      (q_DataPoolTooManyListsOrElementsError == true))
                   {
                      q_ResultError = true;
                      if (opc_InvalidDataPoolIndices != NULL)
@@ -763,7 +768,7 @@ const
                else
                {
                   //ALWAYS do datapool name conflict check
-                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL, NULL);
+                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL, NULL, NULL);
 
                   if (q_DataPoolNameConflict == true)
                   {
@@ -1554,6 +1559,30 @@ int32_t C_OscSystemDefinition::CheckMessageMatch(const C_OscCanMessageIdentifica
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get name max char limit affected items
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  orc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemDefinition::GetNameMaxCharLimitAffectedItems(const uint32_t ou32_NameMaxCharLimit,
+                                                             std::list<C_OscSystemNameMaxCharLimitChangeReportItem> & orc_ChangedItems)
+{
+   this->m_HandleNameMaxCharLimit(ou32_NameMaxCharLimit, &orc_ChangedItems);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply name max char limit
+
+   \param[in]  ou32_NameMaxCharLimit   Name max char limit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemDefinition::ApplyNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit)
+{
+   this->m_HandleNameMaxCharLimit(ou32_NameMaxCharLimit, NULL);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node indexes which are connected to the bus
 
    \param[in]   ou32_BusIndex          Bus index
@@ -1653,8 +1682,8 @@ void C_OscSystemDefinition::AddNodeSquad(std::vector<C_OscNode> & orc_Nodes,
                                          const std::vector<stw::scl::C_SclString> & orc_SubDeviceNames,
                                          const stw::scl::C_SclString & orc_MainDeviceName)
 {
-   tgl_assert(orc_SubDeviceNames.size() == orc_SubDeviceNames.size());
-   if (orc_SubDeviceNames.size() == orc_SubDeviceNames.size())
+   tgl_assert(orc_Nodes.size() == orc_SubDeviceNames.size());
+   if (orc_Nodes.size() == orc_SubDeviceNames.size())
    {
       uint32_t u32_Counter;
 
@@ -1943,5 +1972,70 @@ void C_OscSystemDefinition::m_GetNodeAndComDpIndexesOfBus(const uint32_t ou32_Bu
             }
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemDefinition::m_HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                                     std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->c_Nodes.size(); ++u32_ItNode)
+   {
+      C_OscNode & rc_Node = this->c_Nodes[u32_ItNode];
+      m_HandleNameMaxCharLimitNodeName(u32_ItNode, ou32_NameMaxCharLimit, opc_ChangedItems);
+      rc_Node.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+   for (uint32_t u32_ItBus = 0UL; u32_ItBus < this->c_Buses.size(); ++u32_ItBus)
+   {
+      C_OscSystemBus & rc_Bus = this->c_Buses[u32_ItBus];
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit, "bus-name",
+                                                                                rc_Bus.c_Name,
+                                                                                opc_ChangedItems);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit node name
+
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemDefinition::m_HandleNameMaxCharLimitNodeName(const uint32_t ou32_NodeIndex,
+                                                             const uint32_t ou32_NameMaxCharLimit,
+                                                             std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   //Name
+   uint32_t u32_SquadIndex;
+   const int32_t s32_SquadReturn = this->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex, u32_SquadIndex);
+
+   if (s32_SquadReturn == C_NO_ERR)
+   {
+      C_OscNodeSquad & rc_Squad = this->c_NodeSquads[u32_SquadIndex];
+      const stw::scl::C_SclString c_OldName = rc_Squad.c_BaseName;
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "multi-node-name",
+                                                                                rc_Squad.c_BaseName,
+                                                                                opc_ChangedItems);
+      if (opc_ChangedItems == NULL)
+      {
+         if (c_OldName != rc_Squad.c_BaseName)
+         {
+            this->SetNodeName(ou32_NodeIndex, rc_Squad.c_BaseName);
+         }
+      }
+   }
+   else
+   {
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit, "node-name",
+                                                                                this->c_Nodes[ou32_NodeIndex].c_Properties.c_Name,
+                                                                                opc_ChangedItems);
    }
 }

@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANMESSAGEUNIQUEID_H
-#define C_OSCCANMESSAGEUNIQUEID_H
+#ifndef C_OSCCANMESSAGEUNIQUEID_HPP
+#define C_OSCCANMESSAGEUNIQUEID_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

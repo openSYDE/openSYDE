@@ -1097,3 +1097,19 @@ void C_OscHalcConfig::CalcHash(uint32_t & oru32_HashValue) const
       this->mc_Domains[u32_It].CalcHash(oru32_HashValue);
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscHalcConfig::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                             std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   for (uint32_t u32_ItDomain = 0UL; u32_ItDomain < this->mc_Domains.size(); ++u32_ItDomain)
+   {
+      this->mc_Domains[u32_ItDomain].HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+   }
+}

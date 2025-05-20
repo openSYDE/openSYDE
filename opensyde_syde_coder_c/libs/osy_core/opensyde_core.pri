@@ -25,6 +25,7 @@ INCLUDEPATH += $${PWD} \
                $${PWD}/xml_parser/tinyxml2
 
 SOURCES += \
+    $$PWD/protocol_drivers/communication/C_OscComAutoSupport.cpp \
     $${PWD}/C_OscBinaryHash.cpp \
     $${PWD}/C_OscChecksummedIniFile.cpp \
     $${PWD}/C_OscUtils.cpp \
@@ -48,6 +49,7 @@ SOURCES += \
     $${PWD}/xml_parser/tinyxml2/tinyxml2.cpp
 
 HEADERS += \
+    $$PWD/protocol_drivers/communication/C_OscComAutoSupport.hpp \
     $${PWD}/C_OscBinaryHash.hpp \
     $${PWD}/C_OscChecksummedIniFile.hpp \
     $${PWD}/C_OscUtils.hpp \
@@ -136,29 +138,29 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_code_generation) {
    message("opensyde_core_skip_code_generation not detected ... dragging in package")
 
    INCLUDEPATH += \
-               $${PWD}/exports
+               $${PWD}/exports/code_generation
 
    SOURCES += \
-    $${PWD}/exports/C_OscExportCanOpenConfig.cpp \
-    $${PWD}/exports/C_OscExportCanOpenInit.cpp \
-    $${PWD}/exports/C_OscExportCommunicationStack.cpp \
-    $${PWD}/exports/C_OscExportDataPool.cpp \
-    $${PWD}/exports/C_OscExportHalc.cpp \
-    $${PWD}/exports/C_OscExportNode.cpp \
-    $${PWD}/exports/C_OscExportOsyInit.cpp \
-    $${PWD}/exports/C_OscExportParamSet.cpp \
-    $${PWD}/exports/C_OscExportUti.cpp
+    $${PWD}/exports/code_generation/C_OscExportCanOpenConfig.cpp \
+    $${PWD}/exports/code_generation/C_OscExportCanOpenInit.cpp \
+    $${PWD}/exports/code_generation/C_OscExportCommunicationStack.cpp \
+    $${PWD}/exports/code_generation/C_OscExportDataPool.cpp \
+    $${PWD}/exports/code_generation/C_OscExportHalc.cpp \
+    $${PWD}/exports/code_generation/C_OscExportNode.cpp \
+    $${PWD}/exports/code_generation/C_OscExportOsyInit.cpp \
+    $${PWD}/exports/code_generation/C_OscExportUti.cpp \
+    $${PWD}/exports/code_generation/C_OscExportParamSet.cpp
 
    HEADERS += \
-    $${PWD}/exports/C_OscExportCanOpenConfig.hpp \
-    $${PWD}/exports/C_OscExportCanOpenInit.hpp \
-    $${PWD}/exports/C_OscExportCommunicationStack.hpp \
-    $${PWD}/exports/C_OscExportDataPool.hpp \
-    $${PWD}/exports/C_OscExportHalc.hpp \
-    $${PWD}/exports/C_OscExportNode.hpp \
-    $${PWD}/exports/C_OscExportOsyInit.hpp \
-    $${PWD}/exports/C_OscExportParamSet.hpp \
-    $${PWD}/exports/C_OscExportUti.hpp
+    $${PWD}/exports/code_generation/C_OscExportCanOpenConfig.hpp \
+    $${PWD}/exports/code_generation/C_OscExportCanOpenInit.hpp \
+    $${PWD}/exports/code_generation/C_OscExportCommunicationStack.hpp \
+    $${PWD}/exports/code_generation/C_OscExportDataPool.hpp \
+    $${PWD}/exports/code_generation/C_OscExportHalc.hpp \
+    $${PWD}/exports/code_generation/C_OscExportNode.hpp \
+    $${PWD}/exports/code_generation/C_OscExportOsyInit.hpp \
+    $${PWD}/exports/code_generation/C_OscExportUti.hpp \
+    $${PWD}/exports/code_generation/C_OscExportParamSet.hpp
 }
 
 # optional: project handling (Including all aspects of System Definition)
@@ -176,10 +178,13 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
                   $${PWD}/project \
                   $${PWD}/imports \
                   $${PWD}/project/system \
+                  $${PWD}/project/system/device_definition \
                   $${PWD}/project/system/FileLoadersV2 \
                   $${PWD}/project/system/node \
                   $${PWD}/project/system/node/can \
                   $${PWD}/project/system/node/can/can_open \
+                  $${PWD}/project/system/node/data_logger \
+                  $${PWD}/project/system/target_support_package \
                   $${PWD}/project/view
 
    SOURCES += \
@@ -212,19 +217,23 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/halc/magician/C_OscHalcMagicianUtil.cpp \
        $${PWD}/project/C_OscProject.cpp \
        $${PWD}/project/C_OscProjectFiler.cpp \
-       $${PWD}/project/system/C_OscDeviceDefinitionFiler.cpp \
-       $${PWD}/project/system/C_OscDeviceDefinitionFilerV1.cpp \
-       $${PWD}/project/system/C_OscDeviceDefinition.cpp \
-       $${PWD}/project/system/C_OscSubDeviceDefinition.cpp \
        $${PWD}/project/system/C_OscDeviceGroup.cpp \
        $${PWD}/project/system/C_OscDeviceManager.cpp \
        $${PWD}/project/system/C_OscSystemBus.cpp \
        $${PWD}/project/system/C_OscSystemBusFiler.cpp \
        $${PWD}/project/system/C_OscSystemDefinition.cpp \
        $${PWD}/project/system/C_OscSystemDefinitionFiler.cpp \
+       $${PWD}/project/system/C_OscSystemNameMaxCharLimitChangeReportItem.cpp \
        $${PWD}/project/system/C_OscSystemFilerUtil.cpp \
-       $${PWD}/project/system/C_OscTargetSupportPackage.cpp \
-       $${PWD}/project/system/C_OscTargetSupportPackageFiler.cpp \
+       $${PWD}/project/system/device_definition/C_OscDeviceDefinitionFiler.cpp \
+       $${PWD}/project/system/device_definition/C_OscDeviceDefinitionFilerV1.cpp \
+       $${PWD}/project/system/device_definition/C_OscDeviceDefinition.cpp \
+       $${PWD}/project/system/device_definition/C_OscSupportedCanInterfaceFeatures.cpp \
+       $${PWD}/project/system/device_definition/C_OscSubDeviceDefinition.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackage.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageFiler.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2.cpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2Filer.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeDataPoolFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscSystemBusFilerV2.cpp \
@@ -236,6 +245,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/C_OscCanProtocol.cpp \
        $${PWD}/project/system/node/can/C_OscCanSignal.cpp \
        $${PWD}/project/system/node/can/C_OscCanUtil.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJob.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp \
        $${PWD}/project/system/node/C_OscNode.cpp \
        $${PWD}/project/system/node/C_OscNodeSquad.cpp \
        $${PWD}/project/system/node/C_OscNodeSquadFiler.cpp \
@@ -250,6 +263,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OscNodeDataPoolList.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElement.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElementId.cpp \
+       $${PWD}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListId.cpp \
        $${PWD}/project/system/node/C_OscNodeFiler.cpp \
        $${PWD}/project/system/node/C_OscNodeOpenSydeServerSettings.cpp \
@@ -267,6 +281,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/view/C_OscViewNodeUpdate.cpp \
        $${PWD}/project/view/C_OscViewNodeUpdateParamInfo.cpp \
        $${PWD}/project/view/C_OscViewFiler.cpp \
+       $${PWD}/imports/C_OscEdsDcfImportMessageGroup.cpp \
        $${PWD}/imports/C_OscCanOpenObjectDictionary.cpp \
        $${PWD}/imports/C_OscCanOpenEdsInfoBlock.cpp \
        $${PWD}/imports/C_OscCanOpenEdsDeviceInfoBlock.cpp \
@@ -302,19 +317,23 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/halc/magician/C_OscHalcMagicianUtil.hpp \
        $${PWD}/project/C_OscProject.hpp \
        $${PWD}/project/C_OscProjectFiler.hpp \
-       $${PWD}/project/system/C_OscDeviceDefinition.hpp \
-       $${PWD}/project/system/C_OscDeviceDefinitionFiler.hpp \
-       $${PWD}/project/system/C_OscDeviceDefinitionFilerV1.hpp \
-       $${PWD}/project/system/C_OscSubDeviceDefinition.hpp \
        $${PWD}/project/system/C_OscDeviceGroup.hpp \
        $${PWD}/project/system/C_OscDeviceManager.hpp \
        $${PWD}/project/system/C_OscSystemBus.hpp \
        $${PWD}/project/system/C_OscSystemBusFiler.hpp \
        $${PWD}/project/system/C_OscSystemDefinition.hpp \
        $${PWD}/project/system/C_OscSystemDefinitionFiler.hpp \
+       $${PWD}/project/system/C_OscSystemNameMaxCharLimitChangeReportItem.hpp \
        $${PWD}/project/system/C_OscSystemFilerUtil.hpp \
-       $${PWD}/project/system/C_OscTargetSupportPackage.hpp \
-       $${PWD}/project/system/C_OscTargetSupportPackageFiler.hpp \
+       $${PWD}/project/system/device_definition/C_OscDeviceDefinition.hpp \
+       $${PWD}/project/system/device_definition/C_OscDeviceDefinitionFiler.hpp \
+       $${PWD}/project/system/device_definition/C_OscDeviceDefinitionFilerV1.hpp \
+       $${PWD}/project/system/device_definition/C_OscSupportedCanInterfaceFeatures.hpp \
+       $${PWD}/project/system/device_definition/C_OscSubDeviceDefinition.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackage.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageFiler.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2.hpp \
+       $${PWD}/project/system/target_support_package/C_OscTargetSupportPackageV2Filer.hpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeDataPoolFilerV2.hpp \
        $${PWD}/project/system/FileLoadersV2/C_OscNodeFilerV2.hpp \
        $${PWD}/project/system/FileLoadersV2/C_OscSystemBusFilerV2.hpp \
@@ -335,6 +354,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OscNodeDataPoolList.hpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElement.hpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListElementId.hpp \
+       $${PWD}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.hpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolListId.hpp \
        $${PWD}/project/system/node/C_OscNodeFiler.hpp \
        $${PWD}/project/system/node/C_OscNodeOpenSydeServerSettings.hpp \
@@ -352,11 +372,16 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.hpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.hpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJob.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.hpp \
        $${PWD}/project/view/C_OscViewData.hpp \
        $${PWD}/project/view/C_OscViewPc.hpp \
        $${PWD}/project/view/C_OscViewNodeUpdate.hpp \
        $${PWD}/project/view/C_OscViewNodeUpdateParamInfo.hpp \
        $${PWD}/project/view/C_OscViewFiler.hpp \
+       $${PWD}/imports/C_OscEdsDcfImportMessageGroup.hpp \
        $${PWD}/imports/C_OscCanOpenObjectDictionary.hpp \
        $${PWD}/imports/C_OscCanOpenEdsInfoBlock.hpp \
        $${PWD}/imports/C_OscCanOpenEdsDeviceInfoBlock.hpp \
@@ -427,16 +452,164 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_com_dispatchers) {
 }
 
 
-# optional: protocol drivers (openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# optional: protocol drivers common (openSYDE, STW Flashloader, KEFEX, Data Dealer)
 # Also requires CAN and Ethernet dispatchers
-contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
-   message("opensyde_core_skip_protocol_drivers detected ... skipping package")
+contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_common) {
+   message("opensyde_core_skip_protocol_drivers_common detected ... skipping package")
 } else {
-   message("opensyde_core_skip_protocol_drivers not detected ... dragging in package")
+   message("opensyde_core_skip_protocol_drivers_common not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/protocol_drivers \
+                  $${PWD}/protocol_drivers/communication \
+                  $${PWD}/protocol_drivers/device_config \
+                  $${PWD}/kefex_diaglib/dl_pool \
+                  $${PWD}/kefex_diaglib/hexfile \
+                  $${PWD}/kefex_diaglib/dl_kefex \
+                  $${PWD}/kefex_diaglib/dl_stwflash
+
+   SOURCES += $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.cpp \
+              $${PWD}/kefex_diaglib/hexfile/C_HexFile.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.cpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.cpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.cpp \
+              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.cpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.cpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.cpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.cpp \
+              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.cpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.cpp \
+              $${PWD}/protocol_drivers/C_OscUpdateUtil.cpp \
+              $${PWD}/protocol_drivers/C_OscHexFile.cpp \
+              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.cpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcDeviceInformation.cpp
+
+   HEADERS += $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.hpp \
+              $${PWD}/kefex_diaglib/hexfile/C_HexFile.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.hpp \
+              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.hpp \
+              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.hpp \
+              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.hpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.hpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.hpp \
+              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.hpp \
+              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.hpp \
+              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.hpp \
+              $${PWD}/protocol_drivers/C_OscUpdateUtil.hpp \
+              $${PWD}/protocol_drivers/C_OscHexFile.hpp \
+              $${PWD}/protocol_drivers/communication/C_OscComFlashloaderInformation.hpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcDeviceInformation.hpp
+}
+
+# optional: protocol drivers basic(openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# Also requires CAN and Ethernet dispatchers
+contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_basic) {
+   message("opensyde_core_skip_protocol_drivers_basic detected ... skipping package")
+} else {
+   message("opensyde_core_skip_protocol_drivers_basic not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/protocol_drivers/basic_update \
+                  $${PWD}/protocol_drivers/device_config
+
+   SOURCES += $${PWD}/protocol_drivers/basic_update/C_OscBuSequences.cpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcBasicSequences.cpp
+
+   HEADERS += $${PWD}/protocol_drivers/basic_update/C_OscBuSequences.hpp \
+              $${PWD}/protocol_drivers/device_config/C_OscDcBasicSequences.hpp
+}
+
+# optional: x-certificates generation functionality
+contains(opensyde_core_skip_modules, opensyde_core_skip_x_certificates_generation) {
+   message("opensyde_core_skip_x_certificates_generation detected ... skipping package")
+} else {
+   message("opensyde_core_skip_x_certificates_generation not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/exports/x_certificates_package_generation
+
+   SOURCES += $${PWD}/exports/x_certificates_package_generation/C_OscXceManifest.cpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceManifestFiler.cpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceUpdatePackageParameters.cpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceBase.cpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceCreate.cpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceLoad.cpp \
+
+   HEADERS += $${PWD}/exports/x_certificates_package_generation/C_OscXceManifest.hpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceManifestFiler.hpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceUpdatePackageParameters.hpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceBase.hpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceCreate.hpp \
+              $${PWD}/exports/x_certificates_package_generation/C_OscXceLoad.hpp \
+}
+
+# optional: system package base functionality
+contains(opensyde_core_skip_modules, opensyde_core_skip_system_package_handling) {
+   message("opensyde_core_skip_system_package_handling detected ... skipping package")
+} else {
+   message("opensyde_core_skip_system_package_handling not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/system_package_handling
+
+   SOURCES += $${PWD}/system_package_handling/C_OscSpaServicePackageCreateUtil.cpp \
+              $${PWD}/system_package_handling/C_OscSpaServicePackageLoadUtil.cpp \
+
+   HEADERS += $${PWD}/system_package_handling/C_OscSpaServicePackageCreateUtil.hpp \
+              $${PWD}/system_package_handling/C_OscSpaServicePackageLoadUtil.hpp \
+}
+
+# optional: x-config generation functionality
+contains(opensyde_core_skip_modules, opensyde_core_skip_x_config_generation) {
+   message("opensyde_core_skip_x_config_generation detected ... skipping package")
+} else {
+   message("opensyde_core_skip_x_config_generation not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/exports/x_config_generation
+
+   SOURCES += $${PWD}/exports/x_config_generation/C_OscXcoBase.cpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoCreate.cpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoLoad.cpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoManifest.cpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoManifestFiler.cpp \
+
+   HEADERS += $${PWD}/exports/x_config_generation/C_OscXcoBase.hpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoCreate.hpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoLoad.hpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoManifest.hpp \
+              $${PWD}/exports/x_config_generation/C_OscXcoManifestFiler.hpp \
+}
+
+# optional: protocol drivers system(openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# Also requires CAN and Ethernet dispatchers
+contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers_system) {
+   message("opensyde_core_skip_protocol_drivers_system detected ... skipping package")
+} else {
+   message("opensyde_core_skip_protocol_drivers_system not detected ... dragging in package")
 
    INCLUDEPATH += $${PWD}/data_dealer \
                   $${PWD}/security \
+                  $${PWD}/system_update_package \
                   $${PWD}/protocol_drivers \
+                  $${PWD}/protocol_drivers/basic_update \
                   $${PWD}/protocol_drivers/routing \
                   $${PWD}/protocol_drivers/communication \
                   $${PWD}/protocol_drivers/system_update \
@@ -449,32 +622,13 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
    SOURCES += $${PWD}/data_dealer/C_OscDataDealer.cpp \
               $${PWD}/data_dealer/C_OscDataDealerNvm.cpp \
               $${PWD}/data_dealer/C_OscDataDealerNvmSafe.cpp \
-              $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.cpp \
-              $${PWD}/kefex_diaglib/hexfile/C_HexFile.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.cpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.cpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.cpp \
               $${PWD}/security/C_OscSecurityPem.cpp \
-              $${PWD}/security/C_OscSecurityPemKeyInfo.cpp \
+              $${PWD}/security/C_OscSecurityPemBase.cpp \
               $${PWD}/security/C_OscSecurityPemDatabase.cpp \
+              $${PWD}/security/C_OscSecurityPemKeyInfo.cpp \
+              $${PWD}/security/C_OscSecurityPemSecUpdate.cpp \
+              $${PWD}/security/C_OscSecurityEcdsa.cpp \
               $${PWD}/security/C_OscSecurityRsa.cpp \
-              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.cpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.cpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.cpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.cpp \
-              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.cpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.cpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverBase.cpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverFlash.cpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverProtocol.cpp \
@@ -483,38 +637,26 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/routing/C_OscRoutingRoute.cpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequences.cpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.cpp \
-              $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.cpp \
-              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.cpp
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageV1.cpp \
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageCreate.cpp \
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageLoad.cpp \
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageBase.cpp \
+              $${PWD}/system_update_package/C_OscSupSignatureFiler.cpp \
+              $${PWD}/system_update_package/C_OscSupDefinition.cpp \
+              $${PWD}/system_update_package/C_OscSupDefinitionFiler.cpp \
+              $${PWD}/system_update_package/C_OscSupNodeDefinition.cpp \
+              $${PWD}/system_update_package/C_OscSupNodeDefinitionFiler.cpp \
 
    HEADERS += $${PWD}/data_dealer/C_OscDataDealer.hpp \
               $${PWD}/data_dealer/C_OscDataDealerNvm.hpp \
               $${PWD}/data_dealer/C_OscDataDealerNvmSafe.hpp \
-              $${PWD}/kefex_diaglib/dl_pool/CDLReportEvents.hpp \
-              $${PWD}/kefex_diaglib/hexfile/C_HexFile.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXComm.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommConfiguration.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXCommunicationKEFEX.hpp \
-              $${PWD}/kefex_diaglib/dl_kefex/CKFXProtocol.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLActions.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLECUInformation.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWrite.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLFlashWriteParameters.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLHexFile.hpp \
-              $${PWD}/kefex_diaglib/dl_stwflash/CXFLProtocol.hpp \
               $${PWD}/security/C_OscSecurityPem.hpp \
-              $${PWD}/security/C_OscSecurityPemKeyInfo.hpp \
+              $${PWD}/security/C_OscSecurityPemBase.hpp \
               $${PWD}/security/C_OscSecurityPemDatabase.hpp \
+              $${PWD}/security/C_OscSecurityPemKeyInfo.hpp \
+              $${PWD}/security/C_OscSecurityPemSecUpdate.hpp \
+              $${PWD}/security/C_OscSecurityEcdsa.hpp \
               $${PWD}/security/C_OscSecurityRsa.hpp \
-              $${PWD}/protocol_drivers/C_OscCanDispatcherOsyRouter.hpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolBase.hpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolKfx.hpp \
-              $${PWD}/protocol_drivers/C_OscDiagProtocolOsy.hpp \
-              $${PWD}/protocol_drivers/C_OscFlashProtocolStwFlashloader.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolSerialNumber.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsy.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpBase.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpCan.hpp \
-              $${PWD}/protocol_drivers/C_OscProtocolDriverOsyTpIp.hpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverBase.hpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverFlash.hpp \
               $${PWD}/protocol_drivers/communication/C_OscComDriverProtocol.hpp \
@@ -523,8 +665,15 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/routing/C_OscRoutingRoute.hpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequences.hpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.hpp \
-              $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.hpp \
-              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.hpp
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageV1.hpp \
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageCreate.hpp \
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageLoad.hpp \
+              $${PWD}/system_update_package/C_OscSupServiceUpdatePackageBase.hpp \
+              $${PWD}/system_update_package/C_OscSupSignatureFiler.hpp \
+              $${PWD}/system_update_package/C_OscSupDefinition.hpp \
+              $${PWD}/system_update_package/C_OscSupDefinitionFiler.hpp \
+              $${PWD}/system_update_package/C_OscSupNodeDefinition.hpp \
+              $${PWD}/system_update_package/C_OscSupNodeDefinitionFiler.hpp \
 }
 
 # optional: protocol logging

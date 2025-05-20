@@ -5,8 +5,8 @@
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIGSTANDALONECHANNEL_H
-#define C_OSCHALCCONFIGSTANDALONECHANNEL_H
+#ifndef C_OSCHALCCONFIGSTANDALONECHANNEL_HPP
+#define C_OSCHALCCONFIGSTANDALONECHANNEL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

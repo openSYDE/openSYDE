@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCSYSTEMBUSH
-#define C_OSCSYSTEMBUSH
+#ifndef C_OSCSYSTEMBUS_HPP
+#define C_OSCSYSTEMBUS_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -47,6 +47,8 @@ public:
    stw::scl::C_SclString c_Name;    ///< unique name of bus
    stw::scl::C_SclString c_Comment; ///< user comment
    uint64_t u64_BitRate;            ///< bitrate of bus in bits / second
+   bool q_UseCanFd;                 ///< Flag to use CAN-FD on bus
+   uint64_t u64_CanFdBitRate;       ///< CAN-FD bitrate of bus in bits / second
    uint8_t u8_BusId;                ///< unique bus id
    uint16_t u16_RxTimeoutOffsetMs;  ///< Delta time to wait for receive before timeout in ms
    bool q_UseableForRouting;        ///< indicator if routing is available for this bus

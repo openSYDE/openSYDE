@@ -21,6 +21,7 @@
 #include "C_SclString.hpp"
 #include "TglTime.hpp"
 #include "C_OscLoggingHandler.hpp"
+#include "C_OscComAutoSupport.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -109,6 +110,7 @@ C_OscComDriverBase::C_OscComDriverBase(void) :
    mu32_CanTxCounter(0U),
    mu32_CanTxErrors(0U)
 {
+   mpc_AutoSupportProtocol = new C_OscComAutoSupport();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -120,6 +122,7 @@ C_OscComDriverBase::C_OscComDriverBase(void) :
 C_OscComDriverBase::~C_OscComDriverBase(void)
 {
    this->mpc_CanDispatcher = NULL; //do not delete ! not owned by us
+   delete this->mpc_AutoSupportProtocol;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -209,6 +212,7 @@ int32_t C_OscComDriverBase::StartLogging(const int32_t os32_Bitrate)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscComDriverBase::StopLogging(void)
 {
+   mpc_AutoSupportProtocol->ClearAutoSupportInfo();
    uint32_t u32_Counter;
 
    this->mq_Started = false;
@@ -276,6 +280,18 @@ void C_OscComDriverBase::UpdateBitrate(const int32_t os32_Bitrate)
       this->ms32_CanBitrate = os32_Bitrate;
       // Reset the counter
       this->mu32_CanMessageBits = 0U;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clear rx messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComDriverBase::ClearRxMessages()
+{
+   if (this->mpc_CanDispatcher != NULL)
+   {
+      this->mpc_CanDispatcher->ClearQueue(this->mu16_DispatcherClientHandle);
    }
 }
 
@@ -399,13 +415,34 @@ void C_OscComDriverBase::SendCanMessageQueued(const T_STWCAN_Msg_TX & orc_Msg)
    C_COM       Error on sending CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg)
+int32_t C_OscComDriverBase::SendCanMessageDirect(T_STWCAN_Msg_TX & orc_Msg)
 {
+   orc_Msg.au8_Data[6] = mpc_AutoSupportProtocol->MessageCounter(orc_Msg.u32_ID, orc_Msg.au8_Data[6]);
+   orc_Msg.au8_Data[7] =
+      mpc_AutoSupportProtocol->SetCyclicRedundancyCheckCalculation(orc_Msg.u32_ID, orc_Msg.u8_DLC - 2,
+                                                                   &orc_Msg.au8_Data[0]);
+
    int32_t s32_Return = C_CONFIG;
 
    if (this->mpc_CanDispatcher != NULL)
    {
       s32_Return = this->mpc_CanDispatcher->CAN_Send_Msg(orc_Msg);
+
+      if (mpc_AutoSupportProtocol->SupportInvertedCanMessage(orc_Msg.u32_ID))
+      {
+         uint8_t au8_InvertedData[8U];
+
+         C_OscComAutoSupport::h_InvertCanMessage(&orc_Msg.au8_Data[0], &au8_InvertedData[0]);
+         T_STWCAN_Msg_TX orc_TransmitInvertedMsg;
+         (void)std::memcpy(&orc_TransmitInvertedMsg.au8_Data[0], &au8_InvertedData[0], 8U);
+
+         orc_TransmitInvertedMsg.u32_ID = orc_Msg.u32_ID + 1;
+         orc_TransmitInvertedMsg.u8_DLC = orc_Msg.u8_DLC;
+         orc_TransmitInvertedMsg.u8_XTD = orc_Msg.u8_XTD;
+         orc_TransmitInvertedMsg.u8_RTR = orc_Msg.u8_RTR;
+         orc_TransmitInvertedMsg.u8_Align = orc_Msg.u8_Align;
+         this->mpc_CanDispatcher->CAN_Send_Msg(orc_TransmitInvertedMsg);
+      }
 
       if (s32_Return == C_NO_ERR)
       {
@@ -423,6 +460,22 @@ int32_t C_OscComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg
          c_Msg.u64_TimeStamp = stw::tgl::TglGetTickCountUs();
 
          this->m_HandleCanMessage(c_Msg, true);
+
+         if (mpc_AutoSupportProtocol->SupportInvertedCanMessage(orc_Msg.u32_ID))
+         {
+            uint8_t au8_InvertedData[8U];
+            C_OscComAutoSupport::h_InvertCanMessage(&orc_Msg.au8_Data[0], &au8_InvertedData[0]);
+            T_STWCAN_Msg_RX c_RecieveInvertedMsg;
+            (void)std::memcpy(&c_RecieveInvertedMsg.au8_Data[0], &au8_InvertedData[0], 8U);
+
+            c_RecieveInvertedMsg.u32_ID = orc_Msg.u32_ID + 1;
+            c_RecieveInvertedMsg.u8_DLC = orc_Msg.u8_DLC;
+            c_RecieveInvertedMsg.u8_XTD = orc_Msg.u8_XTD;
+            c_RecieveInvertedMsg.u8_RTR = orc_Msg.u8_RTR;
+            c_RecieveInvertedMsg.u8_Align = orc_Msg.u8_Align;
+            c_RecieveInvertedMsg.u64_TimeStamp = stw::tgl::TglGetTickCountUs();
+            this->m_HandleCanMessage(c_RecieveInvertedMsg, true);
+         }
 
          // Count the message
          if (this->mu32_CanTxCounter < 0xFFFFFFFFU)
@@ -456,11 +509,15 @@ int32_t C_OscComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg
    Interval is ignored and set to 0.
    Use AddCyclicCanMessage for registration of a cyclic CAN message.
 
-   \param[in]     orc_MsgCfg         CAN message configuration
+   \param[in]     orc_MsgCfg                    CAN message configuration
+   \param[in]      oq_SetAutoSupportMode     Is AutoSupport activated
+   \param[in]      oe_ProtocolType           Current message Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscComDriverBase::SendCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg)
+void C_OscComDriverBase::SendCanMessage(C_OscComDriverBaseCanMessage & orc_MsgCfg, const bool oq_SetAutoSupportMode,
+                                        const C_OscCanProtocol::E_Type oe_ProtocolType)
 {
+   mpc_AutoSupportProtocol->AutoSupportModeInfo(orc_MsgCfg.c_Msg.u32_ID, oq_SetAutoSupportMode, oe_ProtocolType);
    this->mc_CanMessageConfigs.push_back(orc_MsgCfg);
    this->mc_CanMessageConfigs.back().u32_Interval = 0U;
 }
@@ -469,10 +526,15 @@ void C_OscComDriverBase::SendCanMessage(const C_OscComDriverBaseCanMessage & orc
 /*! \brief   Registers a cyclic CAN message with a specific configuration
 
    \param[in]     orc_MsgCfg         CAN message configuration
+   \param[in]      oq_SetAutoSupportMode     Is AutoSupport activated
+   \param[in]      oe_ProtocolType           Current message Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscComDriverBase::AddCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg)
+void C_OscComDriverBase::AddCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg,
+                                             const bool oq_SetAutoSupportMode,
+                                             const C_OscCanProtocol::E_Type oe_ProtocolType)
 {
+   mpc_AutoSupportProtocol->AutoSupportModeInfo(orc_MsgCfg.c_Msg.u32_ID, oq_SetAutoSupportMode, oe_ProtocolType);
    this->mc_CanMessageConfigs.push_back(orc_MsgCfg);
    if (orc_MsgCfg.u32_Interval == 0U)
    {
@@ -484,10 +546,15 @@ void C_OscComDriverBase::AddCyclicCanMessage(const C_OscComDriverBaseCanMessage 
 /*! \brief   Removes a cyclic CAN message with a specific configuration
 
    \param[in]     orc_MsgCfg         CAN message configuration
+   \param[in]      oq_SetAutoSupportMode     Is AutoSupport activated
+   \param[in]      oe_ProtocolType           Current message Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscComDriverBase::RemoveCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg)
+void C_OscComDriverBase::RemoveCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg,
+                                                const bool oq_SetAutoSupportMode,
+                                                const C_OscCanProtocol::E_Type oe_ProtocolType)
 {
+   mpc_AutoSupportProtocol->AutoSupportModeInfo(orc_MsgCfg.c_Msg.u32_ID, false, oe_ProtocolType);
    C_OscComDriverBaseCanMessage c_MsgCfg = orc_MsgCfg;
 
    std::list<C_OscComDriverBaseCanMessage>::iterator c_ItConfig;
@@ -499,7 +566,21 @@ void C_OscComDriverBase::RemoveCyclicCanMessage(const C_OscComDriverBaseCanMessa
 
    for (c_ItConfig = this->mc_CanMessageConfigs.begin(); c_ItConfig != this->mc_CanMessageConfigs.end(); ++c_ItConfig)
    {
-      if (*c_ItConfig == c_MsgCfg)
+      if (((false == oq_SetAutoSupportMode) && (*c_ItConfig == c_MsgCfg)) ||
+          ((true == oq_SetAutoSupportMode) && (oe_ProtocolType == C_OscCanProtocol::eCAN_OPEN_SAFETY) &&
+           (*c_ItConfig == c_MsgCfg)) ||
+          ((true == oq_SetAutoSupportMode) && (oe_ProtocolType == C_OscCanProtocol::eECES) &&
+           ((c_ItConfig->c_Msg.u32_ID == orc_MsgCfg.c_Msg.u32_ID) &&
+            (c_ItConfig->c_Msg.u8_Align == orc_MsgCfg.c_Msg.u8_Align) &&
+            (c_ItConfig->c_Msg.u8_DLC == orc_MsgCfg.c_Msg.u8_DLC) &&
+            (c_ItConfig->c_Msg.u8_RTR == orc_MsgCfg.c_Msg.u8_RTR) &&
+            (c_ItConfig->c_Msg.u8_XTD == orc_MsgCfg.c_Msg.u8_XTD) &&
+            (c_ItConfig->c_Msg.au8_Data[0] == orc_MsgCfg.c_Msg.au8_Data[0]) &&
+            (c_ItConfig->c_Msg.au8_Data[1] == orc_MsgCfg.c_Msg.au8_Data[1]) &&
+            (c_ItConfig->c_Msg.au8_Data[2] == orc_MsgCfg.c_Msg.au8_Data[2]) &&
+            (c_ItConfig->c_Msg.au8_Data[3] == orc_MsgCfg.c_Msg.au8_Data[3]) &&
+            (c_ItConfig->c_Msg.au8_Data[4] == orc_MsgCfg.c_Msg.au8_Data[4]) &&
+            (c_ItConfig->c_Msg.au8_Data[5] == orc_MsgCfg.c_Msg.au8_Data[5]))))
       {
          this->mc_CanMessageConfigs.erase(c_ItConfig);
          break;
@@ -527,6 +608,40 @@ void C_OscComDriverBase::PrepareForDestruction(void)
    if (this->mpc_CanDispatcher != NULL)
    {
       this->mpc_CanDispatcher->RemoveClient(this->mu16_DispatcherClientHandle);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On Clear trace we reset message counters
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComDriverBase::ClearData()
+{
+   mpc_AutoSupportProtocol->ResetOnClearData();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On Update of AutoSupportProtocol to send information for stop/start Message counter
+
+   \param[in]       os32_CanId                Current message Can Id
+   \param[in]      oq_SetAutoSupportMode     Is AutoSupport activated
+   \param[in]      oe_ProtocolType           Current message Protocol type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComDriverBase::UpdateAutoSupportProtocol(const int32_t os32_CanId, const bool oq_SetAutoSupportMode,
+                                                   const C_OscCanProtocol::E_Type oe_ProtocolType)
+{
+   mpc_AutoSupportProtocol->AutoSupportModeInfo(os32_CanId, oq_SetAutoSupportMode, oe_ProtocolType);
+   mpc_AutoSupportProtocol->ResetMessageCounters(os32_CanId, oq_SetAutoSupportMode, oe_ProtocolType);
+   std::list<C_OscComDriverBaseCanMessage>::iterator c_ItConfig;
+   for (c_ItConfig = this->mc_CanMessageConfigs.begin(); c_ItConfig != this->mc_CanMessageConfigs.end(); ++c_ItConfig)
+   {
+      if ((static_cast<int32_t>(c_ItConfig->c_Msg.u32_ID) == os32_CanId) &&
+          (oe_ProtocolType == C_OscCanProtocol::eECES) && (oq_SetAutoSupportMode == false))
+      {
+         c_ItConfig->c_Msg.au8_Data[6] = 0;
+         c_ItConfig->c_Msg.au8_Data[7] = 0;
+      }
    }
 }
 

@@ -5,8 +5,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODESQUADFILER_H
-#define C_OSCNODESQUADFILER_H
+#ifndef C_OSCNODESQUADFILER_HPP
+#define C_OSCNODESQUADFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscNodeSquad.hpp"

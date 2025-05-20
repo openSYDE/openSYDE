@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCDEFCONTENTBITMASKITEM_H
-#define C_OSCHALCDEFCONTENTBITMASKITEM_H
+#ifndef C_OSCHALCDEFCONTENTBITMASKITEM_HPP
+#define C_OSCHALCDEFCONTENTBITMASKITEM_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

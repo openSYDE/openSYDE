@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPARAMSETRAWNODE_H
-#define C_OSCPARAMSETRAWNODE_H
+#ifndef C_OSCPARAMSETRAWNODE_HPP
+#define C_OSCPARAMSETRAWNODE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

@@ -9,8 +9,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef STWERRORSHPP
-#define STWERRORSHPP
+#ifndef STWERRORS_HPP
+#define STWERRORS_HPP
 
 #ifndef __cplusplus
 //use sterrors.h for C sources

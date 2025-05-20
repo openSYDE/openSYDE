@@ -6,8 +6,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODESQUAD_H
-#define C_OSCNODESQUAD_H
+#ifndef C_OSCNODESQUAD_HPP
+#define C_OSCNODESQUAD_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

@@ -11,7 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <cstdio>
-#include <stdlib.h>
+#include <ctime>
 #include <dirent.h>
 #include <fnmatch.h>
 #include <ftw.h>
@@ -25,7 +25,6 @@
 #include "C_SclDateTime.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-
 using namespace stw::errors;
 using namespace stw::tgl;
 using namespace stw::scl;
@@ -39,37 +38,11 @@ using namespace stw::scl;
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
-static bool m_FileAgeDosTime(const C_SclString & orc_FileName, uint16_t * const opu16_Date, uint16_t * const opu16_Time);
-static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat, int osn_Type, struct FTW * opt_Ftwb);
+//lint -e{8080} //interface defined by C library
+static int m_RemoveFile(const char_t * const opcn_Pathname, const struct stat * const opc_Stat, const int ox_Type,
+                        struct FTW * const opc_Ftwb);
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
-//utility: get operating system file age
-static bool m_FileAgeDosTime(const C_SclString & orc_FileName, uint16_t * const opu16_Date, uint16_t * const opu16_Time)
-{
-   bool q_Return = false;
-   struct stat t_stat;
-   struct tm t_tm, *pt_tm;
-
-   if (stat(orc_FileName.c_str(), &t_stat) == 0)
-   {
-      pt_tm = localtime(&t_stat.st_mtime);
-      if (pt_tm != NULL)
-      {
-         t_tm = *pt_tm;
-         // build date word
-         *opu16_Date = (pt_tm->tm_year - 80) << 9 |  // year
-		   (pt_tm->tm_mon  + 1 ) << 5 |  // month
-		   pt_tm->tm_mday;               // month day
-         // build time word
-         *opu16_Time = pt_tm->tm_hour << 11 |        // hour
-                       pt_tm->tm_min  << 5  |        // minutes
-         pt_tm->tm_sec / 2;            // secondes
-         // set return value
-         q_Return = true;
-      }
-   }
-   return q_Return;
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get file age time as string
@@ -81,36 +54,37 @@ static bool m_FileAgeDosTime(const C_SclString & orc_FileName, uint16_t * const 
    \param[out]    orc_String       timestamp as string
 
    \return
-   true      timestamp placed in oc_String  \n
-   false     error -> oc_String not valid
+   true      timestamp placed in orc_String  \n
+   false     error -> orc_String not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool stw::tgl::TglFileAgeString(const C_SclString & orc_FileName, C_SclString & orc_String)
 {
-   bool q_Return;
-   uint16_t u16_Time = 0;
-   uint16_t u16_Date = 0;
    C_SclDateTime c_DateTime;
+   struct stat c_Stat;
+   bool q_Return = false;
 
-   q_Return = m_FileAgeDosTime(orc_FileName, &u16_Date, &u16_Time);
-   if (q_Return == true)
+   if (stat(orc_FileName.c_str(), &c_Stat) == 0)
    {
-      c_DateTime.mu16_Day    = static_cast<uint16_t>(u16_Date & 0x1FU);
-      c_DateTime.mu16_Month  = static_cast<uint16_t>((u16_Date >> 5U) & 0x0FU);
-      c_DateTime.mu16_Year   = static_cast<uint16_t>((u16_Date >> 9U) + 1980U);
-      c_DateTime.mu16_Hour   = static_cast<uint16_t>(u16_Time >> 11U);
-      c_DateTime.mu16_Minute = static_cast<uint16_t>((u16_Time >> 5U) & 0x3FU);
-      c_DateTime.mu16_Second = static_cast<uint16_t>((u16_Time & 0x1FU) * 2U);
+      struct std::tm c_Time;
+      struct std::tm * const pc_Time = localtime_r(&c_Stat.st_mtime, &c_Time);
+      if (pc_Time != NULL)
+      {
+         q_Return = true;
+         c_DateTime.mu16_Day    = static_cast<uint16_t>(c_Time.tm_mday);
+         c_DateTime.mu16_Month  = static_cast<uint16_t>(c_Time.tm_mon + 1);
+         c_DateTime.mu16_Year   = static_cast<uint16_t>(c_Time.tm_year + 1900);
+         c_DateTime.mu16_Hour   = static_cast<uint16_t>(c_Time.tm_hour);
+         c_DateTime.mu16_Minute = static_cast<uint16_t>(c_Time.tm_min);
+         c_DateTime.mu16_Second = static_cast<uint16_t>(c_Time.tm_sec);
+         //just to make sure we don't get a leap second reported:
+         if (c_DateTime.mu16_Second >= 60)
+         {
+            c_DateTime.mu16_Second = 59;
+         }
+      }
    }
-   else
-   {
-      c_DateTime.mu16_Day    = 1U;
-      c_DateTime.mu16_Month  = 1U;
-      c_DateTime.mu16_Year   = 1970U;
-      c_DateTime.mu16_Hour   = 0U;
-      c_DateTime.mu16_Minute = 0U;
-      c_DateTime.mu16_Second = 0U;
-   }
+
    orc_String = c_DateTime.DateTimeToString();
    return q_Return;
 }
@@ -129,15 +103,19 @@ bool stw::tgl::TglFileAgeString(const C_SclString & orc_FileName, C_SclString & 
 //----------------------------------------------------------------------------------------------------------------------
 int32_t stw::tgl::TglFileSize(const C_SclString & orc_FileName)
 {
-   std::FILE * pt_File;
    int32_t s32_Size = -1;
 
-   pt_File = std::fopen(orc_FileName.c_str(), "rb");
-   if (pt_File != NULL)
+   std::FILE * const pc_File = std::fopen(orc_FileName.c_str(), "rb");
+   if (pc_File != NULL)
    {
-      (void)std::fseek(pt_File, 0, SEEK_END);
-      s32_Size = std::ftell(pt_File);
-      (void)std::fclose(pt_File);
+      long x_Size; //lint !e8080  type defined by API we use
+      (void)std::fseek(pc_File, 0, SEEK_END);
+      x_Size = std::ftell(pc_File);
+      (void)std::fclose(pc_File);
+      if (x_Size <= INT32_MAX)
+      {
+         s32_Size = static_cast<int32_t>(x_Size);
+      }
    }
    return s32_Size;
 }
@@ -146,7 +124,6 @@ int32_t stw::tgl::TglFileSize(const C_SclString & orc_FileName)
 /*! \brief  Check whether directory exists
 
    Detects whether the specified directory exists.
-   For the Windows target this also includes simple drive names (e.g. "d:")
 
    \param[in]     orc_Path     path to directory (works with or without trailing path delimiter)
 
@@ -158,12 +135,13 @@ int32_t stw::tgl::TglFileSize(const C_SclString & orc_FileName)
 bool stw::tgl::TglDirectoryExists(const C_SclString & orc_Path)
 {
    int32_t s32_Ret;
-   struct stat t_Status;
+   struct stat c_Status;
 
-   s32_Ret = stat(orc_Path.c_str(), &t_Status);
-   return ((s32_Ret == 0) && S_ISDIR(t_Status.st_mode)) ? true : false;
+   s32_Ret = stat(orc_Path.c_str(), &c_Status);
+   //lint -emacro(9001 9130,S_ISDIR)  //system macro uses octal constants and bitwise operations
+   //quality ensured by supplier
+   return ((s32_Ret == 0) && S_ISDIR(c_Status.st_mode)) ? true : false;
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check whether file exists
@@ -180,11 +158,13 @@ bool stw::tgl::TglDirectoryExists(const C_SclString & orc_Path)
 bool stw::tgl::TglFileExists(const C_SclString & orc_FileName)
 {
    bool q_Return = false;
-   struct stat t_stat;
+   struct stat c_Stat;
 
-   if (stat(orc_FileName.c_str(), &t_stat) == 0)
+   if (stat(orc_FileName.c_str(), &c_Stat) == 0)
    {
-      if (S_ISREG(t_stat.st_mode) != false)
+      //lint -emacro(9001 9130,S_ISREG)  //system macro uses octal constants and bitwise operations
+      //quality ensured by supplier
+      if (S_ISREG(c_Stat.st_mode) != false)
       {
          q_Return = true;
       }
@@ -211,23 +191,26 @@ int32_t stw::tgl::TglFileFind(const C_SclString & orc_SearchPattern,
 {
    int32_t s32_Error = C_CONFIG;
    DIR * pc_Dir;
-   struct dirent *pt_Entry;
-   C_SclString c_Path = TglExtractFilePath(orc_SearchPattern);
-   C_SclString c_Pattern = TglExtractFileName(orc_SearchPattern);
+   struct dirent * pc_Entry;
+   const C_SclString c_Path = TglExtractFilePath(orc_SearchPattern);
 
    orc_FoundFiles.SetLength(0);
 
    pc_Dir = opendir(c_Path.c_str());
    if (pc_Dir != NULL)
    {
-      while ((pt_Entry = readdir(pc_Dir)) != NULL)
+      while ((pc_Entry = readdir(pc_Dir)) != NULL)
       {
-         if (pt_Entry->d_type == DT_REG)
+         if (pc_Entry->d_type == DT_REG)
          {
-            if (fnmatch(c_Pattern.c_str(), pt_Entry->d_name, FNM_PATHNAME | FNM_NOESCAPE) == 0)
+            const C_SclString c_Pattern = TglExtractFileName(orc_SearchPattern);
+            //lint -emacro(835 9130,FNM_PATHNAME)  //system macros do bad things; quality ensured by supplier
+            //lint -emacro(835 9130,FNM_NOESCAPE)  //system macros do bad things; quality ensured by supplier
+            //lint -e{9130} //API defined by library
+            if (fnmatch(c_Pattern.c_str(), pc_Entry->d_name, FNM_PATHNAME | FNM_NOESCAPE) == 0)
             {
                orc_FoundFiles.IncLength();
-               orc_FoundFiles[orc_FoundFiles.GetHigh()].c_FileName = pt_Entry->d_name;
+               orc_FoundFiles[orc_FoundFiles.GetHigh()].c_FileName = pc_Entry->d_name;
                s32_Error = C_NO_ERR;
             }
          }
@@ -252,15 +235,21 @@ int32_t stw::tgl::TglFileFind(const C_SclString & orc_SearchPattern,
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString stw::tgl::TglFileIncludeTrailingDelimiter(const C_SclString & orc_Path)
 {
+   C_SclString c_Path;
+
    if (orc_Path.Length() == 0)
    {
-      return "/";
+      c_Path = "/";
    }
-   if (orc_Path.operator[](orc_Path.Length()) != '/')
+   else if (orc_Path.operator [](orc_Path.Length()) != '/')
    {
-      return orc_Path + "/";
+      c_Path = orc_Path + "/";
    }
-   return orc_Path;
+   else
+   {
+      c_Path = orc_Path;
+   }
+   return c_Path;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -326,31 +315,31 @@ C_SclString stw::tgl::TglChangeFileExtension(const C_SclString & orc_Path, const
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString stw::tgl::TglGetExePath(void)
 {
-    int32_t s32_Return;
-    char_t acn_Arg[20];
-    std::vector<char_t> c_VecPath;
-    C_SclString c_Path;
-    bool q_Success = false;
-    int32_t s32_BuffSize;
+   std::vector<char_t> c_VecPath;
+   C_SclString c_Arg;
+   C_SclString c_Path;
+   bool q_Success = false;
 
-    c_VecPath.resize(1, 0);
+   c_VecPath.resize(1, 0);
 
-    sprintf(acn_Arg, "/proc/%d/exe", getpid());
-    do
-    {
+   c_Arg = "/proc/" + C_SclString::IntToStr(getpid()) + "/exe";
+
+   do
+   {
+      ssize_t x_Return;  //lint !e8080  type defined by API we use
+      size_t x_BuffSize; //lint !e8080  type defined by API we use
       c_VecPath.resize(c_VecPath.size() + PATH_MAX, 0);
       // Reserving one byte for null termination
-      s32_BuffSize = c_VecPath.size() - 1;
+      x_BuffSize = c_VecPath.size() - 1;
 
-      s32_Return = readlink(acn_Arg, &c_VecPath[0], s32_BuffSize);
+      x_Return = readlink(c_Arg.c_str(), &c_VecPath[0], x_BuffSize);
 
-      if ((s32_Return >= 0) &&
-          (s32_Return < s32_BuffSize))
+      if ((x_Return >= 0) && (x_Return < static_cast<ssize_t>(x_BuffSize)))
       {
-         // Success: Buffer was big enoug and no error occured
+         // Success: Buffer was big enough and no error occurred
          q_Success = true;
       }
-      else if (s32_Return < 0)
+      else if (x_Return < 0)
       {
          // A not buffer size specific error which can not be fixed by trying again with a bigger buffer size
          // Special case: The error "errno == ENAMETOOLONG" seems no to be fixable by
@@ -362,16 +351,16 @@ C_SclString stw::tgl::TglGetExePath(void)
          // The buffer was probably too small, try a further iteration with an increased buffer size:
          // sn_Return is bigger or equal to sn_BuffSize. This is an indicator for a truncated part of the path
       }
-    }
-    while (q_Success == false);
+   }
+   while (q_Success == false);
 
-    if (q_Success == true)
-    {
-       //we got a path ...
-       c_Path = &c_VecPath[0];
-    }
+   if (q_Success == true)
+   {
+      //we got a path ...
+      c_Path = &c_VecPath[0];
+   }
 
-    return c_Path;
+   return c_Path;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -390,6 +379,7 @@ C_SclString stw::tgl::TglExtractFilePath(const C_SclString & orc_Path)
 {
    uint32_t u32_Return;
    C_SclString c_Path = ".";
+
    u32_Return = orc_Path.LastPos("/");
 
    if (u32_Return != 0U)
@@ -415,11 +405,12 @@ C_SclString stw::tgl::TglExtractFileName(const C_SclString & orc_Path)
 {
    uint32_t u32_Return;
    C_SclString c_FileName;
+
    u32_Return = orc_Path.LastPos("/");
 
    if (u32_Return != 0U)
    {
-      c_FileName = orc_Path.SubString(u32_Return+1, orc_Path.Length());
+      c_FileName = orc_Path.SubString(u32_Return + 1, orc_Path.Length());
    }
    else
    {
@@ -443,15 +434,15 @@ C_SclString stw::tgl::TglExtractFileName(const C_SclString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString stw::tgl::TglExpandFileName(const C_SclString & orc_RelativePath, const C_SclString & orc_BasePath)
 {
-   char_t * pcn_Path;
-   C_SclString c_RelPath = orc_BasePath + "/" + orc_RelativePath;
+   char_t acn_Buffer[PATH_MAX];
    C_SclString c_FullPath;
 
-   pcn_Path = realpath(c_RelPath.c_str(), NULL);
+   const C_SclString c_RelPath = orc_BasePath + "/" + orc_RelativePath;
+   const char_t * const pcn_Path = realpath(c_RelPath.c_str(), &acn_Buffer[0]);
+
    if (pcn_Path != NULL)
    {
       c_FullPath = pcn_Path;
-      free(pcn_Path);
    }
 
    return c_FullPath;
@@ -474,10 +465,10 @@ int32_t stw::tgl::TglCreateDirectory(const C_SclString & orc_Directory)
 {
    int32_t s32_Ret;
    int32_t s32_Result = -1;
-   struct stat t_Status;
+   struct stat c_Status;
 
-   s32_Ret = stat(orc_Directory.c_str(), &t_Status);
-   if ((s32_Ret == 0) && S_ISDIR(t_Status.st_mode))
+   s32_Ret = stat(orc_Directory.c_str(), &c_Status);
+   if ((s32_Ret == 0) && S_ISDIR(c_Status.st_mode))
    {
       // Directory already exists
       s32_Result = 0;
@@ -485,7 +476,7 @@ int32_t stw::tgl::TglCreateDirectory(const C_SclString & orc_Directory)
    else
    {
       // Directory does not exist, create it
-      s32_Ret =  mkdir(orc_Directory.c_str(), 0777);
+      s32_Ret = mkdir(orc_Directory.c_str(), 0777);
       if (s32_Ret == 0)
       {
          s32_Result = 0;
@@ -499,24 +490,26 @@ int32_t stw::tgl::TglCreateDirectory(const C_SclString & orc_Directory)
 /*! \brief  Remove a single file or directory entry. This function is the callback used in the nftw function
 
    \param[in]   opcn_Pathname             File or directory to be removed
-   \param[in]   opt_Stat                  Stat info of the file / directory
-   \param[in]   osn_Type                  File type flags
-   \param[in]   opt_Ftwb                  File location in path
+   \param[in]   opc_Stat                  Stat info of the file / directory
+   \param[in]   ox_Type                   File type flags
+   \param[in]   opc_Ftwb                  File location in path
 
    \return
    0     file/directory removed
    -1    could not remove file directory
 */
 //---------------------------------------------------------------------------------------------------------------------
-static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat, int osn_Type, struct FTW * opt_Ftwb)
+//lint -e{8080} //interface defined by C library
+static int m_RemoveFile(const char_t * const opcn_Pathname, const struct stat * const opc_Stat, const int ox_Type,
+                        struct FTW * const opc_Ftwb)
 {
    int32_t s32_Ret = 0;
-   (void)opt_Stat;
-   (void)osn_Type;
-   (void)opt_Ftwb;
+
+   (void)opc_Stat;
+   (void)ox_Type;
 
    // Do not delete the base folder here
-   if (opt_Ftwb->level > 0)
+   if (opc_Ftwb->level > 0)
    {
       s32_Ret = remove(opcn_Pathname);
    }
@@ -541,14 +534,17 @@ static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat
 int32_t stw::tgl::TglRemoveDirectory(const C_SclString & orc_Directory, const bool oq_ContentOnly)
 {
    int32_t s32_Ret = -1;
-   bool q_DirExists;
 
    // Make sure orc_Directory is a directory
-   q_DirExists = TglDirectoryExists(orc_Directory);
+   const bool q_DirExists = TglDirectoryExists(orc_Directory);
+
    if (q_DirExists == true)
    {
       // Delete directory content
-      s32_Ret = nftw(orc_Directory.c_str(), &m_RemoveFile, 10, (FTW_DEPTH | FTW_MOUNT | FTW_PHYS));
+      // Do *not* use the FTW_MOUNT flag.
+      // Using it can cause issues with files not being reported on overlay file systems
+      // (comparable to https://bugzilla.kernel.org/show_bug.cgi?id=114951)
+      s32_Ret = nftw(orc_Directory.c_str(), &m_RemoveFile, 10, (FTW_DEPTH | FTW_PHYS));
       if ((s32_Ret == 0) && (oq_ContentOnly == false))
       {
          // Delete the base directory if requested
@@ -572,7 +568,7 @@ int32_t stw::tgl::TglRemoveDirectory(const C_SclString & orc_Directory, const bo
    false  path is an absolute path
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool stw::tgl::TglIsRelativePath(const C_SclString & orc_Path) 
+bool stw::tgl::TglIsRelativePath(const C_SclString & orc_Path)
 {
    bool q_IsAbsolute = false;
 

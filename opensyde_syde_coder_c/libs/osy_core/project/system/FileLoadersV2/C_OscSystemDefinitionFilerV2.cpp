@@ -281,8 +281,8 @@ int32_t C_OscSystemDefinitionFilerV2::h_LoadNodes(const uint16_t ou16_XmlFormatV
       if (u32_ExpectedSize != orc_Nodes.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected nodes count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_Nodes.size());
+         c_Tmp.PrintFormatted("Unexpected nodes count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_Nodes.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -372,8 +372,8 @@ int32_t C_OscSystemDefinitionFilerV2::h_LoadBuses(std::vector<C_OscSystemBus> & 
       if (u32_ExpectedSize != orc_Buses.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected bus count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_Buses.size());
+         c_Tmp.PrintFormatted("Unexpected bus count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_Buses.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }

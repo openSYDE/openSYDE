@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIGPARAMETERSTRUCT_H
-#define C_OSCHALCCONFIGPARAMETERSTRUCT_H
+#ifndef C_OSCHALCCONFIGPARAMETERSTRUCT_HPP
+#define C_OSCHALCCONFIGPARAMETERSTRUCT_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscHalcConfigParameter.hpp"

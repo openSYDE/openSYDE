@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCDEFDOMAIN_H
-#define C_OSCHALCDEFDOMAIN_H
+#ifndef C_OSCHALCDEFDOMAIN_HPP
+#define C_OSCHALCDEFDOMAIN_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SclString.hpp"

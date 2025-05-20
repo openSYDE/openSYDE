@@ -5,8 +5,8 @@
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANOPENEDSDEVICEINFOBLOCK_H
-#define C_OSCCANOPENEDSDEVICEINFOBLOCK_H
+#ifndef C_OSCCANOPENEDSDEVICEINFOBLOCK_HPP
+#define C_OSCCANOPENEDSDEVICEINFOBLOCK_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

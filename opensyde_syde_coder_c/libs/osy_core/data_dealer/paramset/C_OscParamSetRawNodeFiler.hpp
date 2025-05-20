@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPARAMSETRAWNODEFILER_H
-#define C_OSCPARAMSETRAWNODEFILER_H
+#ifndef C_OSCPARAMSETRAWNODEFILER_HPP
+#define C_OSCPARAMSETRAWNODEFILER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

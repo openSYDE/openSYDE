@@ -8,8 +8,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCPARAMSETINTERPRETEDDATA_H
-#define C_OSCPARAMSETINTERPRETEDDATA_H
+#ifndef C_OSCPARAMSETINTERPRETEDDATA_HPP
+#define C_OSCPARAMSETINTERPRETEDDATA_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscParamSetInterpretedNode.hpp"

@@ -597,8 +597,8 @@ int32_t C_OscNodeDataPoolFilerV2::h_LoadDataPoolLists(const uint16_t ou16_XmlFor
       if (u32_ExpectedSize != orc_NodeDataPoolLists.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected list count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeDataPoolLists.size());
+         c_Tmp.PrintFormatted("Unexpected list count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeDataPoolLists.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -692,8 +692,8 @@ int32_t C_OscNodeDataPoolFilerV2::h_LoadDataPoolListElements(const uint16_t ou16
       if (u32_ExpectedSize != orc_NodeDataPoolListElements.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeDataPoolListElements.size());
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeDataPoolListElements.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }

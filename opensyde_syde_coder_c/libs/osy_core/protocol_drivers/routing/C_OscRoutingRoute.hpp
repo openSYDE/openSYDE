@@ -6,8 +6,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCROUTINGROUTE_H
-#define C_OSCROUTINGROUTE_H
+#ifndef C_OSCROUTINGROUTE_HPP
+#define C_OSCROUTINGROUTE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

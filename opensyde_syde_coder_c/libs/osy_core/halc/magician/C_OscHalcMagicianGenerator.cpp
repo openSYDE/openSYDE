@@ -1357,7 +1357,9 @@ void C_OscHalcMagicianGenerator::mh_CleanUpHalcDatapools(std::vector<C_OscNodeDa
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscHalcMagicianGenerator::m_FillEmptySpaceHalcDatapools(std::vector<C_OscNodeDataPool> & orc_Datapools) const
 {
-   if (this->mpc_Node->c_HalcConfig.q_NvmBasedConfig)
+   tgl_assert(this->mpc_Node != NULL);
+
+   if ((this->mpc_Node != NULL) && (this->mpc_Node->c_HalcConfig.q_NvmBasedConfig))
    {
       for (std::vector<C_OscNodeDataPool>::iterator c_ItDp = orc_Datapools.begin(); c_ItDp != orc_Datapools.end();
            ++c_ItDp)

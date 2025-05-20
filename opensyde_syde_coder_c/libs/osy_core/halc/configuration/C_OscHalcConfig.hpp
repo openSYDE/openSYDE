@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCHALCCONFIG_H
-#define C_OSCHALCCONFIG_H
+#ifndef C_OSCHALCCONFIG_HPP
+#define C_OSCHALCCONFIG_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscHalcDefBase.hpp"
@@ -87,6 +87,8 @@ public:
                                bool * const opq_ChannelsInvalid,
                                std::vector<uint32_t> * const opc_InvalidChannelIndices) const;
    virtual void CalcHash(uint32_t & oru32_HashValue) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
 private:
    std::vector<C_OscHalcConfigDomain> mc_Domains; ///< Domains of HALC configuration (synced with C_OscHalcDefBase)

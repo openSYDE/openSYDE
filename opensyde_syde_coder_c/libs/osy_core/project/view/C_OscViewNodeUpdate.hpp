@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCVIEWNODEUPDATE_H
-#define C_OSCVIEWNODEUPDATE_H
+#ifndef C_OSCVIEWNODEUPDATE_HPP
+#define C_OSCVIEWNODEUPDATE_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>

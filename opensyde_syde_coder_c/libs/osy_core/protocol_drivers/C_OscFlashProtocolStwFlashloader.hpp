@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCFLASHPROTOCOLSTWFLASHLOADER_H
-#define C_OSCFLASHPROTOCOLSTWFLASHLOADER_H
+#ifndef C_OSCFLASHPROTOCOLSTWFLASHLOADER_HPP
+#define C_OSCFLASHPROTOCOLSTWFLASHLOADER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CXFLFlashWrite.hpp"

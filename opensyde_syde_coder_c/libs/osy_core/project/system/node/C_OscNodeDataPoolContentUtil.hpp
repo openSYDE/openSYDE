@@ -5,8 +5,8 @@
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCNODEDATAPOOLCONTENTUTIL_H
-#define C_OSCNODEDATAPOOLCONTENTUTIL_H
+#ifndef C_OSCNODEDATAPOOLCONTENTUTIL_HPP
+#define C_OSCNODEDATAPOOLCONTENTUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

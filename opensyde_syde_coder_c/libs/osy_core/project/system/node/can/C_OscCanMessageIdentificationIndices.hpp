@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OSCCANMESSAGEIDENTIFICATIONINDICES_H
-#define C_OSCCANMESSAGEIDENTIFICATIONINDICES_H
+#ifndef C_OSCCANMESSAGEIDENTIFICATIONINDICES_HPP
+#define C_OSCCANMESSAGEIDENTIFICATIONINDICES_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <ostream>
