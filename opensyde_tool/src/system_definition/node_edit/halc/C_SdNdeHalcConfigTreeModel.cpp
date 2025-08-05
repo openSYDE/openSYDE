@@ -244,6 +244,15 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const i
                      c_Retval = mh_ConvertBitmasksToBitArray(pc_ParameterElement->c_Value);
                   }
                   break;
+               case C_OscHalcDefContent::eCT_STRING:
+                  {
+                     std::string c_String;
+                     if (pc_ParameterElement->c_Value.GetStringValue(c_String) == C_NO_ERR)
+                     {
+                        c_Retval = c_String.c_str();
+                     }
+                  }
+                  break;
                default:
                   tgl_assert(false);
                   break;
@@ -318,9 +327,53 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const i
             case C_OscHalcDefContent::eCT_BIT_MASK:
                c_Retval = static_cast<int32_t>(eURIEL_MULTI_SELECT_COMBO_BOX);
                break;
+            case C_OscHalcDefContent::eCT_STRING:
+               c_Retval = static_cast<int32_t>(eURIEL_LINE_EDIT);
+               break;
             default:
                tgl_assert(false);
                break;
+            }
+         }
+      }
+      else if (((os32_Role == ms32_USER_ROLE_INTERACTION_USE_MIN_VALUE) ||
+                (os32_Role == ms32_USER_ROLE_INTERACTION_USE_MAX_VALUE))  && (e_Col == eVALUE))
+      {
+         // in HALC case strings are not hex numbers, so do not use min or max values
+         const C_OscHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
+         {
+            if (pc_ParameterElement->c_Value.GetComplexType() == C_OscHalcDefContent::eCT_STRING)
+            {
+               c_Retval = false;
+            }
+         }
+      }
+      else if ((os32_Role == ms32_USER_ROLE_INTERACTION_USE_STR_LENGTH) && (e_Col == eVALUE))
+      {
+         const C_OscHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
+         {
+            if (pc_ParameterElement->c_Value.GetComplexType() == C_OscHalcDefContent::eCT_STRING)
+            {
+               c_Retval = true;
+            }
+         }
+      }
+      else if ((os32_Role == ms32_USER_ROLE_INTERACTION_STR_LENGTH) && (e_Col == eVALUE))
+      {
+         const C_OscHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
+         {
+            if ((pc_ParameterElement->c_Value.GetComplexType() == C_OscHalcDefContent::eCT_STRING) &&
+                (pc_ParameterElement->c_Value.GetArray() == true)) // just to make sure, should be true if eCT_STRING
+            {
+               uint32_t u32_StringLength = pc_ParameterElement->c_Value.GetArraySize();
+               if (u32_StringLength > 0)
+               {
+                  u32_StringLength = u32_StringLength - 1UL; // exclude \0
+               }
+               c_Retval = u32_StringLength;
             }
          }
       }
@@ -468,6 +521,27 @@ bool C_SdNdeHalcConfigTreeModel::setData(const QModelIndex & orc_Index, const QV
                                          c_NewValue) == C_NO_ERR);
                         }
                      }
+                  }
+               }
+               break;
+            case C_OscHalcDefContent::eCT_STRING:
+               //Strings
+               //Set value
+               if (C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelParameterConfigElementString(
+                      this->mu32_NodeIndex,
+                      this->mu32_DomainIndex,
+                      this->mu32_ChannelIndex, u32_ParameterIndex, u32_ParameterElementIndex,
+                      this->mq_ChannelCase, orc_Value.toString().toStdString()) == C_NO_ERR)
+               {
+                  q_Retval = true;
+                  //Linked values
+                  for (uint32_t u32_It = 0UL; u32_It < c_LinkedChannels.size(); ++u32_It)
+                  {
+                     tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelParameterConfigElementString(
+                                   this->mu32_NodeIndex,
+                                   this->mu32_DomainIndex,
+                                   c_LinkedChannels[u32_It], u32_ParameterIndex, u32_ParameterElementIndex,
+                                   this->mq_ChannelCase, orc_Value.toString().toStdString()) == C_NO_ERR);
                   }
                }
                break;

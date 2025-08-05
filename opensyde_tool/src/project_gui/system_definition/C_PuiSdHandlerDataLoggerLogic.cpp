@@ -16,6 +16,7 @@
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
 #include "C_PuiSdUtil.hpp"
 #include "C_PuiSdHandlerDataLoggerLogic.hpp"
 #include "C_PuiSdNodeDataPoolListElementIdSyncUtil.hpp"
@@ -96,6 +97,86 @@ const C_OscDataLoggerDataElementReference * C_PuiSdHandlerDataLoggerLogic::GetDa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add data logger
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Data          Data
+   \param[in]  opc_Name          Name
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::AddDataLogger(const uint32_t ou32_NodeIndex, const C_OscDataLoggerJob & orc_Data,
+                                                     const QString * const opc_Name)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscDataLoggerJob c_NewJob = orc_Data;
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+
+      if (opc_Name != NULL)
+      {
+         c_NewJob.c_Properties.c_Name = opc_Name->toStdString().c_str();
+      }
+      else
+      {
+         c_NewJob.c_Properties.c_Name = C_OscUtils::h_GetUniqueName(
+            mh_GetExistingDataLoggerNames(rc_Node), c_NewJob.c_Properties.c_Name, this->GetNameMaxCharLimit());
+      }
+      rc_Node.c_DataLoggerJobs.push_back(c_NewJob);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete data logger
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::DeleteDataLogger(const uint32_t ou32_NodeIndex,
+                                                        const uint32_t ou32_DataLoggerJobIndex)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      {
+         rc_Node.c_DataLoggerJobs.erase(
+            rc_Node.c_DataLoggerJobs.begin() + ou32_DataLoggerJobIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set data logger active
 
    \param[in]  ou32_NodeIndex             Node index
@@ -138,9 +219,17 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerEnabled(const uint32_t ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set data logger properties
 
-   \param[in]      ou32_NodeIndex            Node index
-   \param[in]      ou32_DataLoggerJobIndex   Data logger job index
-   \param[in,out]  orc_Data                  Data
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  ou32_DataLoggerJobIndex       Data logger job index
+   \param[in]  orc_Name                      Name
+   \param[in]  orc_Comment                   Comment
+   \param[in]  oe_UseCase                    Use case
+   \param[in]  oe_LogFileFormat              Log file format
+   \param[in]  ou32_MaxLogEntries            Max log entries
+   \param[in]  ou32_MaxLogDurationSec        Max log duration sec
+   \param[in]  ou32_LogIntervalMs            Log interval ms
+   \param[in]  oe_LocalLogTrigger            Local log trigger
+   \param[in]  orc_LogDestinationDirectory   Log destination directory
 
    \return
    STW error codes
@@ -149,9 +238,13 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerEnabled(const uint32_t ou32_
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerPropertiesWithoutInterfaceChanges(const uint32_t ou32_NodeIndex,
-                                                                                      const uint32_t ou32_DataLoggerJobIndex,
-                                                                                      const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Data)
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerProperties(const uint32_t ou32_NodeIndex,
+                                                               const uint32_t ou32_DataLoggerJobIndex,
+                                                               const stw::scl::C_SclString & orc_Name,
+                                                               const stw::scl::C_SclString & orc_Comment,
+                                                               const C_OscDataLoggerJobProperties::E_UseCase oe_UseCase,
+                                                               const C_OscDataLoggerJobProperties::E_LogFileFormat oe_LogFileFormat, const uint32_t ou32_MaxLogEntries, const uint32_t ou32_MaxLogDurationSec, const uint32_t ou32_LogIntervalMs, const C_OscDataLoggerJobProperties::E_LocalLogTrigger oe_LocalLogTrigger,
+                                                               const stw::scl::C_SclString & orc_LogDestinationDirectory)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -161,7 +254,19 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerPropertiesWithoutInterfaceCh
       if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
-         rc_DataLoggerJob.c_Properties = orc_Data;
+         rc_DataLoggerJob.c_Properties.c_Name = orc_Name;
+         rc_DataLoggerJob.c_Properties.c_Comment = orc_Comment;
+         rc_DataLoggerJob.c_Properties.e_UseCase = oe_UseCase;
+         rc_DataLoggerJob.c_Properties.e_LogFileFormat = oe_LogFileFormat;
+         rc_DataLoggerJob.c_Properties.u32_MaxLogEntries = ou32_MaxLogEntries;
+         rc_DataLoggerJob.c_Properties.u32_MaxLogDurationSec = ou32_MaxLogDurationSec;
+         rc_DataLoggerJob.c_Properties.u32_LogIntervalMs = ou32_LogIntervalMs;
+         rc_DataLoggerJob.c_Properties.e_LocalLogTrigger = oe_LocalLogTrigger;
+         rc_DataLoggerJob.c_Properties.c_LogDestinationDirectory = orc_LogDestinationDirectory;
+         if (oe_LocalLogTrigger != C_OscDataLoggerJobProperties::eLLT_INTERVAL)
+         {
+            rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.q_Enable = false;
+         }
       }
       else
       {
@@ -176,10 +281,49 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerPropertiesWithoutInterfaceCh
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set data logger properties
+/*! \brief  Set data logger additional trigger properties
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+   \param[in]  orc_Data                   Data
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerAdditionalTriggerProperties(const uint32_t ou32_NodeIndex,
+                                                                                const uint32_t ou32_DataLoggerJobIndex,
+                                                                                const C_OscDataLoggerJobAdditionalTriggerProperties & orc_Data)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
+         rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties = orc_Data;
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set X-app interface
 
    \param[in]  ou32_NodeIndex                Node index
-   \param[in]  ou32_DataLoggerJobIndex       Data logger job index
    \param[in]  oe_ConnectedInterfaceType     Connected interface type
    \param[in]  ou8_ConnectedInterfaceNumber  Connected interface number
 
@@ -190,27 +334,53 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerPropertiesWithoutInterfaceCh
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerInterface(const uint32_t ou32_NodeIndex,
-                                                              const uint32_t ou32_DataLoggerJobIndex,
-                                                              const C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
-                                                              const uint8_t ou8_ConnectedInterfaceNumber)
+int32_t C_PuiSdHandlerDataLoggerLogic::SetXappInterface(const uint32_t ou32_NodeIndex,
+                                                        const C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
+                                                        const uint8_t ou8_ConnectedInterfaceNumber)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
-      {
-         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
-         rc_DataLoggerJob.c_Properties.e_ConnectedInterfaceType = oe_ConnectedInterfaceType;
-         rc_DataLoggerJob.c_Properties.u8_ConnectedInterfaceNumber = ou8_ConnectedInterfaceNumber;
-         this->m_HandlePossibleRouteChange();
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
+
+      rc_Node.c_XappProperties.e_ConnectedInterfaceType = oe_ConnectedInterfaceType;
+      rc_Node.c_XappProperties.u8_ConnectedInterfaceNumber = ou8_ConnectedInterfaceNumber;
+      this->m_ValidateAllRoutesForOneNode(ou32_NodeIndex);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set xapp properties
+
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  ou32_PollingIntervalMs        Polling interval ms
+   \param[in]  ou32_DataRequestIntervalMs    Data request interval ms
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::SetXappProperties(const uint32_t ou32_NodeIndex,
+                                                         const uint32_t ou32_PollingIntervalMs,
+                                                         const uint32_t ou32_DataRequestIntervalMs)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+
+      rc_Node.c_XappProperties.u32_PollingIntervalMs = ou32_PollingIntervalMs;
+      rc_Node.c_XappProperties.u32_DataRequestIntervalMs = ou32_DataRequestIntervalMs;
    }
    else
    {
@@ -287,6 +457,9 @@ int32_t C_PuiSdHandlerDataLoggerLogic::DeleteDataLoggerElement(const uint32_t ou
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
          if (ou32_DataLoggerDataElementIndex < rc_DataLoggerJob.c_ConfiguredDataElements.size())
          {
+            mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                           rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                              ou32_DataLoggerDataElementIndex]);
             rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                rc_DataLoggerJob.c_ConfiguredDataElements.begin() + ou32_DataLoggerDataElementIndex);
          }
@@ -480,6 +653,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeAdded(const uint32_t ou32_In
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeAdded(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_Index);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -490,6 +669,8 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeAdded(const uint32_t ou32_In
          }
       }
    }
+   //Validate new node
+   m_ValidateAllRoutesForOneNode(ou32_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -509,6 +690,13 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeHalc(const uint32_t ou32_Ind
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeHalc(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_Index,
+               c_MapCurToNew);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
          {
@@ -518,6 +706,9 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeHalc(const uint32_t ou32_Ind
                                                                            ou32_Index,
                                                                            c_MapCurToNew) == true)
             {
+               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                 u32_ItDataLoggerElement]);
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
             }
@@ -575,6 +766,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolAdded(const uint32_t
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolAdded(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -611,6 +808,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolMoved(const uint32_t
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolMoved(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolSourceIndex, ou32_DataPoolTargetIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -645,6 +848,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolAboutToBeDeleted(con
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolAboutToBeDeleted(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
          {
@@ -654,6 +863,9 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolAboutToBeDeleted(con
                    rc_DataLoggerElement.c_ConfiguredElementId,
                    ou32_NodeIndex, ou32_DataPoolIndex))
             {
+               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                 u32_ItDataLoggerElement]);
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
             }
@@ -688,6 +900,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListAdded(const uint
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAdded(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -723,6 +941,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListMoved(const uint
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListMoved(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListSourceIndex, ou32_ListTargetIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -756,6 +980,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListAboutToBeDeleted
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAboutToBeDeleted(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
          {
@@ -765,6 +995,9 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListAboutToBeDeleted
                    rc_DataLoggerElement.c_ConfiguredElementId,
                    ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex))
             {
+               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                 u32_ItDataLoggerElement]);
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
             }
@@ -799,6 +1032,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListElementAdded(con
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAdded(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -837,6 +1076,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListElementMoved(con
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementMoved(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementSourceIndex, ou32_ElementTargetIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size(); ++u32_ItDataLoggerElement)
          {
@@ -871,15 +1116,24 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListElementAboutToBe
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
          {
             C_OscDataLoggerDataElementReference & rc_DataLoggerElement =
                rc_DataLoggerJob.c_ConfiguredDataElements[u32_ItDataLoggerElement];
-            if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAboutToBeDeleted(
+            if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
                    rc_DataLoggerElement.c_ConfiguredElementId,
                    ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex))
             {
+               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                 u32_ItDataLoggerElement]);
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
             }
@@ -887,6 +1141,120 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListElementAboutToBe
             {
                ++u32_ItDataLoggerElement;
             }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element type or array changed
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Type              Type
+   \param[in]  oq_IsArray           Is array
+   \param[in]  ou32_ArraySize       Array size
+   \param[in]  oq_IsString          Is string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex,
+                                                                                          const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex, const C_OscNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray, const uint32_t ou32_ArraySize,
+                                                                                          const bool oq_IsString)
+{
+   C_PuiSdHandlerCanOpenLogic::m_HandleSyncNodeDataPoolListElementTypeOrArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex,
+                                                                                     ou32_ListIndex, ou32_ElementIndex,
+                                                                                     oe_Type, oq_IsArray,
+                                                                                     ou32_ArraySize, oq_IsString);
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+      for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementTypeOrArrayChanged(ou32_NodeIndex,
+                                                                                                        ou32_DataPoolIndex,
+                                                                                                        ou32_ListIndex,
+                                                                                                        ou32_ElementIndex,
+                                                                                                        oe_Type,
+                                                                                                        oq_IsArray,
+                                                                                                        rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+                                                                                                        rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_Threshold);
+         }
+         for (uint32_t u32_ItDataLoggerElement = 0UL;
+              u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
+         {
+            C_OscDataLoggerDataElementReference & rc_DataLoggerElement =
+               rc_DataLoggerJob.c_ConfiguredDataElements[u32_ItDataLoggerElement];
+            if ((((rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex == ou32_NodeIndex) &&
+                  (rc_DataLoggerElement.c_ConfiguredElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+                 (rc_DataLoggerElement.c_ConfiguredElementId.u32_ListIndex == ou32_ListIndex)) &&
+                (rc_DataLoggerElement.c_ConfiguredElementId.u32_ElementIndex == ou32_ElementIndex))
+            {
+               if ((oq_IsArray != rc_DataLoggerElement.c_ConfiguredElementId.GetUseArrayElementIndex()) ||
+                   ((rc_DataLoggerElement.c_ConfiguredElementId.GetUseArrayElementIndex()) &&
+                    (ou32_ArraySize <= rc_DataLoggerElement.c_ConfiguredElementId.GetArrayElementIndexOrZero())))
+               {
+                  mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                                 rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                    u32_ItDataLoggerElement]);
+                  rc_DataLoggerJob.c_ConfiguredDataElements.erase(
+                     rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
+               }
+               else
+               {
+                  ++u32_ItDataLoggerElement;
+               }
+            }
+            else
+            {
+               ++u32_ItDataLoggerElement;
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element range changed
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  orc_MinElement       Min element
+   \param[in]  orc_MaxElement       Max element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_HandleSyncNodeDataPoolListElementRangeChanged(const uint32_t ou32_NodeIndex,
+                                                                                    const uint32_t ou32_DataPoolIndex,
+                                                                                    const uint32_t ou32_ListIndex,
+                                                                                    const uint32_t ou32_ElementIndex,
+                                                                                    const C_OscNodeDataPoolContent & orc_MinElement,
+                                                                                    const C_OscNodeDataPoolContent & orc_MaxElement)
+{
+   C_PuiSdHandlerCanOpenLogic::m_HandleSyncNodeDataPoolListElementRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex,
+                                                                               ou32_ListIndex, ou32_ElementIndex,
+                                                                               orc_MinElement, orc_MaxElement);
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+      for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementRangeChanged(ou32_NodeIndex,
+                                                                                                  ou32_DataPoolIndex,
+                                                                                                  ou32_ListIndex,
+                                                                                                  ou32_ElementIndex,
+                                                                                                  orc_MinElement,
+                                                                                                  orc_MaxElement,
+                                                                                                  rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+                                                                                                  rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_Threshold);
          }
       }
    }
@@ -908,6 +1276,12 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleNodeAboutToBeDeleted(const uint32_t 
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
+         if (mh_CheckIdRelevantForSync(rc_DataLoggerJob.c_Properties))
+         {
+            C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeAboutToBeDeleted(
+               rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ElementId,
+               ou32_Index, oq_OnlyMarkInvalid);
+         }
          for (uint32_t u32_ItDataLoggerElement = 0UL;
               u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
          {
@@ -917,6 +1291,9 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandleNodeAboutToBeDeleted(const uint32_t 
                    rc_DataLoggerElement.c_ConfiguredElementId,
                    ou32_Index, oq_OnlyMarkInvalid))
             {
+               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                 u32_ItDataLoggerElement]);
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
             }
@@ -937,7 +1314,21 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandlePossibleRouteChange()
 {
    for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
    {
-      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+      m_ValidateAllRoutesForOneNode(u32_ItNode);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Validate all routes for one node
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::m_ValidateAllRoutesForOneNode(const uint32_t ou32_Index)
+{
+   if (ou32_Index < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_Index];
       for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
       {
          QMap<uint32_t, bool> c_MapNodeReachable;
@@ -950,11 +1341,14 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandlePossibleRouteChange()
             if (!c_MapNodeReachable.contains(rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex))
             {
                c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex] =
-                  C_PuiSdUtil::h_CheckDataLoggerNodeReachable(u32_ItNode, u32_ItDataLogger,
-                                                              rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex);
+                  C_PuiSdUtil::h_CheckXappNodeReachable(ou32_Index,
+                                                        rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex);
             }
             if (!c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex])
             {
+               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                                 u32_ItDataLoggerElement]);
                rc_DataLoggerJob.c_ConfiguredDataElements.erase(
                   rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
             }
@@ -965,4 +1359,61 @@ void C_PuiSdHandlerDataLoggerLogic::m_HandlePossibleRouteChange()
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pointers to all currently registered bus names
+
+   \param[in]  orc_Node    Node
+
+   \return
+   Vector of pointers to all currently registered bus names
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<stw::scl::C_SclString, bool> C_PuiSdHandlerDataLoggerLogic::mh_GetExistingDataLoggerNames(
+   const C_OscNode & orc_Node)
+{
+   std::map<stw::scl::C_SclString, bool> c_Retval;
+   for (uint32_t u32_ItLogger = 0; u32_ItLogger < orc_Node.c_DataLoggerJobs.size(); ++u32_ItLogger)
+   {
+      c_Retval[orc_Node.c_DataLoggerJobs[u32_ItLogger].c_Properties.c_Name] = true;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for data logger element about to be deleted
+
+   \param[in,out]  orc_Properties   Properties
+   \param[in,out]  orc_Element      Element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerDataLoggerLogic::mh_HandleSyncDataLoggerElementAboutToBeDeleted(
+   C_OscDataLoggerJobProperties & orc_Properties, const C_OscDataLoggerDataElementReference & orc_Element)
+{
+   if (mh_CheckIdRelevantForSync(orc_Properties))
+   {
+      if (orc_Element.c_ConfiguredElementId == orc_Properties.c_AdditionalTriggerProperties.c_ElementId)
+      {
+         orc_Properties.c_AdditionalTriggerProperties.q_Enable = false;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check id relevant for sync
+
+   \param[in]  orc_Properties    Properties
+
+   \return
+   Flags
+
+   \retval   True    Relevant for sync
+   \retval   False   Not relevant for sync
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerDataLoggerLogic::mh_CheckIdRelevantForSync(const C_OscDataLoggerJobProperties & orc_Properties)
+{
+   return (orc_Properties.e_LocalLogTrigger == C_OscDataLoggerJobProperties::eLLT_INTERVAL) &&
+          orc_Properties.c_AdditionalTriggerProperties.q_Enable;
 }

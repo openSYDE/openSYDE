@@ -73,16 +73,17 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64_t & oru64_Id, 
 
    Set up GUI with all elements.
 
-   \param[in]      oru64_Id      Unique ID
-   \param[in]      of64_Width    Width of image view
-   \param[in]      of64_Height   Height of image view
-   \param[in]      orc_Image     Image
-   \param[in,out]  opc_Parent    Optional pointer to parent
+   \param[in]      oru64_Id         Unique ID
+   \param[in]      of64_Width       Width of image view
+   \param[in]      of64_Height      Height of image view
+   \param[in]      orc_Image        Image
+   \param[in]      orc_Format       Image format
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64_t & oru64_Id, const float64_t of64_Width,
                                                      const float64_t of64_Height, const QPixmap & orc_Image,
-                                                     QGraphicsItem * const opc_Parent) :
+                                                     const QByteArray & orc_Format, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiBiRectBaseGroup(oru64_Id, mhf64_MIN_WIDTH_IMAGE,
                        mhf64_MIN_HEIGHT_IMAGE, mhf64_ACTION_POINT_OFFSET_IMAGE, true, opc_Parent),
@@ -90,7 +91,7 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64_t & oru64_Id, 
    mq_IsSvgFlag(false)
 {
    // image
-   this->mpc_Image = new C_GiImage(orc_Image, of64_Width, of64_Height);
+   this->mpc_Image = new C_GiImage(orc_Image, orc_Format, of64_Width, of64_Height);
 
    this->m_Init();
 }
@@ -122,6 +123,24 @@ QPixmap C_GiImageGroupWithoutData::GetImage(void) const
    {
       c_Retval = this->mpc_Image->GetImage();
    }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the image type read by QImageReader (PNG, JPG, ...)
+
+   \return  Image type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QByteArray C_GiImageGroupWithoutData::GetImageFormat(void) const
+{
+   QByteArray c_Retval;
+
+   if (this->mpc_Image != NULL)
+   {
+      c_Retval = this->mpc_Image->GetImageFormat();
+   }
+
    return c_Retval;
 }
 

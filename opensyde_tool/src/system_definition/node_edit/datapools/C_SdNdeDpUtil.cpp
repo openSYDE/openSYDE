@@ -105,7 +105,7 @@ void C_SdNdeDpUtil::h_ConvertToElementGeneric(const stw::opensyde_core::C_OscNod
       orc_Generic = orc_OscElement.c_Comment.c_str();
       break;
    case eELEMENT_VALUE_TYPE:
-      if (orc_UiElement.q_InterpretAsString == true)
+      if (orc_OscElement.q_InterpretAsString == true)
       {
          orc_Generic = 10;
       }
@@ -152,7 +152,7 @@ void C_SdNdeDpUtil::h_ConvertToElementGeneric(const stw::opensyde_core::C_OscNod
       if ((ors32_DataSetIndex >= 0) &&
           (static_cast<uint32_t>(ors32_DataSetIndex) < orc_OscElement.c_DataSetValues.size()))
       {
-         if (orc_UiElement.q_InterpretAsString == true)
+         if (orc_OscElement.q_InterpretAsString == true)
          {
             orc_Generic =
                C_SdNdeDpContentUtil::h_ConvertToString(

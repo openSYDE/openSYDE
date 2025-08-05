@@ -1068,6 +1068,50 @@ int32_t C_PuiSdHandlerHalc::SetHalcDomainChannelParameterConfigElementBitmask(co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set halc domain channel parameter config element string
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_Value            Value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerHalc::SetHalcDomainChannelParameterConfigElementString(const uint32_t ou32_NodeIndex,
+                                                                             const uint32_t ou32_DomainIndex,
+                                                                             const uint32_t ou32_ChannelIndex,
+                                                                             const uint32_t ou32_ParameterIndex,
+                                                                             const uint32_t ou32_ElementIndex,
+                                                                             const bool oq_UseChannelIndex,
+                                                                             const std::string & orc_Value)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      s32_Retval = rc_Node.c_HalcConfig.SetDomainChannelParameterConfigElementString(ou32_DomainIndex,
+                                                                                     ou32_ChannelIndex,
+                                                                                     ou32_ParameterIndex,
+                                                                                     ou32_ElementIndex,
+                                                                                     oq_UseChannelIndex,
+                                                                                     orc_Value);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get HALC channel or domain name
 
    \param[in]      ou32_NodeIndex      Node index
@@ -1264,19 +1308,19 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                            {
                            case C_OscHalcDefDomain::eVA_PARAM:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_DomainValues.c_Parameters);
+                                 pc_CurrentDomainDef->c_DomainValues.c_Parameters, u32_CountRelevantItems);
                               break;
                            case C_OscHalcDefDomain::eVA_INPUT:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_DomainValues.c_InputValues);
+                                 pc_CurrentDomainDef->c_DomainValues.c_InputValues, u32_CountRelevantItems);
                               break;
                            case C_OscHalcDefDomain::eVA_OUTPUT:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_DomainValues.c_OutputValues);
+                                 pc_CurrentDomainDef->c_DomainValues.c_OutputValues, u32_CountRelevantItems);
                               break;
                            case C_OscHalcDefDomain::eVA_STATUS:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_DomainValues.c_StatusValues);
+                                 pc_CurrentDomainDef->c_DomainValues.c_StatusValues, u32_CountRelevantItems);
                               break;
                            default:
                               break;
@@ -1289,19 +1333,19 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                            {
                            case C_OscHalcDefDomain::eVA_PARAM:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_ChannelValues.c_Parameters);
+                                 pc_CurrentDomainDef->c_ChannelValues.c_Parameters, u32_CountRelevantItems);
                               break;
                            case C_OscHalcDefDomain::eVA_INPUT:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_ChannelValues.c_InputValues);
+                                 pc_CurrentDomainDef->c_ChannelValues.c_InputValues, u32_CountRelevantItems);
                               break;
                            case C_OscHalcDefDomain::eVA_OUTPUT:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_ChannelValues.c_OutputValues);
+                                 pc_CurrentDomainDef->c_ChannelValues.c_OutputValues, u32_CountRelevantItems);
                               break;
                            case C_OscHalcDefDomain::eVA_STATUS:
                               u32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
-                                 pc_CurrentDomainDef->c_ChannelValues.c_StatusValues);
+                                 pc_CurrentDomainDef->c_ChannelValues.c_StatusValues, u32_CountRelevantItems);
                               break;
                            default:
                               break;
@@ -1327,7 +1371,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               case C_OscHalcDefDomain::eVA_INPUT:
                                  s32_Retval = C_PuiSdHandlerHalc::mh_GetIndexInVector(
@@ -1335,7 +1379,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               case C_OscHalcDefDomain::eVA_OUTPUT:
                                  s32_Retval = C_PuiSdHandlerHalc::mh_GetIndexInVector(
@@ -1343,7 +1387,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               case C_OscHalcDefDomain::eVA_STATUS:
                                  s32_Retval = C_PuiSdHandlerHalc::mh_GetIndexInVector(
@@ -1351,7 +1395,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               default:
                                  break;
@@ -1368,7 +1412,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               case C_OscHalcDefDomain::eVA_INPUT:
                                  s32_Retval = C_PuiSdHandlerHalc::mh_GetIndexInVector(
@@ -1376,7 +1420,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               case C_OscHalcDefDomain::eVA_OUTPUT:
                                  s32_Retval = C_PuiSdHandlerHalc::mh_GetIndexInVector(
@@ -1384,7 +1428,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               case C_OscHalcDefDomain::eVA_STATUS:
                                  s32_Retval = C_PuiSdHandlerHalc::mh_GetIndexInVector(
@@ -1392,7 +1436,7 @@ int32_t C_PuiSdHandlerHalc::TranslateToHalcIndex(const C_OscNodeDataPoolListElem
                                     orc_Id.u32_ElementIndex,
                                     oru32_ParameterIndex,
                                     orq_UseElementIndex,
-                                    oru32_ParameterElementIndex);
+                                    oru32_ParameterElementIndex, u32_CountRelevantItems);
                                  break;
                               default:
                                  break;
@@ -2075,7 +2119,6 @@ C_PuiSdNodeDataPool C_PuiSdHandlerHalc::mh_GetUiDatapoolForOscDataPool(const C_O
       {
          C_PuiSdNodeDataPoolListElement c_Elem;
          c_Elem.q_AutoMinMaxActive = false;
-         c_Elem.q_InterpretAsString = false;
          c_List.c_DataPoolListElements.push_back(c_Elem);
       }
       c_Retval.c_DataPoolLists.push_back(c_List);
@@ -2093,6 +2136,7 @@ C_PuiSdNodeDataPool C_PuiSdHandlerHalc::mh_GetUiDatapoolForOscDataPool(const C_O
    \param[out]  oru32_ParameterIndex         Parameter index
    \param[out]  orq_UseElementIndex          Use element index
    \param[out]  oru32_ParameterElementIndex  Parameter element index
+   \param[in]   ou32_NumChannelsInDatapool   Num channels in datapool
 
    \return
    C_NO_ERR Operation success
@@ -2102,7 +2146,8 @@ C_PuiSdNodeDataPool C_PuiSdHandlerHalc::mh_GetUiDatapoolForOscDataPool(const C_O
 int32_t C_PuiSdHandlerHalc::mh_GetIndexInVector(const std::vector<C_OscHalcDefStruct> & orc_Structs,
                                                 const uint32_t ou32_StartingIndex, const uint32_t ou32_TargetIndex,
                                                 uint32_t & oru32_ParameterIndex, bool & orq_UseElementIndex,
-                                                uint32_t & oru32_ParameterElementIndex)
+                                                uint32_t & oru32_ParameterElementIndex,
+                                                const uint32_t ou32_NumChannelsInDatapool)
 {
    int32_t s32_Retval = C_NO_ERR;
    uint32_t u32_Counter = ou32_StartingIndex;
@@ -2111,22 +2156,34 @@ int32_t C_PuiSdHandlerHalc::mh_GetIndexInVector(const std::vector<C_OscHalcDefSt
    for (uint32_t u32_ItItem = 0UL; (u32_ItItem < orc_Structs.size()) && (q_Found == false); ++u32_ItItem)
    {
       const uint32_t u32_StartingIndex = u32_Counter;
-      u32_Counter += C_OscHalcMagicianDatapoolListHandler::h_CountElements(orc_Structs[u32_ItItem]);
+      u32_Counter += C_OscHalcMagicianDatapoolListHandler::h_CountElements(orc_Structs[u32_ItItem],
+                                                                           ou32_NumChannelsInDatapool);
       if (u32_Counter > ou32_TargetIndex)
       {
          const C_OscHalcDefStruct & rc_Struct = orc_Structs[u32_ItItem];
          oru32_ParameterIndex = u32_ItItem;
          if (rc_Struct.c_StructElements.size() > 0UL)
          {
-            orq_UseElementIndex = true;
-            oru32_ParameterElementIndex = ou32_TargetIndex - u32_StartingIndex;
+            u32_Counter = u32_StartingIndex;
+            for (uint32_t u32_ItEl = 0UL; (u32_ItEl < rc_Struct.c_StructElements.size()) && (q_Found == false);
+                 ++u32_ItEl)
+            {
+               u32_Counter += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
+                  rc_Struct.c_StructElements[u32_ItEl], ou32_NumChannelsInDatapool);
+               if (u32_Counter > ou32_TargetIndex)
+               {
+                  orq_UseElementIndex = true;
+                  oru32_ParameterElementIndex = u32_ItEl;
+                  q_Found = true;
+               }
+            }
          }
          else
          {
+            q_Found = true;
             orq_UseElementIndex = false;
             oru32_ParameterElementIndex = 0UL;
          }
-         q_Found = true;
       }
    }
    if (q_Found == false)

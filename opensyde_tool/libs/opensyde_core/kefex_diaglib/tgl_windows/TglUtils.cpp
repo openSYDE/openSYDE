@@ -13,7 +13,7 @@
 #include "precomp_headers.hpp" //pre-compiled headers
 
 #include <windows.h>
-#include <Lmcons.h> //for UNLEN
+#include <lmcons.h> //for UNLEN
 #include "stwtypes.hpp"
 #include "TglUtils.hpp"
 #include "C_SclString.hpp"

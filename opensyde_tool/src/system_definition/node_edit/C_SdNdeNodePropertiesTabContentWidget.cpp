@@ -175,11 +175,16 @@ void C_SdNdeNodePropertiesTabContentWidget::LoadUserSettings()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  GUI Update trigger on TSP V3 Import
 
-   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  oq_OnlyUpdateProperties    Only update properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesTabContentWidget::m_UpdateTrigger(const uint32_t ou32_NodeIndex)
+void C_SdNdeNodePropertiesTabContentWidget::m_UpdateTrigger(const uint32_t ou32_NodeIndex,
+                                                            const bool oq_OnlyUpdateProperties)
 {
    this->SetNodeIndex(ou32_NodeIndex);
-   Q_EMIT (this->SigUpdateTrigger());
+   if (oq_OnlyUpdateProperties == false)
+   {
+      Q_EMIT (this->SigUpdateTrigger());
+   }
 }

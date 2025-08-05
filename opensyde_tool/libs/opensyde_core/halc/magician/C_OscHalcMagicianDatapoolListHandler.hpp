@@ -30,11 +30,16 @@ public:
    C_OscNodeDataPoolListElement * GetListElement(const uint32_t ou32_DomainIndex,
                                                  const uint32_t ou32_ParameterStructIndex,
                                                  const uint32_t ou32_ParameterStructElementIndex,
-                                                 C_OscNodeDataPoolList & orc_List) const;
+                                                 C_OscNodeDataPoolList & orc_List, const uint32_t ou32_CurChannel,
+                                                 bool * const opq_IsArray = NULL,
+                                                 uint32_t * const opu32_ArrayIndex = NULL) const;
    const C_OscNodeDataPoolListElement * GetListElementConst(const uint32_t ou32_DomainIndex,
                                                             const uint32_t ou32_ParameterStructIndex,
                                                             const uint32_t ou32_ParameterStructElementIndex,
-                                                            const C_OscNodeDataPoolList & orc_List)
+                                                            const C_OscNodeDataPoolList & orc_List,
+                                                            const uint32_t ou32_CurChannel,
+                                                            bool * const opq_IsArray = NULL,
+                                                            uint32_t * const opu32_ArrayIndex = NULL)
    const;
    C_OscNodeDataPoolListElement * GetUseCaseListElement(const uint32_t ou32_DomainIndex,
                                                         C_OscNodeDataPoolList & orc_List) const;
@@ -54,9 +59,13 @@ public:
 
    uint32_t CountRelevantItems(const std::vector<C_OscHalcConfigChannel> & orc_Channels,
                                const C_OscHalcConfigChannel & orc_DomainConfig) const;
+   std::vector<uint32_t> GetRelevantChannels(const std::vector<C_OscHalcConfigChannel> & orc_Channels,
+                                             const C_OscHalcConfigChannel & orc_DomainConfig) const;
 
-   static uint32_t h_CountElements(const std::vector<C_OscHalcDefStruct> & orc_Structs);
-   static uint32_t h_CountElements(const C_OscHalcDefStruct & orc_Struct);
+   static uint32_t h_CountElements(const std::vector<C_OscHalcDefStruct> & orc_Structs,
+                                   const uint32_t ou32_NumChannelsInDatapool);
+   static uint32_t h_CountElements(const C_OscHalcDefStruct & orc_Struct, const uint32_t ou32_NumChannelsInDatapool);
+   static uint32_t h_CountElements(const C_OscHalcDefElement & orc_Element, const uint32_t ou32_NumChannelsInDatapool);
    bool CheckChanPresent(const C_OscHalcConfigChannel & orc_ChannelConfig) const;
    bool CheckChanRelevant(const C_OscHalcConfigChannel & orc_ChannelConfig) const;
    bool CheckChanNumVariableNecessary(const C_OscHalcConfigDomain & orc_ChannelConfig) const;
@@ -72,10 +81,18 @@ private:
    int32_t m_GetListIndex(const uint32_t ou32_DomainIndex, const uint32_t ou32_ParameterStructIndex,
                           const uint32_t ou32_ParameterStructElementIndex, uint32_t & oru32_ListIndex,
                           const bool oq_GetUseCaseIndex, const bool oq_GetChanNumIndex,
-                          const bool oq_GetSafetyFlagIndex) const;
+                          const bool oq_GetSafetyFlagIndex, const uint32_t ou32_CurChannel) const;
 
    static int32_t mh_GetSubElementIndex(const uint32_t ou32_Index, const uint32_t ou32_ElementIndex,
-                                        const std::vector<C_OscHalcDefStruct> & orc_Values, uint32_t & oru32_ListIndex);
+                                        const uint32_t ou32_CurChannel,
+                                        const std::vector<C_OscHalcDefStruct> & orc_Values,
+                                        const std::vector<uint32_t> & orc_RelevantChannels, uint32_t & oru32_ListIndex);
+   static void mh_GetSubDefElementIndex(const C_OscHalcDefElement & orc_DefElement, const uint32_t ou32_CurChannel,
+                                        const std::vector<uint32_t> & orc_RelevantChannels, uint32_t & oru32_ListIndex);
+   int32_t m_GetArrayIndexOfChannel(const uint32_t ou32_DomainIndex,
+                                    const C_OscNodeDataPoolListElement & orc_ListElement,
+                                    const uint32_t ou32_CurChannel, bool & orq_IsArray,
+                                    uint32_t & oru32_ArrayIndex) const;
    bool m_CheckIgnoreFlag(void) const;
 
    //Avoid call

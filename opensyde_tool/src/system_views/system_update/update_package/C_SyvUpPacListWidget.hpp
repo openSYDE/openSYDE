@@ -116,6 +116,7 @@ private:
 
    void m_AdaptFile(const QString & orc_Path);
    QString m_GetDialogPath(void);
+   void m_AddSecurityCertificatePackage(void);
 
    C_SyvUpPacListDelegate mc_Delegate;
    stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
@@ -130,6 +131,7 @@ private:
    QAction * mpc_RemoveAllSectionFilesAction;
    QAction * mpc_RemoveAllNodeFilesAction;
    QAction * mpc_HideShowOptionalSectionsAction;
+   QAction * mpc_AddSecurityCertificatePackageAction;
    QAction * mpc_SkipUpdateOfFile;
    QAction * mpc_ShowInExplorerAction;
    QAction * mpc_PemFileSettings;

@@ -89,30 +89,28 @@ int32_t C_OscZipFile::h_CreateZipFile(const C_SclString & orc_SourcePath, const 
    for (c_Iter = orc_SupFiles.begin(); c_Iter != orc_SupFiles.end(); ++c_Iter)
    {
       const C_SclString c_AbsPath = orc_SourcePath + (*c_Iter);
-      if (TglFileExists(c_AbsPath) == false)
+      if ((TglFileExists(c_AbsPath) == false) && (TglDirectoryExists(c_AbsPath) == false))
       {
          if (opc_ErrorText != NULL)
          {
-            (*opc_ErrorText) = "Input file \"" + c_AbsPath + "\" does not exist.";
+            (*opc_ErrorText) = "Input file/folder \"" + c_AbsPath + "\" does not exist.";
          }
          s32_Return = C_CONFIG;
          break;
       }
    }
 
-   if (s32_Return == C_NO_ERR)
+   // go through all files and store in zip archive
+   for (c_Iter = orc_SupFiles.begin(); (c_Iter != orc_SupFiles.end()) && (s32_Return == C_NO_ERR); ++c_Iter)
    {
-      mz_bool x_MzStatus = MZ_TRUE; //lint !e8080  //using type to match library interface
-      // go through all files and store in zip archive
-      for (c_Iter = orc_SupFiles.begin(); (c_Iter != orc_SupFiles.end()) && (x_MzStatus == MZ_TRUE); ++c_Iter)
+      const C_SclString c_FileName = *c_Iter;
+      if (TglFileExists(orc_SourcePath + c_FileName))
       {
-         C_SclString c_FileName = *c_Iter;
          const C_SclString c_AbsPath = orc_SourcePath + c_FileName;                  // absolute path
          ifstream c_FileStream(c_AbsPath.c_str(), ifstream::binary | ifstream::ate); // open file and set pos
                                                                                      // to the end of file
          if (c_FileStream.is_open() == true)
          {
-            C_SclString c_FilePathWithSlashes;
             // get file length, position is at the end of the input sequence
             const streampos c_FileLength = c_FileStream.tellg();
             // set position to the beginning of the input sequence
@@ -120,7 +118,6 @@ int32_t C_OscZipFile::h_CreateZipFile(const C_SclString & orc_SourcePath, const 
 
             // allocate memory
             char_t * const pcn_FileData = new char_t[c_FileLength];
-            const C_SclString c_Comment = "Zipping file: " + c_FileName; // set filename as comment
 
             // read file content
             c_FileStream.read(pcn_FileData, static_cast<streamsize>(c_FileLength));
@@ -128,36 +125,9 @@ int32_t C_OscZipFile::h_CreateZipFile(const C_SclString & orc_SourcePath, const 
             // close file
             c_FileStream.close();
 
-            // miniz cannot handle windows '\\' directories
-            // therefore change to '/'
-            for (uint32_t u32_Pos = 1U; u32_Pos <= c_FileName.Length(); u32_Pos++)
-            {
-               if (c_FileName[u32_Pos] == '\\')
-               {
-                  c_FilePathWithSlashes += '/';
-               }
-               else
-               {
-                  c_FilePathWithSlashes += c_FileName[u32_Pos];
-               }
-            }
-
-            // store file content to zip archive
-            // mz_zip_add_mem_to_archive_file_in_place is creating, appending and always finalizing the archive
-            // after successful operation
-            x_MzStatus = mz_zip_add_mem_to_archive_file_in_place(
-               orc_ZipArchivePath.c_str(), c_FilePathWithSlashes.c_str(),
-               pcn_FileData, static_cast<size_t>(c_FileLength),
-               c_Comment.c_str(), static_cast<uint16_t>(c_Comment.Length()),
-               MZ_BEST_COMPRESSION);
-            if (x_MzStatus == MZ_FALSE)
-            {
-               if (opc_ErrorText != NULL)
-               {
-                  (*opc_ErrorText) = "Could not create zip file \"" + c_FileName + "\".";
-               }
-               s32_Return = C_NOACT;
-            }
+            s32_Return = C_OscZipFile::mh_AddContentToZipFile(orc_ZipArchivePath, c_FileName,
+                                                              pcn_FileData, static_cast<uint32_t>(c_FileLength),
+                                                              "file", opc_ErrorText);
 
             // free memory
             delete[] pcn_FileData;
@@ -170,6 +140,11 @@ int32_t C_OscZipFile::h_CreateZipFile(const C_SclString & orc_SourcePath, const 
             }
             s32_Return = C_RD_WR;
          }
+      }
+      else
+      {
+         s32_Return = C_OscZipFile::mh_AddContentToZipFile(orc_ZipArchivePath, c_FileName, NULL, 0UL,
+                                                           "folder", opc_ErrorText);
       }
    }
 
@@ -406,5 +381,55 @@ int32_t C_OscZipFile::h_IsZipFile(const C_SclString & orc_FilePath)
       }
    }
 
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add content to zip file
+
+   \param[in]      orc_ZipArchivePath  Zip archive path
+   \param[in]      orc_ItemName        Item name
+   \param[in]      opcn_Content        Content
+   \param[in]      ou32_ContentSize    Content size
+   \param[in]      orc_ItemType        Item type
+   \param[in,out]  opc_ErrorText       Error text
+
+   \return
+   C_NO_ERR    success
+   C_NOACT     could not add data to zip file (does the path to the file exist ?)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscZipFile::mh_AddContentToZipFile(const C_SclString & orc_ZipArchivePath, const C_SclString & orc_ItemName,
+                                             const char_t * const opcn_Content, const uint32_t ou32_ContentSize,
+                                             const C_SclString & orc_ItemType, C_SclString * const opc_ErrorText)
+{
+   int32_t s32_Return = C_NO_ERR;
+   C_SclString c_FilePathWithSlashes = orc_ItemName;
+   const C_SclString c_Comment = "Zipping " + orc_ItemType + ": " + orc_ItemName; // set filename as comment
+   mz_bool x_MzStatus;                                                            //lint !e8080  //using type to match
+
+   // library interface
+
+   // miniz cannot handle windows '\\' directories
+   // therefore change to '/'
+   c_FilePathWithSlashes.ReplaceAll("\\", "/");
+
+   // store file content to zip archive
+   // mz_zip_add_mem_to_archive_file_in_place is creating, appending and always finalizing the archive
+   // after successful operation
+   x_MzStatus = mz_zip_add_mem_to_archive_file_in_place(
+      orc_ZipArchivePath.c_str(), c_FilePathWithSlashes.c_str(),
+      opcn_Content, static_cast<size_t>(ou32_ContentSize),
+      c_Comment.c_str(), static_cast<uint16_t>(c_Comment.Length()),
+      MZ_BEST_COMPRESSION);
+
+   if (x_MzStatus == MZ_FALSE)
+   {
+      if (opc_ErrorText != NULL)
+      {
+         (*opc_ErrorText) = "Could not create zip " + orc_ItemType + " \"" + orc_ItemName + "\".";
+      }
+      s32_Return = C_NOACT;
+   }
    return s32_Return;
 }

@@ -70,6 +70,10 @@ C_SdNdeDalLogJobDataSelectionTableView::C_SdNdeDalLogJobDataSelectionTableView(Q
    this->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
    this->horizontalHeader()->setStretchLastSection(true);
 
+   // Hide column "Custom logging name" temporarily
+   this->setColumnHidden(C_SdNdeDalLogJobDataSelectionTableModel::h_EnumToColumn(C_SdNdeDalLogJobDataSelectionTableModel
+                                                                                 ::eLOGGING_NAME), true);
+
    // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
    this->verticalScrollBar()->hide();

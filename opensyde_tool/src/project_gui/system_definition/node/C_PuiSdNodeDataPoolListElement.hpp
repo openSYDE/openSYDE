@@ -31,7 +31,6 @@ public:
    void CalcHash(uint32_t & oru32_HashValue) const;
 
    bool q_AutoMinMaxActive;
-   bool q_InterpretAsString;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

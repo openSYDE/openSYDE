@@ -147,6 +147,10 @@ void C_SdNdeNodeEditWidget::Save(void) const
    {
       this->mpc_PropertiesWidget->SaveToData();
    }
+   if (this->mpc_DataLoggerWidget != NULL)
+   {
+      this->mpc_DataLoggerWidget->Save();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -132,7 +132,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
       case C_SdNdeDpUtil::eELEMENT_VALUE_TYPE:
          if (orc_NewData.toInt() == 10)
          {
-            c_UiElement.q_InterpretAsString = true;
+            c_OscElement.q_InterpretAsString = true;
             c_OscElement.SetType(C_OscNodeDataPoolContent::E_Type::eSINT8);
             //Handle min max (always valid)
             if (this->mq_Initial == true)
@@ -151,7 +151,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
             {
                const C_OscNodeDataPoolContent::E_Type e_NewType =
                   C_SdNdeDpUtil::h_ConvertContentTypeFromComboBox(static_cast<int8_t>(orc_NewData.toInt()));
-               c_UiElement.q_InterpretAsString = false;
+               c_OscElement.q_InterpretAsString = false;
                if (c_UiElement.q_AutoMinMaxActive == false)
                {
                   //Manual handling necessary
@@ -177,7 +177,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
                const C_OscNodeDataPoolContent::E_Type e_NewType =
                   C_SdNdeDpUtil::h_ConvertContentTypeFromComboBox(static_cast<int8_t>(orc_NewData.toInt()));
                c_OscElement.SetType(e_NewType);
-               c_UiElement.q_InterpretAsString = false;
+               c_OscElement.q_InterpretAsString = false;
             }
          }
          break;
@@ -253,7 +253,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          if ((this->ms32_DataSetIndex >= 0) &&
              (static_cast<uint32_t>(this->ms32_DataSetIndex) < c_OscElement.c_DataSetValues.size()))
          {
-            if (c_UiElement.q_InterpretAsString == true)
+            if (c_OscElement.q_InterpretAsString == true)
             {
                C_SdNdeDpContentUtil::h_SetString(
                   orc_NewData.toString(), c_OscElement.c_DataSetValues[static_cast<uint32_t>(this->ms32_DataSetIndex)]);

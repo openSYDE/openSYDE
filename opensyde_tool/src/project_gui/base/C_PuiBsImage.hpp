@@ -34,6 +34,7 @@ public:
    void CalcHash(uint32_t & oru32_HashValue) const override;
 
    QPixmap c_UiImagePixmap;
+   QByteArray c_UiImageFormat;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

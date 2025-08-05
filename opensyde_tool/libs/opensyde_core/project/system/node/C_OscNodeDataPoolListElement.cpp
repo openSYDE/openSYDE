@@ -48,6 +48,7 @@ C_OscNodeDataPoolListElement::C_OscNodeDataPoolListElement(void) :
    f64_Offset(0.0),
    c_Unit(""),
    e_Access(eACCESS_RW),
+   q_InterpretAsString(false),
    q_DiagEventCall(false),
    c_DataSetValues(),
    c_Value(),
@@ -85,6 +86,12 @@ void C_OscNodeDataPoolListElement::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
+   //Only relevant in this case
+   if ((this->GetArray() == true) && (this->GetType() == C_OscNodeDataPoolContent::eSINT8))
+   {
+      stw::scl::C_SclChecksums::CalcCRC32(&this->q_InterpretAsString, sizeof(this->q_InterpretAsString),
+                                          oru32_HashValue);
+   }
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataSetValues.size(); ++u32_Counter)

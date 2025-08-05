@@ -2152,8 +2152,8 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32_t> & orc_OtherStar
                                                u32_Item - orc_OtherStartIndices[3]);
 
             pc_Item = new C_GiSvDaImageGroup(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item,
-                                             u64_CurUniqueId, pc_UiImageData->f64_Width,
-                                             pc_UiImageData->f64_Height, pc_UiImageData->c_UiImagePixmap);
+                                             u64_CurUniqueId, pc_UiImageData->f64_Width, pc_UiImageData->f64_Height,
+                                             pc_UiImageData->c_UiImagePixmap, pc_UiImageData->c_UiImageFormat);
             pc_Item->LoadData();
 
             this->m_AddImageGroupToScene(pc_Item);

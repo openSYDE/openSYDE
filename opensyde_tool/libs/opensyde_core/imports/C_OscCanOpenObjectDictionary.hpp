@@ -121,7 +121,6 @@ public:
 class C_OscCanOpenObjectDictionary
 {
 private:
-   static int32_t mh_FindValue(const uint32_t ou32_Value, const std::vector<uint32_t> & orc_AllValues);
    int32_t m_CheckForExistingObjects(const stw::scl::C_SclString & orc_Blockname, stw::scl::C_SclIniFile & orc_IniFile);
    int32_t m_GetObjectDescription(const uint16_t ou16_Index, const uint8_t ou8_SubIndex, const bool oq_IsSubIndex,
                                   stw::scl::C_SclIniSection & orc_Section, C_OscCanOpenObjectData & orc_Object);

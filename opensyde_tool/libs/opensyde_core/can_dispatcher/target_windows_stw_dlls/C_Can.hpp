@@ -60,12 +60,6 @@ public:
    virtual int32_t CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message);
    virtual int32_t CAN_Get_System_Time(uint64_t & oru64_SystemTimeUs) const;
 
-   //optional SER streaming functions (do not exist in an "ext" variation yet -> channel member will not be used !!)
-   virtual int32_t SER_Get_TX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize) const;
-   virtual int32_t SER_Send_Bytes(const uint8_t * opu8_Data, const uint32_t ou32_NumBytes);
-   virtual int32_t SER_Get_RX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize) const;
-   virtual int32_t SER_Read_Bytes(uint8_t * const opu8_Data, uint32_t & oru32_NumBytes);
-
    //additional functions for Windows STW CAN DLLs
    //DLL handling:
    int32_t DLL_Open(void);
@@ -81,10 +75,6 @@ public:
    int32_t CAN_Get_Supported_Bitrates(stw::scl::C_SclString & orc_Unit,
                                       stw::scl::C_SclDynamicArray<uint32_t> & orc_Bitrates,
                                       uint32_t & oru32_MultiplicationFactor) const;
-
-   //CANtapi functions do not exist in an "ext" variation yet -> channel member will not be used !!
-   int32_t CANTAPI_Connect(const uint8_t * const opu8_Number, const uint32_t ou32_TimeOut);
-   int32_t CANTAPI_Disconnect(const uint32_t ou32_TimeOut);
 
    //setter/getter functions
    void SetDLLName(const stw::scl::C_SclString & orc_DLLName);

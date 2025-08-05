@@ -78,9 +78,14 @@ void stw::tgl::TglGetDateTimeNow(C_TglDateTime & orc_DateTime)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Delays for the given number of microseconds.
+/*! \brief   Actively wait for a period of time
 
-   \param[in]  ou32_NumberUs    Number of microseconds to wait
+   Actively blocks for the given number of microseconds.
+   Depending on the underlying system very short delays might not be possible
+     and are rounded up to the smallest possible delay.
+   Thus for example 10 calls of TGL_DelayUs(1) can cause a longer delay than 1 call of TGL_DelayUs(10).
+
+   \param[in]   ou32_NumberUs             number of microseconds to block
 */
 //----------------------------------------------------------------------------------------------------------------------
 void stw::tgl::TglDelayUs(const uint32_t ou32_NumberUs)
@@ -104,6 +109,28 @@ void stw::tgl::TglDelayUs(const uint32_t ou32_NumberUs)
 void stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
 {
    usleep(static_cast<useconds_t>(ou32_NumberMs) * 1000);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sleep for a number of milliseconds
+
+   A more use-case oriented sleep:
+   Intended to be used while polling for more complex operations to be completed.
+   Typical use: poll for completion of an ongoing confirmed communication with an external communication partner without
+    actively blocking the CPU. Depending on the architecture an event mechanism might not be available to wait for.
+
+   The goals of the function:
+   * keep sleep time low in order for the communication procedure to be able to check for responses often
+   * but: do not burden the CPU too much and give other threads CPU time
+
+   The strategy chosen depends on the behavior of the target system. e.g.:
+   * under Windows a "Sleep(0)" will provide a good compromise
+   * under Linux "usleep(0)" can result in high CPU loads; using "usleep(1000)" should be acceptable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void stw::tgl::TglSleepPolling()
+{
+   usleep(1000);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,8 @@ INCLUDEPATH += $${PWD} \
                $${PWD}/scl \
                $${PWD}/stwtypes \
                $${PWD}/xml_parser \
-               $${PWD}/xml_parser/tinyxml2
+               $${PWD}/xml_parser/tinyxml2 \
+               $${PWD}/conf_file_handler
 
 SOURCES += \
     $$PWD/protocol_drivers/communication/C_OscComAutoSupport.cpp \
@@ -46,7 +47,8 @@ SOURCES += \
     $${PWD}/xml_parser/C_OscXmlParser.cpp \
     $${PWD}/xml_parser/C_OscXmlParserLog.cpp \
     $${PWD}/xml_parser/C_OscChecksummedXml.cpp \
-    $${PWD}/xml_parser/tinyxml2/tinyxml2.cpp
+    $${PWD}/xml_parser/tinyxml2/tinyxml2.cpp \
+    $${PWD}/conf_file_handler/C_OscConfFileHandler.cpp
 
 HEADERS += \
     $$PWD/protocol_drivers/communication/C_OscComAutoSupport.hpp \
@@ -76,7 +78,8 @@ HEADERS += \
     $${PWD}/xml_parser/C_OscXmlParser.hpp \
     $${PWD}/xml_parser/C_OscXmlParserLog.hpp \
     $${PWD}/xml_parser/C_OscChecksummedXml.hpp \
-    $${PWD}/xml_parser/tinyxml2/tinyxml2.h
+    $${PWD}/xml_parser/tinyxml2/tinyxml2.h \
+    $${PWD}/conf_file_handler/C_OscConfFileHandler.hpp
 
 # optional: zip/unzip
 contains(opensyde_core_skip_modules, opensyde_core_skip_zipping) {
@@ -184,6 +187,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
                   $${PWD}/project/system/node/can \
                   $${PWD}/project/system/node/can/can_open \
                   $${PWD}/project/system/node/data_logger \
+                  $${PWD}/project/system/node/xapp \
                   $${PWD}/project/system/target_support_package \
                   $${PWD}/project/view
 
@@ -238,17 +242,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/FileLoadersV2/C_OscNodeFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscSystemBusFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OscSystemDefinitionFilerV2.cpp \
-       $${PWD}/project/system/node/can/C_OscCanMessage.cpp \
-       $${PWD}/project/system/node/can/C_OscCanMessageUniqueId.cpp \
-       $${PWD}/project/system/node/can/C_OscCanMessageContainer.cpp \
-       $${PWD}/project/system/node/can/C_OscCanMessageIdentificationIndices.cpp \
-       $${PWD}/project/system/node/can/C_OscCanProtocol.cpp \
-       $${PWD}/project/system/node/can/C_OscCanSignal.cpp \
-       $${PWD}/project/system/node/can/C_OscCanUtil.cpp \
-       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJob.cpp \
-       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp \
-       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp \
-       $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp \
        $${PWD}/project/system/node/C_OscNode.cpp \
        $${PWD}/project/system/node/C_OscNodeSquad.cpp \
        $${PWD}/project/system/node/C_OscNodeSquadFiler.cpp \
@@ -272,10 +265,24 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OscNodeCommFiler.cpp \
        $${PWD}/project/system/node/C_OscNodeDataPoolId.cpp \
        $${PWD}/project/system/node/can/C_OscCanInterfaceId.cpp \
+       $${PWD}/project/system/node/can/C_OscCanMessage.cpp \
+       $${PWD}/project/system/node/can/C_OscCanMessageUniqueId.cpp \
+       $${PWD}/project/system/node/can/C_OscCanMessageContainer.cpp \
+       $${PWD}/project/system/node/can/C_OscCanMessageIdentificationIndices.cpp \
+       $${PWD}/project/system/node/can/C_OscCanProtocol.cpp \
+       $${PWD}/project/system/node/can/C_OscCanSignal.cpp \
+       $${PWD}/project/system/node/can/C_OscCanUtil.cpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerMappableSignal.cpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.cpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.cpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJob.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobAdditionalTriggerProperties.cpp \
+       $${PWD}/project/system/node/xapp/C_OscXappProperties.cpp \
+       $${PWD}/project/system/node/xapp/C_OscXappPropertiesFiler.cpp \
        $${PWD}/project/view/C_OscViewPc.cpp \
        $${PWD}/project/view/C_OscViewData.cpp \
        $${PWD}/project/view/C_OscViewNodeUpdate.cpp \
@@ -376,6 +383,9 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobFiler.hpp \
        $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobProperties.hpp \
        $${PWD}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.hpp \
+       $${PWD}/project/system/node/data_logger/C_OscDataLoggerJobAdditionalTriggerProperties.hpp \
+       $${PWD}/project/system/node/xapp/C_OscXappProperties.hpp \
+       $${PWD}/project/system/node/xapp/C_OscXappPropertiesFiler.hpp \
        $${PWD}/project/view/C_OscViewData.hpp \
        $${PWD}/project/view/C_OscViewPc.hpp \
        $${PWD}/project/view/C_OscViewNodeUpdate.hpp \

@@ -97,9 +97,6 @@ C_SclString::C_SclString(void) :
    We cannot use the template constructor as by default streams interpret uint8_t as a character.
 
    \param[in]  ou8_InitValue   initial value
-
-   \return
-   value converted to string
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString::C_SclString(const uint8_t ou8_InitValue)
@@ -116,9 +113,6 @@ C_SclString::C_SclString(const uint8_t ou8_InitValue)
    We cannot use the template constructor as by default streams interpret sint8 as a character.
 
    \param[in]  os8_InitValue   initial value
-
-   \return
-   value converted to string
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString::C_SclString(const int8_t os8_InitValue)
@@ -802,7 +796,7 @@ C_SclString & C_SclString::ReplaceAll(const C_SclString & orc_Search, const C_Sc
 
    \return
    0: string not found
-   >0: position of string in exsiting string (1 = beginning of string)
+   >0: position of string in existing string (1 = beginning of string)
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_SclString::Pos(const C_SclString & orc_SubString) const

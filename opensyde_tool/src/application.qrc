@@ -692,5 +692,7 @@
         <file>images/IconLogging.svg</file>
         <file>images/main_page_and_navi_bar/IconApp.svg</file>
         <file>images/main_page_and_navi_bar/IconProjOpen.svg</file>
+        <file>images/system_views/IconAddKey.svg</file>
+        <file>images/system_views/IconAddKeyDisabled.svg</file>
     </qresource>
 </RCC>

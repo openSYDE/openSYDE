@@ -97,8 +97,11 @@ int32_t C_OscXceCreate::h_CreatePackage(const stw::scl::C_SclString & orc_Packag
    std::set<stw::scl::C_SclString> c_XcertFiles;                     // unique container with
                                                                      // relative file paths for zip
                                                                      // archive
+   std::vector<C_OscXceUpdatePackageParameters> c_UpdatePackageParameters = orc_UpdatePackageParameters;
    // fill with constant file names
    c_XcertFiles.insert(C_OscXceManifestFiler::hc_FILE_NAME);
+   c_XcertFiles.insert(TglFileIncludeTrailingDelimiter(mhc_CERTIFICATES_FOLDER));
+   c_XcertFiles.insert(TglFileIncludeTrailingDelimiter(mhc_UPDATE_PACKAGE_PARAMETERS_FOLDER));
 
    // precondition checks
    s32_Return = mh_CheckParamsToCreatePackage(orc_PackagePath, orc_CertificatesPath, orc_UpdatePackageParameters);
@@ -125,7 +128,12 @@ int32_t C_OscXceCreate::h_CreatePackage(const stw::scl::C_SclString & orc_Packag
    }
    if (s32_Return == C_NO_ERR)
    {
-      const C_OscXceManifest c_Manifest = mh_CreateManifest(orc_UpdatePackageParameters);
+      s32_Return =
+         mh_PrepareCertFiles(c_PackagePathTmp, orc_CertificatesPath, c_UpdatePackageParameters, c_XcertFiles);
+   }
+   if (s32_Return == C_NO_ERR)
+   {
+      const C_OscXceManifest c_Manifest = mh_CreateManifest(c_UpdatePackageParameters);
       const stw::scl::C_SclString c_ManifestPath = c_PackagePathTmp + C_OscXceManifestFiler::hc_FILE_NAME;
       s32_Return = C_OscXceManifestFiler::h_SaveFile(c_Manifest, c_ManifestPath);
       if (s32_Return != C_NO_ERR)
@@ -137,11 +145,6 @@ int32_t C_OscXceCreate::h_CreatePackage(const stw::scl::C_SclString & orc_Packag
          osc_write_log_error(mhc_USE_CASE, mhc_ErrorMessage);
          s32_Return = C_RD_WR; // redefine because we only have a few error codes
       }
-   }
-   if (s32_Return == C_NO_ERR)
-   {
-      s32_Return =
-         mh_PrepareCertFiles(c_PackagePathTmp, orc_CertificatesPath, orc_UpdatePackageParameters, c_XcertFiles);
    }
    // package temporary result folder to zip file
    if ((s32_Return == C_NO_ERR) || (s32_Return == C_WARN))
@@ -186,7 +189,7 @@ int32_t C_OscXceCreate::mh_CheckParamsToCreatePackage(const stw::scl::C_SclStrin
                                                                                   mhc_USE_CASE,
                                                                                   hc_PACKAGE_EXT,
                                                                                   hc_PACKAGE_EXT_TMP,
-                                                                                  mhc_ErrorMessage);
+                                                                                  mhc_ErrorMessage, false);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -253,15 +256,10 @@ C_OscXceManifest C_OscXceCreate::mh_CreateManifest(
       C_OscXceUpdatePackageParameters c_Out;
       const C_OscXceUpdatePackageParameters & rc_In = orc_UpdatePackageParameters[u32_It];
       c_Out.c_Password = rc_In.c_Password;
-      if (rc_In.c_AuthenticationKeyPath.IsEmpty())
-      {
-         c_Out.c_AuthenticationKeyPath = "";
-      }
-      else
-      {
-         c_Out.c_AuthenticationKeyPath = C_OscXceCreate::mh_GenOutFilePathPart(rc_In.c_AuthenticationKeyPath,
-                                                                               C_OscXceBase::mhc_UPDATE_PACKAGE_PARAMETERS_FOLDER);
-      }
+      c_Out.c_AuthenticationKeyPath = rc_In.c_AuthenticationKeyPath;
+      //Apply linux path handling
+      c_Out.c_AuthenticationKeyPath.ReplaceAll("\\", "/");
+
       c_Manifest.c_UpdatePackageParameters.push_back(c_Out);
    }
    return c_Manifest;
@@ -272,35 +270,39 @@ C_OscXceManifest C_OscXceCreate::mh_CreateManifest(
 
    \param[in]      orc_TmpPath                  Tmp path
    \param[in]      orc_CertificatesPath         Certificates path
-   \param[in]      orc_UpdatePackageParameters  Update package parameters
+   \param[in,out]  orc_UpdatePackageParameters  Update package parameters
    \param[in,out]  orc_XcertFiles               Xcert files
 
    \return
-   STW error codes
-
-   \retval   C_NO_ERR   Detailed description
+   C_NO_ERR    success
+   C_NOACT     certificates do not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscXceCreate::mh_PrepareCertFiles(const stw::scl::C_SclString & orc_TmpPath,
                                             const std::vector<stw::scl::C_SclString> & orc_CertificatesPath,
-                                            const std::vector<C_OscXceUpdatePackageParameters> & orc_UpdatePackageParameters,
+                                            std::vector<C_OscXceUpdatePackageParameters> & orc_UpdatePackageParameters,
                                             std::set<stw::scl::C_SclString> & orc_XcertFiles)
 {
    int32_t s32_Return = C_NO_ERR;
 
+   std::map<stw::scl::C_SclString, bool> c_ExistingCertNames;
+
    for (uint32_t u32_It = 0UL; (u32_It < orc_CertificatesPath.size()) && (s32_Return == C_NO_ERR); ++u32_It)
    {
-      s32_Return = mh_CopyFile(orc_CertificatesPath[u32_It], orc_TmpPath, mhc_CERTIFICATES_FOLDER, orc_XcertFiles);
+      s32_Return = mh_CopyFile(orc_CertificatesPath[u32_It], orc_TmpPath, mhc_CERTIFICATES_FOLDER, c_ExistingCertNames,
+                               orc_XcertFiles);
    }
    if (s32_Return == C_NO_ERR)
    {
+      std::map<stw::scl::C_SclString, bool> c_ExistingPackageNames;
       for (uint32_t u32_It = 0UL; (u32_It < orc_UpdatePackageParameters.size()) && (s32_Return == C_NO_ERR); ++u32_It)
       {
-         const C_OscXceUpdatePackageParameters & rc_In = orc_UpdatePackageParameters[u32_It];
+         C_OscXceUpdatePackageParameters & rc_In = orc_UpdatePackageParameters[u32_It];
          if (rc_In.c_AuthenticationKeyPath.IsEmpty() == false)
          {
             s32_Return = mh_CopyFile(rc_In.c_AuthenticationKeyPath, orc_TmpPath, mhc_UPDATE_PACKAGE_PARAMETERS_FOLDER,
-                                     orc_XcertFiles);
+                                     c_ExistingPackageNames,
+                                     orc_XcertFiles, &rc_In.c_AuthenticationKeyPath);
          }
       }
    }
@@ -330,32 +332,39 @@ stw::scl::C_SclString C_OscXceCreate::mh_GenOutFilePathPart(const stw::scl::C_Sc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Copy file
 
-   \param[in]      orc_InPath       In path
-   \param[in]      orc_OutBasePath  Out base path
-   \param[in]      orc_OutFolder    Out folder
-   \param[in,out]  orc_XcertFiles   Xcert files
+   \param[in]      orc_InPath          In path
+   \param[in]      orc_OutBasePath     Out base path
+   \param[in]      orc_OutFolder       Out folder
+   \param[in,out]  orc_ExistingFiles   Existing files
+   \param[in,out]  orc_XcertFiles      Xcert files
+   \param[in,out]  opc_OutFilePath     Out file path
 
    \return
-   STW error codes
-
-   \retval   C_NO_ERR   Detailed description
-   \retval   C_NOACT    Detailed description
+   C_NO_ERR    success
+   C_NOACT     certificates do not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscXceCreate::mh_CopyFile(const stw::scl::C_SclString & orc_InPath,
                                     const stw::scl::C_SclString & orc_OutBasePath,
-                                    const stw::scl::C_SclString & orc_OutFolder,
-                                    std::set<stw::scl::C_SclString> & orc_XcertFiles)
+                                    const stw::scl::C_SclString & orc_OutFolder, std::map<stw::scl::C_SclString,
+                                                                                          bool> & orc_ExistingFiles,
+                                    std::set<stw::scl::C_SclString> & orc_XcertFiles,
+                                    stw::scl::C_SclString * const opc_OutFilePath)
 {
    int32_t s32_Return;
-   const stw::scl::C_SclString c_OutPart = C_OscXceCreate::mh_GenOutFilePathPart(orc_InPath,
-                                                                                 orc_OutFolder);
-   const stw::scl::C_SclString c_Target = orc_OutBasePath + c_OutPart;
+   const stw::scl::C_SclString c_OutFile = C_OscXceCreate::mh_GetUniqueFileName(orc_InPath,
+                                                                                orc_OutFolder, orc_ExistingFiles);
+   const stw::scl::C_SclString c_Target = orc_OutBasePath + c_OutFile;
 
    stw::scl::C_SclString c_Error;
 
-   orc_XcertFiles.insert(c_OutPart);
+   orc_XcertFiles.insert(c_OutFile);
    s32_Return = C_OscUtils::h_CopyFile(orc_InPath, c_Target, NULL, &c_Error);
+   //Updated after copy not before to avoid modifications of const parameters
+   if (opc_OutFilePath != NULL)
+   {
+      *opc_OutFilePath = c_OutFile;
+   }
    if (s32_Return != C_NO_ERR)
    {
       mhc_ErrorMessage = c_Error;
@@ -363,4 +372,33 @@ int32_t C_OscXceCreate::mh_CopyFile(const stw::scl::C_SclString & orc_InPath,
       s32_Return = C_NOACT;
    }
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get unique file name
+
+   \param[in]      orc_InPath          In path
+   \param[in]      orc_OutFolder       Out folder
+   \param[in,out]  orc_ExistingFiles   Existing files
+
+   \return
+   Unique file name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw::scl::C_SclString C_OscXceCreate::mh_GetUniqueFileName(const stw::scl::C_SclString & orc_InPath,
+                                                           const stw::scl::C_SclString & orc_OutFolder,
+                                                           std::map<stw::scl::C_SclString, bool> & orc_ExistingFiles)
+{
+   const stw::scl::C_SclString c_Extension = TglExtractFileExtension(orc_InPath);
+   const stw::scl::C_SclString c_OutPart = C_OscXceCreate::mh_GenOutFilePathPart(orc_InPath,
+                                                                                 orc_OutFolder);
+   const stw::scl::C_SclString c_OutPartWithoutExt =
+      c_OutPart.SubString(1UL, c_OutPart.Length() - c_Extension.Length());
+   const stw::scl::C_SclString c_OutFileWithoutExt = C_OscUtils::h_GetUniqueName(orc_ExistingFiles, c_OutPartWithoutExt,
+                                                                                 0UL);
+   const stw::scl::C_SclString c_OutFile = c_OutFileWithoutExt + c_Extension;
+
+   //Store without extension to only modify base
+   orc_ExistingFiles[c_OutPartWithoutExt] = true;
+   return c_OutFile;
 }

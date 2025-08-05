@@ -6,43 +6,43 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>377</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>C_SdNdeDalLogJobsWidget</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+   <property name="spacing">
+    <number>11</number>
+   </property>
    <property name="leftMargin">
     <number>20</number>
    </property>
    <property name="topMargin">
-    <number>10</number>
-   </property>
-   <property name="rightMargin">
-    <number>12</number>
-   </property>
-   <property name="bottomMargin">
-    <number>10</number>
-   </property>
-   <property name="verticalSpacing">
     <number>0</number>
    </property>
-   <item row="1" column="0">
-    <widget class="stw::opensyde_gui_elements::C_OgeGbxGrayed" name="groupBox">
+   <property name="rightMargin">
+    <number>18</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBox_Transparent">
      <property name="title">
       <string/>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>20</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>10</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -51,64 +51,147 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw::opensyde_gui_elements::C_OgeChxPropertiesSmall" name="pc_ChkBoxLogJob">
-        <property name="text">
-         <string>LogJob1</string>
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+        <property name="spacing">
+         <number>0</number>
         </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
-       </spacer>
+        <item>
+         <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetBackground" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelLogJobs">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Log Jobs</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonAdd">
+               <property name="minimumSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>PushButton</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw::opensyde_gui::C_SdNdeDalLogJobsListView" name="pc_JobsListView">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_BtnLogJobs">
-     <property name="minimumSize">
-      <size>
-       <width>300</width>
-       <height>31</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>31</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Log Jobs</string>
-     </property>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubHalcOverview</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_SdNdeDalLogJobsListView</class>
+   <extends>QTableView</extends>
+   <header>C_SdNdeDalLogJobsListView.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubHalcOverview.hpp</header>
+   <header>C_OgePubSvgIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeChxPropertiesSmall</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxPropertiesSmall.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeGbxGrayed</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxGrayed.hpp</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

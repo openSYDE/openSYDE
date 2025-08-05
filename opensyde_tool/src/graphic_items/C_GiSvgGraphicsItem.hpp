@@ -43,7 +43,7 @@ public:
               QWidget * const opc_Widget = NULL) override;
 
 private:
-   const QString mc_ImagePath;
+   QString mc_ImagePath;
    QSvgRenderer * mpc_SvgRenderer;
 
    //Avoid call

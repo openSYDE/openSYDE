@@ -744,9 +744,9 @@ QString C_UsHandler::GetLastKnownCsvExportPath() const
    Last known Pem file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_UsHandler::GetLastKnownPemFilePath() const
+QString C_UsHandler::GetLastKnownAddPemFilePath() const
 {
-   return this->mc_LastKnownPemFilePath;
+   return this->mc_LastKnownAddPemFilePath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -762,15 +762,42 @@ QStringList C_UsHandler::GetLastKnownUpdatePemFilePaths() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set last known Update Pem File Paths as relative or absolute
+/*! \brief  Get last known public pem file path
 
    \return
-   std::vector<QString>
+   Last known public pem file
+
 */
 //----------------------------------------------------------------------------------------------------------------------
-QStringList C_UsHandler::GetPemFilePathsAsRelativeOrAbsolute() const
+QString C_UsHandler::GetLastKnownPublicPemFilePath() const
 {
-   return this->mc_PemFilePathsAsRelativeOrAbsolute;
+   return this->mc_LastKnownPublicPemFilePath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known pem file password
+
+   \return
+   Last known pem file password
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownPemFilePassword() const
+{
+   return this->mc_LastKnownPemFilePassword;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known secure certificate package file path
+
+   \return
+   Last known secure certificate package
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownSecureCertificatePackagePath() const
+{
+   return this->mc_LastKnownSecureCertificatePackagePath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -784,6 +811,31 @@ QStringList C_UsHandler::GetPemFilePathsAsRelativeOrAbsolute() const
 QString C_UsHandler::GetLastKnownPrivateKeyPath() const
 {
    return this->mc_LastKnownPrivateKeyPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known Add PEM file state
+
+   \return
+   last known Add PEM file state
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsHandler::GetLastKnownAddPemFileState() const
+{
+   return this->mq_LastKnownAddPemFileState;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known secure update config state
+
+   \return
+   last known secure update config state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsHandler::GetLastKnownSecureUpdateConfigState() const
+{
+   return this->mq_LastKnownSecureUpdateConfigState;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1474,9 +1526,9 @@ void C_UsHandler::SetLastKnownCsvExportPath(const QString & orc_NewPath)
    \param[in]  orc_NewPath    Pem file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetLastKnownPemFilePath(const QString & orc_NewPath)
+void C_UsHandler::SetLastKnownAddPemFilePath(const QString & orc_NewPath)
 {
-   this->mc_LastKnownPemFilePath = orc_NewPath;
+   this->mc_LastKnownAddPemFilePath = orc_NewPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1491,14 +1543,58 @@ void C_UsHandler::SetLastKnownUpdatePemFilePaths(const QStringList & orc_PemFile
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set last known Update PEM File Paths as relative or absolute
+/*! \brief  Set last known public pem file path
 
-   \param[in]  orc_PemFilePathsAsRelativeOrAbsolute   vector of pem file paths as relative or absolute
+   \param[in]  orc_NewPath    PEM file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetPemFilePathsAsRelativeOrAbsolute(const QStringList & orc_PemFilePathsAsRelativeOrAbsolute)
+void C_UsHandler::SetLastKnownPublicPemFilePath(const QString & orc_NewPath)
 {
-   this->mc_PemFilePathsAsRelativeOrAbsolute = orc_PemFilePathsAsRelativeOrAbsolute;
+   this->mc_LastKnownPublicPemFilePath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known pem file password
+
+   \param[in]  orc_Password    pem file password
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownPemFilePassword(const QString & orc_Password)
+{
+   this->mc_LastKnownPemFilePassword = orc_Password;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known Add pem file state
+
+   \param[in]  orq_IsEnabled    Add pem file state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownAddPemFileState(const bool & orq_IsEnabled)
+{
+   this->mq_LastKnownAddPemFileState = orq_IsEnabled;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known secure update config state
+
+   \param[in]  orq_IsEnabled    secure update config state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownSecureUpdateConfigState(const bool & orq_IsEnabled)
+{
+   this->mq_LastKnownSecureUpdateConfigState = orq_IsEnabled;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known secure certificate package path
+
+   \param[in]  orc_NewPath    secure certificate package path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownSecureCertificatePackagePath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownSecureCertificatePackagePath = orc_NewPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

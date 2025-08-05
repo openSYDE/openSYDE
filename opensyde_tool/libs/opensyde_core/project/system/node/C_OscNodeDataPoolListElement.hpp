@@ -52,6 +52,7 @@ public:
    float64_t f64_Offset;                                  ///< Offset factor for display
    stw::scl::C_SclString c_Unit;                          ///< Variable unit
    E_Access e_Access;                                     ///< Defined access level
+   bool q_InterpretAsString;                              ///< Flag if data type should be interpreted as string
    bool q_DiagEventCall;                                  ///< Flag if there is an event call
    std::vector<C_OscNodeDataPoolContent> c_DataSetValues; ///< Dataset value(s) for complete data element
    C_OscNodeDataPoolContent c_Value;                      ///< Current value(s) for complete data element

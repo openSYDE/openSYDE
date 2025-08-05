@@ -79,7 +79,9 @@ stw--opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeCbxTableHalc,
 stw--opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
-stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListWidget
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListWidget,
+stw--opensyde_gui_elements--C_OgeLeTableHalc
+
 {
 font-family: "Segoe UI";
 font-size: 12px;
@@ -162,7 +164,8 @@ stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu,
 stw--opensyde_gui_elements--C_OgeLabExternalLink,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView,
-stw--opensyde_gui--C_NagUnUsedProjectFilesTableView
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView
 {
 font-family: "Segoe UI";
 font-size: 13px;
@@ -184,6 +187,7 @@ stw--opensyde_gui_elements--C_OgePubHalcOverview,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="true"][Bold="false"],
 stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Font="13"][SemiBold="true"][Bold="false"],
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement
+
 {
 font-family: "Segoe UI Semibold";
 font-size: 13px;

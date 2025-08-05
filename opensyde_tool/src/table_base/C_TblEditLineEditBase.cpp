@@ -167,15 +167,15 @@ int32_t C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString &
                }
             }
          }
-      }
-      if (this->mc_MaxValue.isEmpty() == false)
-      {
-         const float64_t f64_MaxValue = C_TblEditLineEditBase::mh_GetStringAsFloat(this->mc_MaxValue, q_Worked);
-         if (q_Worked == true)
+         if (this->mc_MaxValue.isEmpty() == false)
          {
-            if (f64_MaxValue < f64_Value)
+            const float64_t f64_MaxValue = C_TblEditLineEditBase::mh_GetStringAsFloat(this->mc_MaxValue, q_Worked);
+            if (q_Worked == true)
             {
-               s32_Retval = C_CONFIG;
+               if (f64_MaxValue < f64_Value)
+               {
+                  s32_Retval = C_CONFIG;
+               }
             }
          }
       }

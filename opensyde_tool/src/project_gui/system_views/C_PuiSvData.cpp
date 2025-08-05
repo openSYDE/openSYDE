@@ -2926,10 +2926,16 @@ void C_PuiSvData::InitFromSystemDefinition(void)
                const C_OscNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItAppl];
                if (rc_Application.e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
                {
-                  // Only in case of a HALC NVM Datapool the size 1 is possible
+                  // Only in case of a HALC NVM Datapool the size >1 is possible
                   tgl_assert(rc_Application.c_ResultPaths.size() == 1);
+                  QString c_Path = rc_Application.c_ResultPaths[0U].c_str();
+                  if (pc_Node->c_Properties.q_XappSupport == true)
+                  {
+                     // special case: X config file is relative to generation directory
+                     c_Path = C_Uti::h_ConcatPathIfNecessary(rc_Application.c_GeneratePath.c_str(), c_Path);
+                  }
                   c_ApplPaths.emplace_back(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                                              rc_Application.c_ProjectPath.c_str(),
+                                              c_Path,
                                               rc_Application.c_ResultPaths[0U].c_str()).toStdString().c_str());
                }
                else

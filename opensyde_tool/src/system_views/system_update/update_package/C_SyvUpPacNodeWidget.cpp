@@ -84,6 +84,7 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
    mq_StwFlashloader(false),
    mq_Connected(false),
    mq_EmptyOptionalSectionsVisible(true),
+   mq_ShowAddSecurityPack(false),
    mu32_PositionNumber(ou32_PositionNumber),
    mu32_FilesUpdated(0U),
    mpc_FilesWidget(NULL),
@@ -99,13 +100,17 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
 
    this->m_Init();
 
-   this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(false); //Set to InVisible for Now - Akhil challa
-   this->mpc_Ui->pc_PbAddSecurityPackage->SetCustomIcons("://images/IconAddEnabled.svg",
-                                                         "://images/IconAddHovered.svg",
-                                                         "://images/IconAddClicked.svg",
-                                                         "://images/IconAddDisabled.svg");
-   this->mpc_Ui->pc_PbAddSecurityPackage->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
-                                                                C_GtGetText::h_GetText("Create Package."));
+   this->mpc_Ui->pc_PbAddSecurityPackage->SetCustomIcons("://images/system_views/IconAddKey.svg",
+                                                         "://images/system_views/IconAddKey.svg",
+                                                         "://images/system_views/IconAddKey.svg",
+                                                         "://images/system_views/IconAddKeyDisabled.svg");
+   this->mpc_Ui->pc_PbAddSecurityPackage->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                   "Create Security Certificate Package"),
+                                                                C_GtGetText::h_GetText(
+                                                                   "Security Certificate Package enables "
+                                                                   "file-based targets to execute the openSYDE client security features "
+                                                                   "like 'Secure Autentication' and 'Secure Updates'. "
+                                                                   "\nAll relevant PEM files and configuration is packed together."));
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_WidgetTitle->SetColorReserved(mc_STYLE_GUIDE_COLOR_10);
@@ -166,7 +171,7 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
    this->mpc_Ui->pc_FrameSepTop->setVisible(false);
 
    connect(this->mpc_Ui->pc_PbAddSecurityPackage, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
-           &C_SyvUpPacNodeWidget::m_AddSecurityCertificatePacakege);
+           &C_SyvUpPacNodeWidget::AddSecurityCertificatePackage);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -215,6 +220,7 @@ void C_SyvUpPacNodeWidget::SetConnected(void)
    this->mq_Connected = true;
 
    this->mpc_Ui->pc_LabIconLock->setVisible(true);
+   this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(false);
 
    // Reset progress bar
    this->mpc_Ui->pc_WidgetTitle->SetProgress(0U);
@@ -374,6 +380,7 @@ void C_SyvUpPacNodeWidget::SetDisconnected(void)
    this->mq_Connected = false;
 
    this->mpc_Ui->pc_LabIconLock->setVisible(false);
+   this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(this->mq_ShowAddSecurityPack);
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -471,6 +478,9 @@ void C_SyvUpPacNodeWidget::AddNewFile(const QString & orc_File, const bool oq_Pa
       this->mpc_FilesWidget->AddFile(orc_File);
       this->mpc_FilesWidget->Expand(true);
    }
+
+   // special case security certificate package: warn user if there is more than one
+   this->m_CheckForMultipleSecurityCertificatePackages(orc_File);
 
    // update visibility of optional sections
    this->UpdateSectionsVisibility();
@@ -1000,6 +1010,40 @@ void C_SyvUpPacNodeWidget::UpdateSectionsVisibility(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add a new Security Certificate Pacakege
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::AddSecurityCertificatePackage()
+{
+   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
+   C_SyvUpPacSecurityCertificatePackageDialog * const pc_SecurityCertificatePackageDialog =
+      new C_SyvUpPacSecurityCertificatePackageDialog(*c_PopUpDialog);
+
+   //Resize
+   c_PopUpDialog->SetSize(QSize(1152, 853));
+
+   Q_UNUSED(pc_SecurityCertificatePackageDialog)
+
+   // "Create" clicked
+   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      const bool q_OptionAddPemFiles = pc_SecurityCertificatePackageDialog->GetOptionAddPemFiles();
+      const bool q_OptionAddSecureAuthentification =
+         pc_SecurityCertificatePackageDialog->GetOptionAddSecureAuthentification();
+      const QString c_Password = pc_SecurityCertificatePackageDialog->GetPassword();
+      const QString c_PublicKeyPath = pc_SecurityCertificatePackageDialog->GetPublicKeyPath();
+      const std::vector<stw::scl::C_SclString> c_PemFiles = pc_SecurityCertificatePackageDialog->GetPemFiles();
+      this->m_OnCreatePackage(c_PublicKeyPath, c_Password, c_PemFiles, q_OptionAddPemFiles,
+                              q_OptionAddSecureAuthentification);
+   }
+   if (c_PopUpDialog != NULL)
+   {
+      c_PopUpDialog->HideOverlay();
+      c_PopUpDialog->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of c_PopUpDialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten show event slot
 
    Here: Adapt the icon position and layout state
@@ -1356,6 +1400,10 @@ void C_SyvUpPacNodeWidget::m_Init(void)
          this->mpc_FilesWidget->InitWidget(this->mu32_ViewIndex, this->mu32_PositionNumber,
                                            this->mu32_NodeIndex, this->mc_NodeName, pc_Node->c_Applications.size(), 0);
       }
+
+      // Show "Add security package"-Button only if file based and X.App support is enabled:
+      this->mq_ShowAddSecurityPack = pc_Node->c_Properties.q_XappSupport && this->mq_FileBased;
+      this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(this->mq_ShowAddSecurityPack);
    }
 
    this->mpc_Ui->pc_ScrollAreaLayout->addSpacerItem(pc_Spacer);
@@ -1611,12 +1659,66 @@ bool C_SyvUpPacNodeWidget::m_CheckFileAlreadyContained(const QString & orc_File)
       c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                                        "The file is already contained in the Update Package "
                                                        "for this node and therefore not added again.")));
-      c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("%1"))
-                           .arg(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File)));
+      c_Message.SetDetails(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File));
       c_Message.Execute();
    }
 
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check for multiple security certificate packages and warn the user. No further action.
+
+   \param[in]  orc_File    File path of new file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_CheckForMultipleSecurityCertificatePackages(const QString & orc_File)
+{
+   if (("." + static_cast<QFileInfo>(orc_File).suffix().toLower()) == C_OscXceBase::h_GetPackageExtension().c_str())
+   {
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+      uint32_t u32_NumberOfSecurityPacks = 0;
+      QString c_FoundPaths;
+
+      if ((pc_Node != NULL) && (pc_View != NULL))
+      {
+         // check only file based files as it is very unlikely to have data blocks with security certificate packages
+         const std::vector<C_SclString> c_Paths =
+            pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED);
+
+         for (std::vector<C_SclString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
+         {
+            if (("." + static_cast<QFileInfo>((*c_It).c_str()).suffix().toLower()) ==
+                C_OscXceBase::h_GetPackageExtension().c_str())
+            {
+               c_FoundPaths += (*c_It).c_str();
+               c_FoundPaths += "\n";
+               u32_NumberOfSecurityPacks++;
+            }
+         }
+      }
+
+      if (u32_NumberOfSecurityPacks > 1)
+      {
+         // inform user that there are multiple security certificate packages
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Multiple Security Certificate Packages"));
+         c_Message.SetDescription(
+            static_cast<QString>(C_GtGetText::h_GetText("There are multiple security certificate packages contained "
+                                                        "in the update package of node %1.")).
+            arg(pc_Node->c_Properties.c_Name.c_str()));
+         c_Message.SetDetails(
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "The node can probably only handle one security certificate package "
+                                    "and thus the rest will be ignored. You can remove unused packages.\n\n"
+                                    "The following security certificate packages are contained in the update package:\n"
+                                    "%1"))
+            .arg(c_FoundPaths));
+         c_Message.SetCustomMinHeight(200, 300);
+         c_Message.Execute();
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1709,74 +1811,99 @@ bool C_SyvUpPacNodeWidget::m_CheckMime(const QMimeData * const opc_Mime, const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Add a new Security Certificate Pacakege
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacNodeWidget::m_AddSecurityCertificatePacakege()
-{
-   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
-   C_SyvUpPacSecurityCertificatePackageDialog * const pc_SecurityCertificatePackageDialog =
-      new C_SyvUpPacSecurityCertificatePackageDialog(*c_PopUpDialog);
-
-   //Resize
-   c_PopUpDialog->SetSize(QSize(1152, 853));
-
-   Q_UNUSED(pc_SecurityCertificatePackageDialog)
-
-   // "Create" clicked
-   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
-   {
-      const QString c_Password = pc_SecurityCertificatePackageDialog->GetPassword();
-      const QString c_PrivateKeyPath = pc_SecurityCertificatePackageDialog->GetPrivateKeyPath();
-      const std::vector<stw::scl::C_SclString> c_PemFiles = pc_SecurityCertificatePackageDialog->GetPemFiles();
-      this->m_OnCreatePackage(c_PrivateKeyPath, c_Password, c_PemFiles);
-   }
-   if (c_PopUpDialog != NULL)
-   {
-      c_PopUpDialog->HideOverlay();
-      c_PopUpDialog->deleteLater();
-   }
-} //lint !e429  //no memory leak because of the parent of c_PopUpDialog and the Qt memory management
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates the security certificate package
 
-   \param[in]  orc_PrivateKeyPath           pem file path
-   \param[in]  orc_Password                 security password
-   \param[in, out]  orc_CertificatesPath    list of pem files added
+   \param[in]       orc_PublicKeyPath                    pem file path
+   \param[in]       orc_Password                         security password
+   \param[in, out]  orc_CertificatesPath                 list of pem files added
+   \param[in]       oq_OptionAddPemFiles                 Option add pem files
+   \param[in]       oq_OptionAddSecureAuthentification   Option add secure authentification
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacNodeWidget::m_OnCreatePackage(const QString & orc_PrivateKeyPath, const QString & orc_Password,
-                                             const std::vector<stw::scl::C_SclString> & orc_CertificatesPath)
+void C_SyvUpPacNodeWidget::m_OnCreatePackage(const QString & orc_PublicKeyPath, const QString & orc_Password,
+                                             const std::vector<stw::scl::C_SclString> & orc_CertificatesPath,
+                                             const bool oq_OptionAddPemFiles,
+                                             const bool oq_OptionAddSecureAuthentification)
 {
-   const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   tgl_assert(pc_ViewData != NULL);
-
    QString c_FilterName;
    QString c_DefaultFilename;
    QString c_SelectedFilterName;
-   std::vector<C_OscXceUpdatePackageParameters> orc_UpdatePackageParameters;
    C_SclStringList c_Warnings;
    C_SclString c_Error;
+   QString c_Folder;
+   QString c_FullPackagePath;
+   const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   tgl_assert(pc_ViewData != NULL);
 
    if (pc_ViewData != NULL)
    {
       c_DefaultFilename = pc_ViewData->GetName().c_str();
    }
-   c_FilterName = C_OscXceBase::h_GetPackageExtension().c_str();
+   c_FilterName = C_GtGetText::h_GetText("Security Certificate Package (*");
+   c_FilterName += C_OscXceBase::h_GetPackageExtension().c_str();
+   c_FilterName += ")";
    c_DefaultFilename += C_GtGetText::h_GetText("_SecurityCertificatePackage");
-   c_DefaultFilename += C_GtGetText::h_GetText("_Secure");
    c_DefaultFilename += static_cast<QString>(C_OscXceBase::h_GetPackageExtension().c_str());
 
-   const QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
-   const QString c_FullPackagePath =
+   c_Folder = C_UsHandler::h_GetInstance()->GetLastKnownSecureCertificatePackagePath();
+
+   // use project path if there is no existing last known path
+   if (c_Folder.isEmpty() || (static_cast<QFileInfo>(c_Folder).dir().exists() == false))
+   {
+      c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
+   }
+
+   c_FullPackagePath =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Directory for Secure Certificate Package"),
                                      c_Folder, c_FilterName, c_DefaultFilename,
                                      QFileDialog::Options(), &c_SelectedFilterName);
-   orc_UpdatePackageParameters.resize(1);
-   orc_UpdatePackageParameters.at(0).c_AuthenticationKeyPath = orc_PrivateKeyPath.toStdString().c_str();
-   orc_UpdatePackageParameters.at(0).c_Password = orc_Password.toStdString().c_str();
-   C_OscXceCreate::h_CreatePackage(
-      c_FullPackagePath.toStdString().c_str(), orc_CertificatesPath, orc_UpdatePackageParameters, c_Warnings, c_Error);
+   if (!c_FullPackagePath.isEmpty())
+   {
+      int32_t s32_Return;
+      std::vector<C_OscXceUpdatePackageParameters> c_UpdatePackageParameters;
+      std::vector<stw::scl::C_SclString> c_UsedCertificatesPath;
+      if (oq_OptionAddPemFiles)
+      {
+         c_UsedCertificatesPath = orc_CertificatesPath;
+      }
+      if (oq_OptionAddSecureAuthentification)
+      {
+         c_UpdatePackageParameters.resize(1);
+         c_UpdatePackageParameters.at(0).c_AuthenticationKeyPath = orc_PublicKeyPath.toStdString().c_str();
+         c_UpdatePackageParameters.at(0).c_Password = orc_Password.toStdString().c_str();
+      }
+      s32_Return = C_OscXceCreate::h_CreatePackage(
+         c_FullPackagePath.toStdString().c_str(), c_UsedCertificatesPath, c_UpdatePackageParameters, c_Warnings,
+         c_Error);
+      C_UsHandler::h_GetInstance()->SetLastKnownSecureCertificatePackagePath(c_FullPackagePath);
+      if (s32_Return == C_NO_ERR)
+      {
+         C_OgeWiCustomMessage c_MessageResult(this);
+         c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Security Certificate Package"));
+         c_MessageResult.SetDescription(C_GtGetText::h_GetText("Security certificate package successfully created. "
+                                                               "Do you want to add it to the update package now?"));
+         c_MessageResult.SetDetails("Package saved at " +
+                                    C_Uti::h_GetLink(c_FullPackagePath, mc_STYLE_GUIDE_COLOR_LINK, c_FullPackagePath));
+         c_MessageResult.SetOkButtonText(C_GtGetText::h_GetText("Add to Update Package"));
+         c_MessageResult.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
+         if (c_MessageResult.Execute() == C_OgeWiCustomMessage::eOK)
+         {
+            const QString c_AddPath =
+               C_ImpUtil::h_AskUserToSaveRelativePath(this, c_FullPackagePath,
+                                                      C_PuiProject::h_GetInstance()->GetFolderPath());
+            this->AddNewFile(c_AddPath, false, false);
+         }
+      }
+      else
+      {
+         C_OgeWiCustomMessage c_MessageResult(this, C_OgeWiCustomMessage::E_Type::eERROR);
+         c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Security Certificate Package"));
+         c_MessageResult.SetDescription(C_GtGetText::h_GetText("Could not create security certificate package!"));
+         c_MessageResult.SetDetails(C_GtGetText::h_GetText("Error code: ") + QString::number(s32_Return) + "\n" +
+                                    C_GtGetText::h_GetText(c_Error.c_str()));
+         c_MessageResult.SetCustomMinHeight(180, 250);
+         c_MessageResult.Execute();
+      }
+   }
 }

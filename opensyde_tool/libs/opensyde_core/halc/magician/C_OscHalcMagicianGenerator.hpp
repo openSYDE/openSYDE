@@ -64,19 +64,21 @@ private:
                                                 const C_OscHalcMagicianDatapoolListHandler & orc_DpHandler);
    static int32_t mh_GenerateVariablesForVector(const std::vector<C_OscHalcDefStruct> & orc_Definition,
                                                 const stw::scl::C_SclString & orc_DomainSingularName,
-                                                const bool oq_IsSafe, const uint32_t ou32_NumChannels,
+                                                const bool oq_IsSafe,
+                                                const std::vector<uint32_t> & orc_RelevantChannels,
                                                 const bool oq_AddDataset, C_OscNodeDataPoolList & orc_List);
    static int32_t mh_GenerateVariablesForVectorElement(const std::vector<C_OscHalcDefStruct> & orc_Definition,
                                                        const uint32_t ou32_DefinitionElementIndex,
                                                        const stw::scl::C_SclString & orc_DomainSingularName,
-                                                       const bool oq_IsSafe, const uint32_t ou32_NumChannels,
+                                                       const bool oq_IsSafe,
+                                                       const std::vector<uint32_t> & orc_RelevantChannels,
                                                        const bool oq_AddDataset, C_OscNodeDataPoolList & orc_List);
    static int32_t mh_AddVariableToList(const C_OscHalcDefElement & orc_Definition,
                                        const std::vector<C_OscHalcDefStruct> & orc_DefinitionArray,
                                        const uint32_t ou32_ParameterIndexStruct,
                                        const uint32_t ou32_ParameterIndexElement,
                                        const stw::scl::C_SclString & orc_DomainSingularName, const bool oq_IsSafe,
-                                       const uint32_t ou32_NumChannels, const bool oq_AddDataset,
+                                       const std::vector<uint32_t> & orc_RelevantChannels, const bool oq_AddDataset,
                                        C_OscNodeDataPoolList & orc_List);
    static int32_t mh_ConvertToDatapoolWithoutArray(const C_OscHalcDefContent & orc_HalcContent,
                                                    C_OscNodeDataPoolContent & orc_DpContent);

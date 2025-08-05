@@ -95,7 +95,8 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
                tgl_assert(c_XmlParser.SelectRoot() == "opensyde-system-definition");
                tgl_assert(c_XmlParser.SelectNodeChild("nodes") == "nodes");
 
-               s32_Return = C_PuiSdHandlerFilerV2::h_LoadNodes(this->mc_UiNodes, c_XmlParser);
+               s32_Return = C_PuiSdHandlerFilerV2::h_LoadNodes(this->mc_UiNodes, c_XmlParser,
+                                                               &this->mc_CoreDefinition.c_Nodes);
 
                if (s32_Return == C_NO_ERR)
                {
@@ -142,7 +143,8 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
                s32_Return = C_PuiSdHandlerFiler::h_LoadSystemDefinitionUiFile(c_FilePath, this->mc_UiNodes,
                                                                               this->mc_UiBuses, this->c_BusTextElements,
                                                                               this->c_Elements,
-                                                                              this->mc_LastKnownHalcCrcs);
+                                                                              this->mc_LastKnownHalcCrcs,
+                                                                              &this->mc_CoreDefinition.c_Nodes);
 
                // Loading separate shared Datapool configuration
                if (s32_Return == C_NO_ERR)
@@ -902,6 +904,53 @@ void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListElementAboutToBeDeleted(con
 {
    Q_EMIT this->SigSyncNodeDataPoolListElementAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                                ou32_ElementIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element type or array changed
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Type              Type
+   \param[in]  oq_IsArray           Is array
+   \param[in]  ou32_ArraySize       Array size
+   \param[in]  oq_IsString          Is string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex,
+                                                                               const uint32_t ou32_DataPoolIndex,
+                                                                               const uint32_t ou32_ListIndex,
+                                                                               const uint32_t ou32_ElementIndex,
+                                                                               const C_OscNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray, const uint32_t ou32_ArraySize,
+                                                                               const bool oq_IsString)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListElementTypeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                          ou32_ElementIndex, oe_Type, oq_IsArray, ou32_ArraySize,
+                                                          oq_IsString);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node data pool list element range changed
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  orc_MinElement       Min element
+   \param[in]  orc_MaxElement       Max element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeDataPoolListElementRangeChanged(const uint32_t ou32_NodeIndex,
+                                                                         const uint32_t ou32_DataPoolIndex,
+                                                                         const uint32_t ou32_ListIndex,
+                                                                         const uint32_t ou32_ElementIndex,
+                                                                         const C_OscNodeDataPoolContent & orc_MinElement,
+                                                                         const C_OscNodeDataPoolContent & orc_MaxElement)
+{
+   Q_EMIT this->SigSyncNodeDataPoolListElementRangeChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                           ou32_ElementIndex, orc_MinElement, orc_MaxElement);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

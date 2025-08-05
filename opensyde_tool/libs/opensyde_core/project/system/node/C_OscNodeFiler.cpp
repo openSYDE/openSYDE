@@ -23,6 +23,7 @@
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscHalcConfigFiler.hpp"
 #include "C_OscDataLoggerJobFiler.hpp"
+#include "C_OscXappPropertiesFiler.hpp"
 #include "C_OscCanOpenManagerFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -186,6 +187,10 @@ int32_t C_OscNodeFiler::h_LoadNode(C_OscNode & orc_Node, C_OscXmlParserBase & or
                      if (s32_Retval == C_NO_ERR)
                      {
                         s32_Retval = mh_LoadDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath);
+                        if (s32_Retval == C_NO_ERR)
+                        {
+                           s32_Retval = mh_LoadXappProperties(orc_Node.c_XappProperties, orc_XmlParser, orc_BasePath);
+                        }
                      }
                   }
                }
@@ -298,6 +303,10 @@ int32_t C_OscNodeFiler::h_SaveNode(const C_OscNode & orc_Node, C_OscXmlParserBas
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_SaveDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath, opc_CreatedFiles);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveXappProperties(orc_Node, orc_XmlParser, orc_BasePath, opc_CreatedFiles);
    }
    return s32_Retval;
 }
@@ -884,10 +893,10 @@ int32_t C_OscNodeFiler::mh_LoadComInterface(std::vector<C_OscNodeComInterfaceSet
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(c_ComInterface.e_InterfaceType,
-                                                                        c_ComInterface.u8_InterfaceNumber,
-                                                                        orc_XmlParser, "communication-interface",
-                                                                        "Loading node definition");
+            s32_Retval = C_OscXappPropertiesFiler::h_LoadCommInterfaceId(c_ComInterface.e_InterfaceType,
+                                                                         c_ComInterface.u8_InterfaceNumber,
+                                                                         orc_XmlParser, "communication-interface",
+                                                                         "Loading node definition");
          }
 
          c_ComInterface.u8_NodeId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("node-id"));
@@ -1008,8 +1017,8 @@ void C_OscNodeFiler::mh_SaveComInterface(const std::vector<C_OscNodeComInterface
       const C_OscNodeComInterfaceSettings & rc_CurComInterface = orc_ComInterfaces[u32_ItComInterface];
 
       orc_XmlParser.CreateAndSelectNodeChild("communication-interface");
-      C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(rc_CurComInterface.e_InterfaceType,
-                                                     rc_CurComInterface.u8_InterfaceNumber, orc_XmlParser);
+      C_OscXappPropertiesFiler::h_SaveCommInterfaceId(rc_CurComInterface.e_InterfaceType,
+                                                      rc_CurComInterface.u8_InterfaceNumber, orc_XmlParser);
       orc_XmlParser.SetAttributeUint32("node-id", static_cast<uint32_t>(rc_CurComInterface.u8_NodeId));
       orc_XmlParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
       orc_XmlParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
@@ -1773,6 +1782,102 @@ int32_t C_OscNodeFiler::mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob>
          const C_SclString c_CombinedFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Save datapool file
          s32_Retval = C_OscDataLoggerJobFiler::h_SaveFile(orc_Config, c_CombinedFileName);
+         //Set file reference
+         orc_XmlParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load X-App properties
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_LoadXappProperties(C_OscXappProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                              const C_SclString & orc_BasePath)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.Initialize();
+   if (orc_XmlParser.SelectNodeChild("x-app-properties-file") == "x-app-properties-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OscXappPropertiesFiler::h_LoadXappProperties(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         s32_Retval =
+            C_OscXappPropertiesFiler::h_LoadXappPropertiesFile(orc_Config,
+                                                               C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                                    orc_XmlParser.
+                                                                                                    GetNodeContent()));
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save X-App properties
+
+   \param[in]      orc_Config          Config
+   \param[in,out]  orc_XmlParser       XML parser
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Created files
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_SaveXappProperties(const C_OscNode & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                              const C_SclString & orc_BasePath,
+                                              std::vector<C_SclString> * const opc_CreatedFiles)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_Config.c_Properties.q_XappSupport)
+   {
+      orc_XmlParser.CreateAndSelectNodeChild("x-app-properties-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         C_OscXappPropertiesFiler::h_SaveXappProperties(orc_Config.c_XappProperties, orc_XmlParser);
+      }
+      else
+      {
+         // const C_SclString c_FileName = C_OscNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SclString c_FileName = C_OscXappPropertiesFiler::h_GetFileName();
+         const C_SclString c_CombinedFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval =
+            C_OscXappPropertiesFiler::h_SaveXappPropertiesFile(orc_Config.c_XappProperties, c_CombinedFileName);
          //Set file reference
          orc_XmlParser.SetNodeContent(c_FileName);
          //Store if necessary

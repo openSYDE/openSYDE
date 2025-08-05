@@ -479,8 +479,8 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32_t> & orc_NodeIndi
                                          u32_Item - orc_OtherStartIndices[3], opc_IdMap != NULL);
 
       pc_Item = new C_GiSdImageGroup(u32_Item,
-                                     u64_CurUniqueId, pc_UiImageData->f64_Width,
-                                     pc_UiImageData->f64_Height, pc_UiImageData->c_UiImagePixmap);
+                                     u64_CurUniqueId, pc_UiImageData->f64_Width, pc_UiImageData->f64_Height,
+                                     pc_UiImageData->c_UiImagePixmap, pc_UiImageData->c_UiImageFormat);
       pc_Item->LoadData();
 
       this->m_AddImageGroupToScene(pc_Item);

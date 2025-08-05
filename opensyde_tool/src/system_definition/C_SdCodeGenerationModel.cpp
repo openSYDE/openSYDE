@@ -112,7 +112,7 @@ int32_t C_SdCodeGenerationModel::Init(const std::vector<uint32_t> & orc_ElementI
                {
                   if (rc_Node.c_Properties.q_XappSupport == true)
                   {
-                     pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (X-App Configuration)").c_str();
+                     pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (X.App Configuration)").c_str();
                   }
                   else
                   {

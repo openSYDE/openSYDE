@@ -30,14 +30,23 @@ public:
       const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
       const uint32_t ou32_DataLoggerDataElementIndex) const;
 
+   int32_t AddDataLogger(const uint32_t ou32_NodeIndex, const stw::opensyde_core::C_OscDataLoggerJob & orc_Data,
+                         const QString * const opc_Name = NULL);
+   int32_t DeleteDataLogger(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
    int32_t SetDataLoggerEnabled(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
                                 const bool oq_Enabled);
-   int32_t SetDataLoggerPropertiesWithoutInterfaceChanges(const uint32_t ou32_NodeIndex,
-                                                          const uint32_t ou32_DataLoggerJobIndex,
-                                                          const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Data);
-   int32_t SetDataLoggerInterface(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
-                                  const opensyde_core::C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
-                                  const uint8_t ou8_ConnectedInterfaceNumber);
+   int32_t SetDataLoggerProperties(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
+                                   const stw::scl::C_SclString & orc_Name, const stw::scl::C_SclString & orc_Comment,
+                                   const stw::opensyde_core::C_OscDataLoggerJobProperties::E_UseCase oe_UseCase,
+                                   const stw::opensyde_core::C_OscDataLoggerJobProperties::E_LogFileFormat oe_LogFileFormat, const uint32_t ou32_MaxLogEntries, const uint32_t ou32_MaxLogDurationSec, const uint32_t ou32_LogIntervalMs, const stw::opensyde_core::C_OscDataLoggerJobProperties::E_LocalLogTrigger oe_LocalLogTrigger, const stw::scl::C_SclString & orc_LogDestinationDirectory);
+   int32_t SetDataLoggerAdditionalTriggerProperties(const uint32_t ou32_NodeIndex,
+                                                    const uint32_t ou32_DataLoggerJobIndex,
+                                                    const stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Data);
+   int32_t SetXappInterface(const uint32_t ou32_NodeIndex,
+                            const opensyde_core::C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
+                            const uint8_t ou8_ConnectedInterfaceNumber);
+   int32_t SetXappProperties(const uint32_t ou32_NodeIndex, const uint32_t ou32_PollingIntervalMs,
+                             const uint32_t ou32_DataRequestIntervalMs);
 
    int32_t AddDataLoggerElement(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
                                 const stw::opensyde_core::C_OscDataLoggerDataElementReference & orc_Data);
@@ -88,10 +97,28 @@ protected:
                                                             const uint32_t ou32_DataPoolIndex,
                                                             const uint32_t ou32_ListIndex,
                                                             const uint32_t ou32_ElementIndex) override;
+   void m_HandleSyncNodeDataPoolListElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex,
+                                                              const uint32_t ou32_DataPoolIndex,
+                                                              const uint32_t ou32_ListIndex,
+                                                              const uint32_t ou32_ElementIndex,
+                                                              const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray, const uint32_t ou32_ArraySize,
+                                                              const bool oq_IsString) override;
+   void m_HandleSyncNodeDataPoolListElementRangeChanged(const uint32_t ou32_NodeIndex,
+                                                        const uint32_t ou32_DataPoolIndex,
+                                                        const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
+                                                        const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MinElement, const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MaxElement)
+   override;
 
 private:
    void m_HandleNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid = false);
    void m_HandlePossibleRouteChange(void);
+   void m_ValidateAllRoutesForOneNode(const uint32_t ou32_Index);
+   static std::map<stw::scl::C_SclString, bool> mh_GetExistingDataLoggerNames(
+      const stw::opensyde_core::C_OscNode & orc_Node);
+   static void mh_HandleSyncDataLoggerElementAboutToBeDeleted(
+      stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Properties,
+      const stw::opensyde_core::C_OscDataLoggerDataElementReference & orc_Element);
+   static bool mh_CheckIdRelevantForSync(const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Properties);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

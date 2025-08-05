@@ -36,12 +36,6 @@ public:
                                               C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveDataElementOptArrayId(const C_OscNodeDataPoolListElementOptArrayId & orc_Config,
                                            C_OscXmlParserBase & orc_XmlParser);
-   static int32_t h_LoadCommInterfaceId(C_OscSystemBus::E_Type & ore_Type, uint8_t & oru8_InterfaceNumber,
-                                        C_OscXmlParserBase & orc_XmlParser,
-                                        const stw::scl::C_SclString & orc_ParentNodeName,
-                                        const stw::scl::C_SclString & orc_UseCase);
-   static void h_SaveCommInterfaceId(const C_OscSystemBus::E_Type oe_Type, const uint8_t ou8_InterfaceNumber,
-                                     C_OscXmlParserBase & orc_XmlParser);
 
 private:
    C_OscDataLoggerJobFiler();
@@ -53,6 +47,10 @@ private:
    static int32_t mh_LoadJobProperties(C_OscDataLoggerJobProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveJobProperties(const C_OscDataLoggerJobProperties & orc_Config,
                                     C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadJobAdditionalTriggerProperties(C_OscDataLoggerJobAdditionalTriggerProperties & orc_Config,
+                                                        C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveJobAdditionalTriggerProperties(const C_OscDataLoggerJobAdditionalTriggerProperties & orc_Config,
+                                                     C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadConfiguredDataElements(std::vector<C_OscDataLoggerDataElementReference> & orc_Config,
                                                 C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveConfiguredDataElements(const std::vector<C_OscDataLoggerDataElementReference> & orc_Config,
@@ -69,6 +67,9 @@ private:
       const C_OscDataLoggerJobProperties::E_LocalLogTrigger & ore_Type);
    static int32_t mh_StringToLocalLogTriggerType(const stw::scl::C_SclString & orc_String,
                                                  C_OscDataLoggerJobProperties::E_LocalLogTrigger & ore_Type);
+   static stw::scl::C_SclString mh_UseCaseTypeToString(const C_OscDataLoggerJobProperties::E_UseCase & ore_Type);
+   static int32_t mh_StringToUseCaseType(const stw::scl::C_SclString & orc_String,
+                                         C_OscDataLoggerJobProperties::E_UseCase & ore_Type);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

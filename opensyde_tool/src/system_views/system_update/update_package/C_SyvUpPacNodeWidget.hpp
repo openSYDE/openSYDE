@@ -95,6 +95,7 @@ public:
    void CollapseAll(void) const;
    void SetEmptyOptionalSectionsVisible(const bool oq_Visible);
    void UpdateSectionsVisibility(void) const;
+   void AddSecurityCertificatePackage(void);
 
 protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;
@@ -116,6 +117,7 @@ private:
    bool mq_StwFlashloader;
    bool mq_Connected;
    bool mq_EmptyOptionalSectionsVisible;
+   bool mq_ShowAddSecurityPack;
 
    uint32_t mu32_PositionNumber;
    uint32_t mu32_FilesUpdated;
@@ -137,6 +139,7 @@ private:
    void m_SetApplicationsUnselected(const C_SyvUpPacSectionNodeWidget * const opc_List) const;
    C_SyvUpPacSectionNodeWidget * m_GetAppParentList(C_SyvUpPacListNodeItemWidget * const opc_App) const;
    bool m_CheckFileAlreadyContained(const QString & orc_File);
+   void m_CheckForMultipleSecurityCertificatePackages(const QString & orc_File);
    bool m_CheckMime(const QMimeData * const opc_Mime, const QPoint & orc_Pos,
                     QStringList * const opc_FilePathsDatablocks = NULL,
                     QStringList * const opc_FilePathsParamsets = NULL,
@@ -146,9 +149,9 @@ private:
 
    static const int32_t mhs32_LAYOUT_THRESHOLD;
 
-   void m_AddSecurityCertificatePacakege(void);
-   void m_OnCreatePackage(const QString & orc_PrivateKeyPath, const QString & orc_Password,
-                          const std::vector<stw::scl::C_SclString> & orc_CertificatesPath);
+   void m_OnCreatePackage(const QString & orc_PublicKeyPath, const QString & orc_Password,
+                          const std::vector<stw::scl::C_SclString> & orc_CertificatesPath,
+                          const bool oq_OptionAddPemFiles, const bool oq_OptionAddSecureAuthentification);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

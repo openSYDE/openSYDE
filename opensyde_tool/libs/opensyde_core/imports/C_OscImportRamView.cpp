@@ -320,6 +320,12 @@ int32_t C_OscImportRamView::h_ImportDataPoolFromRamViewDefProject(const C_SclStr
                      }
                   }
                }
+
+               //RAMView projects have a clear logic: arrays of sint8 are generally interpreted as strings
+               rc_Element.q_InterpretAsString =
+                  ((rc_Element.GetType() ==
+                    C_OscNodeDataPoolContent::eSINT8) &&
+                   (rc_Element.GetArray() == true));
             }
             orc_DataPool.c_Lists.push_back(c_List);
          }

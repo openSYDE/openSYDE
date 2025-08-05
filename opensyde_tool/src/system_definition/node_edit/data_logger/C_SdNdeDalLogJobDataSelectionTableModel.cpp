@@ -406,7 +406,6 @@ QVariant C_SdNdeDalLogJobDataSelectionTableModel::data(const QModelIndex & orc_I
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SdNdeDalLogJobDataSelectionTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   // TODO
    Q_UNUSED(orc_Parent)
    return this->mc_LoggingDataList.size();
 }

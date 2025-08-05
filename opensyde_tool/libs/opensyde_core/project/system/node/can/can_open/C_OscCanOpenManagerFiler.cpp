@@ -876,14 +876,15 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDeviceEdsPart(const C_OscCanO
    if (orc_BasePath.IsEmpty())
    {
       orc_XmlParser.CreateNodeChild("eds-file-content",
-                                    orc_Config.c_EdsFileContent.c_InfoBlock.c_FileContentForSave);
+                                    orc_Config.c_EdsFileContent.c_InfoBlock.c_FileContentForSave.GetText());
    }
    else
    {
       const stw::scl::C_SclString c_CompleteFileName =
          C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileNameWithPrefix);
+      //only use "\n" as separator; SaveStringToFile will add an \r anyways
       s32_Retval = C_OscSystemFilerUtil::h_SaveStringToFile(
-         orc_Config.c_EdsFileContent.c_InfoBlock.c_FileContentForSave, c_CompleteFileName,
+         orc_Config.c_EdsFileContent.c_InfoBlock.c_FileContentForSave.GetText("\n"), c_CompleteFileName,
          "Saving CANopen manager data");
       if (opc_CreatedFiles != NULL)
       {

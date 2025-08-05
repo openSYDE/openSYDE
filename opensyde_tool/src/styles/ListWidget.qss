@@ -3,7 +3,8 @@ stw--opensyde_gui--C_NagViewList,
 stw--opensyde_gui--C_SyvDcConnectedNodeList,
 stw--opensyde_gui--C_SyvDcExistingNodeList,
 stw--opensyde_gui--C_SdNdeDpSelectorListWidget,
-stw--opensyde_gui--C_SyvUpPacListWidget
+stw--opensyde_gui--C_SyvUpPacListWidget,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView
 {
 outline: none;
 }
@@ -23,7 +24,9 @@ stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item:selected,
 stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item:hover,
 stw--opensyde_gui--C_SyvUpPacListWidget,
 stw--opensyde_gui--C_SyvUpPacListWidget::item:selected,
-stw--opensyde_gui--C_SyvUpPacListWidget::item:hover
+stw--opensyde_gui--C_SyvUpPacListWidget::item:hover,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item
 {
 border-style: none;
 }
@@ -53,3 +56,18 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
+
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item
+{
+height: 30px
+}
+
+/* --------------------------------------------------------------------- */
+
+stw--opensyde_gui--C_SdNdeDalLogJobsListView
+{
+padding: 9px;
+}
+
+/* --------------------------------------------------------------------- */
+

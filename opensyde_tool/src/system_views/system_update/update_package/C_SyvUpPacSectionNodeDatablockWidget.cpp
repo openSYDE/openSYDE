@@ -291,9 +291,15 @@ void C_SyvUpPacSectionNodeDatablockWidget::RevertFile(C_SyvUpPacListNodeItemWidg
             // Restore the default path
             if ((this->mu32_SectionNumber < pc_Node->c_Applications.size()))
             {
-               const QString c_Path = C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                  pc_Node->c_Applications[this->mu32_SectionNumber].c_ProjectPath.c_str(),
-                  pc_Node->c_Applications[this->mu32_SectionNumber].c_ResultPaths[u32_AppNumber].c_str());
+               QString c_Path = pc_Node->c_Applications[this->mu32_SectionNumber].c_ResultPaths[u32_AppNumber].c_str();
+               if (pc_Node->c_Properties.q_XappSupport == true)
+               {
+                  // special case: X config file is relative to generation directory
+                  c_Path = C_Uti::h_ConcatPathIfNecessary(
+                     pc_Node->c_Applications[this->mu32_SectionNumber].c_GeneratePath.c_str(), c_Path);
+               }
+               c_Path = C_PuiUtil::h_MakeIndependentOfDbProjectPath(
+                  pc_Node->c_Applications[this->mu32_SectionNumber].c_ProjectPath.c_str(), c_Path);
                if (this->me_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
                {
                   // Remove the view specific path
@@ -708,9 +714,14 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
 
          // Must be set before the current path
          // Set the default path for comparing with import configuration
-         pc_FileWidget->SetDefaultFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                                          rc_Datablock.c_ProjectPath.c_str(),
-                                          rc_Datablock.c_ResultPaths[0].c_str()));
+         QString c_Path = rc_Datablock.c_ResultPaths[0U].c_str();
+         if (orc_Node.c_Properties.q_XappSupport == true)
+         {
+            // special case: X config file is relative to generation directory
+            c_Path = C_Uti::h_ConcatPathIfNecessary(rc_Datablock.c_GeneratePath.c_str(), c_Path);
+         }
+         c_Path = C_PuiUtil::h_MakeIndependentOfDbProjectPath(rc_Datablock.c_ProjectPath.c_str(), c_Path);
+         pc_FileWidget->SetDefaultFile(c_Path);
 
          // Check if a specific path is available
          if (c_ViewDatablockPaths[this->mu32_DataBlockPathNumber] != "")
@@ -719,10 +730,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
          }
          else
          {
-            pc_FileWidget->SetAppFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                                         rc_Datablock.c_ProjectPath.c_str(),
-                                         rc_Datablock.c_ResultPaths[0].c_str()),
-                                      true);
+            pc_FileWidget->SetAppFile(c_Path, true);
          }
          pc_FileWidget->SetSkipOfUpdateFile(c_ViewDatablockSkipFlags[this->mu32_DataBlockPathNumber]);
 

@@ -208,7 +208,9 @@ stw--opensyde_gui--C_NagUnUsedProjectFilesTableView,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
 stw--opensyde_gui--C_NagUnUsedProjectFilesPopUpDialog,
 stw--opensyde_gui--C_SyvUpPacSecurityCertificatePackageDialog,
-stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item
+stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item
 {
 background-color: transparent;
 }
@@ -241,7 +243,8 @@ stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_BRIGHT"][B
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][BackgroundChecked="false"],
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item,
-stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item
+stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item
 {
 border-color: transparent;
 }
@@ -397,6 +400,7 @@ stw--opensyde_gui_elements--C_OgeCbxTableHalc QListView,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item:selected:!hover,
+stw--opensyde_gui_elements--C_OgeLeTableHalc,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView::item:selected:!hover,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
@@ -468,6 +472,7 @@ stw--opensyde_gui_elements--C_OgeMuTabChartFit::item,
 stw--opensyde_gui_elements--C_OgeCbxTableHalc QListView::item,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item,
+stw--opensyde_gui_elements--C_OgeLeTableHalc,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView::item,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
@@ -634,6 +639,7 @@ stw--opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeSpxTableDouble,
 stw--opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
+stw--opensyde_gui_elements--C_OgeLeTableHalc,
 stw--opensyde_gui_elements--C_OgeTedTable,
 stw--opensyde_gui_elements--C_OgeTedDbComment,
 stw--opensyde_gui_elements--C_OgeLabListHeaderHeading,
@@ -708,7 +714,8 @@ stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::item,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item::selected,
-stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item::selected
 {
 color: rgb(57, 57, 109);
 }
@@ -936,7 +943,8 @@ stw--opensyde_gui_elements--C_OgeLabDashboardChart[Style="OPENSYDE_DARK"][Select
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView::item:!selected,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView::item:!selected,
 stw--opensyde_gui--C_SdNdeCoOverviewTableView::item:!selected,
-stw--opensyde_gui--C_SdNdeCoPdoTableView::item:!selected
+stw--opensyde_gui--C_SdNdeCoPdoTableView::item:!selected,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item::!selected
 {
 color: rgb(130, 130, 143);
 }
@@ -1114,7 +1122,8 @@ stw--opensyde_gui_elements--C_OgePubAddChartDataElement:hover:pressed[Style="OPE
 stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::item:selected,
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:selected
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:selected,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item:selected
 {
      background-color: rgb(206, 206, 217);
 }
@@ -1172,6 +1181,7 @@ stw--opensyde_gui_elements--C_OgeSpxFactorProperties,
 stw--opensyde_gui_elements--C_OgeMuTabChartFit::item,
 stw--opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
+stw--opensyde_gui_elements--C_OgeLeTableHalc,
 stw--opensyde_gui_elements--C_OgeWiBorder,
 stw--opensyde_gui_elements--C_OgePubUpdate:!enabled,
 stw--opensyde_gui_elements--C_OgePubDialog:!enabled,
@@ -1196,7 +1206,8 @@ stw--opensyde_gui_elements--C_OgeFraGeneric[Border="10"],
 stw--opensyde_gui_elements--C_OgeChxTiny::indicator:enabled:!checked,
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement:disabled[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement[Style="OPENSYDE_DARK"],
-stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Border="10"]
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Border="10"],
+stw--opensyde_gui--C_SdNdeDalLogJobsListView
 {
 border-color: rgb(206, 206, 217);
 }
@@ -1347,7 +1358,9 @@ stw--opensyde_gui--C_SdBueImportCommMessagesWidget,
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:disabled,
-stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:enabled:!checked
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator:enabled:!checked,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::indicator::disabled,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::indicator::enabled:!checked
 {
 background-color: rgb(237, 237, 242);
 }
@@ -1574,7 +1587,9 @@ stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:indetermi
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:checked,
 stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView::indicator::enabled:indeterminate,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator::enabled:checked,
-stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator::enabled:indeterminate
+stw--opensyde_gui--C_NagUnUsedProjectFilesTableView::indicator::enabled:indeterminate,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::indicator:enabled:checked,
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::indicator:enabled:indeterminate
 {
 background-color: rgb(203, 235, 193);
 }
@@ -1722,6 +1737,7 @@ stw--opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeSpxTableDouble,
 stw--opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
+stw--opensyde_gui_elements--C_OgeLeTableHalc,
 stw--opensyde_gui_elements--C_OgeTedTable,
 stw--opensyde_gui_elements--C_OgeTedDbComment,
 stw--opensyde_gui_elements--C_OgeLabListHeaderHeading,

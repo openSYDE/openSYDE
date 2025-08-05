@@ -37,11 +37,12 @@ using namespace stw::opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 C_OscDataLoggerJobProperties::C_OscDataLoggerJobProperties() :
    c_Name("LogJob"),
+   e_UseCase(eUC_MANUAL),
    e_LogFileFormat(eLFF_CSV),
-   u32_MaxLogFileSizeMb(500),
-   e_LocalLogTrigger(eLLT_ON_CHANGE),
-   e_ConnectedInterfaceType(C_OscSystemBus::eCAN),
-   u8_ConnectedInterfaceNumber(0U)
+   u32_MaxLogEntries(1000),
+   u32_MaxLogDurationSec(60),
+   u32_LogIntervalMs(1000),
+   e_LocalLogTrigger(eLLT_ON_CHANGE)
 {
 }
 
@@ -58,19 +59,25 @@ void C_OscDataLoggerJobProperties::CalcHash(uint32_t & oru32_HashValue) const
 {
    stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_UseCase,
+                                       sizeof(this->e_UseCase),
+                                       oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_LogFileFormat,
                                        sizeof(this->e_LogFileFormat),
                                        oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_MaxLogFileSizeMb,
-                                       sizeof(this->u32_MaxLogFileSizeMb),
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_MaxLogEntries,
+                                       sizeof(this->u32_MaxLogEntries),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_MaxLogDurationSec,
+                                       sizeof(this->u32_MaxLogDurationSec),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_LogIntervalMs,
+                                       sizeof(this->u32_LogIntervalMs),
                                        oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_LocalLogTrigger,
                                        sizeof(this->e_LocalLogTrigger),
                                        oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->e_ConnectedInterfaceType,
-                                       sizeof(this->e_ConnectedInterfaceType),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_ConnectedInterfaceNumber,
-                                       sizeof(this->u8_ConnectedInterfaceNumber),
-                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_LogDestinationDirectory.c_str(),
+                                       this->c_LogDestinationDirectory.Length(), oru32_HashValue);
+   c_AdditionalTriggerProperties.CalcHash(oru32_HashValue);
 }

@@ -12,12 +12,15 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include "TglUtils.hpp"
 #include "stwerrors.hpp"
 #include "C_SclChecksums.hpp"
 #include "C_PuiSdHandler.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 #include "C_PuiSdNodeDataPoolListElementIdSyncUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw::tgl;
 using namespace stw::errors;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
@@ -431,6 +434,63 @@ void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
+   \param[in]      orc_MinElement      Min element
+   \param[in]      orc_MaxElement      Max element
+   \param[in]      orc_DataElementId   Data element ID
+   \param[in,out]  orc_Value           Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementRangeChanged(
+   const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+   const uint32_t ou32_ElementIndex, const C_OscNodeDataPoolContent & orc_MinElement,
+   const C_OscNodeDataPoolContent & orc_MaxElement, const C_OscNodeDataPoolListElementId & orc_DataElementId,
+   C_OscNodeDataPoolContent & orc_Value)
+{
+   if (orc_DataElementId ==
+       C_OscNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex))
+   {
+      C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_Unused;
+      tgl_assert(C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_MinElement,
+                                                                       orc_MaxElement,
+                                                                       orc_Value, e_Unused,
+                                                                       C_OscNodeDataPoolContentUtil::eLEAVE_VALUE) ==
+                 C_NO_ERR);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
+   \param[in]      oe_Type             Type
+   \param[in]      oq_IsArray          Is array
+   \param[in]      orc_DataElementId   Data element ID
+   \param[in,out]  orc_Value           Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementTypeOrArrayChanged(
+   const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+   const uint32_t ou32_ElementIndex, const C_OscNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray,
+   const C_OscNodeDataPoolListElementId & orc_DataElementId, C_OscNodeDataPoolContent & orc_Value)
+{
+   if (orc_DataElementId ==
+       C_OscNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex))
+   {
+      orc_Value.SetType(oe_Type);
+      orc_Value.SetArray(oq_IsArray);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
    \param[in,out]  orc_DataElementId         Data element ID
@@ -495,7 +555,7 @@ void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementMo
    \retval   False   Element still exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAboutToBeDeleted(
+bool C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
    C_OscNodeDataPoolListElementId & orc_DataElementId, const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
    const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex)
 {

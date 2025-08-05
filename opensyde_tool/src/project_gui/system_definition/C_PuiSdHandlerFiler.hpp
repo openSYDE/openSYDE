@@ -45,17 +45,23 @@ public:
    //Data pool
    static int32_t h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> & orc_DataPools,
                                   stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
-                                  const QDir * const opc_BasePath);
+                                  const QDir * const opc_BasePath,
+                                  std::vector<stw::opensyde_core::C_OscNodeDataPool> * const opc_OscDataPools);
    static int32_t h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool,
-                                 stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+                                 stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
+                                 stw::opensyde_core::C_OscNodeDataPool * const opc_OscDataPool);
    static int32_t h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPoolList> & orc_DataPoolLists,
-                                      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+                                      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
+                                      std::vector<stw::opensyde_core::C_OscNodeDataPoolList> * const opc_OscLists);
    static int32_t h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_DataPoolList,
-                                     stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+                                     stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
+                                     stw::opensyde_core::C_OscNodeDataPoolList * const opc_OscList);
    static int32_t h_LoadDataPoolListElements(std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements,
-                                             stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+                                             stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
+                                             std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> * const opc_OscElements);
    static void h_LoadDataPoolListElement(C_PuiSdNodeDataPoolListElement & orc_DataPoolListElement,
-                                         const stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+                                         const stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
+                                         stw::opensyde_core::C_OscNodeDataPoolListElement * const opc_OscElement);
    static int32_t h_SaveDataPools(const std::vector<C_PuiSdNodeDataPool> & orc_UiDataPools,
                                   const std::vector<stw::opensyde_core::C_OscNodeDataPool> * const opc_OscDataPools,
                                   const QDir * const opc_BasePath,
@@ -121,8 +127,10 @@ public:
 
    // Else
    static int32_t h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes,
-                              stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser, const QDir * const opc_BasePath);
-   static int32_t h_LoadNodeFile(C_PuiSdNode & orc_Node, const QString & orc_FilePath, const QDir * const opc_BasePath);
+                              stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser, const QDir * const opc_BasePath,
+                              std::vector<stw::opensyde_core::C_OscNode> * const opc_OscNodes);
+   static int32_t h_LoadNodeFile(C_PuiSdNode & orc_Node, const QString & orc_FilePath, const QDir * const opc_BasePath,
+                                 stw::opensyde_core::C_OscNode * const opc_OscNode);
    static void h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nodes,
                            stw::opensyde_core::C_OscXmlParser & orc_XmlParser);
    static int32_t h_LoadBuses(std::vector<C_PuiSdBus> & orc_Buses,
@@ -149,7 +157,8 @@ public:
                                                std::vector<C_PuiSdTextElementBus> & orc_BusTextElements,
                                                stw::opensyde_gui_logic::C_PuiBsElements & orc_Elements,
                                                std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
-                                                        C_PuiSdLastKnownHalElementId> & orc_LastKnownHalcCrcs);
+                                                        C_PuiSdLastKnownHalElementId> & orc_LastKnownHalcCrcs,
+                                               std::vector<stw::opensyde_core::C_OscNode> * const opc_OscNodes);
 
    //File names
    static QString h_GetNodeUiFileName(void);
@@ -159,10 +168,11 @@ public:
    static QString h_GetSharedDatapoolUiFilePath(const QString & orc_SystemDefinitionCoreFilePath);
 
 private:
-   static int32_t mh_LoadDatapoolFile(C_PuiSdNodeDataPool & orc_DataPool, const QString & orc_FilePath);
+   static int32_t mh_LoadDatapoolFile(C_PuiSdNodeDataPool & orc_DataPool, const QString & orc_FilePath,
+                                      stw::opensyde_core::C_OscNodeDataPool * const opc_OscDataPool);
    static int32_t mh_LoadCommFile(C_PuiSdNodeCanProtocol & orc_UiCanProtocol, const QString & orc_FilePath);
    static int32_t mh_LoadNode(C_PuiSdNode & orc_Node, stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
-                              const QDir * const opc_BasePath);
+                              const QDir * const opc_BasePath, stw::opensyde_core::C_OscNode * const opc_OscNode);
    static int32_t mh_SaveNodeFile(const C_PuiSdNode & orc_UiNode, const stw::opensyde_core::C_OscNode & orc_OscNode,
                                   const QString & orc_FilePath, const QDir * const opc_BasePath);
    static int32_t mh_SaveNode(const C_PuiSdNode & orc_UiNode, const stw::opensyde_core::C_OscNode * const opc_OscNode,
@@ -173,6 +183,8 @@ private:
                                      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,
                                   stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   template <typename T>
+   static T * mh_GetArrayElemIfAvailable(std::vector<T> * const opc_Vector, const uint32_t ou32_Index);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

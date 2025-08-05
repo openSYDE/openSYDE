@@ -299,7 +299,7 @@ void C_SdNdeDbWidget::m_LoadData(void)
          {
             if (pc_Node->c_Properties.q_XappSupport == true)
             {
-               this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: X-App Configuration"));
+               this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: X.App Configuration"));
                this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwnedDisabled.svg");
                this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(9);
                this->mpc_Ui->pc_LabOwned->SetForegroundColor(9);

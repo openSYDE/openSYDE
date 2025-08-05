@@ -34,6 +34,7 @@ project("opensyde_core")
 # --- Project source files ---------------------------------------------------------------------------------------------
 #basic infrastructure (also requires Windows target layer, or a corresponding implementation for e.g. Linux)
 set(OPENSYDE_CORE_COMMON_SOURCES
+   ${CMAKE_CURRENT_SOURCE_DIR}/precomp_headers.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscBinaryHash.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscChecksummedIniFile.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscUtils.cpp
@@ -75,6 +76,8 @@ set(OPENSYDE_CORE_COMMON_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser/C_OscXmlParserLog.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser/C_OscChecksummedXml.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser/tinyxml2/tinyxml2.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/conf_file_handler/C_OscConfFileHandler.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/conf_file_handler/C_OscConfFileHandler.hpp
 )
 
 set(OPENSYDE_CORE_COMMON_INCLUDE_DIRECTORIES
@@ -87,6 +90,7 @@ set(OPENSYDE_CORE_COMMON_INCLUDE_DIRECTORIES
    ${CMAKE_CURRENT_SOURCE_DIR}/stwtypes
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser/tinyxml2
+   ${CMAKE_CURRENT_SOURCE_DIR}/conf_file_handler
 )
 
 # zip/unzip functionality
@@ -233,22 +237,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2/C_OscNodeFilerV2.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2/C_OscSystemBusFilerV2.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2/C_OscSystemDefinitionFilerV2.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessage.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessageUniqueId.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessageContainer.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessageIdentificationIndices.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanProtocol.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanSignal.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanUtil.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanInterfaceId.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerMappableSignal.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJob.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNode.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeSquad.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeSquadFiler.cpp
@@ -271,6 +259,25 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeStwFlashloaderSettings.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeCommFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessage.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessageUniqueId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessageContainer.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanMessageIdentificationIndices.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanProtocol.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanSignal.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanUtil.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OscCanInterfaceId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerMappableSignal.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJob.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobFiler.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobProperties.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobAdditionalTriggerProperties.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/xapp/C_OscXappProperties.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/xapp/C_OscXappPropertiesFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.cpp
@@ -370,6 +377,9 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobProperties.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerDataElementReference.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger/C_OscDataLoggerJobAdditionalTriggerProperties.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/xapp/C_OscXappProperties.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/xapp/C_OscXappPropertiesFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.hpp
@@ -398,6 +408,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/data_logger
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/xapp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/target_support_package
       ${CMAKE_CURRENT_SOURCE_DIR}/project/view
    )
@@ -840,3 +851,5 @@ add_library(opensyde_core ${OPENSYDE_CORE_SOURCES})
 
 # add all include directories to library target and make public
 target_include_directories(opensyde_core PUBLIC ${OPENSYDE_CORE_INCLUDE_DIRECTORIES})
+
+target_precompile_headers(opensyde_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/precomp_headers.hpp)

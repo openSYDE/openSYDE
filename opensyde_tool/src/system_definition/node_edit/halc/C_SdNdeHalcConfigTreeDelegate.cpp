@@ -15,6 +15,7 @@
 #include "C_OgeCbxMultiSelectTableHalc.hpp"
 #include "C_OgeCbxTableHalc.hpp"
 #include "C_OgeSpxTableHalc.hpp"
+#include "C_OgeLeTableHalc.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -62,8 +63,6 @@ C_OgeWiSpinBoxGroup * C_SdNdeHalcConfigTreeDelegate::m_CreateSpinBox(QWidget * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create line edit
 
-   Returns unstyled line edit as we do not need a line edit for HALC parameter editing.
-
    \param[in,out]  opc_Parent    Parent
 
    \return
@@ -72,7 +71,7 @@ C_OgeWiSpinBoxGroup * C_SdNdeHalcConfigTreeDelegate::m_CreateSpinBox(QWidget * c
 //----------------------------------------------------------------------------------------------------------------------
 C_TblEditLineEditBase * C_SdNdeHalcConfigTreeDelegate::m_CreateLineEdit(QWidget * const opc_Parent) const
 {
-   return new C_TblEditLineEditBase(opc_Parent);
+   return new C_OgeLeTableHalc(opc_Parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

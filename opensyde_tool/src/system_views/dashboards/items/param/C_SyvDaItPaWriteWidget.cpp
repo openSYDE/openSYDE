@@ -609,10 +609,6 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
 
       if (pc_OscNode != NULL)
       {
-         const C_PuiSdNodeDataPoolList * const pc_UiList =
-            C_PuiSdHandler::h_GetInstance()->GetUiDataPoolList(u32_CurNodeIndex,
-                                                               (*c_ItItem).u32_DataPoolIndex,
-                                                               (*c_ItItem).u32_ListIndex);
          const C_OscNodeDataPoolList * const pc_OscList =
             C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(u32_CurNodeIndex,
                                                                 (*c_ItItem).u32_DataPoolIndex,
@@ -635,8 +631,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
             }
          }
 
-         if (((pc_OscList != NULL) && (pc_UiList != NULL)) &&
-             (pc_OscList->c_Elements.size() == pc_UiList->c_DataPoolListElements.size()))
+         if (pc_OscList != NULL)
          {
             uint32_t u32_ElementCounter;
             // Heading for list
@@ -648,8 +643,6 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
             for (u32_ElementCounter = 0U; u32_ElementCounter < pc_OscList->c_Elements.size(); ++u32_ElementCounter)
             {
                const C_OscNodeDataPoolListElement * pc_OscElement;
-               const C_PuiSdNodeDataPoolListElement & rc_CurUiListElement =
-                  pc_UiList->c_DataPoolListElements[u32_ElementCounter];
                std::vector<QString> c_NvmValues;
                QString c_ElementNumber;
                QString c_ElementText;
@@ -685,7 +678,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
                }
                if (pc_OscElement != NULL)
                {
-                  if (rc_CurUiListElement.q_InterpretAsString == true)
+                  if (pc_OscElement->q_InterpretAsString == true)
                   {
                      const QString c_Tmp = "\"" + C_SdNdeDpContentUtil::h_ConvertToString(pc_OscElement->c_NvmValue) +
                                            "\"";

@@ -31,16 +31,18 @@ class C_GiImage :
 {
 public:
    C_GiImage(const QString & orc_ImagePath = "", QGraphicsItem * const opc_Parent = NULL);
-   C_GiImage(const QPixmap & orc_Pixmap, const float64_t of64_Width, const float64_t of64_Height,
-             QGraphicsItem * const opc_Parent = NULL);
+   C_GiImage(const QPixmap & orc_Pixmap, const QByteArray & orc_Format, const float64_t of64_Width,
+             const float64_t of64_Height, QGraphicsItem * const opc_Parent = NULL);
    ~C_GiImage() override;
 
    void Redraw(void) override;
 
    QPixmap GetImage(void) const;
+   QByteArray GetImageFormat(void) const;
 
 private:
-   QPixmap mc_OriginalPixmap; ///< Original image for saving
+   QPixmap mc_OriginalPixmap;         ///< Original image for saving
+   QByteArray mc_OriginalImageFormat; ///< Original image format for saving
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

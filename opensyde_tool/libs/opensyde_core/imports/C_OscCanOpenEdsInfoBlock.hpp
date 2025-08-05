@@ -11,6 +11,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscCanOpenEdsFileInfoBlock.hpp"
 #include "C_OscCanOpenEdsDeviceInfoBlock.hpp"
+#include "C_SclStringList.hpp"
+#include "C_SclIniFile.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -26,13 +28,13 @@ class C_OscCanOpenEdsInfoBlock
 public:
    C_OscCanOpenEdsInfoBlock();
 
-   uint32_t u32_FileHash;                      ///< Content of loaded EDS file, parsed for GUI usage
-   stw::scl::C_SclString c_FileContentForSave; ///< Content of loaded EDS file to use when saving to file
+   uint32_t u32_FileHash;                          ///< Content of loaded EDS file, parsed for GUI usage
+   stw::scl::C_SclStringList c_FileContentForSave; ///< Content of loaded EDS file to use when saving to file
    C_OscCanOpenEdsFileInfoBlock c_FileInfo;
    C_OscCanOpenEdsDeviceInfoBlock c_DeviceInfo;
 
    void CalcHash(uint32_t & oru32_HashValue) const;
-   int32_t LoadFromFile(const stw::scl::C_SclString & orc_FilePath, stw::scl::C_SclString & orc_LastError);
+   int32_t LoadFromFile(stw::scl::C_SclIniFile & orc_File, stw::scl::C_SclString & orc_LastError);
 
    uint8_t GetGranularity(void) const;
 

@@ -85,13 +85,20 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableDelegate.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobGeneralSettingsWidget.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobPropertiesWidget.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsListModel.cpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsListView.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.cpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.cpp \
+    ../src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopClipBoardHelper.cpp \
+    ../src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroup.cpp \
+    ../src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroupBase.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.cpp \
@@ -127,6 +134,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesListWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.cpp \
@@ -881,6 +889,7 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableHalc.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableHalc.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxMultiSelectTableHalc.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeTableHalc.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListEditWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubBackNavigation.cpp \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelDpPreviewPopUp.cpp \
@@ -1014,13 +1023,20 @@ HEADERS  += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableDelegate.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobGeneralSettingsWidget.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobPropertiesWidget.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsListModel.hpp \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsListView.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.hpp \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.hpp \
+    ../src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopClipBoardHelper.hpp \
+    ../src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroup.hpp \
+    ../src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroupBase.hpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.hpp \
@@ -1056,6 +1072,7 @@ HEADERS  += \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesListWidget.hpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.hpp \
@@ -1828,6 +1845,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableHalc.hpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableHalc.hpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxMultiSelectTableHalc.hpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeTableHalc.hpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListEditWidget.hpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubBackNavigation.hpp \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelDpPreviewPopUp.hpp \
@@ -1875,7 +1893,9 @@ FORMS    += \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceUpdateEdsDialog.ui \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.ui \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionWidget.ui \
+    ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobGeneralSettingsWidget.ui \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobPropertiesWidget.ui \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.ui \
     ../src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.ui \
@@ -2028,6 +2048,7 @@ FORMS    += \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFilesWidget.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.ui \
     ../src/system_views/system_update/update_package/C_SyvUpPacSecurityCertificatePackageDialog.ui \
@@ -2066,6 +2087,7 @@ INCLUDEPATH += ../src \
                ../src/system_definition/node_edit \
                ../src/system_definition/node_edit/data_blocks \
                ../src/system_definition/node_edit/data_logger \
+               ../src/system_definition/node_edit/data_logger/copy_paste \
                ../src/system_definition/node_edit/datapools \
                ../src/system_definition/node_edit/canopen_manager \
                ../src/system_definition/node_edit/halc \

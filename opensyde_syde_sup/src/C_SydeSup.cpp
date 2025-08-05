@@ -301,8 +301,8 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
       }
       else
       {
-         const stw::scl::C_SclString c_Date = __DATE__;
-         const stw::scl::C_SclString c_Time = __TIME__;
+         const C_SclString c_Date = __DATE__;
+         const C_SclString c_Time = __TIME__;
 
          // Initialize optional parameters and setup logging
          e_Return = this->m_InitOptionalParameters();
@@ -311,6 +311,10 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          h_WriteLog("SYDEsup Version", "SYDEsup Version: " + c_Version + ", MD5-Checksum: " + c_BinaryHash);
          h_WriteLog("SYDEsup Version", "   Binary: " + TglGetExePath(), false, mq_Quiet);
          h_WriteLog("SYDEsup Version", "   Build date: " + c_Date + " " + c_Time, false, mq_Quiet);
+
+         // log command line call and parameters
+         h_WriteLog("SYDEsup call",
+                    "Command line: \"" + C_OscUtils::h_GetCommandLineAsString(os32_Argc, oppcn_Argv) + "\"");
 
          // After initialization of optional parameters: now we know the operation mode.
          // So let's check further parameters are provided for create-package-mode.
@@ -445,15 +449,16 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
 
    //if file extension is not empty we can assume it's a file and we further need to check whether the extension
    //matches, otherwise mc_SUPFilePath is a directory
-   if ((TglExtractFileExtension(this->mc_SupFilePath) != "") &&
-       (TglExtractFileExtension(this->mc_SupFilePath) == ".syde_sup"))
+   if (TglExtractFileExtension(this->mc_SupFilePath) != "")
    {
-      q_PackageIsZip = true;
-   }
-   else if ((TglExtractFileExtension(this->mc_SupFilePath) != "") &&
-            (TglExtractFileExtension(this->mc_SupFilePath) != ".syde_sup"))
-   {
-      e_Result = eERR_PACKAGE_WRONG_EXTENSION;
+      if (TglExtractFileExtension(this->mc_SupFilePath) == ".syde_sup")
+      {
+         q_PackageIsZip = true;
+      }
+      else
+      {
+         e_Result = eERR_PACKAGE_WRONG_EXTENSION;
+      }
    }
    else
    {
@@ -734,8 +739,8 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
    \return
    eERR_CREATE_PROJ_LOAD_FAILED     Could not load project (system definition and/or system views)
    eERR_CREATE_VIEW_NOT_FOUND       Could not find a view with the name provided by user
-   eERR_CREATE_ZIP_RD_RW            File writing problems occured on output file creation or deletion
-   eERR_CREATE_ZIP_CONFIG           Configuration problems occured on update package creation
+   eERR_CREATE_ZIP_RD_RW            File writing problems occurred on output file creation or deletion
+   eERR_CREATE_ZIP_CONFIG           Configuration problems occurred on update package creation
                                      (see C_OscSupServiceUpdatePackageV1::h_CreatePackage for further details)
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -773,8 +778,8 @@ C_SydeSup::E_Result C_SydeSup::CreatePackage(void)
    \param[in]  orq_Quiet      Quiet flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SydeSup::h_WriteLog(const stw::scl::C_SclString & orc_Activity, const stw::scl::C_SclString & orc_Text,
-                           const bool & orq_IsError, const bool & orq_Quiet)
+void C_SydeSup::h_WriteLog(const C_SclString & orc_Activity, const C_SclString & orc_Text, const bool & orq_IsError,
+                           const bool & orq_Quiet)
 {
    if (orq_IsError == true)
    {
@@ -1430,13 +1435,13 @@ int32_t C_SydeSup::m_UpdateSystem(C_SupSuSequences & orc_Sequence, const C_OscSy
             {
                std::vector<C_OscSuSequences::C_ApplicationProperties> c_ClientSideApplications; // of current node
 
-               std::vector<stw::scl::C_SclString>::iterator c_IterFiles;
+               std::vector<C_SclString>::iterator c_IterFiles;
                for (c_IterFiles = orc_ApplicationsToWrite[u16_IterDevices].c_FilesToFlash.begin();
                     c_IterFiles != orc_ApplicationsToWrite[u16_IterDevices].c_FilesToFlash.end();
                     ++c_IterFiles)
                {
                   // Path is already relative to the execution folder
-                  const stw::scl::C_SclString c_Path = c_IterFiles->c_str();
+                  const C_SclString c_Path = c_IterFiles->c_str();
 
                   C_OscHexFile c_HexFile;
 
@@ -1460,9 +1465,9 @@ int32_t C_SydeSup::m_UpdateSystem(C_SupSuSequences & orc_Sequence, const C_OscSy
                   }
                   else
                   {
-                     const stw::scl::C_SclString c_Text = "Could not open HEX file \"" +
-                                                          c_Path + "\" Details: " +
-                                                          c_HexFile.ErrorCodeToErrorText(u32_Result);
+                     const C_SclString c_Text = "Could not open HEX file \"" +
+                                                c_Path + "\" Details: " +
+                                                c_HexFile.ErrorCodeToErrorText(u32_Result);
                      osc_write_log_warning("X-Check feature", c_Text);
                      s32_Result = C_WARN;
                      break;
@@ -1488,7 +1493,7 @@ int32_t C_SydeSup::m_UpdateSystem(C_SupSuSequences & orc_Sequence, const C_OscSy
             if (c_ActiveNodesTypes[u16_IterDevices] == 1)
             {
                std::vector<uint8_t> c_ApplicationsPresentOnServer;
-               std::vector<stw::scl::C_SclString> c_FilesToFlashTemp;
+               std::vector<C_SclString> c_FilesToFlashTemp;
 
                // check for changed applications
                C_OscSuSequences::h_CheckForChangedApplications(
@@ -1501,21 +1506,20 @@ int32_t C_SydeSup::m_UpdateSystem(C_SupSuSequences & orc_Sequence, const C_OscSy
                     c_NodeApplicationsHelperStruct[u16_IterDevices].c_ClientSideApplications.size();
                     ++u16_IterApplications)
                {
-                  const stw::scl::C_SclString c_Temp =
+                  const C_SclString c_Temp =
                      orc_ApplicationsToWrite[u16_IterDevices].c_FilesToFlash[u16_IterApplications];
                   if (c_ApplicationsPresentOnServer[u16_IterApplications] == 0)
                   {
                      // current application needs to be updated on current device
-                     const stw::scl::C_SclString c_Text = "File \"" + c_Temp +
-                                                          "\" not present on device. Needs updating ...";
+                     const C_SclString c_Text = "File \"" + c_Temp + "\" not present on device. Needs updating ...";
 
                      c_FilesToFlashTemp.push_back(c_Temp);
                      osc_write_log_info("X-Check feature", c_Text);
                   }
                   else
                   {
-                     const stw::scl::C_SclString c_Text = "File \"" + c_Temp +
-                                                          "\" present on device. No update needed -> skipping ...";
+                     const C_SclString c_Text = "File \"" + c_Temp +
+                                                "\" present on device. No update needed -> skipping ...";
                      osc_write_log_info("X-Check feature", c_Text);
                   }
                }

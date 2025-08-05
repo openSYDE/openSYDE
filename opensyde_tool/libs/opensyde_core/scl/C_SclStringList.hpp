@@ -53,7 +53,7 @@ public:
    void Insert(const uint32_t ou32_Index, const C_SclString & orc_String);
    int32_t IndexOf(const C_SclString & orc_String);
 
-   C_SclString GetText(void) const;
+   C_SclString GetText(const C_SclString orc_LineSeparator = "\r\n") const;
    uint32_t GetCount(void) const;
 
    void LoadFromFile(const C_SclString & orc_FileName);

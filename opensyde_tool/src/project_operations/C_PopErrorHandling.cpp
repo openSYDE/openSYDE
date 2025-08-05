@@ -73,14 +73,14 @@ void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QStri
       switch (ors32_Err)
       {
       case C_RD_WR:
-         c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
+         c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.<br/>"
                                             "For example, there may be no read access to the file.");
          break;
       case C_RANGE:
          c_Details = C_GtGetText::h_GetText("At least one project file is missing.");
          break;
       case C_NOACT:
-         c_Details = C_GtGetText::h_GetText("A project file is present but its structure is invalid.\n"
+         c_Details = C_GtGetText::h_GetText("A project file is present but its structure is invalid.<br/>"
                                             "For example this can be caused by an invalid XML file.");
          break;
       case C_CONFIG:

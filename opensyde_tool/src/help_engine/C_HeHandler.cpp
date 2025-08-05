@@ -228,6 +228,8 @@ void C_HeHandler::m_InitSpecialHelpPages(void)
    this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDaItPaWriteWidget",
                                       "Parametrization - Write Values to Device");
    this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDcWidget", "Configure Device");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvUpPacSecurityCertificatePackageDialog",
+                                      "Create a Security Certificate Package");
 
    //openSYDE CAN Monitor
    this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_CamMainWindow", "openSYDE CAN Monitor");

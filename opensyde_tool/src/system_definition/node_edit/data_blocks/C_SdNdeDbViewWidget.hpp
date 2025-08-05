@@ -56,7 +56,7 @@ Q_SIGNALS:
    void SigErrorChange(void);
    void SigOwnedDataPoolsChanged(void) const;
    void SigHalcLoadedFromTsp(void);
-   void SigUpdateTrigger(uint32_t ou32_NodeIndex);
+   void SigUpdateTrigger(uint32_t ou32_NodeIndex, const bool oq_OnlyUpdateProperties);
 
 private:
    //Avoid call
@@ -75,7 +75,7 @@ private:
    void m_HandleAddButtonAvailability(void) const;
    uint32_t m_AddApplication(const stw::opensyde_core::C_OscNodeApplication::E_Type oe_Type) const;
    uint32_t m_AddApplication(stw::opensyde_core::C_OscNodeApplication & orc_Application) const;
-   void m_UpdateTrigger();
+   void m_UpdateTrigger(const bool oq_OnlyUpdateProperties);
 
    Ui::C_SdNdeDbViewWidget * mpc_Ui;
    uint32_t mu32_NodeIndex;

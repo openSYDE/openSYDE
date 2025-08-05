@@ -89,6 +89,11 @@ private:
    static int32_t mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob> & orc_Config,
                                      C_OscXmlParserBase & orc_XmlParser, const stw::scl::C_SclString & orc_BasePath,
                                      std::vector<stw::scl::C_SclString> * const opc_CreatedFiles);
+   static int32_t mh_LoadXappProperties(C_OscXappProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                        const stw::scl::C_SclString & orc_BasePath);
+   static int32_t mh_SaveXappProperties(const C_OscNode & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                        const stw::scl::C_SclString & orc_BasePath,
+                                        std::vector<stw::scl::C_SclString> * const opc_CreatedFiles);
    static stw::scl::C_SclString mh_DiagnosticServerToString(const C_OscNodeProperties::E_DiagnosticServerProtocol &
                                                             ore_DiagnosticProtocol);
    static int32_t mh_StringToDiagnosticServer(const stw::scl::C_SclString & orc_String,

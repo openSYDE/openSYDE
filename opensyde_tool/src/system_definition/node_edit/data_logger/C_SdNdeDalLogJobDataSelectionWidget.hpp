@@ -42,6 +42,12 @@ public:
    void InitStaticNames(void) const;
    void ReloadDataElements(void);
 
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+Q_SIGNALS:
+   //lint -restore
+   void SigNumElementsChanged();
+
 private:
    void m_AddClicked(void);
    void m_UpdateUi() const;

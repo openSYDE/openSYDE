@@ -1038,7 +1038,6 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       uint32_t u32_SysViewFlag;
 
       const QStringList c_PemFilePaths = orc_UserSettings.GetLastKnownUpdatePemFilePaths();
-      const QStringList c_PemFilePathsAsRelativeOrAbsolute = orc_UserSettings.GetPemFilePathsAsRelativeOrAbsolute();
 
       // project specific settings
       // Mode
@@ -1181,9 +1180,31 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
          ++s32_ItView;
       }
 
-      // PEM File Path
+      // public PEM File Path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_public_pem_file_path",
+                          orc_UserSettings.GetLastKnownPublicPemFilePath().toStdString().c_str());
+
+      // Add PEM File Path
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_pem_file_path",
-                          orc_UserSettings.GetLastKnownPemFilePath().toStdString().c_str());
+                          orc_UserSettings.GetLastKnownAddPemFilePath().toStdString().c_str());
+
+      // public secure certificate package path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_secure_certificate_package_path",
+                          orc_UserSettings.GetLastKnownSecureCertificatePackagePath().toStdString().c_str());
+
+      // PEM file password
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_pem_file_password",
+                          orc_UserSettings.GetLastKnownPemFilePassword().toStdString().c_str());
+
+      // Add PEM file state
+      orc_Ini.WriteBool(
+         orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_Add_pem_file_state",
+         orc_UserSettings.GetLastKnownAddPemFileState());
+
+      // secure update config state
+      orc_Ini.WriteBool(
+         orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_secure_update_config_state",
+         orc_UserSettings.GetLastKnownSecureUpdateConfigState());
 
       // Values from Update widget
       orc_Ini.WriteInteger("Update", "PemFileCount", c_PemFilePaths.size());
@@ -1191,12 +1212,8 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
            ++s32_SectionCounter)
       {
          const std::string c_PemFilePath = c_PemFilePaths[s32_SectionCounter].toStdString();
-         orc_Ini.WriteString("Update", "PemFiles[" + std::to_string(s32_SectionCounter) + "]",
+         orc_Ini.WriteString("Update", "PemFiles_" + std::to_string(s32_SectionCounter),
                              c_PemFilePath);
-         const std::string c_PemFilePathAsRelativeOrAbsolute =
-            c_PemFilePathsAsRelativeOrAbsolute[s32_SectionCounter].toStdString();
-         orc_Ini.WriteString("Update", "PemFilesAsRelativeOrAbsolute[" + std::to_string(s32_SectionCounter) + "]",
-                             c_PemFilePathAsRelativeOrAbsolute);
       }
    }
 }
@@ -2179,7 +2196,6 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       uint32_t u32_SysViewIndex;
       uint32_t u32_SysViewFlag;
       QStringList c_PemFilePaths;
-      QStringList c_PemFilePathsAsRelativeOrAbsolute;
 
       // Mode
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjMode", 0);
@@ -2286,10 +2302,35 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
                                                     orc_ActiveProject.toStdString().c_str(),
                                                     "ProjSd_last_known_csv_export_path", "").c_str());
 
-      // Pem file path
-      orc_UserSettings.SetLastKnownPemFilePath(orc_Ini.ReadString(
-                                                  orc_ActiveProject.toStdString().c_str(),
-                                                  "ProjSd_last_known_pem_file_path", "").c_str());
+      // public PEM file path
+      orc_UserSettings.SetLastKnownPublicPemFilePath(orc_Ini.ReadString(
+                                                        orc_ActiveProject.toStdString().c_str(),
+                                                        "ProjSd_last_known_public_pem_file_path", "").c_str());
+
+      // Add PEM file path
+      orc_UserSettings.SetLastKnownAddPemFilePath(orc_Ini.ReadString(
+                                                     orc_ActiveProject.toStdString().c_str(),
+                                                     "ProjSd_last_known_pem_file_path", "").c_str());
+
+      // secure certificate package path
+      orc_UserSettings.SetLastKnownSecureCertificatePackagePath(orc_Ini.ReadString(
+                                                                   orc_ActiveProject.toStdString().c_str(),
+                                                                   "ProjSd_last_known_secure_certificate_package_path",
+                                                                   "").c_str());
+
+      // PEM file password
+      orc_UserSettings.SetLastKnownPemFilePassword(orc_Ini.ReadString(
+                                                      orc_ActiveProject.toStdString().c_str(),
+                                                      "ProjSd_last_known_pem_file_password", "").c_str());
+
+      // Add PEM file state
+      orc_UserSettings.SetLastKnownAddPemFileState(
+         orc_Ini.ReadBool(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_Add_pem_file_state", false));
+
+      // secure update config state
+      orc_UserSettings.SetLastKnownSecureUpdateConfigState(
+         orc_Ini.ReadBool(
+            orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_secure_update_config_state", false));
 
       // Last tab index in system definition
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);
@@ -2347,14 +2388,9 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       for (int32_t s32_SectionCounter = 0; s32_SectionCounter < s32_Value; ++s32_SectionCounter)
       {
          c_PemFilePaths.append(
-            orc_Ini.ReadString("Update", "PemFiles[" + C_SclString::IntToStr(s32_SectionCounter) + "]", "").c_str());
-         c_PemFilePathsAsRelativeOrAbsolute.append(
-            orc_Ini.ReadString("Update",
-                               "PemFilesAsRelativeOrAbsolute[" + C_SclString::IntToStr(s32_SectionCounter) + "]",
-                               "").c_str());
+            orc_Ini.ReadString("Update", "PemFiles_" + C_SclString::IntToStr(s32_SectionCounter), "").c_str());
       }
       orc_UserSettings.SetLastKnownUpdatePemFilePaths(c_PemFilePaths);
-      orc_UserSettings.SetPemFilePathsAsRelativeOrAbsolute(c_PemFilePathsAsRelativeOrAbsolute);
    }
    else
    {

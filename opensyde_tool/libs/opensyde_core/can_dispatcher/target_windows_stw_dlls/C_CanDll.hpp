@@ -38,56 +38,24 @@ typedef int32_t (WINAPI * PR_CAN_DLL_INFO)(STW_CAN_DLL_INFO * const opt_Info);
 typedef int32_t (WINAPI * PR_CAN_SEND_EXTMSG)(const STW_CAN_EXTMSG * const opt_Msg);
 typedef int32_t (WINAPI * PR_CAN_READ_EXTMSG)(STW_CAN_EXTMSG * const opt_Msg);
 typedef int32_t (WINAPI * PR_CAN_SEND_EXTRTR)(const STW_CAN_EXTMSG * const opt_Msg);
-typedef int32_t (WINAPI * PR_CAN_INIT_ONE_ID)(const int32_t os32_Bitrate,
-                                              const uint32_t ou32_Id);
-
-//functions only available for stream based communication interfaces:
-typedef int32_t (WINAPI * PR_SER_GET_TX_BUF_COUNT)(uint32_t * const opu32_NumBytes,
-                                                   uint32_t * const opu32_MaxBufSize);
-typedef int32_t (WINAPI * PR_SER_GET_RX_BUF_COUNT)(uint32_t * const opu32_NumBytes,
-                                                   uint32_t * const opu32_MaxBufSize);
-typedef int32_t (WINAPI * PR_SER_SEND_BYTES)(const uint8_t * const opu8_Data,
-                                             const uint32_t ou32_NumBytes);
-typedef int32_t (WINAPI * PR_SER_READ_BYTES)(uint8_t * const opu8_Data,
-                                             uint32_t * const opu32_NumBytes);
-
-//special functions for dial-up based communication interfaces:
-typedef int32_t (WINAPI * PR_CANTAPI_CONNECT)(const uint8_t * opu8_Number,
-                                              const uint32_t ou32_TimeOut);
-typedef int32_t (WINAPI * PR_CANTAPI_DISCONNECT)(const uint32_t ou32_TimeOut);
+typedef int32_t (WINAPI * PR_CAN_INIT_ONE_ID)(const int32_t os32_Bitrate, const uint32_t ou32_Id);
 
 //"ext" function pointer types:
 typedef int32_t (WINAPI * PR_CANext_Init)(const uint8_t ou8_Channel);
 typedef int32_t (WINAPI * PR_CANext_Exit)(const uint8_t ou8_Channel);
-typedef int32_t (WINAPI * PR_CANext_Bitrate)(const uint8_t ou8_Channel,
-                                             const int32_t os32_Bitrate);
-typedef int32_t (WINAPI * PR_CANext_Read_Msg)(const uint8_t ou8_Channel,
-                                              T_STWCAN_Msg_RX * const opt_Message);
-typedef int32_t (WINAPI * PR_CANext_Send_Msg)(const uint8_t ou8_Channel,
-                                              const T_STWCAN_Msg_TX * const opt_Message);
+typedef int32_t (WINAPI * PR_CANext_Bitrate)(const uint8_t ou8_Channel, const int32_t os32_Bitrate);
+typedef int32_t (WINAPI * PR_CANext_Read_Msg)(const uint8_t ou8_Channel, T_STWCAN_Msg_RX * const opt_Message);
+typedef int32_t (WINAPI * PR_CANext_Send_Msg)(const uint8_t ou8_Channel, const T_STWCAN_Msg_TX * const opt_Message);
 typedef int32_t (WINAPI * PR_CANext_InterfaceSetup)(const uint8_t ou8_Channel);
-typedef int32_t (WINAPI * PR_CANext_Status)(const uint8_t ou8_Channel,
-                                            T_STWCAN_Status * const opt_Status);
-typedef int32_t (WINAPI * PR_CANext_Init_One_ID)(const uint8_t ou8_Channel,
-                                                 const int32_t os32_Bitrate,
+typedef int32_t (WINAPI * PR_CANext_Status)(const uint8_t ou8_Channel, T_STWCAN_Status * const opt_Status);
+typedef int32_t (WINAPI * PR_CANext_Init_One_ID)(const uint8_t ou8_Channel, const int32_t os32_Bitrate,
                                                  const uint32_t ou32_Id);
-typedef int32_t (WINAPI * PR_CANext_DLL_Info)(const uint8_t ou8_Channel,
-                                              T_STWCAN_DLLInfo * const opt_Info);
+typedef int32_t (WINAPI * PR_CANext_DLL_Info)(const uint8_t ou8_Channel, T_STWCAN_DLLInfo * const opt_Info);
 typedef int32_t (WINAPI * PR_CANext_Get_Num_Channels)(void);
 typedef int32_t (WINAPI * PR_CANext_Get_System_Time)(uint64_t * const opu64_TimeUs);
-typedef int32_t (WINAPI * PR_CANext_Get_Num_Supported_Bitrates)
-   (uint32_t * const opu32_MultiplicationFactor);
+typedef int32_t (WINAPI * PR_CANext_Get_Num_Supported_Bitrates)(uint32_t * const opu32_MultiplicationFactor);
 typedef int32_t (WINAPI * PR_CANext_Get_Supported_Bitrate)(const uint16_t ou16_BitrateIndex,
                                                            uint32_t * const opu32_Bitrate);
-
-// special functions for stw_tcp.dll:
-typedef int32_t (WINAPI * PR_CANtcp_Read_Device_List_From_Server)(const uint8_t ou8_Channel,
-                                                                  uint32_t * const
-                                                                  opu32_NoOfDevices,
-                                                                  uint32_t * const opu32_MaxLen);
-typedef int32_t (WINAPI * PR_CANtcp_Get_Device_Name)(const uint8_t ou8_Channel,
-                                                     const uint32_t ou32_Index,
-                                                     char_t * const opcn_DeviceName);
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
@@ -118,14 +86,6 @@ private:
    PR_CAN_SEND_EXTRTR mpr_CAN_Send_extRTR;
    PR_CAN_INIT_ONE_ID mpr_CAN_Init_One_ID;
 
-   PR_SER_GET_TX_BUF_COUNT mpr_SER_GET_TX_BUF_COUNT;
-   PR_SER_GET_RX_BUF_COUNT mpr_SER_GET_RX_BUF_COUNT;
-   PR_SER_SEND_BYTES mpr_SER_SEND_BYTES;
-   PR_SER_READ_BYTES mpr_SER_READ_BYTES;
-
-   PR_CANTAPI_CONNECT mpr_CANTAPI_CONNECT;
-   PR_CANTAPI_DISCONNECT mpr_CANTAPI_DISCONNECT;
-
    PR_CANext_Init mpr_CANext_Init;
    PR_CANext_Exit mpr_CANext_Exit;
    PR_CANext_Bitrate mpr_CANext_Bitrate;
@@ -139,9 +99,6 @@ private:
    PR_CANext_Get_System_Time mpr_CANext_Get_System_Time;
    PR_CANext_Get_Num_Supported_Bitrates mpr_CANext_Get_Num_Supported_Bitrates;
    PR_CANext_Get_Supported_Bitrate mpr_CANext_Get_Supported_Bitrate;
-
-   PR_CANtcp_Read_Device_List_From_Server mpr_CANtcp_Read_Device_List_From_Server;
-   PR_CANtcp_Get_Device_Name mpr_CANtcp_Get_Device_Name;
 
    int32_t m_Init(const char_t * const opcn_DllPath);
    void m_Exit(void);
@@ -169,13 +126,6 @@ public:
    int32_t CAN_Send_extRTR(const STW_CAN_EXTMSG & orc_Message);
    int32_t CAN_Init_One_ID(const int32_t os32_BitrateKBitS, const uint32_t ou32_ID);
 
-   int32_t SER_Get_TX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize);
-   int32_t SER_Send_Bytes(const uint8_t * const opu8_Data, const uint32_t ou32_NumBytes);
-   int32_t SER_Get_RX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize);
-   int32_t SER_Read_Bytes(uint8_t * const opu8_Data, uint32_t & oru32_NumBytes);
-   int32_t CANTAPI_Connect(const uint8_t * const opu8_Number, const uint32_t ou32_TimeOut);
-   int32_t CANTAPI_Disconnect(const uint32_t ou32_TimeOut);
-
    //"ext" functions:
    int32_t CANext_Init(const uint8_t ou8_Channel);
    int32_t CANext_Exit(const uint8_t ou8_Channel);
@@ -191,10 +141,6 @@ public:
    int32_t CANext_Get_Num_Supported_Bitrates(uint32_t & oru32_MultiplicationFactor);
    int32_t CANext_Get_Supported_Bitrate(const uint16_t ou16_BitrateIndex, uint32_t & oru32_Bitrate);
 
-   int32_t CANtcp_Read_Device_List_From_Server(const uint8_t ou8_Channel, uint32_t & oru32_NoOfDevices,
-                                               uint32_t & oru32_MaxLen);
-   int32_t CANtcp_Get_Device_Name(const uint8_t ou8_Channel, const uint32_t ou32_Index, char_t * const opcn_DeviceName);
-
    //utilities to convert between different message structure types
    static void STWCANMSG_to_CANMSGRX(T_STWCAN_Msg_RX & orc_Target, const STW_CAN_MSG & orc_Source);
    static void STWCANEXTMSG_to_CANMSGRX(T_STWCAN_Msg_RX & orc_Target, const STW_CAN_EXTMSG & orc_Source);
@@ -202,10 +148,7 @@ public:
    static void CANMSGTX_to_STWCANEXTMSG(STW_CAN_EXTMSG & orc_Target, const T_STWCAN_Msg_TX & orc_Source);
 
    bool mq_ExtFunctionsAvailable;
-   bool mq_ModemFunctionsAvailable;
-   bool mq_StreamFunctionsAvailable; //does not signal availability of "supported_bitrate" functions !
    bool mq_BitrateInformationFunctionsAvailable;
-   bool mq_TCPFunctionsAvailable;
 
    HINSTANCE mpv_DLL;
 };

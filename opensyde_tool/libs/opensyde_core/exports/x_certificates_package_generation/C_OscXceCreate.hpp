@@ -46,13 +46,19 @@ private:
       const std::vector<C_OscXceUpdatePackageParameters> & orc_UpdatePackageParameters);
    static int32_t mh_PrepareCertFiles(const stw::scl::C_SclString & orc_TmpPath,
                                       const std::vector<stw::scl::C_SclString> & orc_CertificatesPath,
-                                      const std::vector<C_OscXceUpdatePackageParameters> & orc_UpdatePackageParameters,
+                                      std::vector<C_OscXceUpdatePackageParameters> & orc_UpdatePackageParameters,
                                       std::set<stw::scl::C_SclString> & orc_XcertFiles);
    static stw::scl::C_SclString mh_GenOutFilePathPart(const stw::scl::C_SclString & orc_InPath,
                                                       const stw::scl::C_SclString & orc_TargetFolder);
    static int32_t mh_CopyFile(const stw::scl::C_SclString & orc_InPath, const stw::scl::C_SclString & orc_OutBasePath,
-                              const stw::scl::C_SclString & orc_OutFolder,
-                              std::set<stw::scl::C_SclString> & orc_XcertFiles);
+                              const stw::scl::C_SclString & orc_OutFolder, std::map<scl::C_SclString,
+                                                                                    bool> & orc_ExistingFiles,
+                              std::set<stw::scl::C_SclString> & orc_XcertFiles,
+                              stw::scl::C_SclString * const opc_OutFilePath = NULL);
+   static stw::scl::C_SclString mh_GetUniqueFileName(const stw::scl::C_SclString & orc_InPath,
+                                                     const stw::scl::C_SclString & orc_OutFolder,
+                                                     std::map<scl::C_SclString,
+                                                              bool> & orc_ExistingFiles);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

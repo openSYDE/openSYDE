@@ -13,7 +13,7 @@
 #include "C_SdNodeToNodeConnectionSetupWidget.hpp"
 #include "ui_C_SdNodeToNodeConnectionSetupWidget.h"
 #include "constants.hpp"
-#include "C_Uti.hpp"
+#include "C_OscUtils.hpp"
 #include "C_GtGetText.hpp"
 #include "stwerrors.hpp"
 #include "C_PuiSdHandler.hpp"
@@ -356,11 +356,11 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
             }
 
             //Init name
-            this->mpc_Ui->pc_LineEditBusName->setText(C_Uti::h_GetUniqueName(C_PuiSdHandler::h_GetInstance()->
-                                                                             GetExistingBusNames(),
-                                                                             c_OscBus.c_Name,
-                                                                             C_PuiSdHandler::h_GetInstance()->
-                                                                             GetNameMaxCharLimit()).c_str());
+            this->mpc_Ui->pc_LineEditBusName->setText(C_OscUtils::h_GetUniqueName(C_PuiSdHandler::h_GetInstance()->
+                                                                                  GetExistingBusNames(),
+                                                                                  c_OscBus.c_Name,
+                                                                                  C_PuiSdHandler::h_GetInstance()->
+                                                                                  GetNameMaxCharLimit()).c_str());
          }
          else
          {

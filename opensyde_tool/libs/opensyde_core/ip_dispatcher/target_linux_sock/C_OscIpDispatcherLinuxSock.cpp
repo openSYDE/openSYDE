@@ -791,7 +791,7 @@ int32_t C_OscIpDispatcherLinuxSock::SendTcp(const uint32_t ou32_Handle, const st
       {
          const ssize_t x_BytesSent = //lint !e970 !e8080 //using type to match library interface
                                      send(this->mc_SocketsTcp[ou32_Handle].s32_Socket,
-                                          &orc_Data[0], orc_Data.size(), 0);
+                                          &orc_Data[0], orc_Data.size(), MSG_NOSIGNAL);
          if (x_BytesSent != static_cast<ssize_t>(orc_Data.size()))
          {
             if (x_BytesSent == -1)

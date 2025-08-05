@@ -123,6 +123,13 @@ public:
                                                              const bool oq_UseChannelIndex,
                                                              const stw::scl::C_SclString & orc_DisplayName,
                                                              const bool oq_Value);
+   int32_t SetHalcDomainChannelParameterConfigElementString(const uint32_t ou32_NodeIndex,
+                                                            const uint32_t ou32_DomainIndex,
+                                                            const uint32_t ou32_ChannelIndex,
+                                                            const uint32_t ou32_ParameterIndex,
+                                                            const uint32_t ou32_ElementIndex,
+                                                            const bool oq_UseChannelIndex,
+                                                            const std::string & orc_Value);
 
    //Misc
    int32_t GetHalChannelOrDomainName(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
@@ -177,7 +184,8 @@ private:
    static int32_t mh_GetIndexInVector(const std::vector<stw::opensyde_core::C_OscHalcDefStruct> & orc_Structs,
                                       const uint32_t ou32_StartingIndex, const uint32_t ou32_TargetIndex,
                                       uint32_t & oru32_ParameterIndex, bool & orq_UseElementIndex,
-                                      uint32_t & oru32_ParameterElementIndex);
+                                      uint32_t & oru32_ParameterElementIndex,
+                                      const uint32_t ou32_NumChannelsInDatapool);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

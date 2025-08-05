@@ -80,6 +80,7 @@ C_SyvUpPacListWidget::C_SyvUpPacListWidget(QWidget * const opc_Parent) :
    mpc_ShowFileInfoAction(NULL),
    mpc_RemoveAllNodeFilesAction(NULL),
    mpc_HideShowOptionalSectionsAction(NULL),
+   mpc_AddSecurityCertificatePackageAction(NULL),
    mpc_SkipUpdateOfFile(NULL),
    mpc_ShowInExplorerAction(NULL),
    mc_LastPath(""),
@@ -897,13 +898,8 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile, 
             C_OgeWiCustomMessage c_MessageResult(this);
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Service Update Package"));
             c_MessageResult.SetDescription(C_GtGetText::h_GetText("Service Update Package successfully created."));
-            const QString c_Details =
-               static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-               arg(C_GtGetText::h_GetText("Package saved at ")).
-               arg(this->mc_LastPath).
-               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-               arg(this->mc_LastPath);
-            c_MessageResult.SetDetails(c_Details);
+            c_MessageResult.SetDetails("Package saved at " +
+                                       C_Uti::h_GetLink(mc_LastPath, mc_STYLE_GUIDE_COLOR_LINK, mc_LastPath));
             c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
          }
@@ -1398,6 +1394,14 @@ void C_SyvUpPacListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos
             this->mpc_PemFileSettings->setVisible(false);
          }
 
+         if (this->mpc_SelectedNode->IsFileBased() == true)
+         {
+            this->mpc_AddSecurityCertificatePackageAction->setVisible(true);
+         }
+         else
+         {
+            this->mpc_AddSecurityCertificatePackageAction->setVisible(false);
+         }
          q_ShowContextMenu = true;
       }
    }
@@ -1439,6 +1443,12 @@ void C_SyvUpPacListWidget::m_SetupContextMenu(void)
 
    this->mpc_ShowFileInfoAction = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("View File Information"), this, &C_SyvUpPacListWidget::m_ViewFileInfo);
+
+   this->mpc_AddSecurityCertificatePackageAction = this->mpc_ContextMenu->addAction(
+      C_GtGetText::h_GetText("Create Security Certificate Package"), this,
+      &C_SyvUpPacListWidget::m_AddSecurityCertificatePackage);
+
+   this->mpc_ContextMenu->addSeparator();
 
    this->mpc_HideShowOptionalSectionsAction = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("Hide Empty Optional Sections"), this,
@@ -1873,4 +1883,13 @@ QString C_SyvUpPacListWidget::m_GetDialogPath(void)
    }
 
    return c_Folder;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create Security Certificate package
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacListWidget::m_AddSecurityCertificatePackage()
+{
+   this->mpc_SelectedNode->AddSecurityCertificatePackage();
 }

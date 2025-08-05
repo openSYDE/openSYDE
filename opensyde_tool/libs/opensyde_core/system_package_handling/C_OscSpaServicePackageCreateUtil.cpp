@@ -48,6 +48,7 @@ const C_SclString C_OscSpaServicePackageCreateUtil::mhc_INI_DEV = "devices.ini";
    \param[in]      orc_PackageExtension      Package extension
    \param[in]      orc_PackageExtensionTmp   Package extension tmp folder
    \param[in,out]  orc_ErrorMessage          Error message
+   \param[in]      oq_CheckFileExist         Check file exist
 
    \return
    C_NO_ERR    success
@@ -60,7 +61,8 @@ int32_t C_OscSpaServicePackageCreateUtil::h_CheckPackagePathParam(const C_SclStr
                                                                   const C_SclString & orc_UseCase,
                                                                   const C_SclString & orc_PackageExtension,
                                                                   const C_SclString & orc_PackageExtensionTmp,
-                                                                  C_SclString & orc_ErrorMessage)
+                                                                  C_SclString & orc_ErrorMessage,
+                                                                  const bool oq_CheckFileExist)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -68,7 +70,7 @@ int32_t C_OscSpaServicePackageCreateUtil::h_CheckPackagePathParam(const C_SclStr
    const bool q_FileExists = TglFileExists(orc_PackagePath);
    const bool q_DirectoryExists = TglDirectoryExists(orc_PackagePath);
 
-   if ((q_FileExists == true) || (q_DirectoryExists == true))
+   if ((oq_CheckFileExist) && ((q_FileExists == true) || (q_DirectoryExists == true)))
    {
       orc_ErrorMessage = "Update Package \"" + orc_PackagePath + "\" exists already.";
       osc_write_log_error(orc_UseCase, orc_ErrorMessage);

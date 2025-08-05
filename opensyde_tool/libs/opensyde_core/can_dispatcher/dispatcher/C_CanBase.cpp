@@ -16,12 +16,14 @@
 #include "stwerrors.hpp"
 #include "C_CanBase.hpp"
 #include "C_SclDynamicArray.hpp"
+#include "TglTime.hpp"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw::errors;
 using namespace stw::can;
 using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
 
@@ -75,6 +77,25 @@ C_CanBase::C_CanBase(void)
 
 C_CanBase::~C_CanBase(void)
 {
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Sleep until RX CAN frame is available
+
+   In this default implementation:
+   Assume there is no driver mechanism to check for OS signals for incoming frames.
+   Override this function if there is a mechanism available in the target driver.
+
+   \param[in]   ou32_MaxWaitTimeMs   maximum number of ms to wait
+*/
+//-----------------------------------------------------------------------------
+void C_CanBase::WaitForRxFrame(const uint32_t ou32_MaxWaitTimeMs)
+{
+   (void)ou32_MaxWaitTimeMs;
+   //Give some CPU time to other threads.
+   //How efficient this approach is in not burning too much CPU time depends on the used OS.
+   TglSleep(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

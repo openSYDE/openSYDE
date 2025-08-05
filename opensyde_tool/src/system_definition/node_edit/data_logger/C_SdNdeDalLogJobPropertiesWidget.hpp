@@ -11,6 +11,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
+#include "C_OscDataLoggerJobProperties.hpp"
+
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
@@ -32,17 +34,20 @@ class C_SdNdeDalLogJobPropertiesWidget :
 
 public:
    explicit C_SdNdeDalLogJobPropertiesWidget(QWidget * const opc_Parent = NULL);
-   ~C_SdNdeDalLogJobPropertiesWidget(void) override;
+   ~C_SdNdeDalLogJobPropertiesWidget(void) noexcept override;
 
    void SetNodeDataLoggerJob(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
+   void Save(void) const;
+   void SaveUserSettings(void) const;
    void InitStaticNames(void) const;
+   void ReloadAdditionalTrigger(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
 Q_SIGNALS:
    //lint -restore
-   void SigReloadDataLoggerDataElements(void);
+   void SigLogJobNameModified();
 
 private:
    Ui::C_SdNdeDalLogJobPropertiesWidget * mpc_Ui;
@@ -62,19 +67,21 @@ private:
 
    void m_GetSupportedLogFileFormats() const;
    void m_GetSupportedLocalData() const;
-   void m_GetSupportedClientInterfaces() const;
-   void m_OnNameEdited(void);
-   void m_OnCommentEdited(void);
-   void m_OnFileSizeChanged(void);
-   void m_OnLogFileFormatChanged(const int32_t os32_NewIndex);
+   void m_GetSupportedLogJobUseCase() const;
+   static QString mh_ConvertTxMethodToName(
+      const stw::opensyde_core::C_OscDataLoggerJobProperties::E_UseCase & ore_Type);
+   void m_OnLogJobUseCaseChanged(const int32_t os32_NewIndex);
    void m_OnLocalDataChanged(const int32_t os32_NewIndex);
-   void m_OnClientInterfaceChanged(const int32_t os32_NewIndex);
+   void m_OnXappSettingsChanged(void);
+   void m_CheckDataLoggerName(void);
+   void m_DisconnectChangeTriggers(void) const;
+   void m_ReconnectChangeTriggers(void) const;
+   void m_OnNameEditingFinished();
+   void m_TrimLogJobName(void) const;
 
    uint32_t mu32_NodeIndex;
    uint32_t mu32_DataLoggerJobIndex;
-   int32_t ms32_LastUsedLogFileFormatIndex;
-   int32_t ms32_LastUsedLocalDataIndex;
-   int32_t ms32_LastUsedInterfaceNumberIndex;
+   stw::opensyde_core::C_OscDataLoggerJobProperties mc_Properties;
 
    //Avoid call
    C_SdNdeDalLogJobPropertiesWidget(const C_SdNdeDalLogJobPropertiesWidget &);

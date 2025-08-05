@@ -272,7 +272,7 @@ const
 /*! \brief   Disassemble CAN-ID
 
    \param[in]      ou32_CanId                  CAN-ID to decode
-   \param[out]     opr_CanAddressInformation   store decoded CAN configuration
+   \param[out]     or_CanAddressInformation    store decoded CAN configuration
 
    \return
    C_NO_ERR    disassembly successful
@@ -357,8 +357,7 @@ C_CanMonProtocolOpenSyde::C_CanMonProtocolOpenSyde(void) :
    * ou8_ServiceSize must be >= 1
    * opu8_ServiceData must be valid
 
-   \param[in]     opu8_ServiceData        service data (starting with service identifier)
-   \param[in]     ou8_ServiceSize         number of bytes in opu8_ServiceData (1..6)
+   \param[in]     ou8_ServiceData         service identifier
    \param[in]     oq_IsNegativeResponse   true: report as negative response
 
    \return

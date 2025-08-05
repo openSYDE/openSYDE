@@ -854,10 +854,9 @@ void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if node is reachable from data logger using diagnostic routing
+/*! \brief  Check if node is reachable from X-app using diagnostic routing
 
    \param[in]  ou32_SdNodeIndex        System definition use case: node index
-   \param[in]  ou32_SdDataLoggerIndex  System definition use case: data logger index
    \param[in]  ou32_TargetNodeIndex    Target node index
 
    \return
@@ -865,15 +864,12 @@ void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
    False No diagnostic mode activated
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdUtil::h_CheckDataLoggerNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_SdDataLoggerIndex,
-                                                 const uint32_t ou32_TargetNodeIndex)
+bool C_PuiSdUtil::h_CheckXappNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_TargetNodeIndex)
 {
    bool q_Retval = false;
-   const C_OscDataLoggerJob * const pc_Job = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(ou32_SdNodeIndex,
-                                                                                               ou32_SdDataLoggerIndex);
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_SdNodeIndex);
 
-   if ((pc_Job != NULL) && (pc_Node != NULL))
+   if (pc_Node != NULL)
    {
       bool q_BusFound = false;
       uint32_t u32_BusIndex = 0UL;
@@ -881,8 +877,8 @@ bool C_PuiSdUtil::h_CheckDataLoggerNodeReachable(const uint32_t ou32_SdNodeIndex
            ++u32_ItInterface)
       {
          const C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
-         if (((rc_Interface.e_InterfaceType == pc_Job->c_Properties.e_ConnectedInterfaceType) &&
-              (rc_Interface.u8_InterfaceNumber == pc_Job->c_Properties.u8_ConnectedInterfaceNumber)) &&
+         if (((rc_Interface.e_InterfaceType == pc_Node->c_XappProperties.e_ConnectedInterfaceType) &&
+              (rc_Interface.u8_InterfaceNumber == pc_Node->c_XappProperties.u8_ConnectedInterfaceNumber)) &&
              (rc_Interface.q_IsDiagnosisEnabled))
          {
             //This interface
@@ -905,6 +901,70 @@ bool C_PuiSdUtil::h_CheckDataLoggerNodeReachable(const uint32_t ou32_SdNodeIndex
          if (s32_Retval == C_NO_ERR)
          {
             q_Retval = true;
+         }
+      }
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if any node data logger uses the provided name
+
+   \param[in]      ou32_NodeIndex                  Node index
+   \param[in]      orc_Name                        Data logger name to check for
+   \param[in]      opu32_DataLoggerJobIndexToSkip  Optional parameter to skip one index
+                                                   (Use-case: skip current data logger to avoid conflict with itself)
+   \param[in,out]  opc_ExistingNames               Optional parameter to list all OTHER existing node names
+
+   \return
+   true  Available
+   false Already in use
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdUtil::h_CheckNodeDataLoggerNameAvailable(const uint32_t ou32_NodeIndex, const C_SclString & orc_Name,
+                                                     const uint32_t * const opu32_DataLoggerJobIndexToSkip,
+                                                     std::vector<C_SclString> * const opc_ExistingNames)
+{
+   bool q_Retval = true;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      //Either end on error or continue if all node names are requested
+      for (uint32_t u32_ItDataLogger = 0;
+           (u32_ItDataLogger < pc_Node->c_DataLoggerJobs.size()) && ((q_Retval == true) || (opc_ExistingNames != NULL));
+           ++u32_ItDataLogger)
+      {
+         bool q_Skip = false;
+         if (opu32_DataLoggerJobIndexToSkip != NULL)
+         {
+            q_Skip = (u32_ItDataLogger == *opu32_DataLoggerJobIndexToSkip);
+         }
+         if (q_Skip == false)
+         {
+            const stw::scl::C_SclString c_CurName = pc_Node->c_DataLoggerJobs[u32_ItDataLogger].c_Properties.c_Name;
+            //Check conflict
+            if (c_CurName.LowerCase() == orc_Name.LowerCase())
+            {
+               q_Retval = false;
+            }
+            //Store other (not checked) data logger name
+            if (opc_ExistingNames != NULL)
+            {
+               bool q_Exists = false;
+               for (uint32_t u32_It = 0UL; u32_It < opc_ExistingNames->size(); ++u32_It)
+               {
+                  if ((*opc_ExistingNames)[u32_It] == c_CurName)
+                  {
+                     q_Exists = true;
+                  }
+               }
+               if (!q_Exists)
+               {
+                  opc_ExistingNames->push_back(c_CurName);
+               }
+            }
          }
       }
    }

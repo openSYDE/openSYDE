@@ -305,7 +305,6 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
          {
             const C_OscNodeDataPool * pc_DataPool;
             const C_OscNodeDataPoolListElement * pc_OscElement;
-            const C_PuiSdNodeDataPoolListElement * pc_UiElement;
             switch (e_Col)
             {
             case eICON:
@@ -318,23 +317,18 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
                break;
             case eVALUE_TYPE:
-               pc_UiElement =
-                  C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                            rc_CurId.u32_DataPoolIndex,
-                                                                            rc_CurId.u32_ListIndex,
-                                                                            rc_CurId.u32_ElementIndex);
-               if (pc_UiElement->q_InterpretAsString == true)
+               pc_OscElement =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurId.u32_NodeIndex,
+                                                                             rc_CurId.u32_DataPoolIndex,
+                                                                             rc_CurId.u32_ListIndex,
+                                                                             rc_CurId.u32_ElementIndex);
+               if (pc_OscElement != NULL)
                {
-                  c_Retval = C_GtGetText::h_GetText("string");
-               }
-               else
-               {
-                  pc_OscElement =
-                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                                rc_CurId.u32_DataPoolIndex,
-                                                                                rc_CurId.u32_ListIndex,
-                                                                                rc_CurId.u32_ElementIndex);
-                  if (pc_OscElement != NULL)
+                  if (pc_OscElement->q_InterpretAsString == true)
+                  {
+                     c_Retval = C_GtGetText::h_GetText("string");
+                  }
+                  else
                   {
                      c_Retval = C_SdNdeDpUtil::h_ConvertContentTypeToString(pc_OscElement->c_Value.GetType());
                   }

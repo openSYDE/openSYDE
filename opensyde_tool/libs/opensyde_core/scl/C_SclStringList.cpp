@@ -158,18 +158,21 @@ int32_t C_SclStringList::IndexOf(const C_SclString & orc_String)
 
    Adds all strings to one single string.
    "\r\n" is inserted after each string (also after the last string).
+   This can be modified by setting orc_LineSeparator.
+
+   \param[in]  orc_LineSeparator   separator between individual lines
 
    \return  concatenated string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_SclStringList::GetText(void) const
+C_SclString C_SclStringList::GetText(const C_SclString orc_LineSeparator) const
 {
    C_SclString c_Text;
    int32_t s32_Index;
 
    for (s32_Index = 0; s32_Index < Strings.GetLength(); s32_Index++)
    {
-      c_Text += (Strings[s32_Index] + "\r\n");
+      c_Text += (Strings[s32_Index] + orc_LineSeparator);
    }
    return c_Text;
 }
@@ -209,7 +212,6 @@ void C_SclStringList::LoadFromFile(const C_SclString & orc_FileName)
    size_t x_SizeRead;
    long x_Index;
    uint32_t u32_NumStrings;
-   uint32_t u32_Line;
    int32_t s32_Len; //2GB file size limit is acceptable
 
    Strings.SetLength(0);
@@ -247,21 +249,28 @@ void C_SclStringList::LoadFromFile(const C_SclString & orc_FileName)
    //improves speed significantly over using ::Add for each line directly
    u32_NumStrings = 0U;
 
-   x_Index = 0U;
-   while (x_Index < x_FileSize)
+   //Possible file endings:
+   //* Windows: lines terminated by \r\n
+   //* Linux: lines terminated by \n only
+   //We want to support files having CR+LF and only LF line endings.
+   //We also want to preserve empty lines.
+   //Approach:
+   //* First pass:
+   //** do not touch '\r'. It might or might not be there.
+   //** replace each '\n' by '\0' and count as one line found
+   //* After that each '\0' will mark the ending of one line.
+   //* Set total number of strings to number of found '\n's
+   //* Second pass:
+   //** jump from one '\0' to the next
+   //** assign each part between '\0' to one string
+   //** check for '\r' as the last character and ignore if there is one
+   for (x_Index = 0; x_Index < x_FileSize; x_Index++)
    {
-      if ((pcn_Buffer[x_Index] == '\r') || (pcn_Buffer[x_Index] == '\n'))
+      if (pcn_Buffer[x_Index] == '\n')
       {
          pcn_Buffer[x_Index] = '\0';
-         //maybe there is a subsequent \n
-         if (pcn_Buffer[x_Index + 1U] == '\n')
-         {
-            x_Index++;
-            pcn_Buffer[x_Index] = '\0';
-         }
          u32_NumStrings++;
       }
-      x_Index++;
    }
    //maybe the last line is not terminated ?
    if ((x_Index > 0) && (pcn_Buffer[x_Index - 1U] != '\0'))
@@ -279,21 +288,23 @@ void C_SclStringList::LoadFromFile(const C_SclString & orc_FileName)
       delete[] pcn_Buffer;
       throw ("C_SclStringList::LoadFromFile: could not allocate buffer for file");
    }
-   x_Index = 0U;
 
-   for (u32_Line = 0U; u32_Line < u32_NumStrings; u32_Line++)
+   x_Index = 0U;
+   for (uint32_t u32_Line = 0U; u32_Line < u32_NumStrings; u32_Line++)
    {
       //using the std::string directly improves performance significantly
-      s32_Len = strlen(&pcn_Buffer[x_Index]);
-      Strings[u32_Line].AsStdString()->assign(&pcn_Buffer[x_Index], s32_Len); //assign with setting length is quite
-                                                                              // fast
-      x_Index += (s32_Len + 1);
+      const char_t * const pcn_String = &pcn_Buffer[x_Index];
 
-      //maybe there is a subsequent \n
-      if ((x_Index < x_FileSize) && (pcn_Buffer[x_Index] == '\0'))
+      s32_Len = strlen(pcn_String);
+      x_Index += (s32_Len + 1); //skip to next string
+
+      //Do we need to strip a final '\r'?
+      if ((s32_Len > 0) && (pcn_String[s32_Len - 1] == '\r'))
       {
-         x_Index++;
+         s32_Len--; //one character less in this string
       }
+
+      Strings[u32_Line].AsStdString()->assign(pcn_String, s32_Len); //assign with setting length is quite fast
    }
 
    delete[] pcn_Buffer;
@@ -318,9 +329,7 @@ void C_SclStringList::SaveToFile(const C_SclString & orc_FileName)
    int32_t s32_Line;
    uint32_t u32_NumWritten;
 
-   std::FILE * pc_File;
-
-   pc_File = std::fopen(orc_FileName.c_str(), "wb");
+   std::FILE * const pc_File = std::fopen(orc_FileName.c_str(), "wb");
    if (pc_File == NULL)
    {
       throw ("C_SclStringList::SaveToFile: could not create file");

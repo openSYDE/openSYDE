@@ -46,6 +46,12 @@ public:
                                      const stw::scl::C_SclString & orc_BasePath);
 
    static int32_t h_IsZipFile(const stw::scl::C_SclString & orc_FilePath);
+
+private:
+   static int32_t mh_AddContentToZipFile(const stw::scl::C_SclString & orc_ZipArchivePath,
+                                         const stw::scl::C_SclString & orc_ItemName, const char_t * const opcn_Content,
+                                         const uint32_t ou32_ContentSize, const scl::C_SclString & orc_ItemType,
+                                         stw::scl::C_SclString * const opc_ErrorText = NULL);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

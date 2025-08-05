@@ -12,11 +12,13 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <QMap>
+
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "TglUtils.hpp"
 #include "C_OscCanUtil.hpp"
-#include "C_Uti.hpp"
+#include "C_OscUtils.hpp"
 #include "C_PuiSdUtil.hpp"
 #include "C_PuiSdHandlerBusLogic.hpp"
 #include "C_PuiSdNodeCanMessageSyncManager.hpp"
@@ -25,7 +27,6 @@
 using namespace stw::scl;
 using namespace stw::tgl;
 using namespace stw::errors;
-using namespace stw::opensyde_gui;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui_logic;
 
@@ -64,7 +65,7 @@ uint32_t C_PuiSdHandlerBusLogic::AddBusAndSort(C_OscSystemBus & orc_OscBus, cons
    }
    else
    {
-      orc_OscBus.c_Name = C_Uti::h_GetUniqueName(
+      orc_OscBus.c_Name = C_OscUtils::h_GetUniqueName(
          this->GetExistingBusNames(), orc_OscBus.c_Name, this->GetNameMaxCharLimit());
    }
    if (oq_AllowBusIdAdaption == true)
@@ -1855,15 +1856,15 @@ int32_t C_PuiSdHandlerBusLogic::SetCanSignal(const C_OscCanMessageIdentification
       //Signal changed signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
       {
-         Q_EMIT (this->SigSyncNodeDataPoolListElementTypeChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                                 c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
-                                                                 orc_OscSignalCommon.GetType(),
-                                                                 orc_OscSignalCommon.GetArray(),
-                                                                 orc_OscSignalCommon.GetArraySize(), false));
-         Q_EMIT (this->SigSyncNodeDataPoolListElementRangeChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
-                                                                  c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
-                                                                  orc_OscSignalCommon.c_MinValue,
-                                                                  orc_OscSignalCommon.c_MaxValue));
+         this->m_HandleSyncNodeDataPoolListElementTypeOrArrayChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                                     c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
+                                                                     orc_OscSignalCommon.GetType(),
+                                                                     orc_OscSignalCommon.GetArray(),
+                                                                     orc_OscSignalCommon.GetArraySize(), false);
+         this->m_HandleSyncNodeDataPoolListElementRangeChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+                                                               c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
+                                                               orc_OscSignalCommon.c_MinValue,
+                                                               orc_OscSignalCommon.c_MaxValue);
       }
       //Ui data pool part
       if (pc_Protocol != NULL)
@@ -2056,7 +2057,7 @@ int32_t C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OscCanMessageIdentifica
       if (orq_AutomatedPropertiesAdaption == true)
       {
          //Get unique name
-         c_AdaptedMessage.c_Name = C_Uti::h_GetUniqueName(
+         c_AdaptedMessage.c_Name = C_OscUtils::h_GetUniqueName(
             this->m_GetExistingMessageNames(orc_MessageId.u32_NodeIndex, orc_MessageId.u32_InterfaceIndex),
             orc_Message.c_Name, this->GetNameMaxCharLimit());
       }
@@ -2195,7 +2196,7 @@ int32_t C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OscCanMessageIdentificat
       C_OscNodeDataPoolListElementId c_Id;
 
       //Get unique name
-      c_OscAdaptedSignalCommon.c_Name = C_Uti::h_GetUniqueName(
+      c_OscAdaptedSignalCommon.c_Name = C_OscUtils::h_GetUniqueName(
          this->m_GetExistingSignalNames(orc_MessageId), orc_OscSignalCommon.c_Name, this->GetNameMaxCharLimit());
       s32_Retval = rc_OscNode.InsertSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                            orc_MessageId.u32_DatapoolIndex,

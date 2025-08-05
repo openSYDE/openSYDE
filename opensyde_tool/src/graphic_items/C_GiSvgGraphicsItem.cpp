@@ -67,31 +67,32 @@ C_GiSvgGraphicsItem::~C_GiSvgGraphicsItem(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new SVG
 
-   \param[in] orc_ImagePath File path to svg
+   \param[in]  orc_ImagePath  File path to svg
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvgGraphicsItem::SetSvg(const QString & orc_ImagePath)
 {
-   delete this->mpc_SvgRenderer;
-   if (orc_ImagePath.compare("") == 0)
+   if (this->mc_ImagePath.compare(orc_ImagePath) != 0)
    {
-      this->mpc_SvgRenderer = NULL;
+      this->mc_ImagePath = orc_ImagePath;
+      delete this->mpc_SvgRenderer;
+      if (orc_ImagePath.compare("") == 0)
+      {
+         this->mpc_SvgRenderer = NULL;
+      }
+      else
+      {
+         this->mpc_SvgRenderer = new QSvgRenderer(orc_ImagePath);
+      }
+      this->update();
    }
-   else
-   {
-      this->mpc_SvgRenderer = new QSvgRenderer(orc_ImagePath);
-   }
-   this->update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply new size
 
-   \param[in] of64_Width  New width
-   \param[in] of64_Height New height
-
-   \return
-   possible return value(s) and description
+   \param[in]  of64_Width     New width
+   \param[in]  of64_Height    New height
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvgGraphicsItem::SetNewSize(const float64_t of64_Width, const float64_t of64_Height)

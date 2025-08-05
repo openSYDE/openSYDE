@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>811</height>
+    <width>613</width>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,8 +27,34 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>20</number>
    </property>
+   <item>
+    <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDisabled">
+     <property name="text">
+      <string>No Data Here</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="stw::opensyde_gui::C_SdNdeDalLogJobGeneralSettingsWidget" name="pc_GeneralSettingsWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
      <property name="orientation">
@@ -102,6 +128,12 @@
    <class>stw::opensyde_gui::C_SdNdeDalLogJobDataSelectionWidget</class>
    <extends>QWidget</extends>
    <header>C_SdNdeDalLogJobDataSelectionWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui::C_SdNdeDalLogJobGeneralSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeDalLogJobGeneralSettingsWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

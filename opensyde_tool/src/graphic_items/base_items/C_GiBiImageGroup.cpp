@@ -56,18 +56,19 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64_t & oru64_Id, const QString & or
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_Id    Unique ID
-   \param[in]     of64_Width  Width of image view
-   \param[in]     of64_Height Height of image view
-   \param[in]     orc_Image   Image
-   \param[in,out] opc_Parent  Optional pointer to parent
+   \param[in]      oru64_Id      Unique ID
+   \param[in]      of64_Width    Width of image view
+   \param[in]      of64_Height   Height of image view
+   \param[in]      orc_Image     Image
+   \param[in]      orc_Format    Image format
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiImageGroup::C_GiBiImageGroup(const uint64_t & oru64_Id, const float64_t of64_Width, const float64_t of64_Height,
-                                   const QPixmap & orc_Image, QGraphicsItem * const opc_Parent) :
+                                   const QPixmap & orc_Image, const QByteArray & orc_Format,
+                                   QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiImageGroupWithoutData(oru64_Id, of64_Width, of64_Height, orc_Image,
-                             opc_Parent)
+   C_GiImageGroupWithoutData(oru64_Id, of64_Width, of64_Height, orc_Image, orc_Format, opc_Parent)
 {
 }
 
@@ -98,7 +99,7 @@ void C_GiBiImageGroup::SetZetValueCustom(const float64_t of64_ZetValue)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update internal data
 
-   \param[in] orc_Data Image data
+   \param[in]  orc_Data    Image data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiImageGroup::m_UpdateData(C_PuiBsImage & orc_Data) const
@@ -106,4 +107,5 @@ void C_GiBiImageGroup::m_UpdateData(C_PuiBsImage & orc_Data) const
    this->UpdateBasicData(orc_Data);
 
    orc_Data.c_UiImagePixmap = this->GetImage();
+   orc_Data.c_UiImageFormat = this->GetImageFormat();
 }

@@ -95,8 +95,9 @@ bool C_PuiSvDbDataElementDisplayFormatter::IsFormatterCompatible(
    if (oe_Category == E_TypeCategory::eINTEGER)
    {
       const QByteArray c_StringToEvaluate = this->c_FormatterString.toLocal8Bit();
-      const std::regex c_RegexInt("^([%%]{2})?[^%]*%[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?[cdiuoxX][^%]*([%%]{2})?$");
-      if (std::regex_search(c_StringToEvaluate.data(), c_RegexInt) == false)
+      static const std::regex hc_RegexInt(
+         "^([%%]{2})?[^%]*%[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?[cdiuoxX][^%]*([%%]{2})?$");
+      if (std::regex_search(c_StringToEvaluate.data(), hc_RegexInt) == false)
       {
          q_RetVal = false;
       }
@@ -104,8 +105,9 @@ bool C_PuiSvDbDataElementDisplayFormatter::IsFormatterCompatible(
    else if (oe_Category == E_TypeCategory::eFLOAT)
    {
       const QByteArray c_StringToEvaluate = this->c_FormatterString.toLocal8Bit();
-      const std::regex c_RegexInt("^([%%]{2})?[^%]*%[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?[eEfFgG][^%]*([%%]{2})?$");
-      if (std::regex_search(c_StringToEvaluate.data(), c_RegexInt) == false)
+      static const std::regex hc_RegexInt(
+         "^([%%]{2})?[^%]*%[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?[eEfFgG][^%]*([%%]{2})?$");
+      if (std::regex_search(c_StringToEvaluate.data(), hc_RegexInt) == false)
       {
          q_RetVal = false;
       }
@@ -113,8 +115,8 @@ bool C_PuiSvDbDataElementDisplayFormatter::IsFormatterCompatible(
    else if (oe_Category == E_TypeCategory::eSTRING)
    {
       const QByteArray c_StringToEvaluate = this->c_FormatterString.toLocal8Bit();
-      const std::regex c_RegexInt("^([%%]{2})?[^%]*%[-]?\\d*(?:\\.\\d+)?[s][^%]*([%%]{2})?$");
-      if (std::regex_search(c_StringToEvaluate.data(), c_RegexInt) == false)
+      static const std::regex hc_RegexInt("^([%%]{2})?[^%]*%[-]?\\d*(?:\\.\\d+)?[s][^%]*([%%]{2})?$");
+      if (std::regex_search(c_StringToEvaluate.data(), hc_RegexInt) == false)
       {
          q_RetVal = false;
       }

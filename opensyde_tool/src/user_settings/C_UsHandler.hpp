@@ -98,10 +98,14 @@ public:
    QString GetLastKnownRamViewProjectPath(void) const;
    QString GetLastKnownJ1939CatalogPath(void) const;
    QString GetLastKnownCsvExportPath(void) const;
-   QString GetLastKnownPemFilePath(void) const;
+   QString GetLastKnownAddPemFilePath(void) const;
    QStringList GetLastKnownUpdatePemFilePaths(void) const;
-   QStringList GetPemFilePathsAsRelativeOrAbsolute(void) const;
+   QString GetLastKnownPublicPemFilePath(void) const;
+   QString GetLastKnownPemFilePassword(void) const;
+   QString GetLastKnownSecureCertificatePackagePath(void) const;
    QString GetLastKnownPrivateKeyPath(void) const;
+   bool GetLastKnownAddPemFileState(void) const;
+   bool GetLastKnownSecureUpdateConfigState(void) const;
    C_UsNode GetProjSdNode(const QString & orc_NodeName) const;
    C_UsCommunication GetProjSdBus(const QString & orc_BusName) const;
    C_UsSystemView GetProjSvSetupView(const QString & orc_ViewName) const;
@@ -165,9 +169,13 @@ public:
    void SetLastKnownRamViewProjectPath(const QString & orc_NewPath);
    void SetLastKnownJ1939CatalogPath(const QString & orc_NewPath);
    void SetLastKnownCsvExportPath(const QString & orc_NewPath);
-   void SetLastKnownPemFilePath(const QString & orc_NewPath);
+   void SetLastKnownAddPemFilePath(const QString & orc_NewPath);
    void SetLastKnownUpdatePemFilePaths(const QStringList & orc_PemFilePaths);
-   void SetPemFilePathsAsRelativeOrAbsolute(const QStringList & orc_PemFilePathsAsRelativeOrAbsolute);
+   void SetLastKnownPublicPemFilePath(const QString & orc_NewPath);
+   void SetLastKnownPemFilePassword(const QString & orc_Password);
+   void SetLastKnownAddPemFileState(const bool & orq_IsEnabled);
+   void SetLastKnownSecureUpdateConfigState(const bool & orq_IsEnabled);
+   void SetLastKnownSecureCertificatePackagePath(const QString & orc_NewPath);
    void SetLastKnownPrivateKeyPath(const QString & orc_NewPath);
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
    void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
@@ -335,9 +343,13 @@ private:
    QString mc_LastKnownCsvExportPath;                    ///< History of last known CSV export path
    QString mc_LastKnownPrivateKeyPath;                   ///< History of last known private key path (PEM file for
    ///< secure update)
-   QString mc_LastKnownPemFilePath;                  ///< History of last known CSV export path
+   QString mc_LastKnownAddPemFilePath;               ///< History of last known Add Pem file path
    QStringList mc_PemFilePaths;                      ///< History of last known Pem file paths
-   QStringList mc_PemFilePathsAsRelativeOrAbsolute;  ///< History of last known Pem file paths as relative or absolute
+   QString mc_LastKnownPublicPemFilePath;            ///< History of last known public Pem file path
+   QString mc_LastKnownPemFilePassword;              ///< History of last known Pem file password
+   bool mq_LastKnownAddPemFileState;                 ///< History of last known Add Pem file state
+   bool mq_LastKnownSecureUpdateConfigState;         ///< History of last known secure update config state
+   QString mc_LastKnownSecureCertificatePackagePath; ///< History of last known secure certificate package path
    QMap<QString, C_UsSystemView> mc_ProjSvSetupView; ///< History of last known view user settings
    QMap<QString, C_UsNode> mc_ProjSdNode;            ///< History of last known node user settings
    QMap<QString, C_UsCommunication> mc_ProjSdBus;    ///< History of last known bus user settings

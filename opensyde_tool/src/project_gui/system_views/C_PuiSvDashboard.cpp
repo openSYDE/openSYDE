@@ -2206,11 +2206,11 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
 {
    if (orc_DataElementId.GetIsValid() == true)
    {
-      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListAboutToBeDeleted(orc_DataElementId,
-                                                                                             ou32_NodeIndex,
-                                                                                             ou32_DataPoolIndex,
-                                                                                             ou32_ListIndex,
-                                                                                             ou32_ElementIndex))
+      if (C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(orc_DataElementId,
+                                                                                                    ou32_NodeIndex,
+                                                                                                    ou32_DataPoolIndex,
+                                                                                                    ou32_ListIndex,
+                                                                                                    ou32_ElementIndex))
       {
          mh_MarkInvalid(orc_DataElementId);
       }
@@ -3427,18 +3427,14 @@ void C_PuiSvDashboard::mh_SyncContentToRangeChanged(const uint32_t ou32_NodeInde
       tgl_assert(orc_Element.c_DataPoolElementsConfig.size() == 1UL);
       if (rc_CurElement.c_ElementId.GetIsValid())
       {
-         if (rc_CurElement.c_ElementId.CheckSameDataElement(C_OscNodeDataPoolListElementId(ou32_NodeIndex,
-                                                                                           ou32_DataPoolIndex,
-                                                                                           ou32_ListIndex,
-                                                                                           ou32_ElementIndex)))
-         {
-            C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_Unused;
-            tgl_assert(C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_MinElement,
-                                                                             orc_MaxElement,
-                                                                             orc_Element.c_InitialValue, e_Unused,
-                                                                             C_OscNodeDataPoolContentUtil::eLEAVE_VALUE) ==
-                       C_NO_ERR);
-         }
+         C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementRangeChanged(ou32_NodeIndex,
+                                                                                               ou32_DataPoolIndex,
+                                                                                               ou32_ListIndex,
+                                                                                               ou32_ElementIndex,
+                                                                                               orc_MinElement,
+                                                                                               orc_MaxElement,
+                                                                                               rc_CurElement.c_ElementId,
+                                                                                               orc_Element.c_InitialValue);
       }
    }
 }
@@ -3473,17 +3469,14 @@ void C_PuiSvDashboard::mh_SyncSlidersToElementTypeOrArrayChanged(const uint32_t 
          const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
             pc_SliderWidgets->c_DataPoolElementsConfig[u32_ItElement];
          const C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
-         if (rc_DataElementId ==
-             C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                                                ou32_ElementIndex,
-                                                C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
-                                                0UL))
-         {
-            C_OscNodeDataPoolContent & rc_CurElement = pc_SliderWidgets->c_Value;
-
-            rc_CurElement.SetType(oe_Type);
-            rc_CurElement.SetArray(oq_IsArray);
-         }
+         C_PuiSdNodeDataPoolListElementIdSyncUtil::h_OnSyncNodeDataPoolListElementTypeOrArrayChanged(ou32_NodeIndex,
+                                                                                                     ou32_DataPoolIndex,
+                                                                                                     ou32_ListIndex,
+                                                                                                     ou32_ElementIndex,
+                                                                                                     oe_Type,
+                                                                                                     oq_IsArray,
+                                                                                                     rc_DataElementId,
+                                                                                                     pc_SliderWidgets->c_Value);
       }
    }
 }

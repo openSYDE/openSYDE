@@ -100,32 +100,31 @@ void C_TblTreDataElementView::InitSd(const uint32_t ou32_NodeIndex, const int32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize tree structure
 
-   \param[in]  ou32_ViewIndex                            View index
-   \param[in]  oq_ShowOnlyWriteElements                  Optional flag to show only writable elements
-   \param[in]  oq_ShowArrayElements                      Optional flag to hide all array elements (if false)
-   \param[in]  oq_ShowArrayIndexElements                 Optional flag to hide all array index elements (if false)
-   \param[in]  oq_Show64BitValues                        Optional flag to hide all 64 bit elements (if false)
-   \param[in]  oq_ShowNvmLists                           Optional flag to only show NVM LISTs
-   \param[in]  opc_AlreasyUsedElements                   Optional pointer to vector with already used elements. All added elements
-                                                         will be marked as used an will be disabled. Usable for Datapool element mode
-   \param[in]  oq_UseInSysViews                          If the view is used within system views/commissioning  or not.
-                                                         Default value is true, false otherwise
-   \param[in]  ou32_SdDataLoggerUseCaseNodeIndex         System definition data logger use case: node index
-   \param[in]  ou32_SdDataLoggerUseCaseDataLoggerIndex   System definition data logger use case: data logger index
+   \param[in]  ou32_ViewIndex                      View index
+   \param[in]  oq_ShowOnlyWriteElements            Optional flag to show only writable elements
+   \param[in]  oq_ShowArrayElements                Optional flag to hide all array elements (if false)
+   \param[in]  oq_ShowArrayIndexElements           Optional flag to hide all array index elements (if false)
+   \param[in]  oq_Show64BitValues                  Optional flag to hide all 64 bit elements (if false)
+   \param[in]  oq_ShowNvmLists                     Optional flag to only show NVM LISTs
+   \param[in]  opc_AlreasyUsedElements             Optional pointer to vector with already used elements. All added elements
+                                                   will be marked as used an will be disabled. Usable for Datapool element mode
+   \param[in]  oq_UseInSysViews                    If the view is used within system views/commissioning  or not.
+                                                   Default value is true, false otherwise
+   \param[in]  ou32_SdDataLoggerUseCaseNodeIndex   System definition data logger use case: node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSv(const uint32_t ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                      const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
                                      const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
-                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews, const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
-                                     const uint32_t ou32_SdDataLoggerUseCaseDataLoggerIndex)
+                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews,
+                                     const uint32_t ou32_SdDataLoggerUseCaseNodeIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    // if the view is used in a context other than system views
    if (oq_UseInSysViews == false)
    {
       this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
-      this->mc_Model.InitSdDatapoolElements(ou32_SdDataLoggerUseCaseNodeIndex, ou32_SdDataLoggerUseCaseDataLoggerIndex,
+      this->mc_Model.InitSdDatapoolElements(ou32_SdDataLoggerUseCaseNodeIndex,
                                             oq_ShowOnlyWriteElements,
                                             oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                             oq_Show64BitValues,

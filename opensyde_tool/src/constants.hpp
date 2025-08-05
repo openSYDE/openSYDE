@@ -294,6 +294,10 @@ const int32_t ms32_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST =
 //3: Offset (float64) encoded as string
 const int32_t ms32_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
    static_cast<int32_t>(Qt::UserRole) + 80;
+//Generic table interface: String length value to use if flag set (type: any number)
+const int32_t ms32_USER_ROLE_INTERACTION_STR_LENGTH = static_cast<int32_t>(Qt::UserRole) + 81;
+//Generic table interface: Flag to see if cell requires a string length while interacting (type: bool, default: false)
+const int32_t ms32_USER_ROLE_INTERACTION_USE_STR_LENGTH = static_cast<int32_t>(Qt::UserRole) + 82;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 

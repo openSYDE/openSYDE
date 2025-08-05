@@ -933,6 +933,105 @@ int32_t C_OscHalcConfig::SetDomainChannelParameterConfigElementBitmask(const uin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set domain channel parameter config element string
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_Value            Value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+   C_CONFIG Type invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscHalcConfig::SetDomainChannelParameterConfigElementString(const uint32_t ou32_DomainIndex,
+                                                                      const uint32_t ou32_ChannelIndex,
+                                                                      const uint32_t ou32_ParameterIndex,
+                                                                      const uint32_t ou32_ElementIndex,
+                                                                      const bool oq_UseChannelIndex,
+                                                                      const std::string & orc_Value)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      C_OscHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+      if (oq_UseChannelIndex)
+      {
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OscHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+            {
+               C_OscHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+               if (rc_Struct.c_ParameterElements.size() > 0UL)
+               {
+                  if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+                  {
+                     C_OscHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                     s32_Retval = rc_Element.c_Value.SetStringValue(orc_Value);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  s32_Retval = rc_Struct.c_Value.SetStringValue(orc_Value);
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         C_OscHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+         {
+            C_OscHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+            if (rc_Struct.c_ParameterElements.size() > 0UL)
+            {
+               if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+               {
+                  C_OscHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                  s32_Retval = rc_Element.c_Value.SetStringValue(orc_Value);
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = rc_Struct.c_Value.SetStringValue(orc_Value);
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get relevant indices for selected use case
 
    \param[in]      ou32_DomainIndex       Domain index

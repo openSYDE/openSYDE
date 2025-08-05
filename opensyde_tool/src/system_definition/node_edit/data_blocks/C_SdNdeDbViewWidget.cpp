@@ -275,6 +275,10 @@ void C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
          {
             m_DeleteAllDatablocks(mu32_NodeIndex, pc_Node->c_Applications);
          }
+         //Always disable X-App support (before adding data blocks)
+         C_PuiSdHandler::h_GetInstance()->SetOscNodePropertyXappSupport(this->mu32_NodeIndex, false);
+         //Ensure new properties are visible
+         this->m_UpdateTrigger(true);
 
          for (uint32_t u32_It = 0; u32_It < pc_Dialog->GetTspApplicationCount(); ++u32_It)
          {
@@ -306,7 +310,7 @@ void C_SdNdeDbViewWidget::AddFromTsp(const bool oq_IsNewNode)
          QString c_Description = "";
          const QString c_Details = "";
          pc_Dialog->ApplyV3Content();
-         this->m_UpdateTrigger();
+         this->m_UpdateTrigger(false);
          c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
 
          c_Description = static_cast<QString>(C_GtGetText::h_GetText("Node definition successfully imported."));
@@ -517,12 +521,12 @@ uint32_t C_SdNdeDbViewWidget::m_AddApplication(C_OscNodeApplication & orc_Applic
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update Trigger for UI pages
 
-      \param[in]  ou32_NodeIndex          Node index
+   \param[in]  oq_OnlyUpdateProperties    Only update properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::m_UpdateTrigger()
+void C_SdNdeDbViewWidget::m_UpdateTrigger(const bool oq_OnlyUpdateProperties)
 {
-   Q_EMIT (this->SigUpdateTrigger(this->mu32_NodeIndex));
+   Q_EMIT (this->SigUpdateTrigger(this->mu32_NodeIndex, oq_OnlyUpdateProperties));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

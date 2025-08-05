@@ -251,7 +251,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelConfiguration->setText(C_GtGetText::h_GetText("Configuration"));
    this->mpc_Ui->pc_LabelProtocol->setText(C_GtGetText::h_GetText("Protocol Support"));
    this->mpc_Ui->pc_LabelProgramming->setText(C_GtGetText::h_GetText("Programming Support"));
-   this->mpc_Ui->pc_LabelXAppSupport->setText(C_GtGetText::h_GetText("X-App Support"));
+   this->mpc_Ui->pc_LabelXAppSupport->setText(C_GtGetText::h_GetText("X.App Support"));
    this->mpc_Ui->pc_LabelComIfSettings->setText(C_GtGetText::h_GetText("Communication Interfaces Settings"));
 
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("openSYDE"));
@@ -315,9 +315,12 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                "\nDefined in read only *.syde_devdef file."
                                                                "\n\nIf enabled, the source code generation feature can "
                                                                "be activated for Data Blocks ."));
-   this->mpc_Ui->pc_LabelXAppSupport->SetToolTipInformation(C_GtGetText::h_GetText("X-App Support"),
+   this->mpc_Ui->pc_LabelXAppSupport->SetToolTipInformation(C_GtGetText::h_GetText("X.App Support"),
                                                             C_GtGetText::h_GetText(
-                                                               "Node properties option, available only for File Based Targets."));
+                                                               "Node properties option, available only for file-based targets.\n\n"
+                                                               "If enabled:\n"
+                                                               "- The X.App configuration support in Data Blocks is enabled\n"
+                                                               "- The tab Data Logger is enabled"));
 
    this->mpc_Ui->pc_LabelProtocol->SetToolTipInformation(C_GtGetText::h_GetText("Protocol Support"),
                                                          C_GtGetText::h_GetText(
@@ -1856,7 +1859,7 @@ void C_SdNdeNodePropertiesWidget::m_XappSupportChange(const int32_t os32_Index)
          (os32_Index == mhs32_PR_INDEX_ENABLED) ? C_GtGetText::h_GetText("Enable") : C_GtGetText::h_GetText("Disable");
 
       c_Description = C_GtGetText::h_GetText("Do you really want to ") + c_EnableDisable.toLower() +
-                      C_GtGetText::h_GetText(" X-App Support?");
+                      C_GtGetText::h_GetText(" X.App Support?");
 
       if (q_FileGenDatablockExists == true)
       {
@@ -1873,11 +1876,11 @@ void C_SdNdeNodePropertiesWidget::m_XappSupportChange(const int32_t os32_Index)
                       c_ConcernedLogJobs.join("\n");
       }
 
-      c_Message.SetHeading(c_EnableDisable + C_GtGetText::h_GetText(" X-App Support"));
+      c_Message.SetHeading(c_EnableDisable + C_GtGetText::h_GetText(" X.App Support"));
       c_Message.SetDescription(c_Description);
       c_Message.SetDetails(c_Details);
 
-      c_Message.SetOkButtonText(c_EnableDisable + C_GtGetText::h_GetText(" X-App Support"));
+      c_Message.SetOkButtonText(c_EnableDisable + C_GtGetText::h_GetText(" X.App Support"));
       c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
 
       if (c_Message.Execute() != C_OgeWiCustomMessage::eYES)

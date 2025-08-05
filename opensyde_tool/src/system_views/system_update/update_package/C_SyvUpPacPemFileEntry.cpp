@@ -41,14 +41,12 @@ using namespace stw::opensyde_gui_logic;
 
    \param[in,out]  opc_Parent                Optional pointer to parent
    \param[in]  orc_File                      Pem file
-   \param[in] oq_IsRelativePath              Is to add path as relative or absolute
    \param[in]  os32_CurrentPemFileIndex      Current pem file widget index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPacPemFileEntry::C_SyvUpPacPemFileEntry(QWidget * const opc_Parent, const QString & orc_File,
-                                               const bool oq_IsRelativePath, const int32_t os32_CurrentPemFileIndex) :
+                                               const int32_t os32_CurrentPemFileIndex) :
    stw::opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
-   q_IsRelativePathToAdd(oq_IsRelativePath),
    c_FilePath(orc_File),
    s32_CurrentPemFileIndex(os32_CurrentPemFileIndex),
    mpc_Ui(new Ui::C_SyvUpPacPemFileEntry)
@@ -60,7 +58,6 @@ C_SyvUpPacPemFileEntry::C_SyvUpPacPemFileEntry(QWidget * const opc_Parent, const
                                                             C_GtGetText::h_GetText(
                                                                "Remove PEM file from list"));
 
-   this->m_GetAbsoluteAndRelativePaths(c_FilePath, C_Uti::h_GetExePath());
    this->m_LoadPemFileInfo();
 
    connect(this->mpc_Ui->pc_PushButtonDelete, &QPushButton::clicked, this, &C_SyvUpPacPemFileEntry::m_DeleteItem);
@@ -81,32 +78,9 @@ C_SyvUpPacPemFileEntry::~C_SyvUpPacPemFileEntry()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacPemFileEntry::m_LoadPemFileInfo()
 {
-   if (this->q_IsRelativePathToAdd)
-   {
-      this->mpc_Ui->pc_LabelPemFilePath->setText(C_Uti::h_MinimizePath(this->mc_CurrentRelativePath,
-                                                                       this->mpc_Ui->pc_LabelPemFilePath->font(),
-                                                                       850, 0U));
-   }
-   else
-   {
-      this->mpc_Ui->pc_LabelPemFilePath->setText(C_Uti::h_MinimizePath(this->mc_CurrentAbsolutePath,
-                                                                       this->mpc_Ui->pc_LabelPemFilePath->font(),
-                                                                       850, 0U));
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get absolute or relative paths for pem files
-
-   \param[in]       orc_Path                  file path
-   \param[in]      orc_AbsoluteReferenceDir   Detailed output parameter description
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacPemFileEntry::m_GetAbsoluteAndRelativePaths(const QString & orc_Path,
-                                                           const QString & orc_AbsoluteReferenceDir)
-{
-   C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, this->mc_CurrentAbsolutePath,
-                                this->mc_CurrentRelativePath);
+   this->mpc_Ui->pc_LabelPemFilePath->setText(C_Uti::h_MinimizePath(c_FilePath,
+                                                                    this->mpc_Ui->pc_LabelPemFilePath->font(),
+                                                                    775, 0U));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

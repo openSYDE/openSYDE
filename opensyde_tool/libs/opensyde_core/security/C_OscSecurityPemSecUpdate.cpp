@@ -81,9 +81,13 @@ int32_t C_OscSecurityPemSecUpdate::LoadFromFile(const std::string & orc_FileName
           (c_UsageInfo.q_ExtendedKeyUsageDefined == false) || (c_UsageInfo.q_ExtendedKeyUsageEmailProtection == false))
       {
          s32_Result = C_OVERFLOW;
-         orc_ErrorMessage = "Certificate: Key usage flags not as expected in PEM file used for secure update "
-                            "configuration. Expected flags \"digitalSignature\" and \"id-kp-emailProtection\""
-                            "to be set.";
+         if (orc_ErrorMessage.empty() == false)
+         {
+            orc_ErrorMessage += " ";
+         }
+         orc_ErrorMessage += "Certificate: Key usage flags not as expected in PEM file used for secure update "
+                             "configuration. Expected flags \"digitalSignature\" and \"id-kp-emailProtection\" "
+                             "to be set.";
       }
    }
    return s32_Result;
@@ -121,29 +125,32 @@ int32_t C_OscSecurityPemSecUpdate::m_ReadPrivateKey(const std::vector<uint8_t> &
       {
          //extract the ECDSA key from the private key portion
          EC_KEY * const pc_EcdsaKey = EVP_PKEY_get1_EC_KEY(pc_PrivKey);
-         //get the private key as BIGNUM (needed for later conversion)
-         const BIGNUM * const pc_PrivBigNum = EC_KEY_get0_private_key(pc_EcdsaKey);
-
-         if (pc_PrivBigNum != NULL)
+         if (pc_EcdsaKey != NULL)
          {
-            const int x_Size = BN_num_bytes(pc_PrivBigNum); //lint !e970 !e8080 //use type expected by API
-            std::vector<uint8_t> c_PrivKey(x_Size);
+            //get the private key as BIGNUM (needed for later conversion)
+            const BIGNUM * const pc_PrivBigNum = EC_KEY_get0_private_key(pc_EcdsaKey);
 
-            //convert BIGNUM to byte array
-            BN_bn2bin(pc_PrivBigNum, &c_PrivKey[0]);
+            if (pc_PrivBigNum != NULL)
+            {
+               const int x_Size = BN_num_bytes(pc_PrivBigNum); //lint !e970 !e8080 //use type expected by API
+               std::vector<uint8_t> c_PrivKey(x_Size);
 
-            //write private key to our internal structure
-            this->mc_KeyInfo.SetPrivateKey(c_PrivKey);
+               //convert BIGNUM to byte array
+               BN_bn2bin(pc_PrivBigNum, &c_PrivKey[0]);
 
-            EVP_PKEY_free(pc_PrivKey);
-            EC_KEY_set_private_key(pc_EcdsaKey, NULL);
-            EC_KEY_free(pc_EcdsaKey);
+               //write private key to our internal structure
+               this->mc_KeyInfo.SetPrivateKey(c_PrivKey);
+
+               EVP_PKEY_free(pc_PrivKey);
+               EC_KEY_set_private_key(pc_EcdsaKey, NULL);
+               EC_KEY_free(pc_EcdsaKey);
+            }
          }
       }
       else
       {
          //No error as private key part is only sometimes present, but info could be useful in layers above
-         orc_ErrorMessage = "No private key present in given file.";
+         orc_ErrorMessage = "Information: No private key present in given file.";
       }
    }
    else

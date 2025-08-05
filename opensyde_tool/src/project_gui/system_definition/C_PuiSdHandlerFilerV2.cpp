@@ -51,8 +51,9 @@ C_PuiSdHandlerFilerV2::C_PuiSdHandlerFilerV2(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pools
 
-   \param[in,out]  orc_DataPools    Data pool elements (Cleared if necessary)
-   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "gui" element
+   \param[in,out]  orc_DataPools       Data pool elements (Cleared if necessary)
+   \param[in,out]  orc_XmlParser       XML parser with the "current" element set to the "gui" element
+   \param[in,out]  opc_OscDataPools    Core data pools
 
    \return
    C_NO_ERR    information loaded
@@ -60,7 +61,8 @@ C_PuiSdHandlerFilerV2::C_PuiSdHandlerFilerV2(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerFilerV2::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> & orc_DataPools,
-                                               C_OscXmlParserBase & orc_XmlParser)
+                                               C_OscXmlParserBase & orc_XmlParser,
+                                               std::vector<C_OscNodeDataPool> * const opc_OscDataPools)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -82,16 +84,19 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> 
       c_CurrentDataPoolNode = orc_XmlParser.SelectNodeChild("data-pool");
       if (c_CurrentDataPoolNode == "data-pool")
       {
+         uint32_t u32_ItDp = 0UL;
          do
          {
+            C_OscNodeDataPool * const pc_OscDp = mh_GetArrayElemIfAvailable(opc_OscDataPools, u32_ItDp);
             const uint32_t u32_DataPoolIndex = orc_XmlParser.GetAttributeUint32("index");
             if (u32_DataPoolIndex >= orc_DataPools.size())
             {
                orc_DataPools.resize(static_cast<std::vector<C_PuiSdNodeDataPool>::size_type>(u32_DataPoolIndex + 1UL));
             }
-            s32_Retval = h_LoadDataPool(orc_DataPools[u32_DataPoolIndex], orc_XmlParser);
+            s32_Retval = h_LoadDataPool(orc_DataPools[u32_DataPoolIndex], orc_XmlParser, pc_OscDp);
             //Next
             c_CurrentDataPoolNode = orc_XmlParser.SelectNodeNext("data-pool");
+            ++u32_ItDp;
          }
          while ((s32_Retval == C_NO_ERR) && (c_CurrentDataPoolNode == "data-pool"));
          //Return
@@ -122,21 +127,28 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool
 
-   \param[in,out] orc_DataPool  Data pool element
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "data-pool" element
+   \param[in,out]  orc_DataPool     Data pool element
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "data-pool" element
+   \param[in,out]  opc_OscDataPool  Core data pool
 
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerFilerV2::h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool, C_OscXmlParserBase & orc_XmlParser)
+int32_t C_PuiSdHandlerFilerV2::h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool, C_OscXmlParserBase & orc_XmlParser,
+                                              C_OscNodeDataPool * const opc_OscDataPool)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    if (orc_XmlParser.SelectNodeChild("lists") == "lists")
    {
-      s32_Retval = h_LoadDataPoolLists(orc_DataPool.c_DataPoolLists, orc_XmlParser);
+      std::vector<C_OscNodeDataPoolList> * pc_OscLists = NULL;
+      if (opc_OscDataPool != NULL)
+      {
+         pc_OscLists = &opc_OscDataPool->c_Lists;
+      }
+      s32_Retval = h_LoadDataPoolLists(orc_DataPool.c_DataPoolLists, orc_XmlParser, pc_OscLists);
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
    }
@@ -152,6 +164,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool
 
    \param[in,out]  orc_DataPoolLists   Data pool lists element
    \param[in,out]  orc_XmlParser       XML parser with the "current" element set to the "lists" element
+   \param[in,out]  opc_OscLists        Core lists
 
    \return
    C_NO_ERR    information loaded
@@ -159,7 +172,8 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPoolList> & orc_DataPoolLists,
-                                                   C_OscXmlParserBase & orc_XmlParser)
+                                                   C_OscXmlParserBase & orc_XmlParser,
+                                                   std::vector<C_OscNodeDataPoolList> * const opc_OscLists)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -179,8 +193,10 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPo
    orc_DataPoolLists.clear();
    if (c_CurrentDataPoolListNode == "list")
    {
+      uint32_t u32_ItList = 0UL;
       do
       {
+         C_OscNodeDataPoolList * const pc_OscList = mh_GetArrayElemIfAvailable(opc_OscLists, u32_ItList);
          const uint32_t u32_DataPoolListIndex = orc_XmlParser.GetAttributeUint32("index");
          if (u32_DataPoolListIndex >= orc_DataPoolLists.size())
          {
@@ -189,10 +205,11 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPo
          }
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadDataPoolList(orc_DataPoolLists[u32_DataPoolListIndex], orc_XmlParser);
+            s32_Retval = h_LoadDataPoolList(orc_DataPoolLists[u32_DataPoolListIndex], orc_XmlParser, pc_OscList);
          }
          //Next
          c_CurrentDataPoolListNode = orc_XmlParser.SelectNodeNext("list");
+         ++u32_ItList;
       }
       while (c_CurrentDataPoolListNode == "list");
       //Return
@@ -215,8 +232,9 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool list
 
-   \param[in,out] orc_DataPoolList Data pool list element
-   \param[in,out] orc_XmlParser    XML parser with the "current" element set to the "list" element
+   \param[in,out]  orc_DataPoolList    Data pool list element
+   \param[in,out]  orc_XmlParser       XML parser with the "current" element set to the "list" element
+   \param[in,out]  opc_OscList         Core list
 
    \return
    C_NO_ERR    information loaded
@@ -224,13 +242,19 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPo
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_DataPoolList,
-                                                  C_OscXmlParserBase & orc_XmlParser)
+                                                  C_OscXmlParserBase & orc_XmlParser,
+                                                  C_OscNodeDataPoolList * const opc_OscList)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    if (orc_XmlParser.SelectNodeChild("data-elements") == "data-elements")
    {
-      h_LoadDataPoolListElements(orc_DataPoolList.c_DataPoolListElements, orc_XmlParser);
+      std::vector<C_OscNodeDataPoolListElement> * pc_OscElements = NULL;
+      if (opc_OscList != NULL)
+      {
+         pc_OscElements = &opc_OscList->c_Elements;
+      }
+      h_LoadDataPoolListElements(orc_DataPoolList.c_DataPoolListElements, orc_XmlParser, pc_OscElements);
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
    }
@@ -246,13 +270,15 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_
 
    \param[in,out]  orc_DataPoolListElements  Data pool list elements
    \param[in,out]  orc_XmlParser             XML parser with the "current" element set to the "data-elements" element
+   \param[in,out]  opc_OscElements           Core elements
 
    \return
    C_NO_ERR    information loaded
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
-   std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OscXmlParserBase & orc_XmlParser)
+   std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OscXmlParserBase & orc_XmlParser,
+   std::vector<C_OscNodeDataPoolListElement> * const opc_OscElements)
 {
    const int32_t s32_RETVAL = C_NO_ERR;
 
@@ -272,8 +298,10 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
    orc_DataPoolListElements.clear();
    if (c_CurrentDataPoolListElementNode == "data-element")
    {
+      uint32_t u32_ItEl = 0UL;
       do
       {
+         C_OscNodeDataPoolListElement * const pc_OscEl = mh_GetArrayElemIfAvailable(opc_OscElements, u32_ItEl);
          const uint32_t u32_DataPoolListElementIndex = orc_XmlParser.GetAttributeUint32("index");
          if (u32_DataPoolListElementIndex >= orc_DataPoolListElements.size())
          {
@@ -281,10 +309,11 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
                                                u32_DataPoolListElementIndex + 1UL));
          }
          h_LoadDataPoolListElement(orc_DataPoolListElements[u32_DataPoolListElementIndex],
-                                   orc_XmlParser);
+                                   orc_XmlParser, pc_OscEl);
 
          //Next
          c_CurrentDataPoolListElementNode = orc_XmlParser.SelectNodeNext("data-element");
+         ++u32_ItEl;
       }
       while (c_CurrentDataPoolListElementNode == "data-element");
       //Return
@@ -307,26 +336,27 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool list element
 
-   \param[in,out] orc_DataPoolListElement Data pool list element
-   \param[in,out] orc_XmlParser           XML parser with the "current" element set to the "data-element" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in,out]  orc_DataPoolListElement   Data pool list element
+   \param[in,out]  orc_XmlParser             XML parser with the "current" element set to the "data-element" element
+   \param[in,out]  opc_OscElement            Core element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFilerV2::h_LoadDataPoolListElement(C_PuiSdNodeDataPoolListElement & orc_DataPoolListElement,
-                                                      const C_OscXmlParserBase & orc_XmlParser)
+                                                      const C_OscXmlParserBase & orc_XmlParser,
+                                                      C_OscNodeDataPoolListElement * const opc_OscElement)
 {
    orc_DataPoolListElement.q_AutoMinMaxActive = orc_XmlParser.GetAttributeBool("auto_min_max_active");
-   orc_DataPoolListElement.q_InterpretAsString = orc_XmlParser.GetAttributeBool("interpret_as_string");
+   if ((opc_OscElement != NULL) && (orc_XmlParser.AttributeExists("interpret_as_string")))
+   {
+      opc_OscElement->q_InterpretAsString = orc_XmlParser.GetAttributeBool("interpret_as_string");
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pools
 
-   \param[in]     orc_DataPools Data pool elements
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "gui" element
+   \param[in]      orc_DataPools    Data pool elements
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "gui" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFilerV2::h_SaveDataPools(const std::vector<C_PuiSdNodeDataPool> & orc_DataPools,
@@ -427,15 +457,14 @@ void C_PuiSdHandlerFilerV2::h_SaveDataPoolListElements(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool list element
 
-   \param[in]     orc_DataPoolListElement Data pool list element
-   \param[in,out] orc_XmlParser           XML parser with the "current" element set to the "data-element" element
+   \param[in]      orc_DataPoolListElement   Data pool list element
+   \param[in,out]  orc_XmlParser             XML parser with the "current" element set to the "data-element" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFilerV2::h_SaveDataPoolListElement(const C_PuiSdNodeDataPoolListElement & orc_DataPoolListElement,
                                                       C_OscXmlParserBase & orc_XmlParser)
 {
    orc_XmlParser.SetAttributeBool("auto_min_max_active", orc_DataPoolListElement.q_AutoMinMaxActive);
-   orc_XmlParser.SetAttributeBool("interpret_as_string", orc_DataPoolListElement.q_InterpretAsString);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1002,13 +1031,15 @@ void C_PuiSdHandlerFilerV2::h_SaveCanSignal(const C_PuiSdNodeCanSignal & orc_Can
 
    \param[out]     orc_Nodes        UI node data containers
    \param[in,out]  orc_XmlParser    XMLParser with the "current" element set to the "nodes" element
+   \param[in,out]  opc_OscNodes     Core nodes
 
    \return
    C_NO_ERR    everything ok
    else        error occured while loading
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerFilerV2::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_OscXmlParserBase & orc_XmlParser)
+int32_t C_PuiSdHandlerFilerV2::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_OscXmlParserBase & orc_XmlParser,
+                                           std::vector<C_OscNode> * const opc_OscNodes)
 {
    int32_t s32_Retval = C_NO_ERR;
    C_SclString c_SelectedNode;
@@ -1027,10 +1058,12 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes,
    orc_Nodes.clear();
    if (c_SelectedNode == "node")
    {
+      uint32_t u32_ItNode = 0UL;
       do
       {
+         C_OscNode * const pc_OscNode = mh_GetArrayElemIfAvailable(opc_OscNodes, u32_ItNode);
          C_PuiSdNode c_Node;
-         s32_Retval = mh_LoadNode(c_Node, orc_XmlParser);
+         s32_Retval = mh_LoadNode(c_Node, orc_XmlParser, pc_OscNode);
          if (s32_Retval == C_NO_ERR)
          {
             orc_Nodes.push_back(c_Node);
@@ -1038,6 +1071,7 @@ int32_t C_PuiSdHandlerFilerV2::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes,
 
          //Next
          c_SelectedNode = orc_XmlParser.SelectNodeNext("node");
+         ++u32_ItNode;
       }
       while (c_SelectedNode == "node");
       //Return
@@ -1268,11 +1302,17 @@ void C_PuiSdHandlerFilerV2::h_SaveBusTextElements(const std::vector<C_PuiSdTextE
    Also uses base class function to load basic information.
    Postcondition: XMLParser has the node "node" selected.
 
-   \param[out]     orc_Node       UI node data container
-   \param[in,out]  orc_XmlParser  XMLParser with the "current" element set to the "node" element
+   \param[out]     orc_Node         UI node data container
+   \param[in,out]  orc_XmlParser    XMLParser with the "current" element set to the "node" element
+   \param[in,out]  opc_OscNode      Core node
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerFilerV2::mh_LoadNode(C_PuiSdNode & orc_Node, C_OscXmlParserBase & orc_XmlParser)
+int32_t C_PuiSdHandlerFilerV2::mh_LoadNode(C_PuiSdNode & orc_Node, C_OscXmlParserBase & orc_XmlParser,
+                                           C_OscNode * const opc_OscNode)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -1289,7 +1329,12 @@ int32_t C_PuiSdHandlerFilerV2::mh_LoadNode(C_PuiSdNode & orc_Node, C_OscXmlParse
          s32_Return = h_LoadCanProtocols(orc_Node.c_UiCanProtocols, orc_XmlParser);
          if (s32_Return == C_NO_ERR)
          {
-            s32_Return = h_LoadDataPools(orc_Node.c_UiDataPools, orc_XmlParser);
+            std::vector<C_OscNodeDataPool> * pc_OscDataPools = NULL;
+            if (opc_OscNode != NULL)
+            {
+               pc_OscDataPools = &opc_OscNode->c_DataPools;
+            }
+            s32_Return = h_LoadDataPools(orc_Node.c_UiDataPools, orc_XmlParser, pc_OscDataPools);
 
             if ((s32_Return == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("busconnections") == "busconnections"))
             {
@@ -1552,8 +1597,8 @@ int32_t C_PuiSdHandlerFilerV2::mh_LoadTextElement(C_PuiBsTextElement * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save text element
 
-   \param[in]     opc_TextElement Text element data element
-   \param[in,out] orc_XmlParser   XML parser with the "current" element set to the "text-element" element
+   \param[in]      opc_TextElement  Text element data element
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "text-element" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFilerV2::mh_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,
@@ -1568,4 +1613,29 @@ void C_PuiSdHandlerFilerV2::mh_SaveTextElement(const C_PuiBsTextElement * const 
    {
       orc_XmlParser.SetAttributeUint32("bus-index", opc_BusTextElement->u32_BusIndex);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get array elem if available
+
+   \param[in,out]  opc_Vector    Vector
+   \param[in]      ou32_Index    Index
+
+   \return
+   Array elem if available
+*/
+//----------------------------------------------------------------------------------------------------------------------
+template <typename T>
+T * C_PuiSdHandlerFilerV2::mh_GetArrayElemIfAvailable(std::vector<T> * const opc_Vector, const uint32_t ou32_Index)
+{
+   T * pc_El = NULL;
+
+   if (opc_Vector != NULL)
+   {
+      if (ou32_Index < opc_Vector->size())
+      {
+         pc_El = &((*opc_Vector)[ou32_Index]);
+      }
+   }
+   return pc_El;
 }

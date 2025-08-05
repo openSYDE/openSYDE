@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>376</width>
+    <width>301</width>
     <height>20</height>
    </rect>
   </property>
@@ -50,22 +50,6 @@
     </spacer>
    </item>
    <item>
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonDelete">
      <property name="minimumSize">
       <size>
@@ -88,14 +72,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLabGroupItemValue</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItemValue.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubSvgIconOnly.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

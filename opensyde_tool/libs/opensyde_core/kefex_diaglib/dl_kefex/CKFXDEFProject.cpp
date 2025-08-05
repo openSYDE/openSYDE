@@ -554,11 +554,12 @@ int32_t C_KFXDEFProject::LoadRAMFiles(const C_SclString & orc_Directory, const C
       return C_CONFIG;
    }
 
+   orc_Lists.SetLength(c_Files.GetLength());
+
    for (s32_Index = 0; s32_Index < c_Files.GetLength(); s32_Index++)
    {
       //Read in the RAM-Files
-      orc_Lists.IncLength(); //takes some time as this has to do a lot of dynamic memory management ...
-      s32_Return = m_LoadRAMListFromFile(c_Files[s32_Index].c_FileName, orc_Lists[orc_Lists.GetHigh()], orc_ErrorText);
+      s32_Return = m_LoadRAMListFromFile(c_Files[s32_Index].c_FileName, orc_Lists[s32_Index], orc_ErrorText);
       if (s32_Return != C_NO_ERR)
       {
          return C_RD_WR;

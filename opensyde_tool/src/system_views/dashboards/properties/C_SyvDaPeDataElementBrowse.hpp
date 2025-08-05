@@ -44,8 +44,7 @@ public:
                                        const bool oq_ShowNvmLists,
                                        const std::vector<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements =
                                           NULL, const bool oq_UseInSysViews = true,
-                                       const uint32_t ou32_SdDataLoggerUseCaseNodeIndex = 0UL,
-                                       const uint32_t ou32_SdDataLoggerUseCaseDataLoggerIndex = 0UL);
+                                       const uint32_t ou32_SdDataLoggerUseCaseNodeIndex = 0UL);
    ~C_SyvDaPeDataElementBrowse(void) override;
 
    void InitStaticNames(void) const;

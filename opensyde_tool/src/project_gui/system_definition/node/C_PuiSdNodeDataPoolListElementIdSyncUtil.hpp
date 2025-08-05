@@ -9,6 +9,7 @@
 #define C_PUISDNODEDATAPOOLLISTELEMENTIDSYNCUTIL_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "C_OscNodeDataPoolContent.hpp"
 #include "C_PuiSdLastKnownHalElementId.hpp"
 #include "C_OscNodeDataPoolListElementOptArrayId.hpp"
 
@@ -61,11 +62,21 @@ public:
    static void h_OnSyncNodeDataPoolListElementAdded(
       stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_DataElementId, const uint32_t ou32_NodeIndex,
       const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex);
+   static void h_OnSyncNodeDataPoolListElementRangeChanged(const uint32_t ou32_NodeIndex,
+                                                           const uint32_t ou32_DataPoolIndex,
+                                                           const uint32_t ou32_ListIndex,
+                                                           const uint32_t ou32_ElementIndex,
+                                                           const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MinElement, const stw::opensyde_core::C_OscNodeDataPoolContent & orc_MaxElement, const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_DataElementId, stw::opensyde_core::C_OscNodeDataPoolContent & orc_Value);
+   static void h_OnSyncNodeDataPoolListElementTypeOrArrayChanged(const uint32_t ou32_NodeIndex,
+                                                                 const uint32_t ou32_DataPoolIndex,
+                                                                 const uint32_t ou32_ListIndex,
+                                                                 const uint32_t ou32_ElementIndex,
+                                                                 const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray, const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_DataElementId, stw::opensyde_core::C_OscNodeDataPoolContent & orc_Value);
    static void h_OnSyncNodeDataPoolListElementMoved(
       stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_DataElementId, const uint32_t ou32_NodeIndex,
       const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex, const uint32_t ou32_ElementSourceIndex,
       const uint32_t ou32_ElementTargetIndex);
-   static bool h_OnSyncNodeDataPoolListAboutToBeDeleted(
+   static bool h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
       stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_DataElementId, const uint32_t ou32_NodeIndex,
       const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex);
    static bool h_OnSyncNodeHalc(stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_DataElementId,

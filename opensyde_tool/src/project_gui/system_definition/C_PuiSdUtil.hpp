@@ -72,8 +72,10 @@ public:
    static void h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
                                          const C_PuiSdNodeConnectionId & orc_ConnectionId,
                                          std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
-   static bool h_CheckDataLoggerNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_SdDataLoggerIndex,
-                                              const uint32_t ou32_TargetNodeIndex);
+   static bool h_CheckXappNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_TargetNodeIndex);
+   static bool h_CheckNodeDataLoggerNameAvailable(const uint32_t ou32_NodeIndex, const stw::scl::C_SclString & orc_Name,
+                                                  const uint32_t * const opu32_DataLoggerJobIndexToSkip,
+                                                  std::vector<stw::scl::C_SclString> * const opc_ExistingNames = NULL);
 
 private:
    C_PuiSdUtil(void);

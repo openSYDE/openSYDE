@@ -195,8 +195,7 @@ private:
                      const QVariant & orc_NewData, const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType,
                      const uint32_t & oru32_ArrayIndex, const int32_t & ors32_DataSetIndex);
 
-   bool m_CheckLink(const C_PuiSdNodeDataPoolListElement * const opc_UiElement,
-                    const opensyde_core::C_OscNodeDataPoolListElement * const opc_OscElement) const;
+   bool m_CheckLink(const opensyde_core::C_OscNodeDataPoolListElement * const opc_OscElement) const;
    void m_OnErrorChange(void);
    void m_MoveItems(const std::vector<uint32_t> & orc_ContiguousIndices, const uint32_t ou32_TargetIndex) const;
    void m_MoveItem(const uint32_t ou32_SourceIndex, const uint32_t ou32_TargetIndex) const;

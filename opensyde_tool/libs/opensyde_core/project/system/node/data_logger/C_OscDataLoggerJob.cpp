@@ -37,7 +37,7 @@ bool C_OscDataLoggerJob::hq_AllowDataloggerFeature = true;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OscDataLoggerJob::C_OscDataLoggerJob() :
-   q_IsEnabled(false)
+   q_IsEnabled(true)
 {
 }
 

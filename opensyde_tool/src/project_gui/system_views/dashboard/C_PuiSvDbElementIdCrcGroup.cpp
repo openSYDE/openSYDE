@@ -39,76 +39,18 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbElementIdCrcGroup::C_PuiSvDbElementIdCrcGroup() :
-   mu32_Crc(0U)
+   C_SdNdeDalCopElementIdCrcGroupBase()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Update CRC
+/*! \brief  default destructor
 
-   \return
-   STW error codes
-
-   \retval   C_NO_ERR   Checksum calculated
-   \retval   C_CONFIG   ID not found
+   Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvDbElementIdCrcGroup::UpdateCrc(void)
+C_PuiSvDbElementIdCrcGroup::~C_PuiSvDbElementIdCrcGroup() noexcept
 {
-   return this->m_CalcCrc(this->mu32_Crc);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check CRC
-
-   \return
-   STW error codes
-
-   \retval   C_NO_ERR     Checksum does match
-   \retval   C_CHECKSUM   Checksum doesnt match
-   \retval   C_CONFIG     ID not found
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvDbElementIdCrcGroup::CheckCrc() const
-{
-   int32_t s32_Retval = C_NO_ERR;
-   uint32_t u32_NewCrc;
-
-   if (this->m_CalcCrc(u32_NewCrc) == C_NO_ERR)
-   {
-      if (u32_NewCrc != this->mu32_Crc)
-      {
-         s32_Retval = C_CHECKSUM;
-      }
-   }
-   else
-   {
-      s32_Retval = C_CONFIG;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get CRC
-
-   \return
-   CRC
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32_t C_PuiSvDbElementIdCrcGroup::GetCrc(void) const
-{
-   return this->mu32_Crc;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set CRC
-
-   \param[in]  ou32_Crc    CRC
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbElementIdCrcGroup::SetCrc(const uint32_t ou32_Crc)
-{
-   this->mu32_Crc = ou32_Crc;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

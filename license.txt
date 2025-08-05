@@ -5,7 +5,7 @@ Please see the "gpl-3.0.txt" license file in this folder for the full license te
 
 The "openSYDE GUI" and "openSYDE CAN Monitor" are based on the openSYDE Core library.
 This library can be alternatively licensed under a proprietary license.
-The "SYDE Coder C" and "SYDEsup" tools can also be licensed under that proprietary license.
+The "SYDE Coder C", "SYDE Gen X" and "SYDEsup" tools can also be licensed under that proprietary license.
 Please contact STW for details.
 
 The sources are provided at https://github.com/openSYDE.
@@ -21,7 +21,8 @@ openSYDE GUI          GPL V3                    opensyde_tool\src
 openSYDE CAN Monitor  GPL V3                    opensyde_tool\src               
 SYDEflash             GPL V3                    opensyde_tool\src                   
 openSYDE Core         GPL V3 or proprietary     opensyde_tool\libs\opensyde_core                   
-SYDE Coder C          GPL V3 or proprietary     opensyde_syde_coder_c                              
+SYDE Coder C          GPL V3 or proprietary     opensyde_syde_coder_c
+SYDE Gen X            GPL V3 or proprietary     opensyde_syde_gen_x
 SYDEsup               GPL V3 or proprietary     opensyde_syde_sup                                  
 cmd_line_flash_tool   GPL V3 or proprietary     opensyde_cmd_line_flash_tool                       
 Qt 5.15.2             LGPL 3                    <no sources provided> (*)                                http://doc.qt.io/qt-5/licensing.html
@@ -47,7 +48,7 @@ The Qt libraries drag in a few other libraries with different licensing terms.
 For details see https://doc.qt.io/qt-5/licenses-used-in-qt.html and the license files distributed with the Qt sources.
 
 Note:
-"openSYDE GUI", "openSYDE CAN Monitor", "SYDE Coder C", "SYDEsup" all are based on the "openSYDE Core".
+"openSYDE GUI", "openSYDE CAN Monitor", "SYDE Coder C", "SYDE X Gen", "SYDEsup" all are based on the "openSYDE Core".
 A copy of the Core is provided with each of those tools.
 The version of the Core"s" may slightly differ.
 

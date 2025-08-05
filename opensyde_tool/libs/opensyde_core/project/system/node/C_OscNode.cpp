@@ -78,6 +78,7 @@ void C_OscNode::Initialize(void)
    c_HalcConfig.Clear();
    c_CanOpenManagers.clear();
    c_DataLoggerJobs.clear();
+   c_XappProperties.Initialize();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -861,6 +862,7 @@ void C_OscNode::CalcHash(uint32_t & oru32_HashValue) const
    {
       this->c_DataLoggerJobs[u32_Counter].CalcHash(oru32_HashValue);
    }
+   this->c_XappProperties.CalcHash(oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

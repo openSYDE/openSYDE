@@ -135,11 +135,9 @@ private:
    void m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
                               const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                               const stw::opensyde_core::C_OscNodeDataPoolListElement & orc_OscElement,
-                              const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiElement,
                               const uint32_t ou32_Index);
    void m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                                   const stw::opensyde_core::C_OscNodeDataPoolListElement & orc_OscElement,
-                                  const stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement & orc_UiElement,
                                   const uint32_t ou32_Index);
    void m_AddAndInitMinMaxAndNameForItem(const uint32_t ou32_Index);
    void m_InitMinMaxAndNameForItem(const stw::opensyde_gui_logic::C_PuiSvDbTable & orc_Table,

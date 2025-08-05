@@ -122,142 +122,6 @@ void C_FlaUpListWidget::AddFileAction(const bool oq_IsActionForExistingFile, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Adding a new hex file
-
-   \param[in]      orc_DialogCaption                  Caption for file dialog
-   \param[in]      orc_DialogFilter                   Filter configuration for file dialog
-   \param[in]      oc_Folder                          Folder of hex file
-   \param[in]      oq_IsActionForExistingFile         Is Action for existing files
-   \param[in,out]  os32_CurrentHexFileIndex           Current hex file widget index
-   \param[in]      oq_IsFileToReplace                 Is file to replace
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::m_AddNewHexFile(const QString & orc_DialogCaption, const QString & orc_DialogFilter,
-                                        const QString & orc_Folder, const bool oq_IsActionForExistingFile,
-                                        int32_t os32_CurrentHexFileIndex, const bool oq_IsFileToReplace)
-{
-   QStringList c_Files;
-
-   if (!oq_IsFileToReplace)
-   {
-      c_Files = QFileDialog::getOpenFileNames(this, orc_DialogCaption, orc_Folder, orc_DialogFilter);
-   }
-   else
-   {
-      const QString c_File = C_OgeWiUtil::h_GetOpenFileName(this, orc_DialogCaption, orc_Folder, orc_DialogFilter,
-                                                            "*.hex");
-      if (!c_File.isEmpty())
-      {
-         c_Files.append(c_File);
-      }
-   }
-
-   for (const QString & rc_File : c_Files)
-   {
-      const bool q_HexFile = (m_LastSuffixOfFileName(rc_File) == "hex");
-
-      if (!q_HexFile)
-      {
-         const QString c_Details = static_cast<QString>("File path: %1").arg(rc_File);
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("Invalid file: only *.hex files are allowed."));
-         c_Message.SetDetails(c_Details);
-         c_Message.SetCustomMinHeight(180, 250);
-         c_Message.Execute();
-      }
-      else
-      {
-         if (!oq_IsActionForExistingFile)
-         {
-            os32_CurrentHexFileIndex = this->count();
-         }
-         // add file
-         this->m_AddNewFile(rc_File, q_HexFile, oq_IsActionForExistingFile, os32_CurrentHexFileIndex);
-         C_UsHandler::h_GetInstance()->SetLastKnownUpdateHexFileLocation(rc_File);
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Delete item on delete button click
-
-   \param[in,out]      os32_CurrentHexFileIndex           Current hex file widget index
-   \param[in]          oq_NeedToUpdateListIndex           Need to update list indexes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::m_DeleteItem(const int32_t os32_CurrentHexFileIndex, const bool oq_NeedToUpdateListIndex)
-{
-   QListWidgetItem * const pc_CurrentItem = this->item(os32_CurrentHexFileIndex);
-
-   if (pc_CurrentItem != NULL)
-   {
-      C_FlaUpListItemWidget * pc_ItemWidget =
-         dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
-
-      if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
-      {
-         if (oq_NeedToUpdateListIndex)
-         {
-            C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eQUESTION);
-
-            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Remove file"));
-            c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove ") +
-                                        pc_ItemWidget->pc_HexFileInfo->c_HexFileInfo.c_FileName +
-                                        C_GtGetText::h_GetText(" from the Hex-Files list?"));
-            c_MessageBox.SetOkButtonText("Remove");
-            c_MessageBox.SetNoButtonText("Keep");
-            c_MessageBox.SetCustomMinHeight(180, 180);
-            if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
-            {
-               pc_ItemWidget = dynamic_cast<C_FlaUpListItemWidget *>(this->takeItem(os32_CurrentHexFileIndex));
-               delete pc_ItemWidget;
-               Q_EMIT (this->SigUpdateFileCounter());
-               m_UpdateHexFileWidgetIndex(os32_CurrentHexFileIndex);
-            }
-         }
-         else
-         {
-            pc_ItemWidget = dynamic_cast<C_FlaUpListItemWidget *>(this->takeItem(os32_CurrentHexFileIndex));
-            delete pc_ItemWidget;
-         }
-         Q_EMIT (this->SigFileRemoved());
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Delete  all item from the list
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::m_DeleteAllItem()
-{
-   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eQUESTION);
-
-   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Remove all File"));
-   c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove all files from the Hex-Files list?"));
-   c_MessageBox.SetOkButtonText("Remove All");
-   c_MessageBox.SetNoButtonText("Keep");
-   c_MessageBox.SetCustomMinHeight(180, 180);
-   if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
-   {
-      this->clear();
-      Q_EMIT (this->SigUpdateFileCounter());
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Open file explorer with file location as default
-
-   \param[in]  os32_CurrentHexFileIndex      Current hex file widget index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::m_SelectFile(const int32_t os32_CurrentHexFileIndex)
-{
-   this->AddFileAction(true, os32_CurrentHexFileIndex, true);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set last known hex files to user settings.ini
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -293,63 +157,6 @@ QStringList C_FlaUpListWidget::GetHexFilePaths(void) const
    }
 
    return c_HexFilePaths;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get hex file paths as relative or absolute
-
-   \return
-   Hex file paths as relative or absolute
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QStringList C_FlaUpListWidget::m_GetHexFilePathsAsRelativeOrAbsolute() const
-{
-   QStringList c_HexFilePathsAsRelativeOrAbsolute;
-
-   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
-   {
-      QListWidgetItem * const pc_CurrentItem = this->item(s32_It);
-      if (pc_CurrentItem != NULL)
-      {
-         const C_FlaUpListItemWidget * const pc_ItemWidget =
-            dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
-         if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
-         {
-            if (pc_ItemWidget->q_IsRelativePathToAdd == true)
-            {
-               c_HexFilePathsAsRelativeOrAbsolute.append("Relative");
-            }
-            else
-            {
-               c_HexFilePathsAsRelativeOrAbsolute.append("Absolute");
-            }
-         }
-      }
-   }
-
-   return c_HexFilePathsAsRelativeOrAbsolute;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get suffix of file
-
-   \param[in]  oc_FilePath    File to check
-
-   \return   suffix of file
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_FlaUpListWidget::m_LastSuffixOfFileName(const QString & orc_File) const
-{
-   QString c_Result = "";
-   const QFileInfo c_FileInfo(orc_File);
-   const QString c_FileName = c_FileInfo.fileName();
-   const int32_t s32_LastFoundIndex = c_FileName.lastIndexOf('.');
-
-   if (s32_LastFoundIndex != -1)
-   {
-      c_Result = c_FileName.mid(s32_LastFoundIndex + 1).toLower();
-   }
-   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -438,76 +245,6 @@ void C_FlaUpListWidget::EnableSettings(const bool oq_Enabled)
       }
    }
    this->mpc_ContextMenu->setEnabled(oq_Enabled);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Reload current hex file on status change
-
-   \param[in]  orc_File                      Path of hex file
-   \param[in]  opc_HexFileInfo               hex file
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::m_ReloadCurrentFile(const QString & orc_File, C_FlaUpHexFileInfo * const opc_HexFileInfo)
-{
-   bool q_HexFile = false;
-
-   if (!orc_File.isEmpty())
-   {
-      q_HexFile = m_IsFileHexFile(orc_File);
-   }
-
-   if (q_HexFile)
-   {
-      opc_HexFileInfo->SetHexFileInfo(orc_File);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overridden drag enter event slot, here accepts MimeData has hasUrls
-
-   \param[in,out]  opc_Event  Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::DragEnterEvent(QDragEnterEvent * const opc_Event)
-{
-   const QMimeData * const pc_MimeData = opc_Event->mimeData();
-
-   if ((this->mq_EnableSettings == true) && pc_MimeData->hasUrls())
-   {
-      const QList<QUrl> c_Urls = pc_MimeData->urls();
-      for (int32_t s32_It = 0; s32_It < c_Urls.size(); ++s32_It)
-      {
-         const QUrl & rc_Url = c_Urls.at(s32_It);
-         if (rc_Url.isLocalFile() && rc_Url.toString().endsWith(".hex"))
-         {
-            opc_Event->setAccepted(true);
-         }
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overridden drag move event slot, here accepts MimeData has hasUrls
-
-   \param[in,out]  opc_Event  Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpListWidget::DragMoveEvent(QDragMoveEvent * const opc_Event)
-{
-   const QMimeData * const pc_MimeData = opc_Event->mimeData();
-
-   if (pc_MimeData->hasUrls())
-   {
-      const QList<QUrl> c_Urls = pc_MimeData->urls();
-      for (int32_t s32_It = 0; s32_It < c_Urls.size(); ++s32_It)
-      {
-         const QUrl & rc_Url = c_Urls.at(s32_It);
-         if (rc_Url.isLocalFile() && rc_Url.toString().endsWith(".hex"))
-         {
-            opc_Event->setAccepted(true);
-         }
-      }
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -601,6 +338,54 @@ void C_FlaUpListWidget::DropEvent(QDropEvent * const opc_Event)
                this->m_AddFile(c_LocalFilePath, false, this->count(),
                                this->m_AskUserToSaveRelativePath(c_LocalFilePath, C_Uti::h_GetExePath()));
             }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overridden drag enter event slot, here accepts MimeData has hasUrls
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::DragEnterEvent(QDragEnterEvent * const opc_Event)
+{
+   const QMimeData * const pc_MimeData = opc_Event->mimeData();
+
+   if ((this->mq_EnableSettings == true) && pc_MimeData->hasUrls())
+   {
+      const QList<QUrl> c_Urls = pc_MimeData->urls();
+      for (int32_t s32_It = 0; s32_It < c_Urls.size(); ++s32_It)
+      {
+         const QUrl & rc_Url = c_Urls.at(s32_It);
+         if (rc_Url.isLocalFile() && rc_Url.toString().endsWith(".hex"))
+         {
+            opc_Event->setAccepted(true);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overridden drag move event slot, here accepts MimeData has hasUrls
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::DragMoveEvent(QDragMoveEvent * const opc_Event)
+{
+   const QMimeData * const pc_MimeData = opc_Event->mimeData();
+
+   if (pc_MimeData->hasUrls())
+   {
+      const QList<QUrl> c_Urls = pc_MimeData->urls();
+      for (int32_t s32_It = 0; s32_It < c_Urls.size(); ++s32_It)
+      {
+         const QUrl & rc_Url = c_Urls.at(s32_It);
+         if (rc_Url.isLocalFile() && rc_Url.toString().endsWith(".hex"))
+         {
+            opc_Event->setAccepted(true);
          }
       }
    }
@@ -971,4 +756,219 @@ bool C_FlaUpListWidget::m_AskUserToSaveRelativePath(const QString & orc_Path, co
       c_Return = false;
    }
    return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adding a new hex file
+
+   \param[in]      orc_DialogCaption                  Caption for file dialog
+   \param[in]      orc_DialogFilter                   Filter configuration for file dialog
+   \param[in]      oc_Folder                          Folder of hex file
+   \param[in]      oq_IsActionForExistingFile         Is Action for existing files
+   \param[in,out]  os32_CurrentHexFileIndex           Current hex file widget index
+   \param[in]      oq_IsFileToReplace                 Is file to replace
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::m_AddNewHexFile(const QString & orc_DialogCaption, const QString & orc_DialogFilter,
+                                        const QString & orc_Folder, const bool oq_IsActionForExistingFile,
+                                        int32_t os32_CurrentHexFileIndex, const bool oq_IsFileToReplace)
+{
+   QStringList c_Files;
+
+   if (!oq_IsFileToReplace)
+   {
+      c_Files = QFileDialog::getOpenFileNames(this, orc_DialogCaption, orc_Folder, orc_DialogFilter);
+   }
+   else
+   {
+      const QString c_File = C_OgeWiUtil::h_GetOpenFileName(this, orc_DialogCaption, orc_Folder, orc_DialogFilter,
+                                                            "*.hex");
+      if (!c_File.isEmpty())
+      {
+         c_Files.append(c_File);
+      }
+   }
+
+   for (const QString & rc_File : c_Files)
+   {
+      const bool q_HexFile = (m_LastSuffixOfFileName(rc_File) == "hex");
+
+      if (!q_HexFile)
+      {
+         const QString c_Details = static_cast<QString>("File path: %1").arg(rc_File);
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Invalid file: only *.hex files are allowed."));
+         c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(180, 250);
+         c_Message.Execute();
+      }
+      else
+      {
+         if (!oq_IsActionForExistingFile)
+         {
+            os32_CurrentHexFileIndex = this->count();
+         }
+         // add file
+         this->m_AddNewFile(rc_File, q_HexFile, oq_IsActionForExistingFile, os32_CurrentHexFileIndex);
+         C_UsHandler::h_GetInstance()->SetLastKnownUpdateHexFileLocation(rc_File);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get hex file paths as relative or absolute
+
+   \return
+   Hex file paths as relative or absolute
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QStringList C_FlaUpListWidget::m_GetHexFilePathsAsRelativeOrAbsolute() const
+{
+   QStringList c_HexFilePathsAsRelativeOrAbsolute;
+
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
+   {
+      QListWidgetItem * const pc_CurrentItem = this->item(s32_It);
+      if (pc_CurrentItem != NULL)
+      {
+         const C_FlaUpListItemWidget * const pc_ItemWidget =
+            dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
+         if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
+         {
+            if (pc_ItemWidget->q_IsRelativePathToAdd == true)
+            {
+               c_HexFilePathsAsRelativeOrAbsolute.append("Relative");
+            }
+            else
+            {
+               c_HexFilePathsAsRelativeOrAbsolute.append("Absolute");
+            }
+         }
+      }
+   }
+
+   return c_HexFilePathsAsRelativeOrAbsolute;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get suffix of file
+
+   \param[in]  oc_FilePath    File to check
+
+   \return   suffix of file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_FlaUpListWidget::m_LastSuffixOfFileName(const QString & orc_File) const
+{
+   QString c_Result = "";
+   const QFileInfo c_FileInfo(orc_File);
+   const QString c_FileName = c_FileInfo.fileName();
+   const int32_t s32_LastFoundIndex = c_FileName.lastIndexOf('.');
+
+   if (s32_LastFoundIndex != -1)
+   {
+      c_Result = c_FileName.mid(s32_LastFoundIndex + 1).toLower();
+   }
+   return c_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete item on delete button click
+
+   \param[in,out]      os32_CurrentHexFileIndex           Current hex file widget index
+   \param[in]          oq_NeedToUpdateListIndex           Need to update list indexes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::m_DeleteItem(const int32_t os32_CurrentHexFileIndex, const bool oq_NeedToUpdateListIndex)
+{
+   QListWidgetItem * const pc_CurrentItem = this->item(os32_CurrentHexFileIndex);
+
+   if (pc_CurrentItem != NULL)
+   {
+      C_FlaUpListItemWidget * pc_ItemWidget =
+         dynamic_cast<C_FlaUpListItemWidget *>(this->itemWidget(pc_CurrentItem));
+
+      if ((pc_ItemWidget != NULL) && (pc_ItemWidget->pc_HexFileInfo != NULL))
+      {
+         if (oq_NeedToUpdateListIndex)
+         {
+            C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eQUESTION);
+
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Remove file"));
+            c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove ") +
+                                        pc_ItemWidget->pc_HexFileInfo->c_HexFileInfo.c_FileName +
+                                        C_GtGetText::h_GetText(" from the Hex-Files list?"));
+            c_MessageBox.SetOkButtonText("Remove");
+            c_MessageBox.SetNoButtonText("Keep");
+            c_MessageBox.SetCustomMinHeight(180, 180);
+            if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
+            {
+               pc_ItemWidget = dynamic_cast<C_FlaUpListItemWidget *>(this->takeItem(os32_CurrentHexFileIndex));
+               delete pc_ItemWidget;
+               Q_EMIT (this->SigUpdateFileCounter());
+               m_UpdateHexFileWidgetIndex(os32_CurrentHexFileIndex);
+            }
+         }
+         else
+         {
+            pc_ItemWidget = dynamic_cast<C_FlaUpListItemWidget *>(this->takeItem(os32_CurrentHexFileIndex));
+            delete pc_ItemWidget;
+         }
+         Q_EMIT (this->SigFileRemoved());
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete  all item from the list
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::m_DeleteAllItem()
+{
+   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eQUESTION);
+
+   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Remove all File"));
+   c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove all files from the Hex-Files list?"));
+   c_MessageBox.SetOkButtonText("Remove All");
+   c_MessageBox.SetNoButtonText("Keep");
+   c_MessageBox.SetCustomMinHeight(180, 180);
+   if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
+   {
+      this->clear();
+      Q_EMIT (this->SigUpdateFileCounter());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Open file explorer with file location as default
+
+   \param[in]  os32_CurrentHexFileIndex      Current hex file widget index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::m_SelectFile(const int32_t os32_CurrentHexFileIndex)
+{
+   this->AddFileAction(true, os32_CurrentHexFileIndex, true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload current hex file on status change
+
+   \param[in]  orc_File                      Path of hex file
+   \param[in]  opc_HexFileInfo               hex file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpListWidget::m_ReloadCurrentFile(const QString & orc_File, C_FlaUpHexFileInfo * const opc_HexFileInfo)
+{
+   bool q_HexFile = false;
+
+   if (!orc_File.isEmpty())
+   {
+      q_HexFile = m_IsFileHexFile(orc_File);
+   }
+
+   if (q_HexFile)
+   {
+      opc_HexFileInfo->SetHexFileInfo(orc_File);
+   }
 }

@@ -33,11 +33,10 @@ class C_SyvUpPacPemFileEntry :
    Q_OBJECT
 
 public:
-   explicit C_SyvUpPacPemFileEntry(QWidget * const opc_Parent, const QString & orc_File, const bool oq_IsRelativePath,
+   explicit C_SyvUpPacPemFileEntry(QWidget * const opc_Parent, const QString & orc_File,
                                    const int32_t os32_CurrentPemFileIndex);
    ~C_SyvUpPacPemFileEntry(void) override;
 
-   bool q_IsRelativePathToAdd;
    QString c_FilePath;
    int32_t s32_CurrentPemFileIndex;
 
@@ -49,11 +48,8 @@ Q_SIGNALS:
 
 private:
    Ui::C_SyvUpPacPemFileEntry * mpc_Ui;
-   QString mc_CurrentAbsolutePath;
-   QString mc_CurrentRelativePath;
 
    void m_LoadPemFileInfo();
-   void m_GetAbsoluteAndRelativePaths(const QString & orc_Path, const QString & orc_AbsoluteReferenceDir);
    void m_DeleteItem(void);
 
    //Avoid call

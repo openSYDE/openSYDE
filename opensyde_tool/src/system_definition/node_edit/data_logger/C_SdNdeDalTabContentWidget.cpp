@@ -24,7 +24,6 @@ using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32_t C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX = 0UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -47,7 +46,8 @@ const uint32_t C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX = 0UL;
 C_SdNdeDalTabContentWidget::C_SdNdeDalTabContentWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDalTabContentWidget),
-   mu32_NodeIndex(0)
+   mu32_NodeIndex(0),
+   mu32_LogJobIndex(0)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -59,11 +59,20 @@ C_SdNdeDalTabContentWidget::C_SdNdeDalTabContentWidget(QWidget * const opc_Paren
 
    this->InitStaticNames();
 
-   this->mpc_Ui->pc_LogJobDataSelectionWidget->setVisible(false);
-   this->mpc_Ui->pc_LogJobPropertiesWidget->setVisible(false);
-
-   connect(this->mpc_Ui->pc_LogJobPropertiesWidget, &C_SdNdeDalLogJobPropertiesWidget::SigReloadDataLoggerDataElements,
+   connect(this->mpc_Ui->pc_GeneralSettingsWidget,
+           &C_SdNdeDalLogJobGeneralSettingsWidget::SigReloadDataLoggerDataElements,
            this, &C_SdNdeDalTabContentWidget::ReloadDataLogger);
+
+   connect(this->mpc_Ui->pc_LogJobsWidget, &C_SdNdeDalLogJobsWidget::SigSelectionChanged, this,
+           &C_SdNdeDalTabContentWidget::SetNodeDataLoggerJob);
+   connect(this->mpc_Ui->pc_LogJobsWidget, &C_SdNdeDalLogJobsWidget::SigNumLogJobsChanged,
+           this, &C_SdNdeDalTabContentWidget::m_NumDataLoggersChanged);
+
+   connect(this->mpc_Ui->pc_LogJobDataSelectionWidget, &C_SdNdeDalLogJobDataSelectionWidget::SigNumElementsChanged,
+           this->mpc_Ui->pc_LogJobPropertiesWidget,
+           &C_SdNdeDalLogJobPropertiesWidget::ReloadAdditionalTrigger);
+   connect(this->mpc_Ui->pc_LogJobPropertiesWidget, &C_SdNdeDalLogJobPropertiesWidget::SigLogJobNameModified,
+           this->mpc_Ui->pc_LogJobsWidget, &C_SdNdeDalLogJobsWidget::OnLogJobNameModified);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,6 +115,8 @@ void C_SdNdeDalTabContentWidget::SaveUserSettings() const
    // sub widgets
    this->mpc_Ui->pc_LogJobsWidget->SaveUserSettings();
    this->mpc_Ui->pc_LogJobDataSelectionWidget->SaveUserSettings();
+   this->mpc_Ui->pc_GeneralSettingsWidget->SaveUserSettings();
+   this->mpc_Ui->pc_LogJobPropertiesWidget->SaveUserSettings();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,20 +126,23 @@ void C_SdNdeDalTabContentWidget::SaveUserSettings() const
 void C_SdNdeDalTabContentWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelNoData->setText(
-      C_GtGetText::h_GetText("No log job declared.\n"
-                             "Enable X-App support in node properties to configure data logger."));
+      C_GtGetText::h_GetText("No Log Jobs declared.\nAdd any via the '+' button."));
+   this->mpc_Ui->pc_LabelDisabled->setText(
+      C_GtGetText::h_GetText("No Log Jobs declared.\n"
+                             "Enable X.App support in node properties to configure data logger."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Trigger entire reload of data logger section
 
-   Necessary if e.g. data elements could have changed or X-App support got disabled
+   Necessary if e.g. data elements could have changed or X.App support got disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalTabContentWidget::ReloadDataLogger()
 {
    this->mpc_Ui->pc_LogJobDataSelectionWidget->ReloadDataElements();
-   this->mpc_Ui->pc_LogJobsWidget->ReloadLogJobs();
+   this->mpc_Ui->pc_LogJobsWidget->LoadLogJobs();
+   this->mpc_Ui->pc_LogJobPropertiesWidget->ReloadAdditionalTrigger();
    this->m_UpdateUi();
 }
 
@@ -143,13 +157,36 @@ void C_SdNdeDalTabContentWidget::SetNode(const uint32_t ou32_NodeIndex)
    this->mu32_NodeIndex = ou32_NodeIndex;
    // Forward node index
    // Table first as reloading might get triggered while initializing other widgets
-   this->mpc_Ui->pc_LogJobDataSelectionWidget->SetNodeDataLoggerJob(ou32_NodeIndex,
-                                                                    C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX);
+   this->mpc_Ui->pc_LogJobDataSelectionWidget->SetNodeDataLoggerJob(ou32_NodeIndex, this->mu32_LogJobIndex);
+
    this->mpc_Ui->pc_LogJobsWidget->SetNode(ou32_NodeIndex);
-   this->mpc_Ui->pc_LogJobPropertiesWidget->SetNodeDataLoggerJob(ou32_NodeIndex,
-                                                                 C_SdNdeDalTabContentWidget::mhu32_STATIC_LOG_JOB_INDEX);
+   this->mpc_Ui->pc_GeneralSettingsWidget->SetNode(ou32_NodeIndex);
+   this->mpc_Ui->pc_LogJobPropertiesWidget->SetNodeDataLoggerJob(ou32_NodeIndex, this->mu32_LogJobIndex);
 
    this->m_UpdateUi();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalTabContentWidget::Save()
+{
+   this->mpc_Ui->pc_GeneralSettingsWidget->Save();
+   this->mpc_Ui->pc_LogJobPropertiesWidget->Save();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Loads the log job properties when the selected log job changes
+ *
+ *  \param[in] ou32_LogJobIndex Selected Log Job index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalTabContentWidget::SetNodeDataLoggerJob(const uint32_t ou32_LogJobIndex)
+{
+   this->mu32_LogJobIndex = ou32_LogJobIndex;
+   this->mpc_Ui->pc_LogJobPropertiesWidget->SetNodeDataLoggerJob(this->mu32_NodeIndex, this->mu32_LogJobIndex);
+   this->mpc_Ui->pc_LogJobDataSelectionWidget->SetNodeDataLoggerJob(this->mu32_NodeIndex, this->mu32_LogJobIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -164,17 +201,48 @@ void C_SdNdeDalTabContentWidget::m_UpdateUi()
    {
       if (pc_Node->c_Properties.q_XappSupport == true)
       {
-         this->mpc_Ui->pc_LogJobDataSelectionWidget->setVisible(true);
-         this->mpc_Ui->pc_LogJobPropertiesWidget->setVisible(true);
-         this->mpc_Ui->pc_LabelNoData->setVisible(false);
+         this->mpc_Ui->pc_GeneralSettingsWidget->setVisible(true);
+         this->mpc_Ui->pc_Splitter->setVisible(true);
+         this->mpc_Ui->pc_LabelDisabled->setVisible(false);
+         m_HandleNoDataLoggersLabel();
       }
       else
       {
-         this->mpc_Ui->pc_LogJobDataSelectionWidget->setVisible(false);
-         this->mpc_Ui->pc_LogJobPropertiesWidget->setVisible(false);
-         this->mpc_Ui->pc_LabelNoData->setVisible(true);
+         this->mpc_Ui->pc_GeneralSettingsWidget->setVisible(false);
+         this->mpc_Ui->pc_Splitter->setVisible(false);
+         this->mpc_Ui->pc_LabelDisabled->setVisible(true);
       }
 
       this->updateGeometry();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Number of data loggers changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalTabContentWidget::m_NumDataLoggersChanged()
+{
+   m_HandleNoDataLoggersLabel();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle no data loggers label
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalTabContentWidget::m_HandleNoDataLoggersLabel()
+{
+   bool q_DataValid = false;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      if (pc_Node->c_DataLoggerJobs.size() > 0UL)
+      {
+         q_DataValid = true;
+      }
+   }
+   this->mpc_Ui->pc_LogJobDataSelectionWidget->setVisible(q_DataValid);
+   this->mpc_Ui->pc_LogJobPropertiesWidget->setVisible(q_DataValid);
+   this->mpc_Ui->pc_LabelNoData->setVisible(q_DataValid == false);
 }

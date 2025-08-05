@@ -76,7 +76,7 @@ int32_t C_PuiTargetSupportPackageFiler::h_LoadTspV3(const QString & orc_TspPath,
             const QString c_UiXmlPath = C_PuiTargetSupportPackageFiler::mh_GetUiNodeXmlPath(c_FolderPath);
             const QFileInfo c_FileInfo(c_UiXmlPath);
             const QDir c_Dir = c_FileInfo.dir();
-            s32_Retval = C_PuiSdHandlerFiler::h_LoadNodeFile(orc_UiNode, c_UiXmlPath, &c_Dir);
+            s32_Retval = C_PuiSdHandlerFiler::h_LoadNodeFile(orc_UiNode, c_UiXmlPath, &c_Dir, &orc_OscNode);
             if (s32_Retval == C_NO_ERR)
             {
                mh_DeleteFolder(c_FolderPath);

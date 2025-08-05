@@ -1930,7 +1930,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OscNodeDataPoolListEl
 
          //value type
          c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Value type: "));
-         if (pc_UiElement->q_InterpretAsString == false)
+         if (pc_DpListElement->q_InterpretAsString == false)
          {
             c_ToolTipContent.append(C_SdNdeDpUtil::h_ConvertContentTypeToString(
                                        pc_DpListElement->c_Value.GetType()));
@@ -1954,7 +1954,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OscNodeDataPoolListEl
          c_ToolTipContent.append("\n");
 
          // do not show min, max, factor, offset, unit for string types
-         if (pc_UiElement->q_InterpretAsString == false)
+         if (pc_DpListElement->q_InterpretAsString == false)
          {
             // auto min max
             c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Auto min/max: "));

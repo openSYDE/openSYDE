@@ -1,0 +1,21 @@
+---------------------------------------------------------------------
+File:      build.txt
+Content:   How to build this project
+---------------------------------------------------------------------
+
+Used build tools:
+=================
+MinGW: 8.1.0
+CMake 3.19.2
+Ninja 1.10.0
+
+Editor:
+=======
+Qt Creator 4.14.2
+Other IDEs that can handle cmakelists.txt should also do the job.
+
+build
+=====
+cmake and ninja are used build tools.
+Either open the cmakelists.txt in a supporting IDE and build.
+Or use ..\bat\build.bat

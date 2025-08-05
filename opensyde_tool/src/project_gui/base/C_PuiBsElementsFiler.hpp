@@ -77,8 +77,8 @@ private:
 
    static void mh_LoadFontStyle(QFont & orc_FontStyle, const stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveFontStyle(const QFont & orc_FontStyle, stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static void mh_PixmapToString(const QPixmap & orc_Pixmap, QString & orc_String);
-   static void mh_StringToPixmap(const QString & orc_String, QPixmap & orc_Pixmap);
+   static void mh_PixmapToString(const QPixmap & orc_Pixmap, const QByteArray & orc_Format, QString & orc_String);
+   static void mh_StringToPixmap(const QString & orc_String, QPixmap & orc_Pixmap, const QByteArray & orc_Format);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

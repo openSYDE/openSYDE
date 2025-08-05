@@ -1159,12 +1159,6 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(
                   tgl_assert(pc_OscContent != NULL);
                   if (pc_OscContent != NULL)
                   {
-                     const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-                        C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(rc_ElementId.u32_NodeIndex,
-                                                                                  rc_ElementId.u32_DataPoolIndex,
-                                                                                  rc_ElementId.u32_ListIndex,
-                                                                                  rc_ElementId.u32_ElementIndex);
-
                      // Scaling
                      if (c_Scaling.q_UseDefault == true)
                      {
@@ -1178,16 +1172,12 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(
                      this->mc_UsedConfig[c_ItItem.value()].c_Scaling = c_Scaling;
 
                      // Formatter
-                     tgl_assert(pc_UiElement != NULL);
-                     if (pc_UiElement != NULL)
-                     {
-                        // Set type and check the formatter if active
-                        c_Formatter.SetType(
-                           C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(
-                              pc_OscContent->c_MinValue,
-                              c_Scaling,
-                              pc_UiElement->q_InterpretAsString));
-                     }
+                     // Set type and check the formatter if active
+                     c_Formatter.SetType(
+                        C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(
+                           pc_OscContent->c_MinValue,
+                           c_Scaling,
+                           pc_OscContent->q_InterpretAsString));
 
                      this->mc_UsedConfig[c_ItItem.value()].c_FormatterConfig = c_Formatter;
                   }
@@ -1318,30 +1308,30 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredNodesActive(void) const
 {
    bool q_AtLeastOneValidElement = false;
 
-   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
-
-   for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t>::const_iterator c_ItElement = rc_Elements.begin();
-        c_ItElement != rc_Elements.end(); ++c_ItElement)
+   std::vector<uint8_t> c_ActiveNodes;
+   const int32_t s32_Retval =
+      C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(this->mu32_ViewIndex,
+                                                                            c_ActiveNodes);
+   if (s32_Retval == C_NO_ERR)
    {
-      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-      if (c_ElementId.GetIsValid() == true)
-      {
-         std::vector<uint8_t> c_ActiveNodes;
-         const int32_t s32_Retval =
-            C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(this->mu32_ViewIndex,
-                                                                                  c_ActiveNodes);
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
-         //Is corresponding view active
-         if ((s32_Retval == C_NO_ERR) &&
-             (c_ElementId.u32_NodeIndex < c_ActiveNodes.size()) &&
-             (c_ActiveNodes[c_ElementId.u32_NodeIndex] == 1U))
+      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t>::const_iterator c_ItElement = rc_Elements.begin();
+           c_ItElement != rc_Elements.end(); ++c_ItElement)
+      {
+         const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItElement.key();
+         if (rc_ElementId.GetIsValid() == true)
          {
-            q_AtLeastOneValidElement = true;
-            break;
+            //Is corresponding view active
+            if ((rc_ElementId.u32_NodeIndex < c_ActiveNodes.size()) &&
+                (c_ActiveNodes[rc_ElementId.u32_NodeIndex] == 1U))
+            {
+               q_AtLeastOneValidElement = true;
+               break;
+            }
          }
       }
    }
-
    return q_AtLeastOneValidElement;
 }
 
@@ -1362,12 +1352,12 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredNodesValidDashboardRoutin
    for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t>::const_iterator c_ItElement = rc_Elements.begin();
         c_ItElement != rc_Elements.end(); ++c_ItElement)
    {
-      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-      if (c_ElementId.GetIsValid() == true)
+      const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItElement.key();
+      if (rc_ElementId.GetIsValid() == true)
       {
          bool q_Error = false;
          tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(this->mu32_ViewIndex,
-                                                                                        c_ElementId.u32_NodeIndex,
+                                                                                        rc_ElementId.u32_NodeIndex,
                                                                                         q_Error) ==
                     C_NO_ERR);
 
@@ -1402,14 +1392,14 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) cons
       for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t>::const_iterator c_ItElement = rc_Elements.begin();
            c_ItElement != rc_Elements.end(); ++c_ItElement)
       {
-         const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-         if ((c_ElementId.GetIsValid() == true) &&
-             (c_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL))
+         const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItElement.key();
+         if ((rc_ElementId.GetIsValid() == true) &&
+             (rc_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL))
          {
             C_OscCanMessageIdentificationIndices c_MessageId;
             uint32_t u32_SignalIndex;
             if ((pc_View->GetOscPcData().GetConnected() == true) &&
-                (C_PuiSdUtil::h_ConvertIndex(c_ElementId, c_MessageId, u32_SignalIndex) == C_NO_ERR))
+                (C_PuiSdUtil::h_ConvertIndex(rc_ElementId, c_MessageId, u32_SignalIndex) == C_NO_ERR))
             {
                const C_OscNode * const pc_Node =
                   C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_MessageId.u32_NodeIndex);

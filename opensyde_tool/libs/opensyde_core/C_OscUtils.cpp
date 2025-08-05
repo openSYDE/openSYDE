@@ -786,6 +786,32 @@ int32_t C_OscUtils::h_CopyFile(const C_SclString & orc_SourceFile, const C_SclSt
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get command line call including arguments in one string, e.g. for log file entry
+
+   \param[in]  os32_Argc   number of command line arguments
+   \param[in]  oppcn_Argv  command line arguments
+
+   \return
+   Command line arguments as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscUtils::h_GetCommandLineAsString(const int32_t os32_Argc, char_t * const * const oppcn_Argv)
+{
+   C_SclString c_CommandLine;
+
+   for (int32_t s32_Argument = 0; s32_Argument < os32_Argc; s32_Argument++)
+   {
+      c_CommandLine += oppcn_Argv[s32_Argument];
+      if (s32_Argument != (os32_Argc - 1))
+      {
+         c_CommandLine += " ";
+      }
+   }
+
+   return c_CommandLine;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get rid of Data Block project path.
 
    If the path contains mc_PATH_VARIABLE_DATABLOCK_PROJ we replace this with the project path,
@@ -796,10 +822,10 @@ int32_t C_OscUtils::h_CopyFile(const C_SclString & orc_SourceFile, const C_SclSt
    This might result in invalid paths if the placeholder variable is not in front of string
    but an absolute path (which would be a misconfiguration).
 
-   \param[in]  orc_DbProjectPath     path for resolving data block project variable and concatenation
-   \param[in]  orc_OsydeProjectPath  path to opened openSYDE project without file name
-                                      (for resolving hc_PATH_VARIABLE_OPENSYDE_PROJ references)
-   \param[in]  orc_Path              path that probably contains variables
+   \param[in]  orc_DbProjectPath       path for resolving data block project variable and concatenation
+   \param[in]  orc_OsydeProjectPath    path to opened openSYDE project without file name
+                                       (for resolving hc_PATH_VARIABLE_OPENSYDE_PROJ references)
+   \param[in]  orc_Path                path that probably contains variables
 
    \return
    Path without Data Block project path dependencies (might still contain placeholder variables or be relative)
@@ -974,4 +1000,155 @@ C_SclString C_OscUtils::h_ConcatPathIfNecessary(const C_SclString & orc_BaseDir,
    c_Retval.ReplaceAll("//", "/");
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get unique item name based on proposal
+
+   \param[in]  orc_ExistingStrings  Existing item names
+   \param[in]  orc_ProposedName     Proposal for item name
+   \param[in]  ou32_MaxCharLimit    Max char limit
+   \param[in]  orc_SkipName         Optional name to block any adaptations for
+
+   \return
+   Unique node name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw::scl::C_SclString C_OscUtils::h_GetUniqueName(const std::map<C_SclString, bool> & orc_ExistingStrings,
+                                                  const stw::scl::C_SclString & orc_ProposedName,
+                                                  const uint32_t ou32_MaxCharLimit,
+                                                  const stw::scl::C_SclString & orc_SkipName)
+{
+   C_SclString c_Retval = orc_ProposedName;
+   bool q_Conflict;
+   int32_t s32_MaxDeviation;
+   C_SclString c_BaseStr;
+
+   std::map<C_SclString, bool>::const_iterator c_ItString;
+
+   //Apply restriction
+   if ((ou32_MaxCharLimit > 0UL) && (c_Retval.Length() > ou32_MaxCharLimit))
+   {
+      c_Retval = c_Retval.SubString(1UL, ou32_MaxCharLimit);
+   }
+
+   do
+   {
+      q_Conflict = false;
+      c_ItString = orc_ExistingStrings.find(c_Retval);
+      if (c_ItString != orc_ExistingStrings.end())
+      {
+         q_Conflict = true;
+         mh_GetBaseNameAndCurrentConflictNumberFromString(c_ItString->first, orc_SkipName, c_BaseStr, s32_MaxDeviation);
+         //Do not use 0 and 1 for name adaptation
+         if (s32_MaxDeviation <= 0)
+         {
+            s32_MaxDeviation = 1;
+         }
+         {
+            const C_SclString c_Appendix = '_' + C_SclString::IntToStr(s32_MaxDeviation + static_cast<int32_t>(1));
+            c_Retval = c_BaseStr + c_Appendix;
+            if ((ou32_MaxCharLimit > 0UL) && (c_Retval.Length() > ou32_MaxCharLimit))
+            {
+               const uint32_t u32_ReqLength = c_Appendix.Length();
+               if (u32_ReqLength < ou32_MaxCharLimit)
+               {
+                  c_Retval = c_BaseStr.SubString(1UL, ou32_MaxCharLimit - c_Appendix.Length()) + c_Appendix;
+               }
+            }
+         }
+      }
+   }
+   while (q_Conflict == true);
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number at string end
+
+   \param[in]   orc_ProposedName    Proposal for name
+   \param[out]  orc_CutString       String without number
+   \param[out]  ors32_Number        Number at end (else -1)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscUtils::h_GetNumberAtStringEnd(const C_SclString & orc_ProposedName, C_SclString & orc_CutString,
+                                        int32_t & ors32_Number)
+{
+   C_SclString c_Number;
+   bool q_UnderscoreDetected = false;
+   bool q_NumberDetected = false;
+   uint32_t u32_ItStr;
+
+   //Default return
+   orc_CutString = orc_ProposedName;
+   ors32_Number = -1;
+
+   for (u32_ItStr = orc_ProposedName.Length(); u32_ItStr > 0; --u32_ItStr)
+   {
+      if ((orc_ProposedName[u32_ItStr] >= '0') && (orc_ProposedName[u32_ItStr] <= '9'))
+      {
+         //Continue
+         q_NumberDetected = true;
+      }
+      else
+      {
+         if ('_' == orc_ProposedName[u32_ItStr])
+         {
+            q_UnderscoreDetected = true;
+         }
+         //Stop
+         break;
+      }
+   }
+   if ((q_NumberDetected == true) && (q_UnderscoreDetected == true))
+   {
+      //Cut string
+      orc_CutString = orc_ProposedName.SubString(1, u32_ItStr - 1);                    //Without underscore
+      c_Number = orc_ProposedName.SubString(u32_ItStr + 1, orc_ProposedName.Length()); //Without underscore
+      try
+      {
+         ors32_Number = c_Number.ToInt();
+      }
+      catch (...)
+      {
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get base name and current conflict number from string
+
+   \param[in]   orc_ConflictingValue   Conflicting value
+   \param[in]   orc_SkipName           Optional name to block any adaptations for
+   \param[out]  orc_CutString          String without number
+   \param[out]  ors32_Number           Number at end (else -1)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscUtils::mh_GetBaseNameAndCurrentConflictNumberFromString(const C_SclString & orc_ConflictingValue,
+                                                                  const stw::scl::C_SclString & orc_SkipName,
+                                                                  C_SclString & orc_CutString, int32_t & ors32_Number)
+{
+   //Search for the SkipName if the skip name is a valid string
+   const uint32_t u32_Pos = orc_SkipName.IsEmpty() ? 0UL : orc_ConflictingValue.LastPos(orc_SkipName);
+
+   if (u32_Pos == 0UL)
+   {
+      //Continue examining the complete string
+      h_GetNumberAtStringEnd(orc_ConflictingValue, orc_CutString, ors32_Number);
+   }
+   else
+   {
+      //Hint: SubString and LastPos start counting at 1
+      const uint32_t u32_ZeroBasedpos = u32_Pos - 1UL;
+      //Extract the part of the string that may be adapted
+      const C_SclString c_StringAfterSkip = orc_ConflictingValue.SubString(
+         (u32_ZeroBasedpos + orc_SkipName.Length()) + 1UL,
+         (orc_ConflictingValue.Length() - orc_SkipName.Length()) - u32_ZeroBasedpos);
+      const C_SclString c_SkippedPart =
+         orc_ConflictingValue.SubString(1UL, u32_ZeroBasedpos + orc_SkipName.Length());
+      //Search remaining part for any number
+      h_GetNumberAtStringEnd(c_StringAfterSkip, orc_CutString, ors32_Number);
+      //Add skipped part to base string again
+      orc_CutString = c_SkippedPart + orc_CutString;
+   }
 }

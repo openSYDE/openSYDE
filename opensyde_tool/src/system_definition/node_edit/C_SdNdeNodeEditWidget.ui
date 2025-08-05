@@ -52,7 +52,7 @@
      <item>
       <widget class="stw::opensyde_gui_elements::C_OgeTawPageNavi" name="pc_TabWidgetPageNavi">
        <property name="currentIndex">
-        <number>0</number>
+        <number>5</number>
        </property>
        <widget class="QWidget" name="pc_TabProperties">
         <attribute name="title">

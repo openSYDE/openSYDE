@@ -18,6 +18,7 @@
 #include "C_OscXmlParserLog.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscSystemFilerUtil.hpp"
+#include "C_OscNodeDataPoolFiler.hpp"
 #include "C_OscDataLoggerJobFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -61,30 +62,12 @@ int32_t C_OscDataLoggerJobFiler::h_LoadFile(std::vector<C_OscDataLoggerJob> & or
    {
       C_OscXmlParserLog c_XmlParser;
       c_XmlParser.SetLogHeading("Loading data loggers data");
-      s32_Retval = c_XmlParser.LoadFromFile(orc_Path);
+      s32_Retval = C_OscSystemFilerUtil::h_GetParserForExistingFile(c_XmlParser, orc_Path,
+                                                                    "opensyde-data-loggers");
       if (s32_Retval == C_NO_ERR)
       {
-         if (c_XmlParser.SelectRoot() == "opensyde-data-loggers")
-         {
-            s32_Retval = h_LoadData(orc_Config, c_XmlParser);
-         }
-         else
-         {
-            osc_write_log_error("Loading data loggers data",
-                                "Could not find \"opensyde-data-loggers\" node.");
-            s32_Retval = C_CONFIG;
-         }
+         s32_Retval = h_LoadData(orc_Config, c_XmlParser);
       }
-      else
-      {
-         osc_write_log_error("Loading data loggers data", "File \"" + orc_Path + "\" could not be opened.");
-         s32_Retval = C_NOACT;
-      }
-   }
-   else
-   {
-      osc_write_log_error("Loading data loggers data", "File \"" + orc_Path + "\" does not exist.");
-      s32_Retval = C_RANGE;
    }
    return s32_Retval;
 }
@@ -327,65 +310,6 @@ void C_OscDataLoggerJobFiler::h_SaveDataElementOptArrayId(const C_OscNodeDataPoo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load comm interface id
-
-   \param[out]     ore_Type               Type
-   \param[out]     oru8_InterfaceNumber   Interface number
-   \param[in,out]  orc_XmlParser          Xml parser
-   \param[in]      orc_ParentNodeName     Parent node name
-   \param[in]      orc_UseCase            Use case
-
-   \return
-   C_NO_ERR   data read
-   C_CONFIG   content of file is invalid or incomplete
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(C_OscSystemBus::E_Type & ore_Type,
-                                                       uint8_t & oru8_InterfaceNumber,
-                                                       C_OscXmlParserBase & orc_XmlParser,
-                                                       const stw::scl::C_SclString & orc_ParentNodeName,
-                                                       const stw::scl::C_SclString & orc_UseCase)
-{
-   int32_t s32_Retval;
-
-   oru8_InterfaceNumber =
-      static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("interface-number"));
-   //Type
-   if (orc_XmlParser.SelectNodeChild("type") == "type")
-   {
-      s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(
-         orc_XmlParser.GetNodeContent(), ore_Type);
-      //Return
-      tgl_assert(orc_XmlParser.SelectNodeParent() == orc_ParentNodeName);
-   }
-   else
-   {
-      osc_write_log_error(orc_UseCase,
-                          "Could not find \"" + orc_ParentNodeName + "\".\"type\" node.");
-      s32_Retval = C_CONFIG;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Save comm interface id
-
-   \param[in]      oe_Type                Type
-   \param[in]      ou8_InterfaceNumber    Interface number
-   \param[in,out]  orc_XmlParser          Xml parser
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(const C_OscSystemBus::E_Type oe_Type,
-                                                    const uint8_t ou8_InterfaceNumber,
-                                                    C_OscXmlParserBase & orc_XmlParser)
-{
-   orc_XmlParser.SetAttributeUint32("interface-number",
-                                    static_cast<uint32_t>(ou8_InterfaceNumber));
-   orc_XmlParser.CreateNodeChild("type",
-                                 C_OscSystemFilerUtil::h_BusTypeEnumToString(oe_Type));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -453,8 +377,29 @@ int32_t C_OscDataLoggerJobFiler::mh_LoadJobProperties(C_OscDataLoggerJobProperti
 
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = orc_XmlParser.GetAttributeUint32Error("max-log-file-size-mb",
-                                                         orc_Config.u32_MaxLogFileSizeMb);
+      if (orc_XmlParser.AttributeExists("max-log-entries"))
+      {
+         s32_Retval = orc_XmlParser.GetAttributeUint32Error("max-log-entries",
+                                                            orc_Config.u32_MaxLogEntries);
+      }
+   }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (orc_XmlParser.AttributeExists("max-log-duration-sec"))
+      {
+         s32_Retval = orc_XmlParser.GetAttributeUint32Error("max-log-duration-sec",
+                                                            orc_Config.u32_MaxLogDurationSec);
+      }
+   }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (orc_XmlParser.AttributeExists("log-interval-ms"))
+      {
+         s32_Retval = orc_XmlParser.GetAttributeUint32Error("log-interval-ms",
+                                                            orc_Config.u32_LogIntervalMs);
+      }
    }
 
    if (s32_Retval == C_NO_ERR)
@@ -496,22 +441,27 @@ int32_t C_OscDataLoggerJobFiler::mh_LoadJobProperties(C_OscDataLoggerJobProperti
          tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
    }
+
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XmlParser.SelectNodeChild("connected-interface") == "connected-interface")
+      if (orc_XmlParser.SelectNodeChild("use-case") == "use-case")
       {
-         s32_Retval = C_OscDataLoggerJobFiler::h_LoadCommInterfaceId(orc_Config.e_ConnectedInterfaceType,
-                                                                     orc_Config.u8_ConnectedInterfaceNumber,
-                                                                     orc_XmlParser, "connected-interface",
-                                                                     "Loading data loggers data");
+         s32_Retval = mh_StringToUseCaseType(orc_XmlParser.GetNodeContent(), orc_Config.e_UseCase);
          tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
-      else
+   }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (orc_XmlParser.SelectNodeChild("log-destination-directory") == "log-destination-directory")
       {
-         //Default
-         orc_Config.e_ConnectedInterfaceType = C_OscSystemBus::eCAN;
-         orc_Config.u8_ConnectedInterfaceNumber = 0U;
+         orc_Config.c_LogDestinationDirectory = orc_XmlParser.GetNodeContent();
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_LoadJobAdditionalTriggerProperties(orc_Config.c_AdditionalTriggerProperties, orc_XmlParser);
    }
    tgl_assert(orc_XmlParser.SelectNodeParent() == "job");
    return s32_Retval;
@@ -528,16 +478,94 @@ void C_OscDataLoggerJobFiler::mh_SaveJobProperties(const C_OscDataLoggerJobPrope
                                                    C_OscXmlParserBase & orc_XmlParser)
 {
    orc_XmlParser.CreateAndSelectNodeChild("properties");
-   orc_XmlParser.SetAttributeUint32("max-log-file-size-mb", orc_Config.u32_MaxLogFileSizeMb);
+   orc_XmlParser.SetAttributeUint32("max-log-entries", orc_Config.u32_MaxLogEntries);
+   orc_XmlParser.SetAttributeUint32("max-log-duration-sec", orc_Config.u32_MaxLogDurationSec);
+   orc_XmlParser.SetAttributeUint32("log-interval-ms", orc_Config.u32_LogIntervalMs);
    orc_XmlParser.CreateNodeChild("name", orc_Config.c_Name);
    orc_XmlParser.CreateNodeChild("comment", orc_Config.c_Comment);
    orc_XmlParser.CreateNodeChild("log-file-format", mh_LogFileTypeTypeToString(orc_Config.e_LogFileFormat));
    orc_XmlParser.CreateNodeChild("local-log-trigger", mh_LocalLogTriggerTypeToString(orc_Config.e_LocalLogTrigger));
-   orc_XmlParser.CreateAndSelectNodeChild("connected-interface");
-   C_OscDataLoggerJobFiler::h_SaveCommInterfaceId(orc_Config.e_ConnectedInterfaceType,
-                                                  orc_Config.u8_ConnectedInterfaceNumber, orc_XmlParser);
-   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+   orc_XmlParser.CreateNodeChild("use-case", mh_UseCaseTypeToString(orc_Config.e_UseCase));
+   orc_XmlParser.CreateNodeChild("log-destination-directory", orc_Config.c_LogDestinationDirectory);
+   mh_SaveJobAdditionalTriggerProperties(orc_Config.c_AdditionalTriggerProperties, orc_XmlParser);
    tgl_assert(orc_XmlParser.SelectNodeParent() == "job");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load job additional trigger properties
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    Data loggers file content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscDataLoggerJobFiler::mh_LoadJobAdditionalTriggerProperties(
+   C_OscDataLoggerJobAdditionalTriggerProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.SelectNodeChild("additional-trigger-properties") == "additional-trigger-properties")
+   {
+      s32_Retval = orc_XmlParser.GetAttributeBoolError("enable", orc_Config.q_Enable);
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XmlParser.SelectNodeChildError("operation");
+         if (s32_Retval == C_NO_ERR)
+         {
+            orc_Config.c_Operation = orc_XmlParser.GetNodeContent();
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XmlParser.SelectNodeChildError("data-pool-element");
+         if (s32_Retval == C_NO_ERR)
+         {
+            s32_Retval = h_LoadDataElementOptArrayId(orc_Config.c_ElementId, orc_XmlParser);
+         }
+         //Return
+         orc_XmlParser.SelectNodeParent();
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XmlParser.SelectNodeChildError("threshold");
+         if (s32_Retval == C_NO_ERR)
+         {
+            //copy over value so we have the correct type:
+            s32_Retval = C_OscNodeDataPoolFiler::h_LoadDataPoolContentV1(orc_Config.c_Threshold, orc_XmlParser);
+            //Return
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
+         }
+      }
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save job additional trigger properties
+
+   \param[in]      orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscDataLoggerJobFiler::mh_SaveJobAdditionalTriggerProperties(
+   const C_OscDataLoggerJobAdditionalTriggerProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.CreateAndSelectNodeChild("additional-trigger-properties");
+   orc_XmlParser.SetAttributeBool("enable", orc_Config.q_Enable);
+   orc_XmlParser.CreateAndSelectNodeChild("data-pool-element");
+   h_SaveDataElementOptArrayId(orc_Config.c_ElementId, orc_XmlParser);
+   //Return
+   orc_XmlParser.SelectNodeParent();
+   orc_XmlParser.CreateAndSelectNodeChild("threshold");
+   C_OscNodeDataPoolFiler::h_SaveDataPoolContentV1(orc_Config.c_Threshold, orc_XmlParser);
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
+   orc_XmlParser.CreateNodeChild("operation", orc_Config.c_Operation);
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -787,6 +815,74 @@ int32_t C_OscDataLoggerJobFiler::mh_StringToLocalLogTriggerType(const stw::scl::
    else if (orc_String == "interval")
    {
       ore_Type = C_OscDataLoggerJobProperties::eLLT_INTERVAL;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Use case type to string
+
+   \param[in]  ore_Type    Type
+
+   \return
+   Stringified use case type to string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw::scl::C_SclString C_OscDataLoggerJobFiler::mh_UseCaseTypeToString(
+   const C_OscDataLoggerJobProperties::E_UseCase & ore_Type)
+{
+   stw::scl::C_SclString c_Retval;
+
+   switch (ore_Type)
+   {
+   case C_OscDataLoggerJobProperties::eUC_MANUAL:
+      c_Retval = "manual";
+      break;
+   case C_OscDataLoggerJobProperties::eUC_AWS:
+      c_Retval = "aws";
+      break;
+   case C_OscDataLoggerJobProperties::eUC_MACHINES_CLOUD:
+      c_Retval = "machines-cloud";
+      break;
+   default:
+      c_Retval = "invalid";
+      break;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  String to use case type
+
+   \param[in]   orc_String    String
+   \param[out]  ore_Type      Type
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscDataLoggerJobFiler::mh_StringToUseCaseType(const stw::scl::C_SclString & orc_String,
+                                                        C_OscDataLoggerJobProperties::E_UseCase & ore_Type)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_String == "manual")
+   {
+      ore_Type = C_OscDataLoggerJobProperties::eUC_MANUAL;
+   }
+   else if (orc_String == "aws")
+   {
+      ore_Type = C_OscDataLoggerJobProperties::eUC_AWS;
+   }
+   else if (orc_String == "machines-cloud")
+   {
+      ore_Type = C_OscDataLoggerJobProperties::eUC_MACHINES_CLOUD;
    }
    else
    {

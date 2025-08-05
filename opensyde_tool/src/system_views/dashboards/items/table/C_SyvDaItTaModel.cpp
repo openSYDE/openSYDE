@@ -1657,20 +1657,14 @@ void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolL
                                                                     orc_ElementId.u32_DataPoolIndex,
                                                                     orc_ElementId.u32_ListIndex,
                                                                     orc_ElementId.u32_ElementIndex);
-      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(orc_ElementId.u32_NodeIndex,
-                                                                   orc_ElementId.u32_DataPoolIndex,
-                                                                   orc_ElementId.u32_ListIndex,
-                                                                   orc_ElementId.u32_ElementIndex);
       const C_OscNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          orc_ElementId.u32_NodeIndex, orc_ElementId.u32_DataPoolIndex);
 
       tgl_assert(pc_OscElement != NULL);
-      tgl_assert(pc_UiElement != NULL);
       tgl_assert(pc_Datapool != NULL);
-      if ((pc_OscElement != NULL) && (pc_UiElement != NULL) && (pc_Datapool != NULL))
+      if ((pc_OscElement != NULL) && (pc_Datapool != NULL))
       {
-         this->m_InitValuesForOneRow(orc_ElementId, orc_ElementConfig, *pc_OscElement, *pc_UiElement, ou32_Index);
+         this->m_InitValuesForOneRow(orc_ElementId, orc_ElementConfig, *pc_OscElement, ou32_Index);
 
          if (orc_ElementConfig.c_DisplayName.compare("") == 0)
          {
@@ -1729,14 +1723,12 @@ void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolL
    \param[in]  orc_ElementId        Element id
    \param[in]  orc_ElementConfig    Element config
    \param[in]  orc_OscElement       Osc element
-   \param[in]  orc_UiElement        Ui element
    \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
                                              const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                                              const C_OscNodeDataPoolListElement & orc_OscElement,
-                                             const C_PuiSdNodeDataPoolListElement & orc_UiElement,
                                              const uint32_t ou32_Index)
 {
    std::vector<float64_t> c_Values;
@@ -1744,7 +1736,7 @@ void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElem
    this->mc_UnscaledMinValues[ou32_Index] = c_Values;
    C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_OscElement.c_MaxValue, c_Values);
    this->mc_UnscaledMaxValues[ou32_Index] = c_Values;
-   this->m_InitStartValueForOneRow(orc_ElementConfig, orc_OscElement, orc_UiElement, ou32_Index);
+   this->m_InitStartValueForOneRow(orc_ElementConfig, orc_OscElement, ou32_Index);
    this->mc_ArrayItemIndex[ou32_Index] = orc_ElementId.GetArrayElementIndexOrZero();
 
    //Percentage
@@ -1765,7 +1757,7 @@ void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElem
    }
 
    //String
-   this->mc_InterpretAsStringFlags[ou32_Index] = orc_UiElement.q_InterpretAsString;
+   this->mc_InterpretAsStringFlags[ou32_Index] = orc_OscElement.q_InterpretAsString;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1773,13 +1765,11 @@ void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElem
 
    \param[in]  orc_ElementConfig    Element config
    \param[in]  orc_OscElement       Osc element
-   \param[in]  orc_UiElement        Ui element
    \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
                                                  const C_OscNodeDataPoolListElement & orc_OscElement,
-                                                 const C_PuiSdNodeDataPoolListElement & orc_UiElement,
                                                  const uint32_t ou32_Index)
 {
    C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_FullyUsefulAndTotallyNecessaryVariable;
@@ -1793,7 +1783,7 @@ void C_SyvDaItTaModel::m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementC
       C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(
          orc_OscElement.c_MinValue,
          orc_ElementConfig.c_ElementScaling,
-         orc_UiElement.q_InterpretAsString));
+         orc_OscElement.q_InterpretAsString));
    //Set unscaled starting value to 0 if possible
    C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_OscElement.c_MinValue,
                                                          orc_OscElement.c_MaxValue, c_Val,

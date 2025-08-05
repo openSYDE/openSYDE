@@ -35,7 +35,7 @@ public:
    C_GiBiImageGroup(const uint64_t & oru64_Id, const QString & orc_ImagePath, QGraphicsItem * const opc_Parent = NULL);
 
    C_GiBiImageGroup(const uint64_t & oru64_Id, const float64_t of64_Width, const float64_t of64_Height,
-                    const QPixmap & orc_Image, QGraphicsItem * const opc_Parent = NULL);
+                    const QPixmap & orc_Image, const QByteArray & orc_Format, QGraphicsItem * const opc_Parent = NULL);
 
    int32_t type() const override;
 

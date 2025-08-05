@@ -62,7 +62,7 @@ Q_SIGNALS:
 
 private:
    Ui::C_SdNdeNodePropertiesTabContentWidget * mpc_Ui;
-   void m_UpdateTrigger(const uint32_t ou32_NodeIndex);
+   void m_UpdateTrigger(const uint32_t ou32_NodeIndex, const bool oq_OnlyUpdateProperties);
 
    //Avoid call
    C_SdNdeNodePropertiesTabContentWidget(const C_SdNdeNodePropertiesTabContentWidget &);

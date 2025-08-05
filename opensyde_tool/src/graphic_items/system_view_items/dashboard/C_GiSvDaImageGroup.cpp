@@ -65,14 +65,16 @@ C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32_t & oru32_ViewIndex, const u
    \param[in]      of64_Width             Width of image view
    \param[in]      of64_Height            Height of image view
    \param[in]      orc_Image              Image
+   \param[in]      orc_Format             Image format
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
                                        const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                        const float64_t of64_Width, const float64_t of64_Height,
-                                       const QPixmap & orc_Image, QGraphicsItem * const opc_Parent) :
-   C_GiBiImageGroup(oru64_Id, of64_Width, of64_Height, orc_Image, opc_Parent),
+                                       const QPixmap & orc_Image, const QByteArray & orc_Format,
+                                       QGraphicsItem * const opc_Parent) :
+   C_GiBiImageGroup(oru64_Id, of64_Width, of64_Height, orc_Image, orc_Format, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eIMAGE)
 {
 }

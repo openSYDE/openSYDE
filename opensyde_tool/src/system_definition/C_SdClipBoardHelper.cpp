@@ -103,7 +103,7 @@ int32_t C_SdClipBoardHelper::h_LoadToDataPool(C_OscNodeDataPool & orc_OscContent
       {
          if (c_StringXml.SelectNodeChild("data-pool") == "data-pool")
          {
-            s32_Retval = C_PuiSdHandlerFiler::h_LoadDataPool(orc_UiContent, c_StringXml);
+            s32_Retval = C_PuiSdHandlerFiler::h_LoadDataPool(orc_UiContent, c_StringXml, NULL);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
@@ -219,7 +219,7 @@ int32_t C_SdClipBoardHelper::h_LoadToDataPoolLists(std::vector<C_OscNodeDataPool
                tgl_assert(c_StringXml.SelectNodeParent() == "gui");
                if (c_StringXml.SelectNodeChild("lists") == "lists")
                {
-                  s32_Retval = C_PuiSdHandlerFiler::h_LoadDataPoolLists(orc_UiContent, c_StringXml);
+                  s32_Retval = C_PuiSdHandlerFiler::h_LoadDataPoolLists(orc_UiContent, c_StringXml, NULL);
                   if (s32_Retval == C_NO_ERR)
                   {
                      //Return
@@ -366,7 +366,7 @@ int32_t C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(
       {
          if (c_StringXml.SelectNodeChild("data-elements") == "data-elements")
          {
-            s32_Retval = C_PuiSdHandlerFiler::h_LoadDataPoolListElements(orc_UiContent, c_StringXml);
+            s32_Retval = C_PuiSdHandlerFiler::h_LoadDataPoolListElements(orc_UiContent, c_StringXml, NULL);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
@@ -840,7 +840,7 @@ int32_t C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OscCanMessage> & orc_M
                            do
                            {
                               c_Tmp.clear();
-                              C_PuiSdHandlerFiler::h_LoadDataPoolListElements(c_Tmp, c_StringXml);
+                              C_PuiSdHandlerFiler::h_LoadDataPoolListElements(c_Tmp, c_StringXml, NULL);
                               orc_UiSignalCommons.push_back(c_Tmp);
                               c_CurrentNode = c_StringXml.SelectNodeNext("data-elements");
                            }
@@ -1185,7 +1185,7 @@ int32_t C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSna
       }
       if ((c_StringXml.SelectNodeChild("nodes-ui") == "nodes-ui") && (s32_Retval == C_NO_ERR))
       {
-         s32_Retval = C_PuiSdHandlerFiler::h_LoadNodes(orc_Data.c_UiNodes, c_StringXml, NULL);
+         s32_Retval = C_PuiSdHandlerFiler::h_LoadNodes(orc_Data.c_UiNodes, c_StringXml, NULL, NULL);
          if (s32_Retval == C_NO_ERR)
          {
             //Return
@@ -1400,7 +1400,7 @@ int32_t C_SdClipBoardHelper::mh_LoadSignalsFromString(const QString & orc_Input,
                   {
                      if (c_StringXml.SelectNodeChild("data-elements") == "data-elements")
                      {
-                        C_PuiSdHandlerFiler::h_LoadDataPoolListElements(orc_UiSignalCommons, c_StringXml);
+                        C_PuiSdHandlerFiler::h_LoadDataPoolListElements(orc_UiSignalCommons, c_StringXml, NULL);
                         //Return
                         tgl_assert(c_StringXml.SelectNodeParent() == "gui");
                         if (c_StringXml.SelectNodeChild("com-signals") == "com-signals")

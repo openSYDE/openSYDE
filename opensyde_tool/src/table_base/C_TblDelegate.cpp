@@ -187,6 +187,10 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
          {
             pc_LineEdit->SetMaxFromVariant(orc_Index.data(ms32_USER_ROLE_INTERACTION_MAXIMUM_VALUE));
          }
+         if (orc_Index.data(ms32_USER_ROLE_INTERACTION_USE_STR_LENGTH).toBool())
+         {
+            pc_LineEdit->setMaxLength(orc_Index.data(ms32_USER_ROLE_INTERACTION_STR_LENGTH).toUInt());
+         }
       }
       break;
    case eURIEL_COMBO_BOX:

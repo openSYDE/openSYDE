@@ -893,21 +893,14 @@ void C_SyvDaPeBase::m_OkClicked(void)
                                                                     this->mc_DataElement.u32_DataPoolIndex,
                                                                     this->mc_DataElement.u32_ListIndex,
                                                                     this->mc_DataElement.u32_ElementIndex);
-      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
-                                                                   this->mc_DataElement.u32_DataPoolIndex,
-                                                                   this->mc_DataElement.u32_ListIndex,
-                                                                   this->mc_DataElement.u32_ElementIndex);
 
-      tgl_assert(pc_UiElement != NULL);
       tgl_assert(pc_Element != NULL);
-      if ((pc_UiElement != NULL) &&
-          (pc_Element != NULL))
+      if (pc_Element != NULL)
       {
          if (c_FormatterConfig.IsFormatterCompatible(
                 C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(pc_Element->c_MinValue,
                                                                         c_Scaling,
-                                                                        pc_UiElement->q_InterpretAsString)) == false)
+                                                                        pc_Element->q_InterpretAsString)) == false)
          {
             // Error
             C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
@@ -1317,7 +1310,6 @@ void C_SyvDaPeBase::m_OnFormatterActiveChange(void) const
 /*! \brief  Check the formatter string
 
    Checks if the printf string has a valid and compatible format.
-
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_CheckFormatterString(void) const
@@ -1334,24 +1326,17 @@ void C_SyvDaPeBase::m_CheckFormatterString(void) const
                                                                     this->mc_DataElement.u32_DataPoolIndex,
                                                                     this->mc_DataElement.u32_ListIndex,
                                                                     this->mc_DataElement.u32_ElementIndex);
-      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
-                                                                   this->mc_DataElement.u32_DataPoolIndex,
-                                                                   this->mc_DataElement.u32_ListIndex,
-                                                                   this->mc_DataElement.u32_ElementIndex);
 
-      tgl_assert(pc_UiElement != NULL);
       tgl_assert(pc_Element != NULL);
 
       // Check if the format is valid and compatible. If not, font color is changed to red and a tool tip is
       // displayed to indicate the error
-      if ((pc_UiElement != NULL) &&
-          (pc_Element != NULL))
+      if (pc_Element != NULL)
       {
          const bool q_FormatterCompatible = c_FormatterConfig.IsFormatterCompatible(
             C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(pc_Element->c_MinValue,
                                                                     c_Scaling,
-                                                                    pc_UiElement->q_InterpretAsString));
+                                                                    pc_Element->q_InterpretAsString));
 
          //set text property
          C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditFormatterString, "Valid",

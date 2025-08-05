@@ -38,16 +38,14 @@ public:
    explicit C_SyvUpPacSecurityCertificatePackageDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent);
    ~C_SyvUpPacSecurityCertificatePackageDialog(void) override;
 
-   void InitStaticNames(void) const;
-   QString GetPrivateKeyPath(void) const;
+   QString GetPublicKeyPath(void) const;
    QString GetPassword(void) const;
    std::vector<stw::scl::C_SclString> GetPemFiles(void);
+   bool GetOptionAddPemFiles(void) const;
+   bool GetOptionAddSecureAuthentification(void) const;
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
-   void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
-   void dropEvent(QDropEvent * const opc_Event) override;
 
 private:
    //Avoid call
@@ -57,23 +55,23 @@ private:
    Ui::C_SyvUpPacSecurityCertificatePackageDialog * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw::opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
-   C_SyvUpPacPemFilesListWidget * mpc_ListWidget;
-   QVBoxLayout * mpc_ScrollLayout;
 
+   void m_InitStaticNames(void) const;
    void m_OkClicked(void);
    void m_CancelClicked(void);
-   void m_InitPemFilesSection(void);
+   void m_ReloadLastSavedData(void);
+   void m_UpdatePemFileWidget(void);
    void m_HandleAddPemFile(void);
    void m_HandleClearAllPemFiles(void);
    void m_UpdateLabelTitleWithFileCounter(void);
-   void m_InitPasswordLineEdit(void);
-   void m_PrivateKeyPathClicked(void);
-   void m_SetPrivateKeyPath(const QString & orc_Path) const;
+   void m_ReloadLastSavedPassword(void);
+   void m_PublicKeyPathClicked(void);
    void m_ShowPassword(void);
    void m_HidePassword(void);
-   void m_OnAddPemFileStateChanged(const int32_t os32_State);
-   void m_OnValidateSecureUpdateConfig();
-   int32_t m_CheckPath(void);
+   int32_t m_OnValidateSecureUpdateConfig(void);
+   int32_t m_OnValidateSecureAuthenticationConfig(void);
+   int32_t m_CheckUpdatePath(void);
+   int32_t m_CheckAuthPemFiles(QString & orc_ErrorPath) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

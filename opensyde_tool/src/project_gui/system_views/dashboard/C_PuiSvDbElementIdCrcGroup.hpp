@@ -10,6 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
+#include "C_SdNdeDalCopElementIdCrcGroupBase.hpp"
 #include "C_PuiSvDbNodeDataPoolListElementId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -21,25 +22,21 @@ namespace opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_PuiSvDbElementIdCrcGroup
+class C_PuiSvDbElementIdCrcGroup :
+   public C_SdNdeDalCopElementIdCrcGroupBase
 {
 public:
    C_PuiSvDbElementIdCrcGroup();
-
-   int32_t UpdateCrc(void);
-   int32_t CheckCrc(void) const;
-
-   uint32_t GetCrc(void) const;
-   void SetCrc(const uint32_t ou32_Crc);
+   ~C_PuiSvDbElementIdCrcGroup() noexcept override;
 
    const C_PuiSvDbNodeDataPoolListElementId & GetElementId(void) const;
    void SetElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_Value);
 
+protected:
+   int32_t m_CalcCrc(uint32_t & oru32_Result) const override;
+
 private:
    C_PuiSvDbNodeDataPoolListElementId mc_ElementId;
-   uint32_t mu32_Crc;
-
-   int32_t m_CalcCrc(uint32_t & oru32_Result) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

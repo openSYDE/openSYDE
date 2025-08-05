@@ -28,7 +28,8 @@ public:
                                           const stw::scl::C_SclString & orc_UseCase,
                                           const stw::scl::C_SclString & orc_PackageExtension,
                                           const stw::scl::C_SclString & orc_PackageExtensionTmp,
-                                          stw::scl::C_SclString & orc_ErrorMessage);
+                                          stw::scl::C_SclString & orc_ErrorMessage,
+                                          const bool oq_CheckFileExist = true);
    static void h_GetTempFolderName(const stw::scl::C_SclString & orc_PackagePath,
                                    const stw::scl::C_SclString & orc_TemporaryDirectory,
                                    const stw::scl::C_SclString & orc_UseCase,

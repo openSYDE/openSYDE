@@ -550,7 +550,7 @@ int32_t C_OscProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8_t o
 
       if (q_Finished == false)
       {
-         stw::tgl::TglSleep(0U); //rescind CPU time to other threads ...
+         stw::tgl::TglSleepPolling(); //rescind CPU time to other threads ...
       }
    }
    mc_LockReception.Release();
@@ -4485,6 +4485,8 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
    C_OscProtocolDriverOsyService c_Response;
    uint8_t u8_NrErrorCode = 0U;
 
+   oru32_MaxBlockLength = 0U;
+
    if (mpc_TransportProtocol == NULL)
    {
       s32_Return = C_CONFIG;
@@ -4595,6 +4597,8 @@ int32_t C_OscProtocolDriverOsy::OsyRequestFileTransfer(const C_SclString & orc_F
    C_OscProtocolDriverOsyService c_Request;
    C_OscProtocolDriverOsyService c_Response;
    uint8_t u8_NrErrorCode = 0U;
+
+   oru32_MaxBlockLength = 0U;
 
    if (mpc_TransportProtocol == NULL)
    {

@@ -943,7 +943,7 @@ int32_t C_KFXProtocol::m_EvalResponses(const uint16_t ou16_TimeOut, const uint8_
 
       if (mq_SleepBetweenPolling == true)
       {
-         stw::tgl::TglSleep(0U); //rescind CPU time to other threads ...
+         stw::tgl::TglSleepPolling(); //rescind CPU time to other threads ...
       }
    }
    if (q_SomeResponse == false)

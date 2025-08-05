@@ -102,22 +102,6 @@ int32_t C_CanDll::m_Init(const char_t * const opcn_DllPath)
       mpr_CAN_Init_One_ID    = reinterpret_cast<PR_CAN_INIT_ONE_ID>(
          reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Init_One_ID")));
 
-      //modem functions
-      mpr_CANTAPI_CONNECT    = reinterpret_cast<PR_CANTAPI_CONNECT>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANTAPI_Connect")));
-      mpr_CANTAPI_DISCONNECT = reinterpret_cast<PR_CANTAPI_DISCONNECT>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANTAPI_Disconnect")));
-
-      //stream functions:
-      mpr_SER_GET_TX_BUF_COUNT = reinterpret_cast<PR_SER_GET_TX_BUF_COUNT>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Get_TX_Buf_Count")));
-      mpr_SER_GET_RX_BUF_COUNT = reinterpret_cast<PR_SER_GET_RX_BUF_COUNT>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Get_RX_Buf_Count")));
-      mpr_SER_SEND_BYTES       = reinterpret_cast<PR_SER_SEND_BYTES>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Send_Bytes")));
-      mpr_SER_READ_BYTES       = reinterpret_cast<PR_SER_READ_BYTES>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Read_Bytes")));
-
       //new style "ext" functions:
       mpr_CANext_Init             = reinterpret_cast<PR_CANext_Init>(
          reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Init")));
@@ -145,11 +129,6 @@ int32_t C_CanDll::m_Init(const char_t * const opcn_DllPath)
          reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Get_Num_Supported_Bitrates")));
       mpr_CANext_Get_Supported_Bitrate = reinterpret_cast<PR_CANext_Get_Supported_Bitrate>(
          reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Get_Supported_Bitrate")));
-
-      mpr_CANtcp_Read_Device_List_From_Server = reinterpret_cast<PR_CANtcp_Read_Device_List_From_Server>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANtcp_ReadDeviceListFromServer")));
-      mpr_CANtcp_Get_Device_Name = reinterpret_cast<PR_CANtcp_Get_Device_Name>(
-         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANtcp_GetDeviceName")));
       //lint -restore
 
       if ((mpr_CAN_Init == NULL) ||
@@ -181,21 +160,13 @@ int32_t C_CanDll::m_Init(const char_t * const opcn_DllPath)
       mq_BitrateInformationFunctionsAvailable =
          ((mpr_CANext_Get_Num_Supported_Bitrates != NULL) &&
           (mpr_CANext_Get_Supported_Bitrate != NULL)) ? true : false;
-
-      mq_ModemFunctionsAvailable  = ((mpr_CANTAPI_CONNECT != NULL) && (mpr_CANTAPI_DISCONNECT != NULL));
-      mq_StreamFunctionsAvailable = ((mpr_SER_GET_TX_BUF_COUNT != NULL) && (mpr_SER_GET_RX_BUF_COUNT != NULL) &&
-                                     (mpr_SER_SEND_BYTES       != NULL) &&
-                                     (mpr_SER_READ_BYTES       != NULL)) ? true : false;
-
-      mq_TCPFunctionsAvailable =
-         ((mpr_CANtcp_Read_Device_List_From_Server != NULL) && (mpr_CANtcp_Get_Device_Name != NULL));
    }
    else
    {
       return (-1); // Dll not loaded
    }
    return (0); // Dll loaded
-} // End of Init_Dll
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -216,14 +187,6 @@ void C_CanDll::m_ClearFunctionPointers(void)
    mpr_CAN_Send_extRTR = NULL;
    mpr_CAN_Init_One_ID = NULL;
 
-   mpr_SER_GET_TX_BUF_COUNT = NULL;
-   mpr_SER_GET_RX_BUF_COUNT = NULL;
-   mpr_SER_SEND_BYTES       = NULL;
-   mpr_SER_READ_BYTES       = NULL;
-
-   mpr_CANTAPI_CONNECT     = NULL;
-   mpr_CANTAPI_DISCONNECT  = NULL;
-
    mpr_CANext_Init         = NULL;
    mpr_CANext_Exit         = NULL;
    mpr_CANext_Bitrate      = NULL;
@@ -238,14 +201,8 @@ void C_CanDll::m_ClearFunctionPointers(void)
    mpr_CANext_Get_Num_Supported_Bitrates = NULL;
    mpr_CANext_Get_Supported_Bitrate = NULL;
 
-   mpr_CANtcp_Read_Device_List_From_Server = NULL;
-   mpr_CANtcp_Get_Device_Name = NULL;
-
    mq_ExtFunctionsAvailable = false;
-   mq_ModemFunctionsAvailable = false;
-   mq_StreamFunctionsAvailable = false;
    mq_BitrateInformationFunctionsAvailable = false;
-   mq_TCPFunctionsAvailable = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -660,102 +617,6 @@ int32_t C_CanDll::CANext_Get_System_Time(uint64_t & oru64_SystemTimeUs)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-int32_t C_CanDll::CANTAPI_Connect(const uint8_t * const opu8_Number, const uint32_t ou32_TimeOut)
-{
-   int32_t s32_Return;
-
-   if (mpr_CANTAPI_CONNECT == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_CANTAPI_CONNECT)(opu8_Number, ou32_TimeOut);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::CANTAPI_Disconnect(const uint32_t ou32_TimeOut)
-{
-   int32_t s32_Return;
-
-   if (mpr_CANTAPI_DISCONNECT == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_CANTAPI_DISCONNECT)(ou32_TimeOut);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::SER_Get_TX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize)
-{
-   int32_t s32_Return;
-
-   if (mpr_SER_GET_TX_BUF_COUNT == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_SER_GET_TX_BUF_COUNT)(&oru32_NumBytes, &oru32_MaxBufSize);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::SER_Get_RX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize)
-{
-   int32_t s32_Return;
-
-   if (mpr_SER_GET_RX_BUF_COUNT == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_SER_GET_RX_BUF_COUNT)(&oru32_NumBytes, &oru32_MaxBufSize);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::SER_Send_Bytes(const uint8_t * const opu8_Data, const uint32_t ou32_NumBytes)
-{
-   int32_t s32_Return;
-
-   if (mpr_SER_SEND_BYTES == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_SER_SEND_BYTES)(opu8_Data, ou32_NumBytes);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::SER_Read_Bytes(uint8_t * const opu8_Data, uint32_t & oru32_NumBytes)
-{
-   int32_t s32_Return;
-
-   if (mpr_SER_READ_BYTES == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_SER_READ_BYTES)(opu8_Data, &oru32_NumBytes);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 int32_t C_CanDll::CANext_Get_Num_Supported_Bitrates(uint32_t & oru32_MultiplicationFactor)
 {
    int32_t s32_Return;
@@ -782,40 +643,6 @@ int32_t C_CanDll::CANext_Get_Supported_Bitrate(const uint16_t ou16_BitrateIndex,
    }
    EnterCriticalSection(&mt_Lock);
    s32_Return = (*mpr_CANext_Get_Supported_Bitrate)(ou16_BitrateIndex, &oru32_Bitrate);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::CANtcp_Read_Device_List_From_Server(const uint8_t ou8_Channel, uint32_t & oru32_NoOfDevices,
-                                                      uint32_t & oru32_MaxLen)
-{
-   int32_t s32_Return;
-
-   if (mpr_CANtcp_Read_Device_List_From_Server == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_CANtcp_Read_Device_List_From_Server)(ou8_Channel, &oru32_NoOfDevices, &oru32_MaxLen);
-   LeaveCriticalSection(&mt_Lock);
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-int32_t C_CanDll::CANtcp_Get_Device_Name(const uint8_t ou8_Channel, const uint32_t ou32_Index,
-                                         char_t * const opcn_DeviceName)
-{
-   int32_t s32_Return;
-
-   if (mpr_CANtcp_Get_Device_Name == NULL)
-   {
-      return C_NOACT;
-   }
-   EnterCriticalSection(&mt_Lock);
-   s32_Return = (*mpr_CANtcp_Get_Device_Name)(ou8_Channel, ou32_Index, opcn_DeviceName);
    LeaveCriticalSection(&mt_Lock);
    return s32_Return;
 }

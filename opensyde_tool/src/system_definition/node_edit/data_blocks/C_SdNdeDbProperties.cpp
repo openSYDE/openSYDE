@@ -1032,7 +1032,7 @@ void C_SdNdeDbProperties::m_LoadData(void)
             if ((q_ProgrammingSupport == true) && (q_XappSupport == true))
             {
                this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText(
-                                                            "File Generation (X - App Configuration)"));
+                                                            "File Generation (X.App Configuration)"));
             }
             else if ((q_ProgrammingSupport == true) && (!q_XappSupport == true))
             {

@@ -1,0 +1,16 @@
+---------------------------------------------------------------------
+File:      about.txt
+Content:   Information about this project
+---------------------------------------------------------------------
+
+Description:
+============
+openSYDE connector console application for x config generation.
+
+Platform:
+=========
+MS Windows 7 and 10
+
+Usage:
+======
+Call the binary without any parameters or with "-h" to print the available command line parameters to the console.

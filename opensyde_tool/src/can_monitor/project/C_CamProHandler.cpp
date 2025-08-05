@@ -14,10 +14,10 @@
 
 #include <QDir>
 
-#include "C_Uti.hpp"
 #include "TglFile.hpp"
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
 #include "C_UsHandler.hpp"
 #include "C_CamDbHandler.hpp"
 #include "C_OscXmlParser.hpp"
@@ -600,7 +600,7 @@ void C_CamProHandler::InsertMessage(const uint32_t ou32_Index, const C_CamProMes
       //Only allow name adaptation if name is not necessary for database identification
       if (c_MessageData.c_DataBaseFilePath.IsEmpty())
       {
-         c_MessageData.c_Name = C_Uti::h_GetUniqueName(this->m_GetAllMessageNames(), c_MessageData.c_Name, 0UL);
+         c_MessageData.c_Name = C_OscUtils::h_GetUniqueName(this->m_GetAllMessageNames(), c_MessageData.c_Name, 0UL);
       }
    }
 

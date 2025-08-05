@@ -75,10 +75,6 @@ int32_t C_SdNdeDpImportRamView::h_ImportDataPoolFromRamViewDefProject(const C_Sc
             //Set GUI-only properties:
             //RAMView projects have a clear logic: arrays of sint8 are generally interpreted as strings
             orc_GuiDataPool.c_DataPoolLists[u32_List].c_DataPoolListElements[u32_Element].q_AutoMinMaxActive = false;
-            orc_GuiDataPool.c_DataPoolLists[u32_List].c_DataPoolListElements[u32_Element].q_InterpretAsString =
-               ((orc_DataPool.c_Lists[u32_List].c_Elements[u32_Element].GetType() ==
-                 C_OscNodeDataPoolContent::eSINT8) &&
-                (orc_DataPool.c_Lists[u32_List].c_Elements[u32_Element].GetArray() == true));
 
             //Try to cope with non-ASCII characters in variable comments as good as possible
             //RAMView projects are basically stored in single-byte ASCII format.

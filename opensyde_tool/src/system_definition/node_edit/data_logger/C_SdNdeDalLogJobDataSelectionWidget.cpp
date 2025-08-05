@@ -163,7 +163,6 @@ void C_SdNdeDalLogJobDataSelectionWidget::InitStaticNames() const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of Add icon clicked
-
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked()
@@ -173,8 +172,7 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked()
 
    C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, 0U, true, false, true, true,
                                                                                  true, true, NULL, false,
-                                                                                 this->mu32_NodeIndex,
-                                                                                 this->mu32_DataLoggerJobIndex);
+                                                                                 this->mu32_NodeIndex);
 
    //Resize
    c_New->SetSize(QSize(800, 800));
@@ -213,6 +211,7 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_AddClicked()
                C_PuiSdHandler::h_GetInstance()->AddDataLoggerElement(this->mu32_NodeIndex,
                                                                      this->mu32_DataLoggerJobIndex,
                                                                      c_Data);
+               Q_EMIT this->SigNumElementsChanged();
             }
          }
       }
@@ -448,5 +447,6 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_DeleteSelectedDataElements(void)
       this->mpc_Ui->pc_TableView->DeleteSelectedElements();
       this->m_UpdateSelection();
       this->m_UpdateUi();
+      Q_EMIT this->SigNumElementsChanged();
    }
 }

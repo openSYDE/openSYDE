@@ -69,14 +69,8 @@ public:
    static QFont h_GetFontPixel(const QFont & orc_Font);
    static QString h_ConvertVersionToStwStyle(const QString & orc_Version);
    static QString h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QString & orc_RelativeOrAbsolutePath);
-   static stw::scl::C_SclString h_GetUniqueName(const std::map<stw::scl::C_SclString, bool> & orc_ExistingStrings,
-                                                const stw::scl::C_SclString & orc_ProposedName,
-                                                const uint32_t ou32_MaxCharLimit,
-                                                const stw::scl::C_SclString & orc_SkipName = "");
    static QString h_GetUniqueNameQt(const std::map<stw::scl::C_SclString, bool> & orc_ExistingStrings,
                                     const QString & orc_ProposedName);
-   static void h_GetNumberAtStringEnd(const stw::scl::C_SclString & orc_ProposedName,
-                                      stw::scl::C_SclString & orc_CutString, int32_t & ors32_Number);
    static std::vector<int32_t> h_CreateAscendingIndexMap(const std::vector<uint32_t> & orc_UnsortedIndices);
    static bool h_CheckSortedAscending(const std::vector<uint32_t> & orc_Indices);
    template <typename T>
@@ -92,11 +86,6 @@ public:
 
 private:
    C_Uti(void);
-
-   static void mh_GetBaseNameAndCurrentConflictNumberFromString(const stw::scl::C_SclString & orc_ConflictingValue,
-                                                                const stw::scl::C_SclString & orc_SkipName,
-                                                                stw::scl::C_SclString & orc_CutString,
-                                                                int32_t & ors32_Number);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

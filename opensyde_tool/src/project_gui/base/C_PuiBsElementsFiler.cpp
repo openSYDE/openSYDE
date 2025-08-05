@@ -822,8 +822,8 @@ void C_PuiBsElementsFiler::mh_SaveBoundary(const C_PuiBsBoundary & orc_Boundary,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load image attributes
 
-   \param[in,out] orc_Image     Image data element
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "image" element
+   \param[in,out]  orc_Image        Image data element
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "image" element
 
    \return
    C_NO_ERR    information loaded
@@ -845,24 +845,37 @@ int32_t C_PuiBsElementsFiler::mh_LoadImage(C_PuiBsImage & orc_Image,
       s32_Return = C_CONFIG;
    }
 
+   // first load format, then the image, to know the format on image load
+   if (orc_XmlParser.SelectNodeChild("image-format") == "image-format")
+   {
+      orc_Image.c_UiImageFormat = orc_XmlParser.GetNodeContent().c_str();
+      orc_XmlParser.SelectNodeParent(); //back up to "image"
+   }
+   else
+   {
+      //Optional
+      orc_Image.c_UiImageFormat = "png";
+   }
+
    if (orc_XmlParser.SelectNodeChild("image-data") == "image-data")
    {
       const QString c_ImageBytes = orc_XmlParser.GetNodeContent().c_str();
-      mh_StringToPixmap(c_ImageBytes, orc_Image.c_UiImagePixmap);
+      mh_StringToPixmap(c_ImageBytes, orc_Image.c_UiImagePixmap, orc_Image.c_UiImageFormat);
       orc_XmlParser.SelectNodeParent(); //back up to "image"
    }
    else
    {
       s32_Return = C_CONFIG;
    }
+
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save image
 
-   \param[in]     orc_Image     Image data element
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "image" element
+   \param[in]      orc_Image        Image data element
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "image" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_SaveImage(const C_PuiBsImage & orc_Image,
@@ -874,16 +887,19 @@ void C_PuiBsElementsFiler::mh_SaveImage(const C_PuiBsImage & orc_Image,
    h_SaveBoxBase(orc_Image, orc_XmlParser);
    orc_XmlParser.SelectNodeParent(); //back to "image"
    orc_XmlParser.CreateAndSelectNodeChild("image-data");
-   mh_PixmapToString(orc_Image.c_UiImagePixmap, c_ImageBytes);
+   mh_PixmapToString(orc_Image.c_UiImagePixmap, orc_Image.c_UiImageFormat, c_ImageBytes);
    orc_XmlParser.SetNodeContent(c_ImageBytes.toStdString().c_str());
+   orc_XmlParser.SelectNodeParent(); //back to "image"
+   orc_XmlParser.CreateAndSelectNodeChild("image-format");
+   orc_XmlParser.SetNodeContent(orc_Image.c_UiImageFormat.toStdString().c_str());
    orc_XmlParser.SelectNodeParent(); //back to "image"
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load line arrow attributes
 
-   \param[in,out] orc_LineArrow Line arrow data element
-   \param[in,out] orc_XmlParser XML parser with the "current" element set to the "line-arrow" element
+   \param[in,out]  orc_LineArrow    Line arrow data element
+   \param[in,out]  orc_XmlParser    XML parser with the "current" element set to the "line-arrow" element
 
    \return
    C_NO_ERR    information loaded
@@ -999,17 +1015,21 @@ void C_PuiBsElementsFiler::mh_SaveFontStyle(const QFont & orc_FontStyle,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert pixmap to string
 
-   \param[in]     orc_Pixmap Pixmap
-   \param[out]    orc_String Byte string
+   \param[in]   orc_Pixmap    Pixmap
+   \param[in]   orc_Format    Image format
+   \param[out]  orc_String    Byte string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, QString & orc_String)
+void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, const QByteArray & orc_Format,
+                                             QString & orc_String)
 {
    QByteArray c_PixmapAsByteArray;
    QBuffer c_PixmapBuffer(&c_PixmapAsByteArray);
+   // use PNG as default image format as we had PNG hard-coded in previous implementation
+   const QByteArray c_Format = orc_Format.isEmpty() ? "png" : orc_Format;
 
    c_PixmapBuffer.open(QIODevice::WriteOnly);
-   orc_Pixmap.save(&c_PixmapBuffer, "PNG");
+   orc_Pixmap.save(&c_PixmapBuffer, c_Format);
    c_PixmapBuffer.close();
 
    orc_String = QString::fromUtf8(c_PixmapAsByteArray.toBase64());
@@ -1018,11 +1038,16 @@ void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, QString
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert string to pixmap
 
-   \param[in]     orc_String Byte string
-   \param[out]    orc_Pixmap Pixmap
+   \param[in]   orc_String    Byte string
+   \param[out]  orc_Pixmap    Pixmap
+   \param[in]   orc_Format    Image format
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsElementsFiler::mh_StringToPixmap(const QString & orc_String, QPixmap & orc_Pixmap)
+void C_PuiBsElementsFiler::mh_StringToPixmap(const QString & orc_String, QPixmap & orc_Pixmap,
+                                             const QByteArray & orc_Format)
 {
-   orc_Pixmap.loadFromData(QByteArray::fromBase64(orc_String.toUtf8()), "PNG");
+   // use PNG as default image type as we had PNG hard-coded in previous implementation
+   const QByteArray c_Format = orc_Format.isEmpty() ? "png" : orc_Format;
+
+   orc_Pixmap.loadFromData(QByteArray::fromBase64(orc_String.toUtf8()), c_Format);
 }

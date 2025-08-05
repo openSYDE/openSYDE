@@ -160,7 +160,7 @@ void C_SyvUpPacListNodeItemDatablockWidget::ViewFileInfo(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpPacListNodeItemDatablockWidget::IsViewFileInfoPossible(void) const
 {
-   return this->GetAppFilePath().compare("") != 0;
+   return (this->GetAppFilePath().compare("") != 0) && (this->mq_FileBased == false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

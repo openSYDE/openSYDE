@@ -11,6 +11,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
+#include "C_OgeContextMenu.hpp"
+
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
@@ -38,15 +40,30 @@ public:
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
    void SetNode(const uint32_t ou32_NodeIndex);
-   void ReloadLogJobs(void) const;
+   void LoadLogJobs(void);
+   void OnLogJobNameModified();
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+Q_SIGNALS:
+   //lint -restore
+   void SigNumLogJobsChanged(void);
+   void SigSelectionChanged(const uint32_t ou32_LogJobIndex);
+
+protected:
+   void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
 
 private:
    Ui::C_SdNdeDalLogJobsWidget * mpc_Ui;
    uint32_t mu32_NodeIndex;
+   stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
 
-   static const uint32_t mhu32_STATIC_LOG_JOB_INDEX;
-
-   void m_OnLogJobStateChanged(void);
+   void m_OnLogJobStateChanged(const QModelIndex orc_Index, const bool oq_IsEnabled);
+   void m_OnAddLogJob(void);
+   void m_OnDeleteLogJob(void);
+   void m_SetupContextMenu(void);
+   void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
+   void m_UpdateLogJobCountLabel(const uint32_t ou32_LogJobCount);
 
    //Avoid call
    C_SdNdeDalLogJobsWidget(const C_SdNdeDalLogJobsWidget &);

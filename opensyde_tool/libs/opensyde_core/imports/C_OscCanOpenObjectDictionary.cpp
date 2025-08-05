@@ -183,11 +183,13 @@ int32_t C_OscCanOpenObjectDictionary::LoadFromFile(const C_SclString & orc_File)
       C_EdsFile c_IniFile(orc_File);
 
       //go through all sections and set up c_Objects
-      for (int32_t s32_Section = 0U; s32_Section < c_IniFile.GetIniSections().GetLength(); s32_Section++)
+      C_SclDynamicArray<C_SclIniSection> & rc_Sections = c_IniFile.GetIniSections();
+
+      for (int32_t s32_Section = 0U; s32_Section < rc_Sections.GetLength(); s32_Section++)
       {
          //We are only interested in the sections describing objects or objects with subobjects.
          //All other sections will be ignored.
-         C_SclIniSection & rc_Section = c_IniFile.GetIniSections()[s32_Section];
+         C_SclIniSection & rc_Section = rc_Sections[s32_Section];
          const C_SclString & rc_SectionName = rc_Section.c_Name;
          if (rc_SectionName.Length() == 4)
          {
@@ -255,62 +257,19 @@ int32_t C_OscCanOpenObjectDictionary::LoadFromFile(const C_SclString & orc_File)
       {
          s32_Return = C_CONFIG;
       }
-   }
-   if (s32_Return == C_NO_ERR)
-   {
-      C_SclString c_InfoError;
-      s32_Return = this->c_InfoBlock.LoadFromFile(orc_File, c_InfoError);
-      if (s32_Return != C_NO_ERR)
+
+      if (s32_Return == C_NO_ERR)
       {
-         this->mc_LastError = c_InfoError;
+         C_SclString c_InfoError;
+         s32_Return = this->c_InfoBlock.LoadFromFile(c_IniFile, c_InfoError);
+         if (s32_Return != C_NO_ERR)
+         {
+            this->mc_LastError = c_InfoError;
+         }
       }
    }
 
    return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Utility for finding value in vector
-
-   Use binary search to find specific entry in uint32_t vector.
-
-   \param[in]     ou32_Value     value to find
-   \param[in]     orc_AllValues  vector with sorted values to search in
-
-   \retval  -1    value not found
-            else  index of value within vector
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscCanOpenObjectDictionary::mh_FindValue(const uint32_t ou32_Value,
-                                                   const std::vector<uint32_t> & orc_AllValues)
-{
-   int32_t s32_Pos;
-   int32_t s32_First;
-   int32_t s32_Last;
-   bool q_Found = false;
-
-   s32_First = 0U;
-   s32_Last  = static_cast<int32_t>(orc_AllValues.size());
-
-   while (s32_First <= s32_Last)
-   {
-      s32_Pos = ((s32_First + s32_Last) / 2);
-      if (ou32_Value > orc_AllValues[s32_Pos])
-      {
-         s32_First = s32_Pos + 1;
-      }
-      else if (ou32_Value < orc_AllValues[s32_Pos])
-      {
-         s32_Last = s32_Pos - 1;
-      }
-      else
-      {
-         //element found
-         q_Found = true;
-         break;
-      }
-   }
-   return (q_Found == true) ? s32_Pos : -1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -391,11 +350,42 @@ int32_t C_OscCanOpenObjectDictionary::m_GetObjectDescription(const uint16_t ou16
                                                              const bool oq_IsSubIndex, C_SclIniSection & orc_Section,
                                                              C_OscCanOpenObjectData & orc_Object)
 {
+   const uint32_t u32_NUM_STRINGS_TO_SEARCH = 10U;
+
+   //Use table to speed up search. Using C_SclIniSection::GetValue could "circle" through the entries depending
+   // on their sequence in the file. Keep number of string comparisons to a minimum.
+   //upper case, so we only need to do this call on the side of the file content:
+   const C_SclString ac_StringsToSearchFor[u32_NUM_STRINGS_TO_SEARCH] =
+   {
+      "PARAMETERNAME",
+      "ACCESSTYPE",
+      "SUBNUMBER",
+      "DATATYPE",
+      "DEFAULTVALUE",
+      "LOWLIMIT",
+      "HIGHLIMIT",
+      "PDOMAPPING",
+      "PARAMETERVALUE", //for DCF files
+      "DENOTATION",     //for DCF files
+   };
+   bool aq_StringsAlreadyFound[u32_NUM_STRINGS_TO_SEARCH] =
+   {
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+   };
+
    int32_t s32_Return = C_NO_ERR;
 
-   orc_Object.u16_Index   = ou16_Index;
-   orc_Object.c_Name      = orc_Section.GetValue("ParameterName").Trim();
-   orc_Object.c_Access    = orc_Section.GetValue("AccessType").UpperCase().Trim();
+   //preset values:
+   orc_Object.u16_Index = ou16_Index;
    if (oq_IsSubIndex == true)
    {
       orc_Object.u8_NumSubs  = 0xFFU; //0xFF: is_a_sub
@@ -403,95 +393,112 @@ int32_t C_OscCanOpenObjectDictionary::m_GetObjectDescription(const uint16_t ou16
    }
    else
    {
-      if (orc_Section.GetValue("SubNumber") == "")
-      {
-         orc_Object.u8_NumSubs = 0U; //spec: may be empty if no sub-index exists
-      }
-      else
-      {
-         try
-         {
-            orc_Object.u8_NumSubs = static_cast<uint8_t>(orc_Section.GetValue("SubNumber").ToInt());
-         }
-         catch (...)
-         {
-            mc_LastError.PrintFormatted("File contains non-numeric SubNumber for object %04X.%02X !",
-                                        static_cast<uint32_t>(ou16_Index),
-                                        static_cast<uint32_t>(ou8_SubIndex));
-            s32_Return = C_CONFIG;
-         }
-      }
+      orc_Object.u8_NumSubs = 0U; //spec: may be empty if no sub-index exists
       orc_Object.u8_SubIndex = 0U;
    }
+   orc_Object.u8_DataType = C_OscCanOpenObjectData::hu8_DATA_TYPE_DOMAIN; //optional for "DOMAIN" objects
+   orc_Object.q_IsMappableIntoPdo = false;
 
-   if (s32_Return == C_NO_ERR)
+   C_SclDynamicArray<C_SclIniKey> & rc_Keys = orc_Section.c_Keys;
+   for (int32_t s32_Key = 0; s32_Key < rc_Keys.GetLength(); s32_Key++)
    {
-      if (orc_Section.GetValue("DataType") == "")
-      {
-         orc_Object.u8_DataType = C_OscCanOpenObjectData::hu8_DATA_TYPE_DOMAIN; //optional for "DOMAIN" objects
-      }
-      else
-      {
-         try
-         {
-            orc_Object.u8_DataType = static_cast<uint8_t>(orc_Section.GetValue("DataType").ToInt());
-         }
-         catch (...)
-         {
-            mc_LastError.PrintFormatted("File contains non-numeric DataType for object %04X.%02X !",
-                                        static_cast<uint32_t>(ou16_Index),
-                                        static_cast<uint32_t>(ou8_SubIndex));
-            s32_Return = C_CONFIG;
-         }
-      }
-   }
+      const C_SclString c_KeyUpperCase = rc_Keys[s32_Key].c_Key.UpperCase();
 
-   if (s32_Return == C_NO_ERR)
-   {
-      uint8_t u8_Size;
-      orc_Object.DataTypeToTextAndSize(NULL, &u8_Size);
-      orc_Object.SetSize(u8_Size);
-      orc_Object.c_DefaultValue = orc_Section.GetValue("DefaultValue").Trim();
-      orc_Object.c_LowLimit = orc_Section.GetValue("LowLimit").Trim();
-      orc_Object.c_HighLimit = orc_Section.GetValue("HighLimit").Trim();
-      //stuff from DCF files:
-      orc_Object.c_ParameterValue = orc_Section.GetValue("ParameterValue").Trim();
-      orc_Object.c_Denotation = orc_Section.GetValue("Denotation").Trim();
-      if (orc_Section.GetValue("PDOMapping") == "")
+      for (uint32_t u32_StringIndex = 0U; u32_StringIndex < u32_NUM_STRINGS_TO_SEARCH; u32_StringIndex++)
       {
-         orc_Object.q_IsMappableIntoPdo = false;
-      }
-      else
-      {
-         try
+         if ((aq_StringsAlreadyFound[u32_StringIndex] == false) &&
+             (c_KeyUpperCase == ac_StringsToSearchFor[u32_StringIndex]))
          {
-            const int32_t s32_Value = orc_Section.GetValue("PDOMapping").ToInt();
-            if (s32_Value == 0)
+            //got one !
+            const C_SclString & rc_Value = rc_Keys[s32_Key].c_Value;
+            aq_StringsAlreadyFound[u32_StringIndex] = true; //no need to string compare this one again
+
+            switch (u32_StringIndex)
             {
-               orc_Object.q_IsMappableIntoPdo = false;
-            }
-            else if (s32_Value == 1)
-            {
-               orc_Object.q_IsMappableIntoPdo = true;
-            }
-            else
-            {
-               orc_Object.q_IsMappableIntoPdo = false;
-               mc_LastError.PrintFormatted(
-                  "Invalid boolean value \"%s\" found in entry \"PDOMapping\" for object %04X.%02X !",
-                  orc_Section.GetValue("PDOMapping").c_str(),
-                  static_cast<uint32_t>(ou16_Index),
-                  static_cast<uint32_t>(ou8_SubIndex));
+            case 0:
+               orc_Object.c_Name = rc_Value;
+               break;
+            case 1:
+               orc_Object.c_Access = rc_Value.UpperCase();
+               break;
+            case 2:
+               try
+               {
+                  orc_Object.u8_NumSubs = static_cast<uint8_t>(rc_Value.ToInt());
+               }
+               catch (...)
+               {
+                  mc_LastError.PrintFormatted("File contains non-numeric SubNumber for object %04X.%02X !",
+                                              static_cast<uint32_t>(ou16_Index),
+                                              static_cast<uint32_t>(ou8_SubIndex));
+                  s32_Return = C_CONFIG;
+               }
+               break;
+            case 3:
+               try
+               {
+                  orc_Object.u8_DataType = static_cast<uint8_t>(rc_Value.ToInt());
+               }
+               catch (...)
+               {
+                  mc_LastError.PrintFormatted("File contains non-numeric DataType for object %04X.%02X !",
+                                              static_cast<uint32_t>(ou16_Index),
+                                              static_cast<uint32_t>(ou8_SubIndex));
+                  s32_Return = C_CONFIG;
+               }
+               break;
+            case 4:
+               orc_Object.c_DefaultValue = rc_Value;
+               break;
+            case 5:
+               orc_Object.c_LowLimit = rc_Value;
+               break;
+            case 6:
+               orc_Object.c_HighLimit = rc_Value;
+               break;
+            case 7:
+               try
+               {
+                  const int32_t s32_Value = rc_Value.ToInt();
+                  if (s32_Value == 0)
+                  {
+                     orc_Object.q_IsMappableIntoPdo = false;
+                  }
+                  else if (s32_Value == 1)
+                  {
+                     orc_Object.q_IsMappableIntoPdo = true;
+                  }
+                  else
+                  {
+                     orc_Object.q_IsMappableIntoPdo = false;
+                     mc_LastError.PrintFormatted(
+                        "Invalid boolean value \"%s\" found in entry \"PDOMapping\" for object %04X.%02X !",
+                        rc_Value.c_str(),
+                        static_cast<uint32_t>(ou16_Index),
+                        static_cast<uint32_t>(ou8_SubIndex));
+                     s32_Return = C_CONFIG;
+                  }
+               }
+               catch (...)
+               {
+                  mc_LastError.PrintFormatted(
+                     "Could not parse entry \"PDOMapping\" value \"%s\" for object %04X.%02X !",
+                     rc_Value.c_str(),
+                     static_cast<uint32_t>(ou16_Index),
+                     static_cast<uint32_t>(ou8_SubIndex));
+                  s32_Return = C_CONFIG;
+               }
+               break;
+            case 8:
+               orc_Object.c_ParameterValue = rc_Value;
+               break;
+            case 9:
+               orc_Object.c_Denotation = rc_Value;
+               break;
+            default:
                s32_Return = C_CONFIG;
+               break;
             }
-         }
-         catch (...)
-         {
-            mc_LastError.PrintFormatted("Could not parse entry \"PDOMapping\" value \"%s\" for object %04X.%02X !",
-                                        orc_Section.GetValue("PDOMapping").c_str(),
-                                        static_cast<uint32_t>(ou16_Index),
-                                        static_cast<uint32_t>(ou8_SubIndex));
-            s32_Return = C_CONFIG;
          }
       }
    }

@@ -683,7 +683,7 @@ int32_t C_OscHalcMagicianGenerator::mh_FillHalcDatapoolsChannel(C_OscNodeDataPoo
                   ou32_ItDomain,
                   u32_ItParam,
                   u32_ItElem,
-                  orc_List);
+                  orc_List, ou32_ItRelevantChannel);
                //Use user value
                if (q_IsRelevant)
                {
@@ -710,7 +710,7 @@ int32_t C_OscHalcMagicianGenerator::mh_FillHalcDatapoolsChannel(C_OscNodeDataPoo
                ou32_ItDomain,
                u32_ItParam,
                0UL,
-               orc_List);
+               orc_List, ou32_ItRelevantChannel);
             //Use user value
             if (q_IsRelevant)
             {
@@ -798,8 +798,9 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForDomain(const C_OscHal
 {
    int32_t s32_Retval = C_NO_ERR;
    //Count
-   const uint32_t u32_CountRelevant = orc_DpHandler.CountRelevantItems(
+   const std::vector<uint32_t> c_RelevantChannels = orc_DpHandler.GetRelevantChannels(
       orc_Domain.c_ChannelConfigs, orc_Domain.c_DomainConfig);
+   const uint32_t u32_CountRelevant = static_cast<uint32_t>(c_RelevantChannels.size());
 
    if (u32_CountRelevant > 0UL)
    {
@@ -830,27 +831,27 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForDomain(const C_OscHal
       {
          s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_DomainValues.c_Parameters,
                                                     orc_Domain.c_SingularName, oq_IsSafe,
-                                                    u32_CountRelevant, true,
+                                                    c_RelevantChannels, true,
                                                     orc_HalcListParam);
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_DomainValues.c_InputValues,
                                                        orc_Domain.c_SingularName, oq_IsSafe,
-                                                       u32_CountRelevant, false,
+                                                       c_RelevantChannels, false,
                                                        orc_HalcListInput);
          }
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_DomainValues.c_OutputValues,
                                                        orc_Domain.c_SingularName, oq_IsSafe,
-                                                       u32_CountRelevant, false,
+                                                       c_RelevantChannels, false,
                                                        orc_HalcListOutput);
          }
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_DomainValues.c_StatusValues,
                                                        orc_Domain.c_SingularName, oq_IsSafe,
-                                                       u32_CountRelevant, false,
+                                                       c_RelevantChannels, false,
                                                        orc_HalcListStatus);
          }
       }
@@ -858,27 +859,27 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForDomain(const C_OscHal
       {
          s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_ChannelValues.c_Parameters,
                                                     orc_Domain.c_SingularName, oq_IsSafe,
-                                                    u32_CountRelevant, true,
+                                                    c_RelevantChannels, true,
                                                     orc_HalcListParam);
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_ChannelValues.c_InputValues,
                                                        orc_Domain.c_SingularName, oq_IsSafe,
-                                                       u32_CountRelevant, false,
+                                                       c_RelevantChannels, false,
                                                        orc_HalcListInput);
          }
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_ChannelValues.c_OutputValues,
                                                        orc_Domain.c_SingularName, oq_IsSafe,
-                                                       u32_CountRelevant, false,
+                                                       c_RelevantChannels, false,
                                                        orc_HalcListOutput);
          }
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = mh_GenerateVariablesForVector(orc_Domain.c_ChannelValues.c_StatusValues,
                                                        orc_Domain.c_SingularName, oq_IsSafe,
-                                                       u32_CountRelevant, false,
+                                                       c_RelevantChannels, false,
                                                        orc_HalcListStatus);
          }
       }
@@ -892,7 +893,7 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForDomain(const C_OscHal
    \param[in]      orc_Definition            Definition
    \param[in]      orc_DomainSingularName    Domain singular name
    \param[in]      oq_IsSafe                 Is safe
-   \param[in]      ou32_NumChannels          Num channels
+   \param[in]      orc_RelevantChannels      Relevant channels
    \param[in]      oq_AddDataset             Add dataset
    \param[in,out]  orc_List                  List
 
@@ -903,7 +904,8 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForDomain(const C_OscHal
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVector(
    const std::vector<C_OscHalcDefStruct> & orc_Definition, const stw::scl::C_SclString & orc_DomainSingularName,
-   const bool oq_IsSafe, const uint32_t ou32_NumChannels, const bool oq_AddDataset, C_OscNodeDataPoolList & orc_List)
+   const bool oq_IsSafe, const std::vector<uint32_t> & orc_RelevantChannels, const bool oq_AddDataset,
+   C_OscNodeDataPoolList & orc_List)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -911,7 +913,7 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVector(
    {
       s32_Retval = C_OscHalcMagicianGenerator::mh_GenerateVariablesForVectorElement(orc_Definition, u32_ItStruct,
                                                                                     orc_DomainSingularName, oq_IsSafe,
-                                                                                    ou32_NumChannels, oq_AddDataset,
+                                                                                    orc_RelevantChannels, oq_AddDataset,
                                                                                     orc_List);
    }
    return s32_Retval;
@@ -924,7 +926,7 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVector(
    \param[in]      ou32_DefinitionElementIndex  Definition element index
    \param[in]      orc_DomainSingularName       Domain singular name
    \param[in]      oq_IsSafe                    Is safe
-   \param[in]      ou32_NumChannels             Num channels
+   \param[in]      orc_RelevantChannels         Relevant channels
    \param[in]      oq_AddDataset                Add dataset
    \param[in,out]  orc_List                     List
 
@@ -935,8 +937,8 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVector(
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVectorElement(
    const std::vector<C_OscHalcDefStruct> & orc_Definition, const uint32_t ou32_DefinitionElementIndex,
-   const stw::scl::C_SclString & orc_DomainSingularName,   const bool oq_IsSafe, const uint32_t ou32_NumChannels,
-   const bool oq_AddDataset, C_OscNodeDataPoolList & orc_List)
+   const stw::scl::C_SclString & orc_DomainSingularName,   const bool oq_IsSafe,
+   const std::vector<uint32_t> & orc_RelevantChannels, const bool oq_AddDataset, C_OscNodeDataPoolList & orc_List)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -950,14 +952,14 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVectorElement(
          {
             s32_Retval = mh_AddVariableToList(rc_Struct.c_StructElements[u32_ItElem], orc_Definition,
                                               ou32_DefinitionElementIndex, u32_ItElem, orc_DomainSingularName,
-                                              oq_IsSafe, ou32_NumChannels, oq_AddDataset, orc_List);
+                                              oq_IsSafe, orc_RelevantChannels, oq_AddDataset, orc_List);
          }
       }
       else
       {
          s32_Retval =
             mh_AddVariableToList(rc_Struct, orc_Definition, ou32_DefinitionElementIndex, 0UL, orc_DomainSingularName,
-                                 oq_IsSafe, ou32_NumChannels, oq_AddDataset, orc_List);
+                                 oq_IsSafe, orc_RelevantChannels, oq_AddDataset, orc_List);
       }
    }
    else
@@ -976,7 +978,7 @@ int32_t C_OscHalcMagicianGenerator::mh_GenerateVariablesForVectorElement(
    \param[in]      ou32_ParameterIndexElement   Parameter index element
    \param[in]      orc_DomainSingularName       Domain singular name
    \param[in]      oq_IsSafe                    Is safe
-   \param[in]      ou32_NumChannels             Num channels
+   \param[in]      orc_RelevantChannels         Relevant channels
    \param[in]      oq_AddDataset                Add dataset
    \param[in,out]  orc_List                     List
 
@@ -990,7 +992,8 @@ int32_t C_OscHalcMagicianGenerator::mh_AddVariableToList(const C_OscHalcDefEleme
                                                          const uint32_t ou32_ParameterIndexStruct,
                                                          const uint32_t ou32_ParameterIndexElement,
                                                          const stw::scl::C_SclString & orc_DomainSingularName,
-                                                         const bool oq_IsSafe, const uint32_t ou32_NumChannels,
+                                                         const bool oq_IsSafe,
+                                                         const std::vector<uint32_t> & orc_RelevantChannels,
                                                          const bool oq_AddDataset, C_OscNodeDataPoolList & orc_List)
 {
    int32_t s32_Retval;
@@ -1007,10 +1010,14 @@ int32_t C_OscHalcMagicianGenerator::mh_AddVariableToList(const C_OscHalcDefEleme
    c_Element.e_Access =
       oq_IsSafe ? C_OscNodeDataPoolListElement::eACCESS_RO : C_OscNodeDataPoolListElement::eACCESS_RW;
 
-   s32_Retval = mh_ConvertToDatapoolAndResize(orc_Definition.c_MinValue, ou32_NumChannels, c_Element.c_MinValue);
+   s32_Retval =
+      mh_ConvertToDatapoolAndResize(orc_Definition.c_MinValue,
+                                    static_cast<uint32_t>(orc_RelevantChannels.size()), c_Element.c_MinValue);
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = mh_ConvertToDatapoolAndResize(orc_Definition.c_MaxValue, ou32_NumChannels, c_Element.c_MaxValue);
+      s32_Retval = mh_ConvertToDatapoolAndResize(orc_Definition.c_MaxValue,
+                                                 static_cast<uint32_t>(orc_RelevantChannels.size()),
+                                                 c_Element.c_MaxValue);
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -1021,11 +1028,25 @@ int32_t C_OscHalcMagicianGenerator::mh_AddVariableToList(const C_OscHalcDefEleme
       {
          c_Element.c_DataSetValues.push_back(c_Element.c_MinValue);
       }
-
-      tgl_assert(C_OscHalcMagicianUtil::h_GetVariableName(orc_DefinitionArray, ou32_ParameterIndexStruct,
-                                                          ou32_ParameterIndexElement, orc_DomainSingularName,
-                                                          c_Element.c_Name) == C_NO_ERR);
-      orc_List.c_Elements.push_back(c_Element);
+      if (orc_Definition.GetComplexType() == C_OscHalcDefContent::eCT_STRING)
+      {
+         c_Element.q_InterpretAsString = true;
+         for (uint32_t u32_ItEl = 0UL; u32_ItEl < orc_RelevantChannels.size(); ++u32_ItEl)
+         {
+            tgl_assert(C_OscHalcMagicianUtil::h_GetVariableName(orc_DefinitionArray, ou32_ParameterIndexStruct,
+                                                                ou32_ParameterIndexElement, orc_DomainSingularName,
+                                                                c_Element.c_Name,
+                                                                orc_RelevantChannels[u32_ItEl]) == C_NO_ERR);
+            orc_List.c_Elements.push_back(c_Element);
+         }
+      }
+      else
+      {
+         tgl_assert(C_OscHalcMagicianUtil::h_GetVariableName(orc_DefinitionArray, ou32_ParameterIndexStruct,
+                                                             ou32_ParameterIndexElement, orc_DomainSingularName,
+                                                             c_Element.c_Name, 0UL) == C_NO_ERR);
+         orc_List.c_Elements.push_back(c_Element);
+      }
    }
    return s32_Retval;
 }
@@ -1048,7 +1069,7 @@ int32_t C_OscHalcMagicianGenerator::mh_ConvertToDatapoolWithoutArray(const C_Osc
 
    orc_DpContent = orc_HalcContent;
 
-   if ((orc_HalcContent.GetArray()) ||
+   if ((orc_HalcContent.GetArray() && (orc_HalcContent.GetComplexType() != C_OscHalcDefContent::eCT_STRING)) ||
        ((orc_HalcContent.GetComplexType() == C_OscHalcDefContent::eCT_BIT_MASK) &&
         ((orc_HalcContent.GetType() == C_OscNodeDataPoolContent::eFLOAT32) ||
          (orc_HalcContent.GetType() == C_OscNodeDataPoolContent::eFLOAT64))))
@@ -1079,7 +1100,7 @@ int32_t C_OscHalcMagicianGenerator::mh_ConvertToDatapoolAndAssign(const C_OscHal
    C_OscNodeDataPoolContent c_ApplyValue;
    int32_t s32_Retval = mh_ConvertToDatapoolWithoutArray(orc_HalcContent, c_ApplyValue);
 
-   if (s32_Retval == C_NO_ERR)
+   if ((s32_Retval == C_NO_ERR) && (orc_HalcContent.GetComplexType() != C_OscHalcDefContent::eCT_STRING))
    {
       if (((orc_HalcContent.GetArray()) || (c_ApplyValue.GetArray())) ||
           ((orc_HalcContent.GetComplexType() == C_OscHalcDefContent::eCT_BIT_MASK) &&
@@ -1170,7 +1191,7 @@ int32_t C_OscHalcMagicianGenerator::mh_ConvertToDatapoolAndResize(const C_OscHal
 
    if (s32_Retval == C_NO_ERR)
    {
-      if ((orc_HalcContent.GetArray()) ||
+      if ((orc_HalcContent.GetArray() && (orc_HalcContent.GetComplexType() != C_OscHalcDefContent::eCT_STRING)) ||
           ((orc_HalcContent.GetComplexType() == C_OscHalcDefContent::eCT_BIT_MASK) &&
            ((orc_HalcContent.GetType() == C_OscNodeDataPoolContent::eFLOAT32) ||
             (orc_HalcContent.GetType() == C_OscNodeDataPoolContent::eFLOAT64))))
@@ -1278,6 +1299,9 @@ int32_t C_OscHalcMagicianGenerator::mh_ConvertToDatapoolAndResize(const C_OscHal
                   }
                }
             }
+            break;
+         case C_OscHalcDefContent::eCT_STRING:
+            //Nothing to do
             break;
          default:
             break;

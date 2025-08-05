@@ -16,11 +16,13 @@
 #include "stwerrors.hpp"
 #include "C_OscUtils.hpp"
 #include "C_SclChecksums.hpp"
+#include "C_SclIniFile.hpp"
+#include "C_SclStringList.hpp"
 #include "C_OscCanOpenEdsInfoBlock.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
-
+using namespace stw::scl;
 using namespace stw::errors;
 using namespace stw::opensyde_core;
 
@@ -64,37 +66,26 @@ void C_OscCanOpenEdsInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load from file
 
-   \param[in]      orc_FilePath     File path
+   \param[in]      orc_File         Opened eds file to load from
    \param[in,out]  orc_LastError    Last error
 
    \return
    STW error codes
 
    \retval   C_NO_ERR   Values read
-   \retval   C_RANGE    File not found
    \retval   C_CONFIG   At least one value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscCanOpenEdsInfoBlock::LoadFromFile(const stw::scl::C_SclString & orc_FilePath,
-                                               stw::scl::C_SclString & orc_LastError)
+int32_t C_OscCanOpenEdsInfoBlock::LoadFromFile(C_SclIniFile & orc_File, C_SclString & orc_LastError)
 {
-   int32_t s32_Retval = C_NO_ERR;
+   int32_t s32_Retval;
 
-   if (TglFileExists(orc_FilePath))
+   orc_File.GetFileAsStringList(this->c_FileContentForSave);
+   this->m_InitHash();
+   s32_Retval = this->c_FileInfo.LoadFromIni(orc_File, orc_LastError);
+   if (s32_Retval == C_NO_ERR)
    {
-      stw::scl::C_SclIniFile c_IniFile(orc_FilePath);
-      C_OscUtils::h_FileToString(orc_FilePath, this->c_FileContentForSave);
-      this->m_InitHash();
-      s32_Retval = this->c_FileInfo.LoadFromIni(c_IniFile, orc_LastError);
-
-      if (s32_Retval == C_NO_ERR)
-      {
-         s32_Retval = this->c_DeviceInfo.LoadFromIni(c_IniFile, orc_LastError);
-      }
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
+      s32_Retval = this->c_DeviceInfo.LoadFromIni(orc_File, orc_LastError);
    }
    return s32_Retval;
 }
@@ -119,6 +110,10 @@ void C_OscCanOpenEdsInfoBlock::m_InitHash()
 {
    this->u32_FileHash = 0xFFFFFFFFU;
 
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_FileContentForSave.c_str(),
-                                       this->c_FileContentForSave.Length(), this->u32_FileHash);
+   for (int32_t s32_Line = 0; s32_Line < this->c_FileContentForSave.Strings.GetLength(); s32_Line++)
+   {
+      stw::scl::C_SclChecksums::CalcCRC32(this->c_FileContentForSave.Strings[s32_Line].c_str(),
+                                          this->c_FileContentForSave.Strings[s32_Line].Length(),
+                                          this->u32_FileHash);
+   }
 }

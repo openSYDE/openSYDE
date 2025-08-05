@@ -19,6 +19,9 @@
 #include "stwerrors.hpp"
 #include "C_GtGetText.hpp"
 #include "C_PuiSdUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -27,6 +30,7 @@ using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,10 +56,7 @@ C_SdNdeDalLogJobPropertiesWidget::C_SdNdeDalLogJobPropertiesWidget(QWidget * con
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDalLogJobPropertiesWidget),
    mu32_NodeIndex(0),
-   mu32_DataLoggerJobIndex(0),
-   ms32_LastUsedLogFileFormatIndex(0),
-   ms32_LastUsedLocalDataIndex(0),
-   ms32_LastUsedInterfaceNumberIndex(0)
+   mu32_DataLoggerJobIndex(0)
 
 {
    this->mpc_Ui->setupUi(this);
@@ -63,47 +64,36 @@ C_SdNdeDalLogJobPropertiesWidget::C_SdNdeDalLogJobPropertiesWidget(QWidget * con
    this->mpc_Ui->pc_LabelIconFileFormat->SetFontPixel(36, true);
    this->mpc_Ui->pc_LabelIcon->SetSvg("://images/IconLogging.svg");
 
-   this->mpc_Ui->pc_SpinBoxMaxFileSize->SetMinimumCustom(100);
-   this->mpc_Ui->pc_SpinBoxMaxFileSize->SetMaximumCustom(1024);
-
    // name length restriction
    this->mpc_Ui->pc_LineEditName->setMaxLength(C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit());
 
-   //Hiding Max File Size for now
-   this->mpc_Ui->pc_LabelMaxFileSize->setVisible(false);
-   this->mpc_Ui->pc_SpinBoxMaxFileSize->setVisible(false);
-   this->mpc_Ui->horizontalSpacer_9->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
-   this->mpc_Ui->horizontalSpacer_8->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-   //Set mode to disable for now
-   this->mpc_Ui->pc_ComboBoxLocalData->setDisabled(true);
-   this->mpc_Ui->pc_ComboBoxLocalData->setCurrentText("On Change");
+   this->m_GetSupportedLogFileFormats();
+   this->m_GetSupportedLocalData();
+   this->m_GetSupportedLogJobUseCase();
 
    this->InitStaticNames();
 
+   // set LoggingInterval min/max
+   this->mpc_Ui->pc_SpinBoxLoggingInterval->SetMinimumCustom(0);
+   this->mpc_Ui->pc_SpinBoxLoggingInterval->SetMaximumCustom(0x7FFFFFFF);
+
+   // set LogDuration min/max
+   this->mpc_Ui->pc_SpinBoxLogDuration->SetMinimumCustom(0);
+   this->mpc_Ui->pc_SpinBoxLogDuration->SetMaximumCustom(0x7FFFFFFF);
+
+   // set MaxLogEntries min/max
+   this->mpc_Ui->pc_SpxBoxMaxLogEntries->SetMinimumCustom(0);
+   this->mpc_Ui->pc_SpxBoxMaxLogEntries->SetMaximumCustom(0x7FFFFFFF);
+
    connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::editingFinished,
-           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnNameEdited);
-   connect(this->mpc_Ui->pc_TextEditComment, &C_OgeTedPropertiesComment::SigEditingFinished,
-           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnCommentEdited);
-   connect(this->mpc_Ui->pc_ComboBoxLogFileFormat,
-           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
-           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLogFileFormatChanged);
-   connect(this->mpc_Ui->pc_ComboBoxLocalData,
-           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
-           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged);
-   connect(this->mpc_Ui->pc_ComboBoxClientInterface,
-           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
-           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnClientInterfaceChanged);
-   connect(this->mpc_Ui->pc_SpinBoxMaxFileSize, static_cast<void (QSpinBox::*)(
-                                                               int32_t)>(&C_OgeSpxNumber::valueChanged), this,
-           &C_SdNdeDalLogJobPropertiesWidget::m_OnFileSizeChanged);
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_TrimLogJobName);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDalLogJobPropertiesWidget::~C_SdNdeDalLogJobPropertiesWidget()
+C_SdNdeDalLogJobPropertiesWidget::~C_SdNdeDalLogJobPropertiesWidget() noexcept
 {
    delete this->mpc_Ui;
 }
@@ -120,39 +110,58 @@ void C_SdNdeDalLogJobPropertiesWidget::SetNodeDataLoggerJob(const uint32_t ou32_
 {
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(ou32_NodeIndex,
                                                                                                   ou32_DataLoggerJobIndex);
-   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-   const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
 
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu32_DataLoggerJobIndex = ou32_DataLoggerJobIndex;
-   this->m_GetSupportedLogFileFormats();
-   this->m_GetSupportedLocalData();
-   this->m_GetSupportedClientInterfaces();
-
+   this->m_DisconnectChangeTriggers();
    if (pc_Retval != NULL)
    {
-      //this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str()); //AC: Disabled for fixed name
-      this->mpc_Ui->pc_LineEditName->setText("LogJob1");
-      this->mpc_Ui->pc_LineEditName->setDisabled(true);
+      this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str());
       this->mpc_Ui->pc_TextEditComment->setText(pc_Retval->c_Properties.c_Comment.c_str());
+      this->mpc_Ui->pc_ComboBoxLogJobUseCase->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.e_UseCase));
       this->mpc_Ui->pc_ComboBoxLogFileFormat->setCurrentIndex(static_cast<int32_t>(pc_Retval->c_Properties.
                                                                                    e_LogFileFormat));
+      this->mpc_Ui->pc_LineEditLogDestination->setText(static_cast<QString>(pc_Retval->c_Properties.
+                                                                            c_LogDestinationDirectory.c_str()));
       this->mpc_Ui->pc_ComboBoxLocalData->setCurrentIndex(
          static_cast<int32_t>(pc_Retval->c_Properties.e_LocalLogTrigger));
-      this->mpc_Ui->pc_SpinBoxMaxFileSize->setValue(static_cast<int32_t>(pc_Retval->c_Properties.u32_MaxLogFileSizeMb));
-
-      if (pc_Retval->c_Properties.e_ConnectedInterfaceType == C_OscSystemBus::E_Type::eETHERNET)
-      {
-         this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
-                                                                                        u8_ConnectedInterfaceNumber +
-                                                                                        pc_DevDef->u8_NumCanBusses));
-      }
-      else
-      {
-         this->mpc_Ui->pc_ComboBoxClientInterface->setCurrentIndex(static_cast<uint8_t>(pc_Retval->c_Properties.
-                                                                                        u8_ConnectedInterfaceNumber));
-      }
+      this->mpc_Ui->pc_SpinBoxLoggingInterval->setValue(pc_Retval->c_Properties.u32_LogIntervalMs);
+      this->mpc_Ui->pc_SpinBoxLogDuration->setValue(pc_Retval->c_Properties.u32_MaxLogDurationSec);
+      this->mpc_Ui->pc_SpxBoxMaxLogEntries->setValue(pc_Retval->c_Properties.u32_MaxLogEntries);
+      this->m_OnLogJobUseCaseChanged(this->mpc_Ui->pc_ComboBoxLogJobUseCase->currentIndex());
+      this->m_OnLocalDataChanged(this->mpc_Ui->pc_ComboBoxLocalData->currentIndex());
    }
+   this->m_ReconnectChangeTriggers();
+   this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->SetNodeDataLoggerJob(ou32_NodeIndex, ou32_DataLoggerJobIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::Save() const
+{
+   C_PuiSdHandler::h_GetInstance()->SetDataLoggerProperties(mu32_NodeIndex,
+                                                            mu32_DataLoggerJobIndex,
+                                                            this->mc_Properties.c_Name,
+                                                            this->mc_Properties.c_Comment,
+                                                            this->mc_Properties.e_UseCase,
+                                                            this->mc_Properties.e_LogFileFormat,
+                                                            this->mc_Properties.u32_MaxLogEntries,
+                                                            this->mc_Properties.u32_MaxLogDurationSec,
+                                                            this->mc_Properties.u32_LogIntervalMs,
+                                                            this->mc_Properties.e_LocalLogTrigger,
+                                                            this->mc_Properties.c_LogDestinationDirectory);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} TODO
+void C_SdNdeDalLogJobPropertiesWidget::SaveUserSettings() const
+{
+   //TODO
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,23 +175,77 @@ void C_SdNdeDalLogJobPropertiesWidget::InitStaticNames() const
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here..."));
    this->mpc_Ui->pc_LabelGeneral->setText(C_GtGetText::h_GetText("General"));
-   this->mpc_Ui->pc_LabelLogTriggerCondition->setText(C_GtGetText::h_GetText("Log Trigger Condition"));
    this->mpc_Ui->pc_LabelLogFileFormat->setText(C_GtGetText::h_GetText("Log File Format"));
-   this->mpc_Ui->pc_LabelMaxFileSize->setText(C_GtGetText::h_GetText("Max. File Size"));
    this->mpc_Ui->pc_LabelMode->setText(C_GtGetText::h_GetText("Mode"));
+   this->mpc_Ui->pc_LabelGeneral->setText(C_GtGetText::h_GetText("General"));
+   this->mpc_Ui->pc_LabelLogJobUseCase->setText(C_GtGetText::h_GetText("Log Job Use-Case"));
+   this->mpc_Ui->pc_LabelLogFileFormat->setText(C_GtGetText::h_GetText("Log File Format"));
+   this->mpc_Ui->pc_LabelLogDestination->setText(C_GtGetText::h_GetText("Log Destination"));
+   this->mpc_Ui->pc_LineEditLogDestination->setPlaceholderText(C_GtGetText::h_GetText("./ExampleSubFolder"));
+   this->mpc_Ui->pc_LabelMode->setText(C_GtGetText::h_GetText("Mode"));
+   this->mpc_Ui->pc_LabelLoggingInterval->setText(C_GtGetText::h_GetText("Logging Interval"));
+   this->mpc_Ui->pc_LabelLogDuration->setText(C_GtGetText::h_GetText("Log Duration"));
+   this->mpc_Ui->pc_LabelMaxLogEntries->setText(C_GtGetText::h_GetText("Max Log Entries"));
+
+   //tooltips
+   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                        "Name"),
+                                                     static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "Symbolic log job name. Unique within Data Logger.\n"
+                                                                             "\nFollowing naming conventions are required:"
+                                                                             "\n - must not be empty"
+                                                                             "\n - must not start with digits"
+                                                                             "\n - only alphanumeric characters and \"_\""
+                                                                             "\n - should not be longer than %1 (= project setting) characters")).arg(
+                                                        C_PuiSdHandler::h_GetInstance()->GetNameMaxCharLimit()));
+   this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
+                                                        C_GtGetText::h_GetText("Comment for this log job."));
+
+   this->mpc_Ui->pc_LabelLogJobUseCase->SetToolTipInformation(C_GtGetText::h_GetText("Log Job Use-Case"),
+                                                              C_GtGetText::h_GetText(
+                                                                 "Select the use-case of the log job:\n"
+                                                                 "- Manual: Select custom log destination and file format.\n"
+                                                                 "- AWS: Logging for AWS cloud\n"
+                                                                 "- maschines.cloud: Logging for maschines.cloud"));
+   this->mpc_Ui->pc_LabelLogFileFormat->SetToolTipInformation(C_GtGetText::h_GetText("Log File Format"),
+                                                              C_GtGetText::h_GetText(
+                                                                 "Log File Format, relevant when log job use-case 'Manual' is selected."));
+   this->mpc_Ui->pc_LabelLogDestination->SetToolTipInformation(C_GtGetText::h_GetText("Log Destination"),
+                                                               C_GtGetText::h_GetText(
+                                                                  "Log Destination, relevant when log job use-case 'Manual' is selected.\n"
+                                                                  "Sub-folder name where the log files are stored."));
+
+   this->mpc_Ui->pc_LabelMode->SetToolTipInformation(C_GtGetText::h_GetText("Mode"),
+                                                     C_GtGetText::h_GetText(
+                                                        "Log Mode:\n"
+                                                        "- On Change: On every value change, the data element is logged to file. \n"
+                                                        "- Interval: Every logging interval all logging data of a log job are logged to file."));
+   this->mpc_Ui->pc_LabelLoggingInterval->SetToolTipInformation(C_GtGetText::h_GetText("Logging Interval"),
+                                                                C_GtGetText::h_GetText(
+                                                                   "Relevant when log mode 'Interval' is selected.\n"
+                                                                   "Every logging interval all logging data of a log job are logged to file."));
+   this->mpc_Ui->pc_LabelLogDuration->SetToolTipInformation(C_GtGetText::h_GetText("Log Duration"),
+                                                            C_GtGetText::h_GetText(
+                                                               "Relevant when log mode 'Interval' is selected.\n"
+                                                               "Max log duration of a file before starting a new one."));
+   this->mpc_Ui->pc_LabelMaxLogEntries->SetToolTipInformation(C_GtGetText::h_GetText("Max Log Entries"),
+                                                              C_GtGetText::h_GetText(
+                                                                 "Relevant when log mode 'Interval' is selected.\n"
+                                                                 "Max log entries in a file before starting a new one."));
 
    // Icon section
-   switch (this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex())
-   {
-   case 0:
-      this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("CSV"));
-      break;
-   case 1:
-      this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("Parquet"));
-      break;
-   default:
-      break;
-   }
+   this->mpc_Ui->pc_LabelIconFileFormat->setText(
+      mh_ConvertTxMethodToName(static_cast<C_OscDataLoggerJobProperties::E_UseCase>(
+                                  this->mpc_Ui->pc_ComboBoxLogJobUseCase->currentIndex())));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload additional trigger
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::ReloadAdditionalTrigger()
+{
+   this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->Reload();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -234,133 +297,91 @@ void C_SdNdeDalLogJobPropertiesWidget::m_GetSupportedLocalData() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Add client interfaces (CAN/ETHERNET) into related combo box
+/*! \brief  Add supported log job use cases into related combo box
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobPropertiesWidget::m_GetSupportedClientInterfaces() const
+void C_SdNdeDalLogJobPropertiesWidget::m_GetSupportedLogJobUseCase() const
 {
-   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-   const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
-
-   std::vector<QString> c_InterfaceNames;
-   QString c_InterfaceName;
-
-   for (uint8_t u8_Iterator = 0; u8_Iterator < pc_DevDef->u8_NumCanBusses; ++u8_Iterator)
-   {
-      c_InterfaceName = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN, u8_Iterator);
-      c_InterfaceNames.push_back(c_InterfaceName);
-   }
-
-   for (uint8_t u8_Iterator = 0; u8_Iterator < pc_DevDef->u8_NumEthernetBusses; ++u8_Iterator)
-   {
-      c_InterfaceName = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eETHERNET, u8_Iterator);
-      c_InterfaceNames.push_back(c_InterfaceName);
-   }
-
-   for (uint32_t u32_InterfaceNamesCounter = 0U;
-        u32_InterfaceNamesCounter < static_cast<uint32_t>(c_InterfaceNames.size());
-        ++u32_InterfaceNamesCounter)
-   {
-      this->mpc_Ui->pc_ComboBoxClientInterface->addItem(c_InterfaceNames[u32_InterfaceNamesCounter]);
-   }
+   // Must be same order as defined in core
+   this->mpc_Ui->pc_ComboBoxLogJobUseCase->addItem(mh_ConvertTxMethodToName(C_OscDataLoggerJobProperties::eUC_MANUAL));
+   this->mpc_Ui->pc_ComboBoxLogJobUseCase->addItem(mh_ConvertTxMethodToName(C_OscDataLoggerJobProperties::eUC_AWS));
+   this->mpc_Ui->pc_ComboBoxLogJobUseCase->addItem(mh_ConvertTxMethodToName(C_OscDataLoggerJobProperties::
+                                                                            eUC_MACHINES_CLOUD));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for editing finished on name property
+/*! \brief   Convert tx method to name
+
+   \param[in]  ore_Type    Tx method
+
+   \return
+   Name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobPropertiesWidget::m_OnNameEdited()
+QString C_SdNdeDalLogJobPropertiesWidget::mh_ConvertTxMethodToName(
+   const C_OscDataLoggerJobProperties::E_UseCase & ore_Type)
 {
-   const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
-                                                                                                  mu32_DataLoggerJobIndex);
+   QString c_Retval;
 
-   if (pc_Retval != NULL)
+   switch (ore_Type)
    {
-      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
-
-      rc_Properties.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                      mu32_DataLoggerJobIndex,
-                                                                                      rc_Properties);
+   case C_OscDataLoggerJobProperties::eUC_MANUAL:
+      c_Retval = C_GtGetText::h_GetText("Manual");
+      break;
+   case C_OscDataLoggerJobProperties::eUC_AWS:
+      c_Retval = C_GtGetText::h_GetText("AWS");
+      break;
+   case C_OscDataLoggerJobProperties::eUC_MACHINES_CLOUD:
+      c_Retval = C_GtGetText::h_GetText("machines.cloud");
+      break;
+   default:
+      c_Retval = "";
+      break;
    }
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for SigEditingFinished on comment property
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobPropertiesWidget::m_OnCommentEdited()
-{
-   const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
-                                                                                                  mu32_DataLoggerJobIndex);
-
-   if (pc_Retval != NULL)
-   {
-      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
-
-      rc_Properties.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                      mu32_DataLoggerJobIndex,
-                                                                                      rc_Properties);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for valueChanged on file size spin box property
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobPropertiesWidget::m_OnFileSizeChanged()
-{
-   const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
-                                                                                                  mu32_DataLoggerJobIndex);
-
-   if (pc_Retval != NULL)
-   {
-      C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
-
-      rc_Properties.u32_MaxLogFileSizeMb = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxMaxFileSize->value());
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                      mu32_DataLoggerJobIndex,
-                                                                                      rc_Properties);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for File format combo box index change.
+/*! \brief  Slot for log job use case combo box index change.
 
    \param[in]  os32_NewIndex  New combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobPropertiesWidget::m_OnLogFileFormatChanged(const int32_t os32_NewIndex)
+void C_SdNdeDalLogJobPropertiesWidget::m_OnLogJobUseCaseChanged(const int32_t os32_NewIndex)
 {
-   if (this->ms32_LastUsedLogFileFormatIndex != os32_NewIndex)
-   {
-      const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
-                                                                                                     mu32_DataLoggerJobIndex);
-      if (pc_Retval != NULL)
-      {
-         switch (os32_NewIndex)
-         {
-         case 0:
-            this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("CSV"));
-            break;
-         case 1:
-            this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("Parquet"));
-            break;
-         default:
-            break;
-         }
-         C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+   const C_OscDataLoggerJobProperties::E_UseCase e_UseCase =
+      static_cast<C_OscDataLoggerJobProperties::E_UseCase>(os32_NewIndex);
 
-         rc_Properties.e_LogFileFormat =
-            static_cast<C_OscDataLoggerJobProperties::E_LogFileFormat>(this->mpc_Ui->pc_ComboBoxLogFileFormat->
-                                                                       currentIndex());
-         C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                         mu32_DataLoggerJobIndex,
-                                                                                         rc_Properties);
-         this->ms32_LastUsedLogFileFormatIndex = this->mpc_Ui->pc_ComboBoxLogFileFormat->currentIndex();
-      }
+   switch (e_UseCase)
+   {
+   case C_OscDataLoggerJobProperties::eUC_AWS:
+      this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("AWS"));
+
+      this->mpc_Ui->pc_GbxFileFormat->setVisible(false);
+      this->mpc_Ui->pc_LabelLogDestination->setVisible(false);
+      this->mpc_Ui->pc_LineEditLogDestination->setVisible(false);
+      break;
+
+   case C_OscDataLoggerJobProperties::eUC_MACHINES_CLOUD:
+      this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("machines.cloud"));
+
+      this->mpc_Ui->pc_GbxFileFormat->setVisible(false);
+      this->mpc_Ui->pc_LabelLogDestination->setVisible(false);
+      this->mpc_Ui->pc_LineEditLogDestination->setVisible(false);
+      break;
+
+   case C_OscDataLoggerJobProperties::eUC_MANUAL:
+      this->mpc_Ui->pc_LabelIconFileFormat->setText(C_GtGetText::h_GetText("Manual"));
+
+      this->mpc_Ui->pc_GbxFileFormat->setVisible(true);
+      this->mpc_Ui->pc_LabelLogDestination->setVisible(true);
+      this->mpc_Ui->pc_LineEditLogDestination->setVisible(true);
+      break;
+
+   default:
+      break;
    }
+   this->m_OnXappSettingsChanged();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -371,53 +392,251 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLogFileFormatChanged(const int32_t os
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged(const int32_t os32_NewIndex)
 {
-   if (this->ms32_LastUsedLocalDataIndex != os32_NewIndex)
+   switch (os32_NewIndex)
    {
-      const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
-                                                                                                     mu32_DataLoggerJobIndex);
-      if (pc_Retval != NULL)
-      {
-         C_OscDataLoggerJobProperties rc_Properties = pc_Retval->c_Properties;
+   case 0:
+      this->mpc_Ui->pc_GbxLoggingInterval->setVisible(false);
+      this->mpc_Ui->pc_GbxLogDuration->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxMaxLogEntries->setVisible(true);
+      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->setVisible(false);
+      break;
+   case 1:
+      this->mpc_Ui->pc_GbxLoggingInterval->setVisible(true);
+      this->mpc_Ui->pc_GbxLogDuration->setVisible(true);
+      this->mpc_Ui->pc_GroupBoxMaxLogEntries->setVisible(false);
+      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->setVisible(true);
+      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->Reload();
+      break;
+   default:
+      break;
+   }
 
-         rc_Properties.e_LocalLogTrigger =
-            static_cast<C_OscDataLoggerJobProperties::E_LocalLogTrigger>(this->mpc_Ui->pc_ComboBoxLocalData->
-                                                                         currentIndex());
-         C_PuiSdHandler::h_GetInstance()->SetDataLoggerPropertiesWithoutInterfaceChanges(mu32_NodeIndex,
-                                                                                         mu32_DataLoggerJobIndex,
-                                                                                         rc_Properties);
-         this->ms32_LastUsedLocalDataIndex = this->mpc_Ui->pc_ComboBoxLocalData->currentIndex();
-      }
+   this->m_OnXappSettingsChanged();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for X-App settings data value changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged()
+{
+   const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                                                                  mu32_DataLoggerJobIndex);
+
+   if (pc_Retval != NULL)
+   {
+      this->mc_Properties = pc_Retval->c_Properties;
+
+      this->mc_Properties.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
+      this->mc_Properties.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
+      this->mc_Properties.e_UseCase =
+         static_cast<C_OscDataLoggerJobProperties::E_UseCase>(this->mpc_Ui->pc_ComboBoxLogJobUseCase->currentIndex());
+      this->mc_Properties.e_LogFileFormat =
+         static_cast<C_OscDataLoggerJobProperties::E_LogFileFormat>(this->mpc_Ui->pc_ComboBoxLogFileFormat->
+                                                                    currentIndex());
+      this->mc_Properties.c_LogDestinationDirectory =
+         this->mpc_Ui->pc_LineEditLogDestination->text().toStdString().c_str();
+      this->mc_Properties.e_LocalLogTrigger =
+         static_cast<C_OscDataLoggerJobProperties::E_LocalLogTrigger>(this->mpc_Ui->pc_ComboBoxLocalData->
+                                                                      currentIndex());
+      this->mc_Properties.u32_LogIntervalMs = this->mpc_Ui->pc_SpinBoxLoggingInterval->value();
+      this->mc_Properties.u32_MaxLogDurationSec = this->mpc_Ui->pc_SpinBoxLogDuration->value();
+      this->Save();
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for client interface combo box index change.
-
-   \param[in]  os32_NewIndex  New combo box index
+/*! \brief   Check data logger name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobPropertiesWidget::m_OnClientInterfaceChanged(const int32_t os32_NewIndex)
+void C_SdNdeDalLogJobPropertiesWidget::m_CheckDataLoggerName()
 {
-   if (this->ms32_LastUsedInterfaceNumberIndex != os32_NewIndex)
-   {
-      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-      const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
-      uint8_t u8_ConnectedInterfaceNumber;
-      C_OscSystemBus::E_Type e_ConnectedInterfaceType;
+   //check
+   const C_SclString c_LogJobName = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
+   const bool q_IsLogJobNameUnique = C_PuiSdUtil::h_CheckNodeDataLoggerNameAvailable(this->mu32_NodeIndex, c_LogJobName,
+                                                                                     &this->mu32_DataLoggerJobIndex,
+                                                                                     NULL);
+   const bool q_IsLoggerNameValid = C_OscUtils::h_CheckValidCeName(c_LogJobName);
 
-      if (os32_NewIndex < pc_DevDef->u8_NumCanBusses)
+   //set invalid text property
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid",
+                                          q_IsLogJobNameUnique && q_IsLoggerNameValid);
+
+   if ((q_IsLogJobNameUnique == true) && (q_IsLoggerNameValid == true))
+   {
+      this->mpc_Ui->pc_LineEditName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                           C_GtGetText::h_GetText(""),
+                                                           C_NagToolTip::eDEFAULT);
+   }
+   else
+   {
+      const QString c_Heading = C_GtGetText::h_GetText("Data Logger Job Name");
+      QString c_Content;
+      if (q_IsLogJobNameUnique == false)
       {
-         e_ConnectedInterfaceType = C_OscSystemBus::E_Type::eCAN;
-         u8_ConnectedInterfaceNumber = static_cast<uint8_t>(os32_NewIndex);
+         c_Content += C_GtGetText::h_GetText("- is already in use\n");
+      }
+      if (q_IsLoggerNameValid == false)
+      {
+         c_Content += C_GtGetText::h_GetText("- is empty or contains invalid characters.\n");
+      }
+      this->mpc_Ui->pc_LineEditName->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Disconnect change triggers
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_DisconnectChangeTriggers() const
+{
+   disconnect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::textChanged,
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_CheckDataLoggerName);
+   disconnect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::editingFinished,
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnNameEditingFinished);
+   disconnect(this->mpc_Ui->pc_TextEditComment, &C_OgeTedPropertiesComment::SigEditingFinished,
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+
+   disconnect(this->mpc_Ui->pc_ComboBoxLogJobUseCase,
+              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLogJobUseCaseChanged);
+   disconnect(this->mpc_Ui->pc_ComboBoxLogFileFormat,
+              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+   disconnect(this->mpc_Ui->pc_LineEditLogDestination, &QLineEdit::editingFinished, this,
+              &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+
+   disconnect(this->mpc_Ui->pc_ComboBoxLocalData,
+              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged);
+   disconnect(this->mpc_Ui->pc_SpinBoxLoggingInterval,
+              static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+   disconnect(this->mpc_Ui->pc_SpinBoxLogDuration,
+              static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reconnect change triggers
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_ReconnectChangeTriggers() const
+{
+   connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::textChanged,
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_CheckDataLoggerName);
+   connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::editingFinished,
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnNameEditingFinished);
+   connect(this->mpc_Ui->pc_TextEditComment, &C_OgeTedPropertiesComment::SigEditingFinished,
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+
+   connect(this->mpc_Ui->pc_ComboBoxLogJobUseCase,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLogJobUseCaseChanged);
+   connect(this->mpc_Ui->pc_ComboBoxLogFileFormat,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+   connect(this->mpc_Ui->pc_LineEditLogDestination, &QLineEdit::editingFinished, this,
+           &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+
+   connect(this->mpc_Ui->pc_ComboBoxLocalData,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged);
+   connect(this->mpc_Ui->pc_SpinBoxLoggingInterval,
+           static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+   connect(this->mpc_Ui->pc_SpinBoxLogDuration,
+           static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On name editing finished an error Message Box shown on existing same log job name
+   Trim name on any white spaces
+   Save changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_OnNameEditingFinished()
+{
+   //This function can somehow be called twice, so ... let's avoid that!
+   static bool hq_InProgress = false;
+
+   if (hq_InProgress == false)
+   {
+      std::vector<stw::scl::C_SclString> c_ExistingLogJobNames;
+      const C_SclString c_LogJobName = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
+      hq_InProgress = true;
+      if (C_PuiSdUtil::h_CheckNodeDataLoggerNameAvailable(this->mu32_NodeIndex, c_LogJobName,
+                                                          &this->mu32_DataLoggerJobIndex,
+                                                          &c_ExistingLogJobNames) == false)
+      {
+         const QString c_Description =
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "A Log Job with the name \"%1\" already exists. Choose another name.")).
+            arg(c_LogJobName.c_str());
+         QString c_Details;
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Log Job naming"));
+         c_Message.SetDescription(c_Description);
+         c_Details.append(C_GtGetText::h_GetText("Used Log Job names:\n"));
+         for (uint32_t u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingLogJobNames.size();
+              ++u32_ItExistingName)
+         {
+            const C_SclString & rc_Name = c_ExistingLogJobNames[u32_ItExistingName];
+            c_Details.append(static_cast<QString>("\"%1\"\n").arg(rc_Name.c_str()));
+         }
+         c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(220, 350);
+         c_Message.Execute();
+         //Restore previous name
+         {
+            const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
+               this->mu32_NodeIndex,
+               this->mu32_DataLoggerJobIndex);
+            if (pc_Retval != NULL)
+            {
+               this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str());
+            }
+         }
+      }
+      else if (C_OscUtils::h_CheckValidCeName(c_LogJobName) == false)
+      {
+         const QString c_Description =
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "Data Logger Job name \"%1\" is empty or contains invalid characters.")).
+            arg(c_LogJobName.c_str());
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Log Job naming"));
+         c_Message.SetDescription(c_Description);
+         c_Message.SetCustomMinHeight(220, 350);
+         c_Message.Execute();
+         //Restore previous name
+         {
+            const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
+               this->mu32_NodeIndex,
+               this->mu32_DataLoggerJobIndex);
+            if (pc_Retval != NULL)
+            {
+               this->mpc_Ui->pc_LineEditName->setText(pc_Retval->c_Properties.c_Name.c_str());
+            }
+         }
       }
       else
       {
-         e_ConnectedInterfaceType = C_OscSystemBus::E_Type::eETHERNET;
-         u8_ConnectedInterfaceNumber = static_cast<uint8_t>(os32_NewIndex) - pc_DevDef->u8_NumCanBusses;
+         this->m_OnXappSettingsChanged();
+         Q_EMIT this->SigLogJobNameModified();
       }
-      C_PuiSdHandler::h_GetInstance()->SetDataLoggerInterface(mu32_NodeIndex, mu32_DataLoggerJobIndex,
-                                                              e_ConnectedInterfaceType, u8_ConnectedInterfaceNumber);
-      this->ms32_LastUsedInterfaceNumberIndex = this->mpc_Ui->pc_ComboBoxClientInterface->currentIndex();
-      Q_EMIT this->SigReloadDataLoggerDataElements();
+      hq_InProgress = false; //lint !e838 its static and could be used on strange second call
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trim Log Job name
+
+   Remove whitespaces at the beginning and end of the string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_TrimLogJobName() const
+{
+   this->mpc_Ui->pc_LineEditName->setText(this->mpc_Ui->pc_LineEditName->text().trimmed());
 }

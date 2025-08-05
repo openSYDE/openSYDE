@@ -313,7 +313,6 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
    {
       c_DefaultUiSignal.q_AutoMinMaxActive = false;
    }
-   c_DefaultUiSignal.q_InterpretAsString = false;
 
    // resize Ui vectors
    // Rx messages
