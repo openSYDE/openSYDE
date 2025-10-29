@@ -12,6 +12,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <cstdio>
 #include <ctime>
+#include <stdint.h>
+#include <stdlib.h>
 #include <dirent.h>
 #include <fnmatch.h>
 #include <ftw.h>

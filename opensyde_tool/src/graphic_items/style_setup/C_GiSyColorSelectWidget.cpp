@@ -15,7 +15,7 @@
 #include "precomp_headers.hpp"
 
 #include <QString>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include "C_GiSyColorSelectWidget.hpp"
 #include "ui_C_GiSyColorSelectWidget.h"
@@ -882,8 +882,9 @@ void C_GiSyColorSelectWidget::m_RgbaClicked(void) const
 void C_GiSyColorSelectWidget::m_PushButtonHtml(void) const
 {
    this->mpc_Ui->pc_LineEditColor->setText(this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().name().toUpper());
-   this->mpc_Ui->pc_LineEditColor->setValidator(new QRegExpValidator(QRegExp("#([A-Fa-f0-9]{1,6})"),
-                                                                     this->mpc_Ui->pc_LineEditColor));
+   this->mpc_Ui->pc_LineEditColor->setValidator(
+      new QRegularExpressionValidator(QRegularExpression("#([A-Fa-f0-9]{1,6})"),
+                                      this->mpc_Ui->pc_LineEditColor));
    // set an empty input mask when the html button is checked
    this->mpc_Ui->pc_LineEditColor->setInputMask("");
 }
@@ -1294,11 +1295,10 @@ void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const uint32_t ou32_Rgb)
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyColorSelectWidget::m_GrabScreenColor(const QPoint & orc_Position) const
 {
-   const QDesktopWidget * const pc_Desktop = QApplication::desktop();
-   const QPixmap c_Pixmap = QGuiApplication::screens().at(pc_Desktop->screenNumber())->grabWindow(pc_Desktop->winId(),
-                                                                                                  orc_Position.x(),
-                                                                                                  orc_Position.y(),
-                                                                                                  1, 1);
+   const QPixmap c_Pixmap = QGuiApplication::primaryScreen()->grabWindow(0,
+                                                                         orc_Position.x(),
+                                                                         orc_Position.y(),
+                                                                         1, 1);
 
    return c_Pixmap.toImage().pixel(0, 0);
 }

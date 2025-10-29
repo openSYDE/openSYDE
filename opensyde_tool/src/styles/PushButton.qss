@@ -262,6 +262,13 @@ border-width: 1px;
 border-bottom-width: 0px;
 }
 
+stw--opensyde_gui_elements--C_OgePubDataLoggerJobsOverview
+{
+border-style: none;
+border-width: 0px;
+border-bottom-width: 0px;
+}
+
 /* --------------------------------------------------------------------- */
 stw--opensyde_gui_elements--C_OgePubHalcPanel
 {

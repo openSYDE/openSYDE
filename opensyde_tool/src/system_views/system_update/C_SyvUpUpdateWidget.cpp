@@ -608,12 +608,12 @@ int32_t C_SyvUpUpdateWidget::m_InitSequence(void)
       }
       else
       {
+         const uint32_t u32_BITNESS = 8 * sizeof(size_t);
          c_Message =
-            static_cast<QString>(
-               C_GtGetText::h_GetText(
-                  "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                  "double-click on PC)."));
-         c_MessageBox.SetCustomMinHeight(200, 200);
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "CAN initialization failed. Check your PC CAN interface configuration (System View "
+                                    "setup - double-click on PC). Make sure to use a %1-bit DLL.")).arg(u32_BITNESS);
+         c_MessageBox.SetCustomMinHeight(180, 180);
       }
       break;
    case C_CHECKSUM:

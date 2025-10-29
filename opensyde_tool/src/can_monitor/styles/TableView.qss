@@ -40,7 +40,8 @@ border-width: 0px;
 border-bottom-width: 1px;
 }
 
-stw--opensyde_gui--C_CamMosFilterTableView QHeaderView
+stw--opensyde_gui--C_CamMosFilterTableView QHeaderView,
+stw--opensyde_gui--C_CamMosFilterTableView QHeaderView::section
 {
 border-style: none;
 }

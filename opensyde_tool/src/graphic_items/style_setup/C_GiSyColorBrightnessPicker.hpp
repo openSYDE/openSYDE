@@ -9,8 +9,9 @@
 #define C_GISYCOLORBRIGHTNESSPICKER_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QDesktopWidget>
 #include "stwtypes.hpp"
+
+#include <QWidget>
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw

@@ -12,13 +12,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"
-
-#include <iostream>
-
 #include <QApplication>
 #include <QFileInfo>
-#include <QDesktopWidget>
 #include <QMimeData>
 
 #include "C_NagMainWindow.hpp"
@@ -32,13 +27,10 @@
 #include "stwerrors.hpp"
 #include "C_SyvUtil.hpp"
 #include "C_HeHandler.hpp"
-#include "C_SdTopologyWidget.hpp"
-#include "C_SdNdeDpEditWidget.hpp"
 #include "C_SdHandlerWidget.hpp"
 #include "C_SyvHandlerWidget.hpp"
 #include "C_UsHandler.hpp"
 #include "C_OgeOverlay.hpp"
-#include "C_SdNdeNodeEditWidget.hpp"
 #include "C_PuiProject.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_PuiSdHandler.hpp"
@@ -175,7 +167,9 @@ C_NagMainWindow::C_NagMainWindow(const uint16_t ou16_Timer) :
    {
       QPoint c_Position = C_UsHandler::h_GetInstance()->GetScreenPos();
       QSize c_Size = C_UsHandler::h_GetInstance()->GetAppSize();
-      C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700), true);
+
+      C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(
+         c_Position, c_Size, C_UsHandler::h_GetInstance()->GetAppScreenIndex(), QSize(1000, 700), true);
       this->setGeometry(c_Position.x(), c_Position.y(), c_Size.width(), c_Size.height());
    }
 
@@ -192,8 +186,16 @@ C_NagMainWindow::C_NagMainWindow(const uint16_t ou16_Timer) :
    //Window icon
    C_OgeWiUtil::h_SetWindowIcon(this);
 
+   //Maximized
    if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
    {
+      // move to correct screen on multi screen setups
+      const uint32_t u32_ScreenIndex = C_UsHandler::h_GetInstance()->GetAppScreenIndex();
+      const QScreen * const pc_Screen =
+         (static_cast<int32_t>(u32_ScreenIndex) < QGuiApplication::screens().size()) ?
+         QGuiApplication::screens().at(u32_ScreenIndex) : QGuiApplication::primaryScreen();
+
+      this->move(pc_Screen->geometry().topLeft());
       this->showMaximized();
    }
 
@@ -987,6 +989,7 @@ void C_NagMainWindow::m_SaveScreenProperties(void) const
    C_UsHandler::h_GetInstance()->SetScreenPos(this->normalGeometry().topLeft());
    C_UsHandler::h_GetInstance()->SetAppSize(this->normalGeometry().size());
    C_UsHandler::h_GetInstance()->SetAppMaximized(this->isMaximized());
+   C_UsHandler::h_GetInstance()->SetAppScreenIndex(QGuiApplication::screens().indexOf(this->screen()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

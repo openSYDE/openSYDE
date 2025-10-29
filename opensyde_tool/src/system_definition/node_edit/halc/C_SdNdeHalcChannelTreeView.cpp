@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Tree model for HALC channels overview.
+   \brief       Tree view for HALC channels overview.
 
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -55,6 +55,7 @@ C_SdNdeHalcChannelTreeView::C_SdNdeHalcChannelTreeView(QWidget * const opc_Paren
    this->setHeaderHidden(true);
    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
    this->m_SetupContextMenu();
+   this->setMouseTracking(true);
 
    connect(this->selectionModel(), &QItemSelectionModel::currentRowChanged,
            this, &C_SdNdeHalcChannelTreeView::m_OnChannelSelected);

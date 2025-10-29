@@ -35,7 +35,7 @@ class C_SdNdeDalLogJobsListModel :
 public:
    explicit C_SdNdeDalLogJobsListModel(QObject * const opc_Parent = NULL);
    void UpdateData(const uint32_t ou32_NodeIndex);
-   void DoRemoveRow(const uint32_t ou32_ElementIndex);
+   void DoRemoveRows(const std::vector<uint32_t> & orc_DataLoggerJobIndices);
 
    QVariant data(const QModelIndex & orc_Index, const int32_t os32_Role =
                     static_cast<int32_t>(Qt::DisplayRole)) const override;
@@ -48,7 +48,7 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigDataChanged(const QModelIndex orc_Index, const bool oq_IsEnabled);
+   void SigDataChanged(const QModelIndex & orc_Index, const bool oq_IsEnabled);
 
 private:
    class C_DalLogJob

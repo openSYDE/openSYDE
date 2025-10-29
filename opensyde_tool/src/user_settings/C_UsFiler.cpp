@@ -204,6 +204,10 @@ void C_UsFiler::mh_SaveNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_NodeIdSelectedDatapoolName = static_cast<QString>("%1Selected_datapool_name").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedProtocol = static_cast<QString>("%1Selected_protocol").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedInterface = static_cast<QString>("%1Selected_interface").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedDataLoggerLogJobIndex = static_cast<QString>("%1Selected_DataLogger_LogJobindex").arg(
+      orc_NodeIdBase);
+   const QString c_DataLoggerOverviewWidgetSelected = static_cast<QString>("%1Selected_DataLogger_LogJob_Overview").arg(
+      orc_NodeIdBase);
    const QList<QString> c_DatapoolKeyList = orc_Node.GetDatapoolKeysInternal();
    int32_t s32_ItDatapool = 0;
 
@@ -336,6 +340,14 @@ void C_UsFiler::mh_SaveNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
       //Important iterator step
       ++s32_ItDatapool;
    }
+   //DataLogger LogJob Index
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_NodeIdSelectedDataLoggerLogJobIndex.toStdString().c_str(),
+                        static_cast<int32_t>(orc_Node.GetSelectedDataLoggerLogJobIndex()));
+   //DataLogger Overview widget selected
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                     c_DataLoggerOverviewWidgetSelected.toStdString().c_str(),
+                     orc_Node.GetIsOverviewWidgetSelected());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -980,6 +992,9 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    // Application maximizing flag
    orc_Ini.WriteBool("Screen", "Size_maximized", orc_UserSettings.GetAppMaximized());
 
+   // Application screen index
+   orc_Ini.WriteInteger("Screen", "Screen_index", orc_UserSettings.GetAppScreenIndex());
+
    // Sys def topology toolbox position
    orc_Ini.WriteInteger("SdTopologyToolbox", "Position_x", orc_UserSettings.GetSdTopologyToolboxPos().x());
    orc_Ini.WriteInteger("SdTopologyToolbox", "Position_y", orc_UserSettings.GetSdTopologyToolboxPos().y());
@@ -1268,6 +1283,10 @@ void C_UsFiler::mh_LoadNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_NodeIdSelectedDatapoolName = static_cast<QString>("%1Selected_datapool_name").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedProtocol = static_cast<QString>("%1Selected_protocol").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedInterface = static_cast<QString>("%1Selected_interface").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedDataLoggerLogJobIndex = static_cast<QString>("%1Selected_DataLogger_LogJobindex").arg(
+      orc_NodeIdBase);
+   const QString c_DataLoggerOverviewWidgetSelected = static_cast<QString>("%1Selected_DataLogger_LogJob_Overview").arg(
+      orc_NodeIdBase);
 
    //Selected datapool name
    c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
@@ -1288,7 +1307,6 @@ void C_UsFiler::mh_LoadNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
    c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
                               c_NodeIdSelectedHalcChannel.toStdString().c_str(), "").c_str();
    orc_UserSettings.SetProjSdNodeSelectedHalcChannel(orc_NodeName, c_Tmp);
-
    //CANopen columns
    c_Columns.clear();
    C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_CanOpenOvColumnId, c_Columns);
@@ -1388,6 +1406,15 @@ void C_UsFiler::mh_LoadNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
       const QString c_DatapoolIdBase = static_cast<QString>("%1Datapool%2").arg(orc_NodeIdBase).arg(s32_ItDatapool);
       mh_LoadDatapool(orc_Ini, orc_SectionName, c_DatapoolIdBase, orc_NodeName, orc_UserSettings);
    }
+   //DataLogger LogJob Index
+   u32_Tmp = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                 c_NodeIdSelectedDataLoggerLogJobIndex.toStdString().c_str(), 0);
+   orc_UserSettings.SetProjSdNodeSelectedDataLoggerLogJobIndex(orc_NodeName, u32_Tmp);
+   //DataLogger Overview widget selected
+   const bool q_IsOverviewWidgetSelected = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                                                            c_DataLoggerOverviewWidgetSelected.toStdString().c_str(),
+                                                            false);
+   orc_UserSettings.SetProjSdNodeIsOverviewWidgetSelected(orc_NodeName, q_IsOverviewWidgetSelected);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2128,6 +2155,10 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    // Application maximizing flag
    q_Flag = orc_Ini.ReadBool("Screen", "Size_maximized", true);
    orc_UserSettings.SetAppMaximized(q_Flag);
+
+   // Application screen index
+   s32_Value = orc_Ini.ReadInteger("Screen", "Screen_index", 0);
+   orc_UserSettings.SetAppScreenIndex(static_cast<uint32_t>(s32_Value));
 
    // Sys def topology toolbox position
    c_Pos.setX(orc_Ini.ReadInteger("SdTopologyToolbox", "Position_x", -1));

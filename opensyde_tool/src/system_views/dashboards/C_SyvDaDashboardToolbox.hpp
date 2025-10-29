@@ -43,7 +43,7 @@ public:
    void ApplyDarkMode(const bool oq_Active);
 
 protected:
-   void enterEvent(QEvent * const opc_Event) override;
+   void enterEvent(QEnterEvent * const opc_Event) override;
    void leaveEvent(QEvent * const opc_Event) override;
 
 private:

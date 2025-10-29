@@ -10,10 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"
-
 #include <QFileInfo>
-#include <QWinTaskbarButton>
 
 #include "stwerrors.hpp"
 #include "C_SyvUpInformationWidget.hpp"
@@ -23,7 +20,6 @@
 #include "C_UsHandler.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OscHexFile.hpp"
-#include "C_OgeWiUtil.hpp"
 #include "C_OscParamSetHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -67,18 +63,11 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
    mu64_FlashedBytesTimestampPrev(0ULL),
    mu64_FlashedBytesTimestampPrevPrev(0ULL)
 {
-   QWidget * const pc_Top = C_OgeWiUtil::h_GetWidgetUnderNextPopUp(this);
-   QWinTaskbarButton * const pc_Button = new QWinTaskbarButton(pc_Top);
-
    this->mpc_Ui->setupUi(this);
 
    // splitter
    this->mpc_Ui->pc_SplitterVert->SetMargins(10, 38);
    this->mpc_Ui->pc_SplitterVert->setStretchFactor(0, 1);
-
-   //handle task bar button
-   pc_Button->setWindow(pc_Top->windowHandle());
-   this->mpc_Progress = pc_Button->progress();
 
    this->ResetSummary();
 
@@ -106,7 +95,6 @@ C_SyvUpInformationWidget::~C_SyvUpInformationWidget()
 {
    m_SaveUserSettings();
 
-   delete this->mpc_Progress;
    delete this->mpc_Ui;
 }
 
@@ -318,9 +306,6 @@ void C_SyvUpInformationWidget::ResetSummary(void)
 
    this->m_UpdateEstimatedWaitTime(false);
    this->m_UpdateLabel();
-
-   // reset win progress
-   this->m_UpdateWinProgress(false, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle new heading.
@@ -542,7 +527,6 @@ void C_SyvUpInformationWidget::UpdateProgress(const uint16_t ou16_Progress100, c
       }
 
       //Convert to overall progress
-      m_UpdateWinProgress(true, u16_ActualProgress);
       m_UpdateProgressVisualization(u16_ActualProgress, oq_Finished);
 
       //Update data transfer
@@ -561,7 +545,6 @@ void C_SyvUpInformationWidget::UpdateProgress(const uint16_t ou16_Progress100, c
    else
    {
       uint64_t u64_AverageDataRate;
-      m_UpdateWinProgress(false, ou16_Progress100);
       m_UpdateProgressVisualization(ou16_Progress100, oq_Finished);
 
       //Update data transfer
@@ -846,21 +829,6 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
 
       m_UpdateLabel();
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set task bar progress
-
-   \param[in]  oq_Visible  Progress is visible flag
-   \param[in]  os32_Value  Progress value (0-100)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::m_UpdateWinProgress(const bool oq_Visible, const int32_t os32_Value)
-{
-   this->mpc_Progress->setVisible(oq_Visible);
-   this->mpc_Progress->setMinimum(0);
-   this->mpc_Progress->setMaximum(100);
-   this->mpc_Progress->setValue(os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

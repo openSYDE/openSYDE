@@ -12,8 +12,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
-#include <QMap>
-
 #include "stwtypes.hpp"
 #include "TglUtils.hpp"
 #include "stwerrors.hpp"
@@ -768,17 +766,16 @@ void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32_t ou32_NodeIndex)
    false No conflict
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex) const
+bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex)
 {
    bool q_Retval;
-   static QMap<uint32_t, bool> hc_PreviousResult;
 
    //Get reference hash
    const uint32_t u32_Hash = this->m_GetHashNode(oru32_NodeIndex);
    //Look up
-   const QMap<uint32_t, bool>::const_iterator c_It = hc_PreviousResult.find(u32_Hash);
+   const QMap<uint32_t, bool>::const_iterator c_It = mc_PreviousNodeErrorCheckResult.find(u32_Hash);
 
-   if (c_It == hc_PreviousResult.end())
+   if (c_It == mc_PreviousNodeErrorCheckResult.end())
    {
       bool q_NameConflict;
       bool q_NameEmpty;
@@ -825,11 +822,11 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32_t & oru32_NodeIndex
              (q_CommMaxSignalCountInvalid == true) || (q_CoPdoCountInvalid == true) ||
              (q_CoHeartbeatInvalid == true))
          {
-            hc_PreviousResult.insert(u32_Hash, true);
+            mc_PreviousNodeErrorCheckResult.insert(u32_Hash, true);
          }
          else
          {
-            hc_PreviousResult.insert(u32_Hash, false);
+            mc_PreviousNodeErrorCheckResult.insert(u32_Hash, false);
          }
       }
       else
@@ -5770,6 +5767,18 @@ const
       }
    }
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clear system definition
+
+   \param[in]  oq_TriggerSyncSignals   Trigger sync signals
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::Clear(const bool oq_TriggerSyncSignals)
+{
+   this->mc_PreviousNodeErrorCheckResult.clear();
+   C_PuiSdHandlerData::Clear(oq_TriggerSyncSignals);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

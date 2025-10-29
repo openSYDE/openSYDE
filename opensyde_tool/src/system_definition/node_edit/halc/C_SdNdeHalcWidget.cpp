@@ -93,6 +93,8 @@ C_SdNdeHalcWidget::C_SdNdeHalcWidget(QWidget * const opc_Parent) :
 
    // panel colors
    this->mpc_Ui->pc_WiHalcDefFilePanel->SetBackgroundColor(11);
+   this->mpc_Ui->pc_WiChannelTreeContent->SetBackgroundColor(12);
+   // styling the tree's background via stylesheet background-color somehow effects the complete layout
    this->mpc_Ui->pc_LabFileTitle->SetBackgroundColor(0);
    this->mpc_Ui->pc_LabFileTitle->SetForegroundColor(3);
    this->mpc_Ui->pc_LabFileTitle->SetFontPixel(16, true);

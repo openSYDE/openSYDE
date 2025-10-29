@@ -51,8 +51,9 @@ using namespace stw::opensyde_gui_logic;
 
    Load system definition and store in information in our instance data.
 
-   \param[in]  orc_Path             Path to system definition file
-   \param[in]  opu16_FileVersion    Optional storage for file version
+   \param[in]      orc_Path                        Path to system definition file
+   \param[in]      opu16_FileVersion               Optional storage for file version
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    data read and placed into instance data
@@ -64,7 +65,8 @@ using namespace stw::opensyde_gui_logic;
    C_CHECKSUM  verify of system definition failed. Loaded ui part does not match to loaded core part
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path, uint16_t * const opu16_FileVersion)
+int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path, uint16_t * const opu16_FileVersion,
+                                         std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -82,7 +84,7 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
          s32_Return = C_OscSystemDefinitionFiler::h_LoadSystemDefinition(
             mc_CoreDefinition, c_XmlParser,
             C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str(),
-            orc_Path, true, &u16_FileVersion);
+            orc_Path, true, &u16_FileVersion, NULL, false, NULL, opc_ErrorDetailsMissingDevices);
          if (opu16_FileVersion != NULL)
          {
             *opu16_FileVersion = u16_FileVersion;

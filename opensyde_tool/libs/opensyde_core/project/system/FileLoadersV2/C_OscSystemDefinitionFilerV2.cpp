@@ -47,14 +47,15 @@ using namespace stw::scl;
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]  orc_SystemDefinition         Pointer to storage
-   \param[in]   orc_PathSystemDefinition     Path to system definition
-   \param[in]   orc_PathDeviceDefinitions    Path to device definition description file
-   \param[in]   oq_UseDeviceDefinitions      Flag for using device definitions, if the flag is true
-                                             orc_PathDeviceDefinitions can be an empty string.
-                                             It is highly recommended to use the device definitions.
-                                             Purpose for not using the device definition is when only read
-                                             access to a part of the system definition is necessary.
+   \param[out]     orc_SystemDefinition            Pointer to storage
+   \param[in]      orc_PathSystemDefinition        Path to system definition
+   \param[in]      orc_PathDeviceDefinitions       Path to device definition description file
+   \param[in]      oq_UseDeviceDefinitions         Flag for using device definitions, if the flag is true
+                                                   orc_PathDeviceDefinitions can be an empty string.
+                                                   It is highly recommended to use the device definitions.
+                                                   Purpose for not using the device definition is when only read
+                                                   access to a part of the system definition is necessary.
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    data read
@@ -67,8 +68,8 @@ using namespace stw::scl;
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinitionFile(C_OscSystemDefinition & orc_SystemDefinition,
                                                                  const stw::scl::C_SclString & orc_PathSystemDefinition,
-                                                                 const stw::scl::C_SclString & orc_PathDeviceDefinitions,
-                                                                 const bool oq_UseDeviceDefinitions)
+                                                                 const stw::scl::C_SclString & orc_PathDeviceDefinitions, const bool oq_UseDeviceDefinitions,
+                                                                 std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -79,7 +80,7 @@ int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinitionFile(C_OscSystemDefi
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XmlParser, orc_PathDeviceDefinitions,
-                                             oq_UseDeviceDefinitions);
+                                             oq_UseDeviceDefinitions, opc_ErrorDetailsMissingDevices);
       }
       else
       {
@@ -218,11 +219,12 @@ void C_OscSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OscSyste
     The caller is responsible to provide a static life-time of orc_DeviceDefinitions.
     Otherwise the "device definition" pointers in C_OscNode will point to invalid data.
 
-   \param[in]      ou16_XmlFormatVersion     version of XML format
-   \param[out]     orc_Nodes                 data storage
-   \param[in,out]  orc_XmlParser             XML with "nodes" active
-   \param[in]      orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
-   \param[in]      oq_UseDeviceDefinitions   Flag for using device definitions
+   \param[in]      ou16_XmlFormatVersion           version of XML format
+   \param[out]     orc_Nodes                       data storage
+   \param[in,out]  orc_XmlParser                   XML with "nodes" active
+   \param[in]      orc_DeviceDefinitions           List of known devices (must contain all device types used by nodes)
+   \param[in]      oq_UseDeviceDefinitions         Flag for using device definitions
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    no error
@@ -234,7 +236,8 @@ int32_t C_OscSystemDefinitionFilerV2::h_LoadNodes(const uint16_t ou16_XmlFormatV
                                                   std::vector<C_OscNode> & orc_Nodes,
                                                   C_OscXmlParserBase & orc_XmlParser,
                                                   const C_OscDeviceManager & orc_DeviceDefinitions,
-                                                  const bool oq_UseDeviceDefinitions)
+                                                  const bool oq_UseDeviceDefinitions,
+                                                  std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 
 {
    int32_t s32_Retval = C_NO_ERR;
@@ -303,7 +306,14 @@ int32_t C_OscSystemDefinitionFilerV2::h_LoadNodes(const uint16_t ou16_XmlFormatV
                                 "System Definition contains node \"" + orc_Nodes[u32_NodeIndex].c_Properties.c_Name +
                                 "\" of device type \"" +
                                 orc_Nodes[u32_NodeIndex].c_DeviceType + "\" which is not a known device.");
-            break;
+            if (opc_ErrorDetailsMissingDevices == NULL)
+            {
+               break;
+            }
+            else
+            {
+               opc_ErrorDetailsMissingDevices->push_back(orc_Nodes[u32_NodeIndex].c_DeviceType);
+            }
          }
          else
          {
@@ -434,10 +444,11 @@ void C_OscSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OscSystemBus>
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]     orc_SystemDefinition         Pointer to storage
-   \param[in,out]  orc_XmlParser                XML with default state
-   \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
-   \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions
+   \param[out]     orc_SystemDefinition            Pointer to storage
+   \param[in,out]  orc_XmlParser                   XML with default state
+   \param[in]      orc_PathDeviceDefinitions       Path to device definition description file
+   \param[in]      oq_UseDeviceDefinitions         Flag for using device definitions
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    data read
@@ -449,7 +460,8 @@ void C_OscSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OscSystemBus>
 int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OscSystemDefinition & orc_SystemDefinition,
                                                              C_OscXmlParserBase & orc_XmlParser,
                                                              const stw::scl::C_SclString & orc_PathDeviceDefinitions,
-                                                             const bool oq_UseDeviceDefinitions)
+                                                             const bool oq_UseDeviceDefinitions,
+                                                             std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -509,7 +521,8 @@ int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OscSystemDefiniti
          if (orc_XmlParser.SelectNodeChild("nodes") == "nodes")
          {
             s32_Retval = h_LoadNodes(u16_FileVersion, orc_SystemDefinition.c_Nodes, orc_XmlParser,
-                                     C_OscSystemDefinition::hc_Devices, oq_UseDeviceDefinitions);
+                                     C_OscSystemDefinition::hc_Devices, oq_UseDeviceDefinitions,
+                                     opc_ErrorDetailsMissingDevices);
             if (s32_Retval == C_NO_ERR)
             {
                //Return

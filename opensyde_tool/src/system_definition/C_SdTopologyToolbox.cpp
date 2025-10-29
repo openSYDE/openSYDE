@@ -209,7 +209,7 @@ void C_SdTopologyToolbox::InitStaticNames(void) const
    \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyToolbox::enterEvent(QEvent * const opc_Event)
+void C_SdTopologyToolbox::enterEvent(QEnterEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
 

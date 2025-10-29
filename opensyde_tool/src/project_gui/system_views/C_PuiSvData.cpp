@@ -103,6 +103,29 @@ void C_PuiSvData::CalcHash(uint32_t & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get hash for view
+
+   \return
+   Hash for view
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t C_PuiSvData::GetHash(void)
+{
+   uint32_t u32_Retval = 0xFFFFFFFFU;
+
+   if (this->mc_ViewHashCache.GetHashAvailable())
+   {
+      u32_Retval = this->mc_ViewHashCache.GetHash();
+   }
+   else
+   {
+      this->CalcHash(u32_Retval);
+      this->mc_ViewHashCache.SetHash(u32_Retval);
+   }
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get service mode active
 
    \return
@@ -2017,6 +2040,17 @@ void C_PuiSvData::SetPcCanDllPath(const QString & orc_DllPath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set allow view hash cache
+
+   \param[in]  oq_NewValue    New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::SetAllowHashCache(const bool oq_NewValue)
+{
+   this->mc_ViewHashCache.SetAllowCash(oq_NewValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new read rail item to configuration
 
    \param[in]  orc_Id      ID
@@ -2935,8 +2969,7 @@ void C_PuiSvData::InitFromSystemDefinition(void)
                      c_Path = C_Uti::h_ConcatPathIfNecessary(rc_Application.c_GeneratePath.c_str(), c_Path);
                   }
                   c_ApplPaths.emplace_back(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                                              c_Path,
-                                              rc_Application.c_ResultPaths[0U].c_str()).toStdString().c_str());
+                                              rc_Application.c_ProjectPath.c_str(), c_Path).toStdString().c_str());
                }
                else
                {

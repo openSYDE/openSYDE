@@ -54,6 +54,7 @@ public:
    QPoint GetScreenPos(void) const;
    QSize GetAppSize(void) const;
    bool GetAppMaximized(void) const;
+   uint32_t GetAppScreenIndex(void) const;
    QPoint GetSdTopologyToolboxPos(void) const;
    QSize GetSdTopologyToolboxSize(void) const;
    bool GetSdTopologyToolboxMaximized(void) const;
@@ -126,6 +127,7 @@ public:
    void SetScreenPos(const QPoint & orc_New);
    void SetAppSize(const QSize & orc_New);
    void SetAppMaximized(const bool oq_New);
+   void SetAppScreenIndex(const uint32_t ou32_New);
    void SetSdTopologyToolboxPos(const QPoint & orc_New);
    void SetSdTopologyToolboxSize(const QSize & orc_New);
    void SetNaviBarSize(const int32_t os32_Value);
@@ -222,6 +224,8 @@ public:
    void SetProjSdNodeHalcConfigColumnWidth(const QString & orc_NodeName, const std::vector<int32_t> & orc_Value);
    void SetProjSdNodeSelectedHalcDomain(const QString & orc_NodeName, const QString & orc_Value);
    void SetProjSdNodeSelectedHalcChannel(const QString & orc_NodeName, const QString & orc_Value);
+   void SetProjSdNodeSelectedDataLoggerLogJobIndex(const QString & orc_NodeName, const int32_t os32_LogJobIndex);
+   void SetProjSdNodeIsOverviewWidgetSelected(const QString & orc_NodeName, const bool oq_IsOverviewWidgetSelected);
    void SetProjSdBusSelectedMessage(const QString & orc_BusName,
                                     const stw::opensyde_core::C_OscCanProtocol::E_Type oe_SelectedProtocol,
                                     const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
@@ -304,6 +308,7 @@ private:
    QPoint mc_ScreenPos;                       ///< History of last known screen position
    QSize mc_AppSize;                          ///< History of last known openSyde window size
    bool mq_AppMaximized;                      ///< History of openSyde window state
+   uint32_t mu32_ScreenIndex;                 ///< History of last known screen (multiple monitor setup)
    QPoint mc_SdTopologyToolboxPos;            ///< History of last known sys def toolbox position
    QSize mc_SdTopologyToolboxSize;            ///< History of last known sys def toolbox size
    int32_t ms32_NaviBarSize;                  ///< Last known navi bar size

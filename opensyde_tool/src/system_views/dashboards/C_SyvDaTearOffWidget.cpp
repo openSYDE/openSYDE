@@ -91,7 +91,7 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32_t ou32_ViewIndex, const 
 
    pc_Layout = new QHBoxLayout(this->mpc_Ui->pc_DashboardContainerWidget);
    pc_Layout->setSpacing(0);
-   pc_Layout->setMargin(0);
+   pc_Layout->setContentsMargins(0, 0, 0, 0);
 
    //Replace internal widget
    if (opc_Widget == NULL)
@@ -101,7 +101,7 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32_t ou32_ViewIndex, const 
    else
    {
       this->mpc_Dashboard = opc_Widget;
-      this->mpc_Dashboard->layout()->setMargin(0);
+      this->mpc_Dashboard->layout()->setContentsMargins(0, 0, 0, 0);
       this->mpc_Dashboard->setParent(this);
       //Explicit show necessary for this use-case
       this->mpc_Dashboard->show();

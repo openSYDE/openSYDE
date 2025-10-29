@@ -47,7 +47,7 @@ public:
    void InitStaticNames(void) const;
 
 protected:
-   void enterEvent(QEvent * const opc_Event) override;
+   void enterEvent(QEnterEvent * const opc_Event) override;
    void leaveEvent(QEvent * const opc_Event) override;
    void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    void dragMoveEvent(QDragMoveEvent * const opc_Event) override;

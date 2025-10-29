@@ -15,13 +15,12 @@
 #include <QVBoxLayout>
 #include <QStylePainter>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 
 #include "stwtypes.hpp"
 
 #include "C_GtGetText.hpp"
 #include "C_OgeCbxMultiSelect.hpp"
-#include "C_OgeCbxTableBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_logic;
@@ -63,8 +62,7 @@ C_OgeCbxMultiSelect::C_OgeCbxMultiSelect(QWidget * const opc_Parent) :
    this->mpc_PopFrame->layout()->addWidget(this->mpc_ListWidget);
    this->mpc_PopFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
-   connect(this->mpc_ListWidget, &QListWidget::itemClicked, this, &C_OgeCbxMultiSelect::m_ScanItemSelect);
-   connect(this->mpc_ListWidget, &QListWidget::clicked, this, &C_OgeCbxMultiSelect::m_ListWidgetItemClicked);
+   connect(this->mpc_ListWidget, &QListWidget::itemClicked, this, &C_OgeCbxMultiSelect::m_ListWidgetItemClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -196,7 +194,7 @@ void C_OgeCbxMultiSelect::showPopup()
 {
    QRect c_Rect;
    const int32_t s32_ListHeight = (this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 2;
-   const QRect c_ScreenRect = QApplication::desktop()->screenGeometry(this);
+   const QRect c_ScreenRect = QApplication::primaryScreen()->geometry();
    const QPoint c_Above = this->mapToGlobal(QPoint(0, 0));
    const QPoint c_Below = this->mapToGlobal(QPoint(0, this->geometry().height()));
    const int32_t s32_BelowHeight = std::min(abs(c_ScreenRect.bottom() - c_Below.y()), s32_ListHeight);
@@ -328,20 +326,39 @@ void C_OgeCbxMultiSelect::Init(const QStringList & orc_Strings, const QBitArray 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check, which item is selected and set it so the combo box text
+/*! \brief  Check or uncheck clicked item, update displayed string and inform about value change
 
    If an item checked, the text of this item is set to the combo box text.
    If an item unchecked, the text of this item removed from the combo box text
 
-   \param[in]  opc_Item    Item, which is checked/unchecked
+   \param[in]  opc_Item    Item, which is clicked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeCbxMultiSelect::m_ScanItemSelect(const QListWidgetItem * const opc_Item)
+void C_OgeCbxMultiSelect::m_ListWidgetItemClicked(QListWidgetItem * const opc_Item)
 {
-   this->m_UpdateDisplayName();
+   if (opc_Item != NULL)
+   {
+      // Unfortunately we cannot use (opc_Item->checkState() == Qt::Checked) here, because when clicking on the
+      // checkbox square, this already had changed. So when using the checkstate, check/uncheck does not work anymore
+      // when clicking on the checkbox (but only on the text). Vise versa, when not handling it manually and using
+      // the given mechanism, clicking on the item outside of the checkbox does not check/uncheck it anymore.
+      if (this->mc_DisplayText.contains(opc_Item->text()))
+      {
+         // item was checked and now gets unchecked
+         opc_Item->setCheckState(Qt::Unchecked);
+      }
+      else
+      {
+         // item was not checked and now gets checked
+         opc_Item->setCheckState(Qt::Checked);
+      }
 
-   // inform about value changed
-   Q_EMIT (SigValueChanged(opc_Item->text(), opc_Item->checkState() == Qt::Checked));
+      // update combobox string
+      this->m_UpdateDisplayName();
+
+      // inform about value changed
+      Q_EMIT (SigValueChanged(opc_Item->text(), opc_Item->checkState() == Qt::Checked));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -389,31 +406,4 @@ void C_OgeCbxMultiSelect::m_UpdateDisplayName(void)
    // set the item names to combo box
    this->SetDisplayText(c_Display);
    this->SetToolTipInformation(C_GtGetText::h_GetText("Selected Elements:"), c_ToolTip);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check or uncheck clicked item
-
-   If an item checked, the text of this item is set to the combo box text.
-   If an item unchecked, the text of this item removed from the combo box text
-
-   \param[in]  orc_ModelIndex    Index of the list widget model
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeCbxMultiSelect::m_ListWidgetItemClicked(const QModelIndex & orc_ModelIndex)
-{
-   QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(orc_ModelIndex.row());
-
-   if (pc_Item != NULL)
-   {
-      if (pc_Item->checkState() == Qt::Checked)
-      {
-         pc_Item->setCheckState(Qt::Unchecked);
-      }
-      else
-      {
-         pc_Item->setCheckState(Qt::Checked);
-      }
-      this->m_ScanItemSelect(pc_Item);
-   }
 }

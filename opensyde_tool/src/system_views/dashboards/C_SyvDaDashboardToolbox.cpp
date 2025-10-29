@@ -124,7 +124,7 @@ void C_SyvDaDashboardToolbox::ApplyDarkMode(const bool oq_Active)
    \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardToolbox::enterEvent(QEvent * const opc_Event)
+void C_SyvDaDashboardToolbox::enterEvent(QEnterEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
 

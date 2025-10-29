@@ -117,7 +117,7 @@ int32_t C_OscZipFile::h_CreateZipFile(const C_SclString & orc_SourcePath, const 
             c_FileStream.seekg(0LL, ifstream::beg);
 
             // allocate memory
-            char_t * const pcn_FileData = new char_t[c_FileLength];
+            char_t * const pcn_FileData = new char_t[static_cast<size_t>(c_FileLength)];
 
             // read file content
             c_FileStream.read(pcn_FileData, static_cast<streamsize>(c_FileLength));

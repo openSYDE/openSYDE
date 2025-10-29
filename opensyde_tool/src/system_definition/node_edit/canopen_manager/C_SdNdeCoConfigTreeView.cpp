@@ -70,7 +70,7 @@ C_SdNdeCoConfigTreeDelegate::C_SdNdeCoConfigTreeDelegate(QObject * const opc_Par
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overridden paint event
 
-   Here: Draw special background of channel ID and paint parent selected state.
+   Here: Paint parent selected state.
 
    \param[in,out]  opc_Painter   Painter
    \param[in]      orc_Option    Option
@@ -125,6 +125,7 @@ C_SdNdeCoConfigTreeView::C_SdNdeCoConfigTreeView(QWidget * const opc_Parent) :
    this->setHeaderHidden(true);
    this->setSelectionMode(QAbstractItemView::SingleSelection);
    this->m_SetupContextMenu();
+   this->setMouseTracking(true);
 
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
@@ -583,10 +584,10 @@ C_OscCanOpenManagerDeviceInfo C_SdNdeCoConfigTreeView::h_CreateNewDevice(const Q
    C_OscCanOpenManagerDeviceInfo c_Config;
    const QFileInfo c_FileInfo(orc_EdsPath);
 
-   c_Config.c_EdsFileName = TglExtractFileName(orc_EdsPath.toStdString());
-   tgl_assert(c_Config.c_EdsFileContent.LoadFromFile(orc_EdsPath.toStdString()) == C_NO_ERR);
+   c_Config.c_OriginalEdsFileName = TglExtractFileName(orc_EdsPath.toStdString());
+   c_Config.c_ProjectEdsFilePath = orc_EdsPath.toStdString();
    tgl_assert(c_FileInfo.exists());
-   C_SdNdeCoConfigTreeView::mh_InitMappableSignals(c_Config.c_EdsFileMappableSignals, c_Config.c_EdsFileContent,
+   C_SdNdeCoConfigTreeView::mh_InitMappableSignals(c_Config.c_EdsFileMappableSignals, c_Config.GetEdsFileContent(),
                                                    c_FileInfo.suffix().toLower() == "eds");
    C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(c_Config);
    return c_Config;
@@ -1001,8 +1002,9 @@ void C_SdNdeCoConfigTreeView::m_OnItemSelected(void)
                // as selected)
                this->expand(c_Current);
             }
-            this->setCurrentIndex(c_Current.child(C_SdNdeCoConfigTreeModel::hu32_INDEX_DEVICE_USE_CASE_CONFIGURATION,
-                                                  0));
+            this->setCurrentIndex(c_Current.model()->index(C_SdNdeCoConfigTreeModel::
+                                                           hu32_INDEX_DEVICE_USE_CASE_CONFIGURATION,
+                                                           0, c_Current));
          }
          else
          {
@@ -1160,16 +1162,17 @@ void C_SdNdeCoConfigTreeView::m_OnExpanded(const QModelIndex & orc_ExpandedIndex
 void C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(C_OscCanOpenManagerDeviceInfo & orc_Device)
 {
    const int32_t s32_HB_OFF_VALUE = 0;
-   const QString c_FileName = orc_Device.c_EdsFileName.UpperCase().c_str();
+   const QString c_FileName = orc_Device.c_OriginalEdsFileName.UpperCase().c_str();
    const bool q_IsEds = c_FileName.endsWith(".EDS");
+   const C_OscCanOpenObjectDictionary & rc_EdsFileContent = orc_Device.GetEdsFileContent();
 
    //heartbeat producing supported?
-   if (orc_Device.c_EdsFileContent.IsHeartbeatProducerSupported() == true)
+   if (rc_EdsFileContent.IsHeartbeatProducerSupported() == true)
    {
       //supported
       // check for read-only
       bool q_HbProducerRo = true;
-      tgl_assert(orc_Device.c_EdsFileContent.IsHeartbeatProducerRo(q_HbProducerRo) == C_NO_ERR);
+      tgl_assert(rc_EdsFileContent.IsHeartbeatProducerRo(q_HbProducerRo) == C_NO_ERR);
 
       // get default value first (100 ms)
       const int32_t s32_DefaultHeartbeatProducerTimeMs =
@@ -1177,7 +1180,7 @@ void C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(C_OscCanOpenManagerDeviceI
       int32_t s32_HeartbeatProducerTimeMs = s32_DefaultHeartbeatProducerTimeMs;
 
       // get heartbeat producer time from EDS
-      const C_OscCanOpenObjectData * const pc_OscCanOpenObject = orc_Device.c_EdsFileContent.GetCanOpenObject(
+      const C_OscCanOpenObjectData * const pc_OscCanOpenObject = rc_EdsFileContent.GetCanOpenObject(
          C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_PRODUCER);
       if (pc_OscCanOpenObject != NULL)
       {
@@ -1221,11 +1224,11 @@ void C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(C_OscCanOpenManagerDeviceI
       orc_Device.q_EnableHeartbeatProducing = false;
    }
 
-   if (orc_Device.c_EdsFileContent.GetNumHeartbeatConsumers() != 0)
+   if (rc_EdsFileContent.GetNumHeartbeatConsumers() != 0)
    {
       // check for read-only
       bool q_HbConsumerRo = true;
-      tgl_assert(orc_Device.c_EdsFileContent.IsHeartbeatConsumerRo(q_HbConsumerRo) == C_NO_ERR);
+      tgl_assert(rc_EdsFileContent.IsHeartbeatConsumerRo(q_HbConsumerRo) == C_NO_ERR);
 
       orc_Device.q_EnableHeartbeatConsuming = !q_HbConsumerRo;
 
@@ -1241,7 +1244,7 @@ void C_SdNdeCoConfigTreeView::mh_InitNewDeviceContent(C_OscCanOpenManagerDeviceI
          // Checking the first consumer because this is the entry which will be used for the user specified
          // value when it is not read-only too
          const C_OscCanOpenObjectData * const pc_OscCanOpenObject =
-            orc_Device.c_EdsFileContent.GetCanOpenSubIndexObject(
+            rc_EdsFileContent.GetCanOpenSubIndexObject(
                C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_CONSUMER, 1);
          if (pc_OscCanOpenObject != NULL)
          {

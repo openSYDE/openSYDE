@@ -19,6 +19,10 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
+#include <winsock2.h>
+// Adding windows.h here for avoiding problems with ambigous "byte" declarations
+#include <windows.h>
+
 //don't include anything here; so the test project can also verify whether all required headers are included
 
 #endif

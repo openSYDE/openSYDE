@@ -195,6 +195,9 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    // Application maximizing flag
    orc_Ini.WriteBool("Screen", "Size_maximized", orc_UserSettings.GetAppMaximized());
 
+   // Application screen index
+   orc_Ini.WriteInteger("Screen", "Screen_index", orc_UserSettings.GetAppScreenIndex());
+
    //Buttons
    orc_Ini.WriteBool("Buttons", "Hex", orc_UserSettings.GetButtonHexActive());
    orc_Ini.WriteBool("Buttons", "TimeStamp", orc_UserSettings.GetButtonRelativeTimeStampActive());
@@ -333,6 +336,10 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    // Application maximizing flag
    q_Flag = orc_Ini.ReadBool("Screen", "Size_maximized", true);
    orc_UserSettings.SetAppMaximized(q_Flag);
+
+   // Application screen index
+   s32_Value = orc_Ini.ReadInteger("Screen", "Screen_index", 0);
+   orc_UserSettings.SetAppScreenIndex(static_cast<uint32_t>(s32_Value));
 
    // Buttons
    q_Flag = orc_Ini.ReadBool("Buttons", "Hex", true);

@@ -90,7 +90,7 @@ C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32_t ou32_ViewIndex, co
 
    if (oq_Window == true)
    {
-      this->layout()->setMargin(0);
+      this->layout()->setContentsMargins(0, 0, 0, 0);
    }
 
    //Error handling

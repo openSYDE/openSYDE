@@ -146,24 +146,7 @@ void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void)
 void C_SyvDaItDashboardSliderWidget::SetMinMax(const int32_t os32_MinValue, const QString & orc_MinString,
                                                const int32_t os32_MaxValue, const QString & orc_MaxString)
 {
-#if QT_VERSION > QT_VERSION_CHECK(5, 15, 2)
-#warning Check if this bug fix is still necessary in new Qt version
-#endif
-   // Bug fix for qt issue in QStyle::sliderPositionFromValue (https://bugreports.qt.io/browse/QTBUG-29764)
-   // Can be reproduced in any call of:
-   // QStyle::sliderPositionFromValue(std::numeric_limits<int>::min(), 0, 0, 100,false);
-   // leads to crashes in C_OgeSliDashboard::paintEvent and
-   // in C_OgeSliToolTipBase::m_MoveToolTip (Systemtest Project View "Bus0" Tab "Single" and Tab "WIN-PC2")
-   const int64_t s64_Range = static_cast<int64_t>(os32_MaxValue) - static_cast<int64_t>(os32_MinValue);
-
-   if (s64_Range == std::abs(static_cast<int64_t>(std::numeric_limits<int32_t>::min())))
-   {
-      this->mpc_Ui->pc_HorizontalSlider->setMinimum(os32_MinValue + 1);
-   }
-   else
-   {
-      this->mpc_Ui->pc_HorizontalSlider->setMinimum(os32_MinValue);
-   }
+   this->mpc_Ui->pc_HorizontalSlider->setMinimum(os32_MinValue);
    this->mc_Min = orc_MinString;
    this->mpc_Ui->pc_HorizontalSlider->setMaximum(os32_MaxValue);
    this->mc_Max = orc_MaxString;

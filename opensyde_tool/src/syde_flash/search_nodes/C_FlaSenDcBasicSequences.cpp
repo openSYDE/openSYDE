@@ -125,7 +125,9 @@ int32_t C_FlaSenDcBasicSequences::InitDcSequences(const C_SclString & orc_CanDll
    }
    else
    {
-      osc_write_log_error(c_LogActivity, "Could not load the CAN DLL!");
+      const std::string c_Bitness = QString::number(8 * sizeof(size_t)).toStdString();
+      osc_write_log_error(c_LogActivity,
+                          "Could not load the CAN DLL! Make sure to use a " + c_Bitness + "-bit DLL.");
    }
 
    if (s32_Return == C_NO_ERR)

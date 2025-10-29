@@ -1,10 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Short description
-
-   Detailed description (optional). The module shall be described detailed if it is not described completely
-   by short description.
+   \brief       Show the brightness of the current color.
 
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */

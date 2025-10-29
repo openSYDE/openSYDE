@@ -67,7 +67,7 @@
 #include <QVariant>
 #include <QVector>
 #include <QWidget>
-/*
+
 //Qt modules
 // Cannot use the include-all ones from Qt as they conflict with the DBC library
 #include <QtGui>
@@ -82,7 +82,7 @@
 #include "C_SdTopologyScene.hpp"
 #include "C_GtGetText.hpp"
 #include "C_SclChecksums.hpp"
-*/
+
 #endif
 
 #endif

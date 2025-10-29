@@ -57,11 +57,23 @@ C_SyvUpPacServiceUpdatePackageDialog::C_SyvUpPacServiceUpdatePackageDialog(
    // set default option
    this->mpc_Ui->pc_RbArchiveFile->setChecked(true);
 
+   this->mpc_Ui->pc_CbxFileVersion->addItem("Version 1");
+   this->mpc_Ui->pc_CbxFileVersion->addItem("Version 2");
+
+   this->mpc_Ui->pc_CbxFileVersion->setCurrentIndex(1);
+
    // connects
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked,
            this, &C_SyvUpPacServiceUpdatePackageDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked,
            this, &C_SyvUpPacServiceUpdatePackageDialog::m_CancelClicked);
+
+   connect(this->mpc_Ui->pc_RbArchiveFile, &QRadioButton::toggled, this,
+           &C_SyvUpPacServiceUpdatePackageDialog::m_OnRadioButtonToggled);
+   connect(this->mpc_Ui->pc_RbUnzip, &QRadioButton::toggled, this,
+           &C_SyvUpPacServiceUpdatePackageDialog::m_OnRadioButtonToggled);
+   connect(this->mpc_Ui->pc_RbSecureArchive, &QRadioButton::toggled, this,
+           &C_SyvUpPacServiceUpdatePackageDialog::m_OnRadioButtonToggled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,11 +100,17 @@ void C_SyvUpPacServiceUpdatePackageDialog::InitStaticNames() const
    this->mpc_Ui->pc_RbSecureArchive->setText((C_GtGetText::h_GetText("Secure Archive File (*.syde_sup)")));
    this->mpc_Ui->pc_RbUnzip->setText((C_GtGetText::h_GetText("Un-zipped to a Directory")));
    this->mpc_Ui->pc_LabelType->setText((C_GtGetText::h_GetText("Select Type")));
+   this->mpc_Ui->pc_LabFileVersion->setText((C_GtGetText::h_GetText("File Version")));
 
    // Tool tips
    this->mpc_Ui->pc_RbArchiveFile->SetToolTipInformation(C_GtGetText::h_GetText("Archive File"),
                                                          C_GtGetText::h_GetText(
                                                             "Saves the Service Update Package as archive, here the files are saved as a zipped archive with the file extension .syde_sup."));
+   this->mpc_Ui->pc_LabFileVersion->SetToolTipInformation(C_GtGetText::h_GetText("*.syde_sup File Version"),
+                                                          C_GtGetText::h_GetText(
+                                                             "Defines the file version of the .syde_sup package. \n"
+                                                             "Version 1: use this version for compatibility with older SYDEsup tools, which do not support Version 2.\n"
+                                                             "Version 2: Default version to use. Supports the complete feature set."));
    this->mpc_Ui->pc_RbUnzip->SetToolTipInformation(C_GtGetText::h_GetText("Directory"),
                                                    C_GtGetText::h_GetText(
                                                       "Saves the Service Update Package as a directory, in which all files are present individually. \n"
@@ -103,6 +121,18 @@ void C_SyvUpPacServiceUpdatePackageDialog::InitStaticNames() const
                                                            C_GtGetText::h_GetText(
                                                               "Saves the Service Update Package as a signed archive .syde_sup. "
                                                               "\nThis option allows the user to sign the archive with a private signature key and also encrypt the archive content with a password."));
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the selected sydesup version
+
+   \return
+   Version 1 ..... returns when version 1 is selected
+   Version 2 ..... returns when version 2 is selected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SyvUpPacServiceUpdatePackageDialog::GetSelectedVersion() const
+{
+   return this->mpc_Ui->pc_CbxFileVersion->currentText();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -133,7 +163,6 @@ const
    {
       e_Type =  E_PackageType::eARCHIVE;
    }
-
    return e_Type;
 }
 
@@ -153,4 +182,28 @@ void C_SyvUpPacServiceUpdatePackageDialog::m_OkClicked(void) const
 void C_SyvUpPacServiceUpdatePackageDialog::m_CancelClicked(void) const
 {
    this->mrc_ParentDialog.reject();
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for Radio button's toggle
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacServiceUpdatePackageDialog::m_OnRadioButtonToggled()
+{
+   const C_SyvUpPacServiceUpdatePackageDialog::E_PackageType e_Type = this->GetSelectedOption();
+
+   switch (e_Type)
+   {
+   case E_PackageType::eARCHIVE:
+      this->mpc_Ui->pc_CbxFileVersion->setEnabled(true);
+      break;
+   case E_PackageType::eDIRECTORY:
+      this->mpc_Ui->pc_CbxFileVersion->setEnabled(false);
+      break;
+   case E_PackageType::eSECURE_ARCHIVE:
+      this->mpc_Ui->pc_CbxFileVersion->setEnabled(false);
+      break;
+   default:
+      this->mpc_Ui->pc_CbxFileVersion->setEnabled(true);
+      break;
+   }
 }

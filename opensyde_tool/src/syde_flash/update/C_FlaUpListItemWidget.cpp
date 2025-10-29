@@ -135,9 +135,9 @@ C_FlaUpListItemWidget::~C_FlaUpListItemWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaUpListItemWidget::m_GetHexFileInformation(void)
 {
-   const QFileInfo & rc_FileInfo(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath);
+   const QFileInfo c_FileInfo(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath);
 
-   if (rc_FileInfo.exists())
+   if (c_FileInfo.exists() == true)
    {
       if (this->q_IsRelativePathToAdd)
       {
@@ -459,9 +459,9 @@ void C_FlaUpListItemWidget::m_FileStatusCheck()
 {
    if (this->pc_HexFileInfo != NULL)
    {
-      const QFileInfo & rc_FileInfo(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath);
+      const QFileInfo c_FileInfo(this->pc_HexFileInfo->c_HexFileInfo.c_FilePath);
 
-      if (!rc_FileInfo.exists())
+      if (c_FileInfo.exists() == false)
       {
          if (this->mpc_Ui->pc_DeviceIDLabel->text() != "Missing")
          {

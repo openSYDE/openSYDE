@@ -97,7 +97,7 @@ private:
    void m_InitBorderItems(void);
    void m_InitEmptyItems(void);
    void m_InitProtocolItems(void);
-   void m_CoLoadEdsRestricitions(void);
+   void m_CoLoadEdsRestrictions(void);
    void m_AddSignal(const uint32_t ou32_SignalIndex);
    void m_RemoveSignal(const uint32_t ou32_SignalIndex);
 

@@ -116,6 +116,7 @@ C_SdBueJ1939AddMessagesFromCatalogTreeView::C_SdBueJ1939AddMessagesFromCatalogTr
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 
    this->setSortingEnabled(true);
+   this->setMouseTracking(true);
 
    connect(this, &QTreeView::clicked, this,
            &C_SdBueJ1939AddMessagesFromCatalogTreeView::m_OnItemChecked);

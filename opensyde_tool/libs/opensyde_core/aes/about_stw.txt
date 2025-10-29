@@ -1,0 +1,7 @@
+AES implementation by SergeyBel
+
+Used version:
+v2.1.0
+
+Source:
+https://github.com/SergeyBel/AES/tree/v2.1.0

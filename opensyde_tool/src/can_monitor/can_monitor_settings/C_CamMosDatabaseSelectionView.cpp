@@ -244,7 +244,8 @@ QModelIndex C_CamMosDatabaseSelectionView::m_ManualMapFromSource(const QModelInd
 {
    QModelIndex c_Retval;
 
-   if ((orc_Index.parent().isValid() == true) || (this->mc_SortModel.filterRegExp().isEmpty() == false))
+   if ((orc_Index.parent().isValid() == true) ||
+       (this->mc_SortModel.filterRegularExpression().pattern().isEmpty() == false))
    {
       c_Retval = this->mc_SortModel.mapFromSource(orc_Index);
    }

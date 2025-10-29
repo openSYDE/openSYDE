@@ -384,11 +384,45 @@ int32_t C_SyvDcWidget::m_InitSequence(void)
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_COM:
-      c_Message =
-         static_cast<QString>(C_GtGetText::h_GetText(
-                                 "CAN initialization failed. Check your PC CAN interface configuration "
-                                 "(System View setup - double-click on PC)."));
-      c_MessageBox.SetCustomMinHeight(230, 230);
+      {
+         bool q_IsEthernet = false;
+
+         //Check if ethernet
+         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+         if (pc_View != NULL)
+         {
+            if (pc_View->GetOscPcData().GetConnected())
+            {
+               const C_OscSystemBus * const pc_Bus =
+                  C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
+               if (pc_Bus != NULL)
+               {
+                  if (pc_Bus->e_Type == C_OscSystemBus::eETHERNET)
+                  {
+                     q_IsEthernet = true;
+                  }
+               }
+            }
+         }
+         if (q_IsEthernet)
+         {
+            c_Message =
+               static_cast<QString>(
+                  C_GtGetText::h_GetText(
+                     "Ethernet initialization failed. Check your Ethernet adapter settings in Windows system network configuration."));
+            c_MessageBox.SetCustomMinHeight(180, 180);
+         }
+         else
+         {
+            c_Message =
+               static_cast<QString>(
+                  C_GtGetText::h_GetText(
+                     "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
+                     "double-click on PC)."));
+            c_MessageBox.SetCustomMinHeight(200, 200);
+         }
+      }
       break;
    case C_CHECKSUM:
       c_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal buffer overflow detected."));

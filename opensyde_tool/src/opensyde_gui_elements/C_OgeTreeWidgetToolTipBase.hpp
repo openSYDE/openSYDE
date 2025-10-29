@@ -41,7 +41,6 @@ protected:
    const QHeaderView * m_Header(void) const override;
    const QAbstractItemModel * m_Model(void) const override;
    bool m_BaseEvent(QEvent * const opc_Event) override;
-   void m_SetMouseTracking(const bool oq_Active) override;
    QModelIndex m_IndexAtGlobalPos(const QPoint & orc_GlobalPos) const override;
 };
 

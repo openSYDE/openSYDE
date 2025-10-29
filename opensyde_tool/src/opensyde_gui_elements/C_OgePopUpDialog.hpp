@@ -18,6 +18,7 @@
 #include <QDialog>
 #include <QAbstractButton>
 #include <QPointer>
+#include <QScreen>
 #include "C_OgeOverlay.hpp"
 
 namespace Ui
@@ -57,7 +58,7 @@ public:
    void HideTitle(void) const;
    void HideOverlay(void) const;
    void SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose);
-   int32_t ApplicationRunningScreen() const;
+   const QScreen * ApplicationRunningScreen() const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

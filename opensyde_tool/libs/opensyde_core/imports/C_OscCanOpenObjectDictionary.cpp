@@ -149,6 +149,34 @@ bool C_OscCanOpenObjectData::operator <(const C_OscCanOpenObjectData & orc_Objec
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscCanOpenObjectDictionary::C_OscCanOpenObjectDictionary() :
+   mu32_OriginalFileHash(0U)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: remember hash over (const) file content
+
+   Calculate and remember hash value over file content of original EDS file.
+   This will not change. So there's no need to recalculate at run-time.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscCanOpenObjectDictionary::m_RememberFileHash()
+{
+   this->mu32_OriginalFileHash = 0xFFFFFFFFU;
+
+   for (int32_t s32_Line = 0; s32_Line < this->c_TextFileContent.Strings.GetLength(); s32_Line++)
+   {
+      stw::scl::C_SclChecksums::CalcCRC32(this->c_TextFileContent.Strings[s32_Line].c_str(),
+                                          this->c_TextFileContent.Strings[s32_Line].Length(),
+                                          this->mu32_OriginalFileHash);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data from CANopen EDS file
 
    Strategy:
@@ -171,6 +199,7 @@ int32_t C_OscCanOpenObjectDictionary::LoadFromFile(const C_SclString & orc_File)
 {
    int32_t s32_Return = C_NO_ERR;
 
+   mu32_OriginalFileHash = 0U;
    mc_LastError = "";
    c_OdObjects.clear();
 
@@ -266,6 +295,13 @@ int32_t C_OscCanOpenObjectDictionary::LoadFromFile(const C_SclString & orc_File)
          {
             this->mc_LastError = c_InfoError;
          }
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         //remember full original content of file
+         c_IniFile.GetFileAsStringList(this->c_TextFileContent);
+         this->m_RememberFileHash();
       }
    }
 
@@ -830,6 +866,8 @@ C_SclString C_OscCanOpenObjectDictionary::GetLastErrorText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscCanOpenObjectDictionary::CalcHash(uint32_t & oru32_HashValue) const
 {
+   C_SclChecksums::CalcCRC32(&this->mu32_OriginalFileHash, sizeof(this->mu32_OriginalFileHash), oru32_HashValue);
+
    this->c_InfoBlock.CalcHash(oru32_HashValue);
 
    for (std::map<uint16_t, C_OscCanOpenObject>::const_iterator c_Element = this->c_OdObjects.begin();

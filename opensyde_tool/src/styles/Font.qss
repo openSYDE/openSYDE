@@ -100,9 +100,9 @@ stw--opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView,
 stw--opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
 stw--opensyde_gui_elements--C_OgeLabNavigationSubHeading
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 12px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* --------------------------------------------------------------------- */
@@ -184,14 +184,15 @@ stw--opensyde_gui--C_SdBueNodeSelectorWidget QLabel#pc_BueNodeSelectorTitleLabel
 stw--opensyde_gui_elements--C_OgePubMessageOk,
 stw--opensyde_gui_elements--C_OgePubMessageCancel,
 stw--opensyde_gui_elements--C_OgePubHalcOverview,
+stw--opensyde_gui_elements--C_OgePubDataLoggerJobsOverview,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="true"][Bold="false"],
 stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Font="13"][SemiBold="true"][Bold="false"],
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement
 
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 13px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* STYLE_GUIDE_FONT_BOLD_13 */
@@ -247,9 +248,9 @@ stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTreeView QHeaderView::secti
 stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QHeaderView::section,
 stw--opensyde_gui--C_NagUnUsedProjectFilesTableView QHeaderView::section
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 14px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* STYLE_GUIDE_FONT_BOLD_14 */
@@ -292,9 +293,9 @@ stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="16"][SemiBol
 /*stw--opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab,*/
 stw--opensyde_gui_elements--C_OgeLabDashboardTab
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 16px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* STYLE_GUIDE_FONT_BOLD_16 */
@@ -318,15 +319,15 @@ font-weight: normal;
 /* STYLE_GUIDE_FONT_SEMIBOLD_18 */
 stw--opensyde_gui_elements--C_OgeLabHeadingWidgetSubTitle,
 stw--opensyde_gui_elements--C_OgeLabHeadingWidgetSubSubTitle,
-stw--opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab,
+stw--opensyde_gui_elements--C_OgeTawSelector QTabBar::tab,
 stw--opensyde_gui_elements--C_OgePubIconText,
 stw--opensyde_gui_elements--C_OgePubUseCase,
 stw--opensyde_gui_elements--C_OgeLabReadMain,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="18"][SemiBold="true"][Bold="false"]
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 18px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* STYLE_GUIDE_FONT_BOLD_18 */
@@ -349,9 +350,9 @@ font-weight: normal;
 /* STYLE_GUIDE_FONT_SEMIBOLD_20 */
 stw--opensyde_gui_elements--C_OgeLabHeadingProperties
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 20px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* --------------------------------------------------------------------- */
@@ -369,9 +370,9 @@ stw--opensyde_gui_elements--C_OgeLabTreeNode,
 stw--opensyde_gui_elements--C_OgeLabNodeType,
 stw--opensyde_gui_elements--C_OgeLabCategorySubHeading
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 22px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* STYLE_GUIDE_FONT_BOLD_22 */
@@ -420,18 +421,18 @@ font-weight: normal;
 /* STYLE_GUIDE_FONT_SEMIBOLD_36 */
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="36"][SemiBold="true"][Bold="false"]
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 36px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_SEMIBOLD_40 */
 stw--opensyde_gui_elements--C_OgeLabBusType
 {
-font-family: "Segoe UI Semibold";
+font-family: "Segoe UI";
 font-size: 40px;
-font-weight: normal;
+font-weight: 600; /*semibold*/
 }
 
 /* --------------------------------------------------------------------- */

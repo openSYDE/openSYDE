@@ -19,7 +19,6 @@
 #include <QFileInfo>
 #include <QApplication>
 #include <QStyleOption>
-#include <QDesktopWidget>
 
 #include "C_OscUtils.hpp"
 #include "TglUtils.hpp"
@@ -138,19 +137,24 @@ void C_OgeWiUtil::h_SetWindowIcon(QWidget * const opc_Widget)
 
    \param[in,out]  orc_GlobalPosition           Global position of top left corner (Set to default if necessary)
    \param[in,out]  orc_Size                     Size of widget (Set to default if necessary)
+   \param[in]      ou32_ScreenIndex             Screen index (for multi screen setup)
    \param[in]      orc_DefaultSize              Default size of widget
    \param[in]      oq_AddLogEntryForWindowSize  Optional flag to add log entry for window size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition, QSize & orc_Size,
-                                                     const QSize & orc_DefaultSize,
+                                                     const uint32_t ou32_ScreenIndex, const QSize & orc_DefaultSize,
                                                      const bool oq_AddLogEntryForWindowSize)
 {
-   const QDesktopWidget * const pc_Desktop = QApplication::desktop();
+   // get correct screen on multi screen setup (default to primary screen)
+   const QScreen * const pc_Screen = (static_cast<int32_t>(ou32_ScreenIndex) < QGuiApplication::screens().size()) ?
+                                     QGuiApplication::screens().at(ou32_ScreenIndex) : QGuiApplication::primaryScreen();
+
+   tgl_assert(pc_Screen != NULL);
 
    // Desktop size gets increase by one on each side
    //  because the check seems to exclude the bottom right corner if exact match
-   const QRect c_RectDesktop = pc_Desktop->geometry().adjusted(-1, -1, 2, 2);
+   const QRect c_RectDesktop = pc_Screen->geometry().adjusted(-1, -1, 2, 2);
 
    // are the coordinates inside of all screen ares?
    if ((c_RectDesktop.contains(orc_GlobalPosition) == true) &&
@@ -169,9 +173,8 @@ void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition
    {
       osc_write_log_info("Setup main window screen",
                          static_cast<QString>("Setup main window for screen width %1, height %2").arg(
-                            pc_Desktop->geometry().width()).arg(pc_Desktop->
-                                                                geometry()
-                                                                .height()).toStdString().c_str());
+                            QApplication::primaryScreen()->geometry().width()).arg(
+                            QApplication::primaryScreen()->geometry().height()).toStdString().c_str());
    }
 }
 

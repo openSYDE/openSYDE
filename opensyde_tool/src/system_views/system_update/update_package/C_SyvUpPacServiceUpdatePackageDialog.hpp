@@ -46,6 +46,7 @@ public:
    void InitStaticNames(void) const;
 
    E_PackageType GetSelectedOption() const;
+   QString GetSelectedVersion(void) const;
 
 private:
    //Avoid call
@@ -55,6 +56,7 @@ private:
 
    void m_OkClicked(void) const;
    void m_CancelClicked(void) const;
+   void m_OnRadioButtonToggled();
 
    Ui::C_SyvUpPacServiceUpdatePackageDialog * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed

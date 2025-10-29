@@ -16,7 +16,6 @@
 #include <QObject>
 #include <QString>
 
-#include "stwtypes.hpp"
 #include "C_SclString.hpp"
 
 #include "C_Can.hpp"
@@ -42,6 +41,7 @@ class C_SyvDcDeviceConfiguation
 {
 public:
    C_SyvDcDeviceConfiguation(void);
+   C_SyvDcDeviceConfiguation(const C_SyvDcDeviceConfiguation & orc_Source);
    C_SyvDcDeviceConfiguation & operator =(const C_SyvDcDeviceConfiguation & orc_Source) &;
 
    // Identifier of the device

@@ -457,7 +457,7 @@ C_SyvDaChaPlot::C_SyvDaChaPlot(QWidget * const opc_Parent) :
    QCustomPlot(opc_Parent),
    mq_DragMouseCursorAdapted(false),
    mpc_ClickedCursor(NULL),
-   mc_LastItemLineEvent(QEvent::None, QPointF(), QPointF(), QPointF(), Qt::NoButton, Qt::NoButton, Qt::NoModifier)
+   mc_LastItemLineEventPos(QPoint())
 {
    QPen c_Pen = this->selectionRect()->pen();
    QBrush c_Brush = this->selectionRect()->brush();
@@ -568,7 +568,7 @@ void C_SyvDaChaPlot::mousePressEvent(QMouseEvent * const opc_Event)
             {
                this->mpc_ClickedCursor->setSelected(true);
                Q_EMIT (this->SigCursorItemClicked(this->mpc_ClickedCursor));
-               this->mc_LastItemLineEvent = *opc_Event;
+               this->mc_LastItemLineEventPos = opc_Event->pos();
                QApplication::setOverrideCursor(Qt::SplitHCursor);
             }
          }
@@ -624,7 +624,7 @@ void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    if (this->mpc_ClickedCursor != NULL)
    {
-      const QPointF c_Delta = opc_Event->pos() - this->mc_LastItemLineEvent.pos();
+      const QPointF c_Delta = opc_Event->pos() - this->mc_LastItemLineEventPos;
       // Get the position in pixel coordinates
       const float64_t f64_CurrPosHorizontal = this->xAxis->coordToPixel(this->mpc_ClickedCursor->start->coords().x());
       // Calculate the difference in pixels
@@ -636,7 +636,7 @@ void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
       this->mpc_ClickedCursor->UpdatePosition(f64_NewAxisVertical);
 
       // Store the event
-      this->mc_LastItemLineEvent = *opc_Event;
+      this->mc_LastItemLineEventPos = opc_Event->pos();
 
       // Redrawing is necessary
       this->replot();

@@ -14,6 +14,7 @@
 
 #include <QMap>
 
+#include "C_Uti.hpp"
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "C_OscUtils.hpp"
@@ -139,10 +140,10 @@ int32_t C_PuiSdHandlerDataLoggerLogic::AddDataLogger(const uint32_t ou32_NodeInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Delete data logger
+/*! \brief  Delete multiple data loggers
 
    \param[in]  ou32_NodeIndex             Node index
-   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+   \param[in]  orc_DataLoggerJobIndices   Data logger job indices
 
    \return
    STW error codes
@@ -151,22 +152,28 @@ int32_t C_PuiSdHandlerDataLoggerLogic::AddDataLogger(const uint32_t ou32_NodeInd
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSdHandlerDataLoggerLogic::DeleteDataLogger(const uint32_t ou32_NodeIndex,
-                                                        const uint32_t ou32_DataLoggerJobIndex)
+int32_t C_PuiSdHandlerDataLoggerLogic::DeleteMultipleDataLoggers(const uint32_t ou32_NodeIndex,
+                                                                 const std::vector<uint32_t> & orc_DataLoggerJobIndices)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
+      const std::vector<uint32_t> c_DataLoggerJobIndicesSortedDescending = C_Uti::h_UniquifyAndSortDescending(
+         orc_DataLoggerJobIndices);
       C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      for (std::vector<uint32_t>::const_iterator c_It = c_DataLoggerJobIndicesSortedDescending.cbegin();
+           c_It != c_DataLoggerJobIndicesSortedDescending.cend(); ++c_It)
       {
-         rc_Node.c_DataLoggerJobs.erase(
-            rc_Node.c_DataLoggerJobs.begin() + ou32_DataLoggerJobIndex);
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
+         if (*c_It < rc_Node.c_DataLoggerJobs.size())
+         {
+            rc_Node.c_DataLoggerJobs.erase(
+               rc_Node.c_DataLoggerJobs.begin() + *c_It);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
    }
    else
@@ -563,6 +570,57 @@ int32_t C_PuiSdHandlerDataLoggerLogic::CheckAndHandleNewElement(const C_OscNodeD
                                                                                                    this->mc_LastKnownHalcCrcs);
 
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Remove all ids for invalid routes for one node
+
+   \param[in]      ou32_Index    Index
+   \param[in,out]  orc_Data      Data
+
+   \return
+   Flags
+
+   \retval   True    Changes happened
+   \retval   False   Nothing changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerDataLoggerLogic::h_RemoveAllIdsForInvalidRoutesForOneNode(const uint32_t ou32_Index,
+                                                                             std::vector<C_OscDataLoggerJob> & orc_Data)
+{
+   bool q_Retval = false;
+
+   for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < orc_Data.size(); ++u32_ItDataLogger)
+   {
+      QMap<uint32_t, bool> c_MapNodeReachable;
+      C_OscDataLoggerJob & rc_DataLoggerJob = orc_Data[u32_ItDataLogger];
+      for (uint32_t u32_ItDataLoggerElement = 0UL;
+           u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
+      {
+         C_OscDataLoggerDataElementReference & rc_DataLoggerElement =
+            rc_DataLoggerJob.c_ConfiguredDataElements[u32_ItDataLoggerElement];
+         if (!c_MapNodeReachable.contains(rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex))
+         {
+            c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex] =
+               C_PuiSdUtil::h_CheckXappNodeReachable(ou32_Index,
+                                                     rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex);
+         }
+         if (!c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex])
+         {
+            mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
+                                                           rc_DataLoggerJob.c_ConfiguredDataElements[
+                                                              u32_ItDataLoggerElement]);
+            rc_DataLoggerJob.c_ConfiguredDataElements.erase(
+               rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
+            q_Retval = true;
+         }
+         else
+         {
+            ++u32_ItDataLoggerElement;
+         }
+      }
+   }
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1329,35 +1387,7 @@ void C_PuiSdHandlerDataLoggerLogic::m_ValidateAllRoutesForOneNode(const uint32_t
    if (ou32_Index < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_Index];
-      for (uint32_t u32_ItDataLogger = 0UL; u32_ItDataLogger < rc_Node.c_DataLoggerJobs.size(); ++u32_ItDataLogger)
-      {
-         QMap<uint32_t, bool> c_MapNodeReachable;
-         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[u32_ItDataLogger];
-         for (uint32_t u32_ItDataLoggerElement = 0UL;
-              u32_ItDataLoggerElement < rc_DataLoggerJob.c_ConfiguredDataElements.size();)
-         {
-            C_OscDataLoggerDataElementReference & rc_DataLoggerElement =
-               rc_DataLoggerJob.c_ConfiguredDataElements[u32_ItDataLoggerElement];
-            if (!c_MapNodeReachable.contains(rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex))
-            {
-               c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex] =
-                  C_PuiSdUtil::h_CheckXappNodeReachable(ou32_Index,
-                                                        rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex);
-            }
-            if (!c_MapNodeReachable[rc_DataLoggerElement.c_ConfiguredElementId.u32_NodeIndex])
-            {
-               mh_HandleSyncDataLoggerElementAboutToBeDeleted(rc_DataLoggerJob.c_Properties,
-                                                              rc_DataLoggerJob.c_ConfiguredDataElements[
-                                                                 u32_ItDataLoggerElement]);
-               rc_DataLoggerJob.c_ConfiguredDataElements.erase(
-                  rc_DataLoggerJob.c_ConfiguredDataElements.begin() + u32_ItDataLoggerElement);
-            }
-            else
-            {
-               ++u32_ItDataLoggerElement;
-            }
-         }
-      }
+      h_RemoveAllIdsForInvalidRoutesForOneNode(ou32_Index, rc_Node.c_DataLoggerJobs);
    }
 }
 

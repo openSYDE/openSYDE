@@ -51,6 +51,8 @@ public:
    const std::vector<int32_t> & GetHalcConfigColumnWidth(void) const;
    QString GetSelectedHalcDomainName(void) const;
    QString GetSelectedHalcChannel(void) const;
+   int32_t GetSelectedDataLoggerLogJobIndex(void) const;
+   bool GetIsOverviewWidgetSelected(void) const;
 
    void SetSelectedDatapoolName(const QString & orc_DatapoolName);
    void SetSelectedProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol);
@@ -83,6 +85,8 @@ public:
    void SetHalcConfigColumnWidth(const std::vector<int32_t> & orc_Value);
    void SetSelectedHalcDomain(const QString & orc_Value);
    void SetSelectedHalcChannel(const QString & orc_Value);
+   void SetSelectedDataLoggerLogJobIndex(const int32_t os32_Value);
+   void SetIsOverviewWidgetSelected(const bool oq_IsOverviewWidgetSelected);
 
 private:
    std::vector<int32_t> mc_CanOpenOverviewColumnWidth;
@@ -101,6 +105,8 @@ private:
    QString mc_SelectedDataPoolName;
    QString mc_SelectedHalcDomainName;
    QString mc_SelectedHalcChannelId;
+   int32_t ms32_SelectedDataLoggerLogJobIndex;
+   bool mq_IsOverviewWidgetSelected;
    stw::opensyde_core::C_OscCanProtocol::E_Type me_SelectedProtocol;
    uint32_t mu32_SelectedInterface;
    QMap<QString, C_UsNodeDatapool> mc_Datapools; ///< History of last known node datapool user settings

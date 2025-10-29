@@ -40,7 +40,8 @@ public:
                                              uint16_t * const opu16_ReadFileVersion = NULL,
                                              const std::vector<uint8_t> * const opc_NodesToLoad = NULL,
                                              const bool oq_SkipContent = false,
-                                             const stw::scl::C_SclString * const opc_ExpectedNodeName = NULL);
+                                             const stw::scl::C_SclString * const opc_ExpectedNodeName = NULL,
+                                             std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices = NULL);
    static int32_t h_SaveSystemDefinitionFile(const C_OscSystemDefinition & orc_SystemDefinition,
                                              const stw::scl::C_SclString & orc_Path,
                                              std::vector<stw::scl::C_SclString> * const opc_CreatedFiles = NULL);
@@ -50,7 +51,8 @@ public:
                               const bool oq_UseFileInterface = true,
                               const std::vector<uint8_t> * const opc_NodesToLoad = NULL,
                               const bool oq_SkipContent = false,
-                              const stw::scl::C_SclString * const opc_ExpectedNodeName = NULL);
+                              const stw::scl::C_SclString * const opc_ExpectedNodeName = NULL,
+                              std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices = NULL);
    static int32_t h_LoadBuses(std::vector<C_OscSystemBus> & orc_Buses, C_OscXmlParserBase & orc_XmlParser);
    static int32_t h_SaveNodes(const std::vector<C_OscNode> & orc_Nodes, C_OscXmlParserBase & orc_XmlParser,
                               const stw::scl::C_SclString & orc_BasePath,
@@ -64,7 +66,8 @@ public:
                                          uint16_t * const opu16_ReadFileVersion = NULL,
                                          const std::vector<uint8_t> * const opc_NodesToLoad = NULL,
                                          const bool oq_SkipContent = false,
-                                         const stw::scl::C_SclString * const opc_ExpectedNodeName = NULL);
+                                         const stw::scl::C_SclString * const opc_ExpectedNodeName = NULL,
+                                         std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices = NULL);
    static int32_t h_SaveSystemDefinition(const C_OscSystemDefinition & orc_SystemDefinition,
                                          C_OscXmlParserBase & orc_XmlParser, const stw::scl::C_SclString & orc_BasePath,
                                          std::vector<stw::scl::C_SclString> * const opc_CreatedFiles);

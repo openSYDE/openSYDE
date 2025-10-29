@@ -52,7 +52,7 @@ C_TblViewToolTipBase::C_TblViewToolTipBase(QWidget * const opc_Parent) :
    ms32_HoveredVertHeader(-1),
    ms32_HoveredHorzHeader(-1)
 {
-   //Check mouse tracking active in all tables using this class?
+   //Check mouse tracking active in all tables using this class? (just disable if using persistent editors)
 }
 
 //----------------------------------------------------------------------------------------------------------------------

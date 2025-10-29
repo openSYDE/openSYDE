@@ -59,6 +59,23 @@ C_SyvDcDeviceConfiguation::C_SyvDcDeviceConfiguation(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy constructor
+
+   \param[in]  orc_Source  instance to copy from
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SyvDcDeviceConfiguation::C_SyvDcDeviceConfiguation(const C_SyvDcDeviceConfiguation & orc_Source) :
+   c_SerialNumber(orc_Source.c_SerialNumber),
+   u8_SubNodeId(orc_Source.u8_SubNodeId),
+   c_OldComConfig(orc_Source.c_OldComConfig),
+   c_NodeIds(orc_Source.c_NodeIds),
+   c_BusIds(orc_Source.c_BusIds),
+   c_CanBitrates(orc_Source.c_CanBitrates),
+   c_IpAddresses(orc_Source.c_IpAddresses)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Assignment operator.
 
    \param[in]  orc_Source  instance to assign

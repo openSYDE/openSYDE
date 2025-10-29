@@ -24,14 +24,25 @@ namespace opensyde_core
 
 class C_OscCanOpenManagerDeviceInfo
 {
+private:
+   //Use mutable to keep "dynamic loading" from having a const-correctness impact for the application.
+   //From an API perspective access via GetEdsFileContent is still logically const
+   mutable C_OscCanOpenObjectDictionary mc_EdsFileContent; ///< Content of loaded EDS file
+   mutable bool mq_EdsFileContentLoaded;
+
 public:
    C_OscCanOpenManagerDeviceInfo();
 
    void CalcHash(uint32_t & oru32_HashValue) const;
 
-   stw::scl::C_SclString c_EdsFileName;           ///< File name of loaded EDS file
-   C_OscCanOpenObjectDictionary c_EdsFileContent; ///< Content of loaded EDS file, parsed for
-   ///< GUI usage
+   const C_OscCanOpenObjectDictionary & GetEdsFileContent() const;
+   void SetEdsFileContent(const C_OscCanOpenObjectDictionary & orc_NewContent);
+
+   stw::scl::C_SclString c_ProjectEdsFilePath; ///< Absolute file path to EDS file for delayed loading; not part of the
+                                               // file's content
+
+   stw::scl::C_SclString c_OriginalEdsFileName; ///< File name of original EDS file
+
    std::vector<C_OscCanOpenManagerMappableSignal> c_EdsFileMappableSignals; ///< All parsed and valid mappable signals
    bool q_DeviceOptional;                                                   ///< Flag for CANopen manager to consider
    ///< this device

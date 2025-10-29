@@ -904,13 +904,14 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_AddAdaptedMessage(const C_OscCanOpenMana
    C_OscCanMessage c_NewOscMessage = orc_ExistingOscMessage;
    C_PuiSdNodeCanMessage c_NewUiMessage = orc_ExistingUiMessage;
    bool q_IsRo;
+   const C_OscCanOpenObjectDictionary & rc_EdsFileContent = orc_NewConfig.GetEdsFileContent();
 
    C_SdNdeCoDeviceUpdateEdsDialog::mh_AdaptMessageProperties(orc_NewConfig, orc_ImportedOscMessageData,
                                                              c_NewOscMessage,
                                                              oq_MessageIsTxInEds, c_WarningMessages);
 
-   tgl_assert(orc_NewConfig.c_EdsFileContent.IsPdoMappingRo(c_NewOscMessage.u16_CanOpenManagerPdoIndex,
-                                                            oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR);
+   tgl_assert(rc_EdsFileContent.IsPdoMappingRo(c_NewOscMessage.u16_CanOpenManagerPdoIndex,
+                                               oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR);
    if (q_IsRo)
    {
       //Add info
@@ -1002,25 +1003,26 @@ C_OscCanOpenManagerDeviceInfo C_SdNdeCoDeviceUpdateEdsDialog::m_AdaptConfig(
       C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(this->mu32_ManagerNodeIndex,
                                                                this->mu8_ManagerInterfaceId,
                                                                this->mc_DeviceNodeId);
+   const C_OscCanOpenObjectDictionary & rc_EdsFileContent = orc_NewConfig.GetEdsFileContent();
 
    tgl_assert(pc_ExistingConfig != NULL);
    if (pc_ExistingConfig != NULL)
    {
-      const std::set<uint8_t> c_Map = orc_NewConfig.c_EdsFileContent.GetAllAvailableFactorySettingsSubIndices();
+      const std::set<uint8_t> c_Map = rc_EdsFileContent.GetAllAvailableFactorySettingsSubIndices();
       const std::set<uint8_t>::const_iterator c_ItResult = c_Map.find(
          pc_ExistingConfig->u8_ResetNodeObjectDictionarySubIndex);
       // check for read-only
       bool q_IsRo = true;
       c_NewConfig = *pc_ExistingConfig;
       // Always replace
-      c_NewConfig.c_EdsFileContent = orc_NewConfig.c_EdsFileContent;
+      c_NewConfig.SetEdsFileContent(rc_EdsFileContent);
       c_NewConfig.c_EdsFileMappableSignals = orc_NewConfig.c_EdsFileMappableSignals;
-      c_NewConfig.c_EdsFileName = orc_NewConfig.c_EdsFileName;
+      c_NewConfig.c_OriginalEdsFileName = orc_NewConfig.c_OriginalEdsFileName;
 
       // Conditional replace
-      if (orc_NewConfig.c_EdsFileContent.IsHeartbeatProducerSupported())
+      if (rc_EdsFileContent.IsHeartbeatProducerSupported())
       {
-         tgl_assert(orc_NewConfig.c_EdsFileContent.IsHeartbeatProducerRo(q_IsRo) == C_NO_ERR);
+         tgl_assert(rc_EdsFileContent.IsHeartbeatProducerRo(q_IsRo) == C_NO_ERR);
          if (q_IsRo)
          {
             c_NewConfig.q_EnableHeartbeatProducing = false;
@@ -1032,9 +1034,9 @@ C_OscCanOpenManagerDeviceInfo C_SdNdeCoDeviceUpdateEdsDialog::m_AdaptConfig(
          c_NewConfig.q_EnableHeartbeatProducing = false;
          c_NewConfig.u16_HeartbeatProducerTimeMs = orc_NewConfig.u16_HeartbeatProducerTimeMs;
       }
-      if (orc_NewConfig.c_EdsFileContent.GetNumHeartbeatConsumers() != 0)
+      if (rc_EdsFileContent.GetNumHeartbeatConsumers() != 0)
       {
-         tgl_assert(orc_NewConfig.c_EdsFileContent.IsHeartbeatConsumerRo(q_IsRo) == C_NO_ERR);
+         tgl_assert(rc_EdsFileContent.IsHeartbeatConsumerRo(q_IsRo) == C_NO_ERR);
          if (q_IsRo)
          {
             c_NewConfig.q_EnableHeartbeatConsuming = false;
@@ -1078,9 +1080,10 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_AdaptMessageProperties(const C_OscCanOpe
                                                                QString & orc_WarningMessages)
 {
    bool q_IsRo;
+   const C_OscCanOpenObjectDictionary & rc_EdsFileContent = orc_NewConfig.GetEdsFileContent();
 
-   tgl_assert(orc_NewConfig.c_EdsFileContent.IsCobIdRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
-                                                       oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR);
+   tgl_assert(rc_EdsFileContent.IsCobIdRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
+                                          oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR);
    if (q_IsRo)
    {
       if (orc_NewOscMessage.u32_CanId != orc_ImportedOscMessageData.u32_CanId)
@@ -1133,8 +1136,8 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_AdaptMessageProperties(const C_OscCanOpe
          orc_NewOscMessage.q_IsExtended = orc_ImportedOscMessageData.q_IsExtended;
       }
    }
-   tgl_assert(orc_NewConfig.c_EdsFileContent.IsTransmissionTypeRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
-                                                                  oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR);
+   tgl_assert(rc_EdsFileContent.IsTransmissionTypeRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
+                                                     oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR);
    if (q_IsRo)
    {
       if (orc_NewOscMessage.e_TxMethod != orc_ImportedOscMessageData.e_TxMethod)
@@ -1152,8 +1155,8 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_AdaptMessageProperties(const C_OscCanOpe
             orc_ImportedOscMessageData.u8_CanOpenTxMethodAdditionalInfo;
       }
    }
-   if (orc_NewConfig.c_EdsFileContent.IsInhibitTimeRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
-                                                      oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR)
+   if (rc_EdsFileContent.IsInhibitTimeRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
+                                         oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR)
    {
       if (q_IsRo)
       {
@@ -1170,8 +1173,8 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_AdaptMessageProperties(const C_OscCanOpe
          }
       }
    }
-   if (orc_NewConfig.c_EdsFileContent.IsEventTimerRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
-                                                     oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR)
+   if (rc_EdsFileContent.IsEventTimerRo(orc_NewOscMessage.u16_CanOpenManagerPdoIndex,
+                                        oq_MessageIsTxInEds, q_IsRo) == C_NO_ERR)
    {
       if (q_IsRo)
       {

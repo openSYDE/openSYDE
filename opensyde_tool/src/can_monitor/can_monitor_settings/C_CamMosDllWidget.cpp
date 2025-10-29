@@ -287,9 +287,12 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
       }
       else
       {
+         const uint32_t u32_BITNESS = 8 * sizeof(size_t);
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL initialization not successful."));
+         c_MessageBox.SetDescription(
+            static_cast<QString>(C_GtGetText::h_GetText("CAN DLL initialization not successful. "
+                                                        "Make sure to use a %1-bit DLL.")).arg(u32_BITNESS));
          c_MessageBox.Execute();
       }
       (void)c_Can.DLL_Close();

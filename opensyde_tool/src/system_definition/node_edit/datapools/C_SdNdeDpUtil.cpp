@@ -13,13 +13,9 @@
 #include "precomp_headers.hpp"
 
 #include <cmath>
-#include <limits>
 #include <QApplication>
 #include "stwerrors.hpp"
-#include "C_OscUtils.hpp"
 #include "C_SdNdeDpUtil.hpp"
-#include "C_SdUtil.hpp"
-#include "C_Uti.hpp"
 #include "constants.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_OgeWiTableSpinBoxGroup.hpp"
@@ -94,8 +90,6 @@ void C_SdNdeDpUtil::h_ConvertToElementGeneric(const stw::opensyde_core::C_OscNod
                                               QVariant & orc_Generic, const uint32_t & oru32_Index,
                                               const int32_t & ors32_DataSetIndex)
 {
-   QString c_Precison;
-
    switch (ore_Type)
    {
    case eELEMENT_NAME:
@@ -134,16 +128,10 @@ void C_SdNdeDpUtil::h_ConvertToElementGeneric(const stw::opensyde_core::C_OscNod
       orc_Generic = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(orc_OscElement.c_MaxValue, oru32_Index);
       break;
    case eELEMENT_FACTOR:
-      c_Precison = QString::number(orc_OscElement.f64_Factor, 'g', 17);
-      c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
-                         Qt::CaseInsensitive);
-      orc_Generic = c_Precison;
+      orc_Generic = orc_OscElement.f64_Factor;
       break;
    case eELEMENT_OFFSET:
-      c_Precison = QString::number(orc_OscElement.f64_Offset, 'g', 17);
-      c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
-                         Qt::CaseInsensitive);
-      orc_Generic = c_Precison;
+      orc_Generic = orc_OscElement.f64_Offset;
       break;
    case eELEMENT_UNIT:
       orc_Generic = orc_OscElement.c_Unit.c_str();

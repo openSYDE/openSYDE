@@ -228,13 +228,38 @@ void C_SyvUpPacSectionNodeWidget::SetUpdateApplicationError(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::SetUpdateFinished(void)
 {
-   if (this->mq_FileBased == true)
-   {
-      uint32_t u32_Counter;
+   uint32_t u32_Counter;
 
-      // Special case: After updating a file based node, it is not possible to read back or confirm
-      // the state of the node. Reset the state of all applications
-      for (u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
+   for (u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
+   {
+      bool q_SetToToDo = false;
+      if (this->mq_FileBased == true)
+      {
+         // Special case: After updating a file based node, it is not possible to read back or confirm
+         // the state of the node. Reset the state of all applications
+         q_SetToToDo = true;
+      }
+      else
+      {
+         // Special case 2: For syde_psi files the same argument as for file based
+         QLayoutItem * const pc_CurrentItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(u32_Counter);
+
+         // Adapt the icon of the finished application
+         if (pc_CurrentItem != NULL)
+         {
+            C_SyvUpPacListNodeItemWidget * const pc_App =
+               dynamic_cast<C_SyvUpPacListNodeItemWidget *>(pc_CurrentItem->widget());
+
+            if ((pc_App != NULL) &&
+                (pc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET))
+            {
+               // It is a paramset aka syde_psi file
+               q_SetToToDo = true;
+            }
+         }
+      }
+
+      if (q_SetToToDo == true)
       {
          this->m_SetFileState(u32_Counter, C_SyvUpPacListNodeItemWidget::hu32_STATE_TO_DO);
       }

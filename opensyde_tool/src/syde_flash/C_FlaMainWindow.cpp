@@ -11,7 +11,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
-#include <QWinTaskbarButton>
 
 #include "stwerrors.hpp"
 #include "C_OscLoggingHandler.hpp"
@@ -21,7 +20,6 @@
 #include "C_GtGetText.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_FlaConNodeConfigPopup.hpp"
-#include "C_FlaSenDcBasicSequences.hpp"
 #include "C_FlaSenSearchNodePopup.hpp"
 #include "C_Uti.hpp"
 #include "C_FlaUpListItemWidget.hpp"
@@ -122,29 +120,11 @@ C_FlaMainWindow::C_FlaMainWindow(QWidget * const opc_Parent) :
 C_FlaMainWindow::~C_FlaMainWindow()
 {
    delete this->mpc_Ui;
-   delete this->mpc_Progress;
    delete this->mpc_UpSequences;
    this->mpc_UpSequences = NULL;
 
    delete this->mpc_CanDispatcher;
    this->mpc_CanDispatcher = NULL;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overwritten show event slot
-
-   Init progress in Windows taskbar
-
-   \param[in,out]  opc_Event  Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaMainWindow::showEvent(QShowEvent * const opc_Event)
-{
-   //handle task bar button
-   m_InitWinTaskbar();
-
-   opc_Event->accept();
-   QMainWindow::showEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,11 +177,19 @@ void C_FlaMainWindow::m_LoadUserSettings(void)
    QPoint c_Position = C_UsHandler::h_GetInstance()->GetScreenPos();
    QSize c_Size = C_UsHandler::h_GetInstance()->GetAppSize();
 
-   C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700));
+   C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size,
+                                                   C_UsHandler::h_GetInstance()->GetAppScreenIndex(), QSize(1000, 700));
    this->setGeometry(c_Position.x(), c_Position.y(), c_Size.width(), c_Size.height());
 
    if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
    {
+      // move to correct screen on multi screen setups
+      const uint32_t u32_ScreenIndex = C_UsHandler::h_GetInstance()->GetAppScreenIndex();
+      const QScreen * const pc_Screen =
+         (static_cast<int32_t>(u32_ScreenIndex) < QGuiApplication::screens().size()) ?
+         QGuiApplication::screens().at(u32_ScreenIndex) : QGuiApplication::primaryScreen();
+
+      this->move(pc_Screen->geometry().topLeft());
       this->showMaximized();
    }
 
@@ -228,6 +216,7 @@ void C_FlaMainWindow::m_SaveUserSettings(void)
    C_UsHandler::h_GetInstance()->SetScreenPos(this->normalGeometry().topLeft());
    C_UsHandler::h_GetInstance()->SetAppSize(this->normalGeometry().size());
    C_UsHandler::h_GetInstance()->SetAppMaximized(this->isMaximized());
+   C_UsHandler::h_GetInstance()->SetAppScreenIndex(QGuiApplication::screens().indexOf(this->screen()));
 
    // splitter
    // update to actual value if settings are not collapsed
@@ -581,25 +570,6 @@ uint32_t stw::opensyde_gui::C_FlaMainWindow::m_CalculateFileBytesFlashed(const u
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Init windows taskbar progress bar
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaMainWindow::m_InitWinTaskbar(void)
-{
-   const uint8_t u8_MINIMUM_PERCENTAGE = 0;
-   const uint8_t u8_MAXIMUM_PERCENTAGE = 100;
-
-   QWidget * const pc_Top = C_OgeWiUtil::h_GetWidgetUnderNextPopUp(this);
-   QWinTaskbarButton * const pc_Button = new QWinTaskbarButton(pc_Top);
-
-   pc_Button->setWindow(pc_Top->windowHandle());
-
-   this->mpc_Progress = pc_Button->progress();
-   this->mpc_Progress->setMinimum(u8_MINIMUM_PERCENTAGE);
-   this->mpc_Progress->setMaximum(u8_MAXIMUM_PERCENTAGE);
-} //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Error has been detected
 
    Reset progress bar, taskbar progress, necessary values and show a popup window if wanted
@@ -655,7 +625,6 @@ bool C_FlaMainWindow::m_ErrorDetected(const bool & orq_ShowErrorMessage)
 void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage)
 {
    const uint8_t u8_MAX_PERCENTAGE = 100;
-   const bool q_VISIBLE_WIN_PROGRESS = true;
 
    if ((oru8_ProgressInPercentage == 0) && mq_NewFile)
    {
@@ -681,7 +650,6 @@ void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentag
       u8_TotalProgressInPercentage = m_CalcualteTotalProgressInPercentage();
 
       this->mpc_Ui->pc_UpdateWidget->UpdateProgressBar(u8_TotalProgressInPercentage);
-      this->m_UpdateWinProgress(q_VISIBLE_WIN_PROGRESS, u8_TotalProgressInPercentage);
       this->mpc_Ui->pc_UpdateWidget->UpdateDataTransfer(mu64_FlashedBytes);
    }
 
@@ -705,19 +673,6 @@ void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentag
 void C_FlaMainWindow::m_UpdateFileIcon(const uint32_t & oru32_FileIndex, const uint8_t & oru8_ProgressState) const
 {
    this->mpc_Ui->pc_UpdateWidget->SetStatusIcon(oru32_FileIndex, oru8_ProgressState);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set task bar progress
-
-   \param[in]  orq_Visible  Progress is visible flag
-   \param[in]  oru8_Value  Progress value (0-100)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_FlaMainWindow::m_UpdateWinProgress(const bool & orq_Visible, const uint8_t & oru8_Value)
-{
-   this->mpc_Progress->setVisible(orq_Visible);
-   this->mpc_Progress->setValue(oru8_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -749,7 +704,6 @@ uint8_t C_FlaMainWindow::m_CalcualteTotalProgressInPercentage(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaMainWindow::m_ResetProgressBar()
 {
-   const bool q_VISIBLE_PROGRESSBAR = false;
    const uint8_t u8_PROGRESSBAR_VALUE = 0;
    const uint8_t u8_FLAHSED_FILES_COUNTER = 0;
 
@@ -757,9 +711,6 @@ void C_FlaMainWindow::m_ResetProgressBar()
    this->mpc_Ui->pc_UpdateWidget->ResetSummary();
    this->mpc_Ui->pc_UpdateWidget->UpdateProgressBar(u8_PROGRESSBAR_VALUE);
    this->mpc_Ui->pc_UpdateWidget->UpdateDataTransfer(u8_PROGRESSBAR_VALUE);
-
-   /*Reset taskbar progress*/
-   m_UpdateWinProgress(q_VISIBLE_PROGRESSBAR, u8_PROGRESSBAR_VALUE);
 
    /*Reset local variables*/
    this->mc_SecTimer.stop();
@@ -812,7 +763,9 @@ int32_t C_FlaMainWindow::m_InitUpdateSequence(void)
       }
       else
       {
-         osc_write_log_error("Initialization", "Could not load the CAN DLL!");
+         const std::string c_Bitness = QString::number(8 * sizeof(size_t)).toStdString();
+         osc_write_log_error("Initialization",
+                             "Could not load the CAN DLL! Make sure to use a " + c_Bitness + "-bit DLL.");
       }
    }
 
@@ -844,9 +797,12 @@ int32_t C_FlaMainWindow::m_InitUpdateSequence(void)
 
    if (s32_Return != C_NO_ERR)
    {
+      const uint32_t u32_BITNESS = 8 * sizeof(size_t);
       C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_TitleBarWidget, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Initialization failed"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Failed to initialize CAN interface."));
+      c_Message.SetDescription(
+         static_cast<QString>(C_GtGetText::h_GetText("Failed to initialize CAN interface. "
+                                                     "Make sure to use a %1-bit DLL.")).arg(u32_BITNESS));
       c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("For details see ")) +
                            C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
                                             C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()) + ".");
@@ -1022,11 +978,6 @@ void C_FlaMainWindow::m_TimerUpdate(void)
          mu32_FlashedFilesCounter = 0;
          mu64_FlashedBytes = 0;
          mu32_FlashedBytesTmp = 0;
-         const uint8_t u8_WIN_PROGRESS_PERCENTAGE = 0;
-         const bool q_VISIBLE_WIN_PROGRESS = false;
-
-         this->m_UpdateWinProgress(q_VISIBLE_WIN_PROGRESS, u8_WIN_PROGRESS_PERCENTAGE);
-
          this->me_UpdateStep = C_FlaUpSequences::eRESETSYSTEM;
          this->ms32_NextHexFile = 0; // reset
          s32_ThreadResult = this->mpc_UpSequences->StartResetSystem();

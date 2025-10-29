@@ -249,22 +249,22 @@ void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
 
    Here: Add additional information
 
-   \param[in] oc_Items Affected items
+   \param[in] orc_Items Affected items
 
    \return
    Mime data for drag event
 */
 //----------------------------------------------------------------------------------------------------------------------
-QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc_Items) const
+QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> & orc_Items) const
 {
-   QMimeData * const pc_Retval = QListWidget::mimeData(oc_Items);
+   QMimeData * const pc_Retval = QListWidget::mimeData(orc_Items);
 
    if (pc_Retval != NULL)
    {
-      if (oc_Items.size() > 0)
+      if (orc_Items.size() > 0)
       {
          const C_SyvDcConnectedNodeWidget * const pc_Widget =
-            dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(oc_Items[0]));
+            dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(orc_Items[0]));
          if (pc_Widget != NULL)
          {
             QString c_StringSubNodeIdsToOldNodeIds;

@@ -150,6 +150,19 @@ void C_SdNdeDalLogJobDataSelectionWidget::ReloadDataElements()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the number of local and remote elements
+
+   \param[in,out]   oru32_LocalElements     Number of local elements
+   \param[in,out]   oru32_RemoteElements    Number of remote elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobDataSelectionWidget::GetElementLocationCount(uint32_t & oru32_LocalElements,
+                                                                  uint32_t & oru32_RemoteElements)
+{
+   this->mpc_Ui->pc_TableView->GetElementLocationCount(oru32_LocalElements, oru32_RemoteElements);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initializes all visible strings on the widget
 
 */
@@ -335,7 +348,7 @@ void C_SdNdeDalLogJobDataSelectionWidget::m_UpdateSelection() const
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobDataSelectionWidget::m_OnDataChangedInModel(const QModelIndex orc_Index, const QString oc_Data)
+void C_SdNdeDalLogJobDataSelectionWidget::m_OnDataChangedInModel(const QModelIndex & orc_Index, const QString oc_Data)
 {
    bool q_UseCustomName = true;
    QString c_Data(oc_Data);

@@ -14,6 +14,7 @@
 
 #include "TglFile.hpp"
 #include "stwerrors.hpp"
+#include "C_SclString.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscXmlParserLog.hpp"
 #include "C_OscNodeCommFiler.hpp"
@@ -24,7 +25,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
-
+using namespace stw::scl;
 using namespace stw::errors;
 using namespace stw::opensyde_core;
 
@@ -65,8 +66,7 @@ C_OscCanOpenManagerFiler::C_OscCanOpenManagerFiler()
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::h_LoadFile(std::map<uint8_t, C_OscCanOpenManagerInfo> & orc_Config,
-                                             const stw::scl::C_SclString & orc_Path,
-                                             const stw::scl::C_SclString & orc_BasePath)
+                                             const C_SclString & orc_Path, const C_SclString & orc_BasePath)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -120,11 +120,9 @@ int32_t C_OscCanOpenManagerFiler::h_LoadFile(std::map<uint8_t, C_OscCanOpenManag
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::h_SaveFile(const std::map<uint8_t,
                                                             C_OscCanOpenManagerInfo> & orc_Config,
-                                             const stw::scl::C_SclString & orc_Path,
-                                             const stw::scl::C_SclString & orc_BasePath,
-                                             std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
-                                             const std::map<uint32_t,
-                                                            stw::scl::C_SclString> & orc_NodeIndicesToNameMap)
+                                             const C_SclString & orc_Path, const C_SclString & orc_BasePath,
+                                             std::vector<C_SclString> * const opc_CreatedFiles, const std::map<uint32_t,
+                                                                                                               C_SclString> & orc_NodeIndicesToNameMap)
 {
    C_OscXmlParser c_XmlParser;
    int32_t s32_Retval = C_OscSystemFilerUtil::h_GetParserForNewFile(c_XmlParser, orc_Path,
@@ -166,8 +164,7 @@ int32_t C_OscCanOpenManagerFiler::h_SaveFile(const std::map<uint8_t,
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::h_LoadData(std::map<uint8_t, C_OscCanOpenManagerInfo> & orc_Config,
-                                             C_OscXmlParserBase & orc_XmlParser,
-                                             const stw::scl::C_SclString & orc_BasePath)
+                                             C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath)
 {
    int32_t s32_Retval = orc_XmlParser.SelectNodeChildError("can-open-managers");
 
@@ -178,7 +175,7 @@ int32_t C_OscCanOpenManagerFiler::h_LoadData(std::map<uint8_t, C_OscCanOpenManag
       s32_Retval = orc_XmlParser.GetAttributeUint32Error("length", u32_ExpectedSize);
       if (s32_Retval == C_NO_ERR)
       {
-         stw::scl::C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("can-open-manager");
+         C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("can-open-manager");
          if (c_NodeName == "can-open-manager")
          {
             do
@@ -202,7 +199,7 @@ int32_t C_OscCanOpenManagerFiler::h_LoadData(std::map<uint8_t, C_OscCanOpenManag
          }
          if (u32_ExpectedSize != orc_Config.size())
          {
-            stw::scl::C_SclString c_Tmp;
+            C_SclString c_Tmp;
             c_Tmp.PrintFormatted("Unexpected CANopen manager count, expected: %u, got %u", u32_ExpectedSize,
                                  static_cast<uint32_t>(orc_Config.size()));
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
@@ -233,17 +230,15 @@ int32_t C_OscCanOpenManagerFiler::h_LoadData(std::map<uint8_t, C_OscCanOpenManag
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::h_SaveData(const std::map<uint8_t,
                                                             C_OscCanOpenManagerInfo> & orc_Config,
-                                             C_OscXmlParserBase & orc_XmlParser,
-                                             const stw::scl::C_SclString & orc_BasePath,
-                                             std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
-                                             const std::map<uint32_t,
-                                                            stw::scl::C_SclString> & orc_NodeIndicesToNameMap)
+                                             C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath,
+                                             std::vector<C_SclString> * const opc_CreatedFiles, const std::map<uint32_t,
+                                                                                                               C_SclString> & orc_NodeIndicesToNameMap)
 {
    int32_t s32_Retval = C_NO_ERR;
 
    //File version
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("file-version") == "file-version");
-   orc_XmlParser.SetNodeContent(stw::scl::C_SclString::IntToStr(mhu16_FILE_VERSION_1));
+   orc_XmlParser.SetNodeContent(C_SclString::IntToStr(mhu16_FILE_VERSION_1));
    //Return
    orc_XmlParser.SelectNodeParent();
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("can-open-managers") == "can-open-managers");
@@ -277,7 +272,7 @@ int32_t C_OscCanOpenManagerFiler::h_SaveData(const std::map<uint8_t,
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::mh_LoadManagerData(C_OscCanOpenManagerInfo & orc_Config,
                                                      C_OscXmlParserBase & orc_XmlParser,
-                                                     const stw::scl::C_SclString & orc_BasePath)
+                                                     const C_SclString & orc_BasePath)
 {
    int32_t s32_Retval = C_OscCanOpenManagerFiler::mh_LoadManagerProperties(orc_Config, orc_XmlParser);
 
@@ -310,10 +305,10 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerData(C_OscCanOpenManagerInfo & o
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::mh_SaveManagerData(const C_OscCanOpenManagerInfo & orc_Config,
                                                      C_OscXmlParserBase & orc_XmlParser,
-                                                     const stw::scl::C_SclString & orc_BasePath,
-                                                     std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
+                                                     const C_SclString & orc_BasePath,
+                                                     std::vector<C_SclString> * const opc_CreatedFiles,
                                                      const std::map<uint32_t,
-                                                                    stw::scl::C_SclString> & orc_NodeIndicesToNameMap)
+                                                                    C_SclString> & orc_NodeIndicesToNameMap)
 {
    C_OscCanOpenManagerFiler::mh_SaveManagerProperties(orc_Config, orc_XmlParser);
    return C_OscCanOpenManagerFiler::mh_SaveManagerSubDevices(orc_Config.c_CanOpenDevices, orc_XmlParser, orc_BasePath,
@@ -394,7 +389,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerProperties(C_OscCanOpenManagerIn
          s32_Retval = orc_XmlParser.SelectNodeChildError("nmt-error-behaviour");
          if (s32_Retval == C_NO_ERR)
          {
-            const stw::scl::C_SclString c_Text = orc_XmlParser.GetNodeContent();
+            const C_SclString c_Text = orc_XmlParser.GetNodeContent();
             s32_Retval = C_OscCanOpenManagerFiler::mh_StringToCanOpenManagerInfoType(c_Text,
                                                                                      orc_Config.e_NmtErrorBehaviour);
             if (s32_Retval == C_NO_ERR)
@@ -513,7 +508,7 @@ void C_OscCanOpenManagerFiler::mh_SaveManagerSyncProperties(const C_OscCanOpenMa
 int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevices(std::map<C_OscCanInterfaceId,
                                                                     C_OscCanOpenManagerDeviceInfo> & orc_Config,
                                                            C_OscXmlParserBase & orc_XmlParser,
-                                                           const stw::scl::C_SclString & orc_BasePath)
+                                                           const C_SclString & orc_BasePath)
 {
    int32_t s32_Retval = orc_XmlParser.SelectNodeChildError("can-open-devices");
 
@@ -524,7 +519,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevices(std::map<C_OscCanInte
       s32_Retval = orc_XmlParser.GetAttributeUint32Error("length", u32_ExpectedSize);
       if (s32_Retval == C_NO_ERR)
       {
-         stw::scl::C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("can-open-device");
+         C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("can-open-device");
          if (c_NodeName == "can-open-device")
          {
             do
@@ -560,7 +555,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevices(std::map<C_OscCanInte
          }
          if (u32_ExpectedSize != orc_Config.size())
          {
-            stw::scl::C_SclString c_Tmp;
+            C_SclString c_Tmp;
             c_Tmp.PrintFormatted("Unexpected can open device count, expected: %u, got %u", u32_ExpectedSize,
                                  static_cast<uint32_t>(orc_Config.size()));
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
@@ -592,10 +587,10 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevices(std::map<C_OscCanInte
 int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDevices(const std::map<C_OscCanInterfaceId,
                                                                           C_OscCanOpenManagerDeviceInfo> & orc_Config,
                                                            C_OscXmlParserBase & orc_XmlParser,
-                                                           const stw::scl::C_SclString & orc_BasePath,
-                                                           std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
+                                                           const C_SclString & orc_BasePath,
+                                                           std::vector<C_SclString> * const opc_CreatedFiles,
                                                            const std::map<uint32_t,
-                                                                          stw::scl::C_SclString> & orc_NodeIndicesToNameMap)
+                                                                          C_SclString> & orc_NodeIndicesToNameMap)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -607,7 +602,7 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDevices(const std::map<C_OscC
         ++c_It)
    {
       const std::map<uint32_t,
-                     stw::scl::C_SclString>::const_iterator c_FoundName = orc_NodeIndicesToNameMap.find(
+                     C_SclString>::const_iterator c_FoundName = orc_NodeIndicesToNameMap.find(
          c_It->first.u32_NodeIndex);
       orc_XmlParser.CreateAndSelectNodeChild("can-open-device");
       orc_XmlParser.CreateAndSelectNodeChild("interface-id");
@@ -624,7 +619,7 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDevices(const std::map<C_OscC
       {
          s32_Retval = C_CONFIG;
          osc_write_log_error("saving canopen manager",
-                             "could not find index " + stw::scl::C_SclString::IntToStr(
+                             "could not find index " + C_SclString::IntToStr(
                                 c_It->first.u32_NodeIndex) + " in parameter orc_NodeIndicesToNameMap");
       }
       tgl_assert(orc_XmlParser.SelectNodeParent() == "can-open-devices");
@@ -647,7 +642,7 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDevices(const std::map<C_OscC
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevice(C_OscCanOpenManagerDeviceInfo & orc_Config,
                                                           C_OscXmlParserBase & orc_XmlParser,
-                                                          const stw::scl::C_SclString & orc_BasePath)
+                                                          const C_SclString & orc_BasePath)
 {
    int32_t s32_Retval = orc_XmlParser.SelectNodeChildError("properties");
 
@@ -740,9 +735,9 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDevice(C_OscCanOpenManagerDev
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDevice(const C_OscCanOpenManagerDeviceInfo & orc_Config,
                                                           C_OscXmlParserBase & orc_XmlParser,
-                                                          const stw::scl::C_SclString & orc_BasePath,
-                                                          std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
-                                                          const stw::scl::C_SclString & orc_NodeName,
+                                                          const C_SclString & orc_BasePath,
+                                                          std::vector<C_SclString> * const opc_CreatedFiles,
+                                                          const C_SclString & orc_NodeName,
                                                           const uint8_t ou8_InterfaceNumber)
 {
    int32_t s32_Retval;
@@ -786,14 +781,14 @@ int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDevice(const C_OscCanOpenMana
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDeviceEdsPart(C_OscCanOpenManagerDeviceInfo & orc_Config,
                                                                  C_OscXmlParserBase & orc_XmlParser,
-                                                                 const stw::scl::C_SclString & orc_BasePath)
+                                                                 const C_SclString & orc_BasePath)
 {
    int32_t s32_Retval =
       orc_XmlParser.SelectNodeChildError("eds-file-name");
 
    if (s32_Retval == C_NO_ERR)
    {
-      const stw::scl::C_SclString c_EdsFileName = orc_XmlParser.GetNodeContent();
+      const C_SclString c_EdsFileName = orc_XmlParser.GetNodeContent();
       tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
 
       if (orc_BasePath.IsEmpty())
@@ -809,24 +804,17 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDeviceEdsPart(C_OscCanOpenMan
       }
       else
       {
-         const stw::scl::C_SclString c_CompleteFileName =
-            C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath,
-                                                 c_EdsFileName);
-         if (TglFileExists(c_CompleteFileName))
+         const C_SclString c_CompleteFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_EdsFileName);
+         //EDS file is only loaded on demand, remember path:
+         orc_Config.c_ProjectEdsFilePath = c_CompleteFileName;
+
+         if (TglFileExists(c_CompleteFileName) == false)
          {
-            s32_Retval = orc_Config.c_EdsFileContent.LoadFromFile(c_CompleteFileName);
-            if (s32_Retval != C_NO_ERR)
-            {
-               orc_XmlParser.ReportErrorForNodeContentStartingWithXmlContext(
-                  "Could not parse EDS file \"" + c_EdsFileName + "\" at path \"" + orc_BasePath + "\". Error: \"" +
-                  orc_Config.c_EdsFileContent.GetLastErrorText() + "\"");
-            }
-         }
-         else
-         {
-            s32_Retval = C_CONFIG;
-            orc_XmlParser.ReportErrorForNodeContentStartingWithXmlContext(
-               "Could not find file \"" + c_EdsFileName + "\" at path \"" + orc_BasePath + "\".");
+            //Issue a warning if file does not exist. Do not consider a hard error. As long as the content is not needed
+            // having the file available is not strictly required.
+            osc_write_log_info("Loading CANopen manager data",
+                               "Non existing file \"" + c_CompleteFileName +
+                               "\" is referenced by CANopen manager configuration.");
          }
       }
    }
@@ -834,7 +822,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDeviceEdsPart(C_OscCanOpenMan
    {
       s32_Retval =
          orc_XmlParser.SelectNodeChildError("eds-original-file-name");
-      orc_Config.c_EdsFileName = orc_XmlParser.GetNodeContent();
+      orc_Config.c_OriginalEdsFileName = orc_XmlParser.GetNodeContent();
       tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
    }
    return s32_Retval;
@@ -860,37 +848,53 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerSubDeviceEdsPart(C_OscCanOpenMan
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenManagerFiler::mh_SaveManagerSubDeviceEdsPart(const C_OscCanOpenManagerDeviceInfo & orc_Config,
                                                                  C_OscXmlParserBase & orc_XmlParser,
-                                                                 const stw::scl::C_SclString & orc_BasePath,
-                                                                 std::vector<stw::scl::C_SclString> * const opc_CreatedFiles, const stw::scl::C_SclString & orc_NodeName,
+                                                                 const C_SclString & orc_BasePath,
+                                                                 std::vector<C_SclString> * const opc_CreatedFiles,
+                                                                 const C_SclString & orc_NodeName,
                                                                  const uint8_t ou8_InterfaceNumber)
 {
    int32_t s32_Retval = C_NO_ERR;
-   const stw::scl::C_SclString c_ItemPrefixUnprepared = orc_NodeName + "_can_" + stw::scl::C_SclString::IntToStr(
-      ou8_InterfaceNumber) + "_";
-   const stw::scl::C_SclString c_ItemPrefixPrepared = C_OscSystemFilerUtil::h_PrepareItemNameForFileName(
-      c_ItemPrefixUnprepared);
-   const stw::scl::C_SclString c_FileNameWithPrefix = c_ItemPrefixPrepared + orc_Config.c_EdsFileName;
+   const C_SclString c_ItemPrefixUnprepared = orc_NodeName + "_can_" + C_SclString::IntToStr(ou8_InterfaceNumber) + "_";
+   const C_SclString c_ItemPrefixPrepared = C_OscSystemFilerUtil::h_PrepareItemNameForFileName(c_ItemPrefixUnprepared);
+   const C_SclString c_FileNameWithPrefix = c_ItemPrefixPrepared + orc_Config.c_OriginalEdsFileName;
 
    orc_XmlParser.CreateNodeChild("eds-file-name", c_FileNameWithPrefix);
-   orc_XmlParser.CreateNodeChild("eds-original-file-name", orc_Config.c_EdsFileName);
+   orc_XmlParser.CreateNodeChild("eds-original-file-name", orc_Config.c_OriginalEdsFileName);
    if (orc_BasePath.IsEmpty())
    {
-      orc_XmlParser.CreateNodeChild("eds-file-content",
-                                    orc_Config.c_EdsFileContent.c_InfoBlock.c_FileContentForSave.GetText());
+      const C_OscCanOpenObjectDictionary & rc_EdsFileContent = orc_Config.GetEdsFileContent();
+      orc_XmlParser.CreateNodeChild("eds-file-content", rc_EdsFileContent.c_TextFileContent.GetText());
    }
    else
    {
-      const stw::scl::C_SclString c_CompleteFileName =
-         C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileNameWithPrefix);
-      //only use "\n" as separator; SaveStringToFile will add an \r anyways
-      s32_Retval = C_OscSystemFilerUtil::h_SaveStringToFile(
-         orc_Config.c_EdsFileContent.c_InfoBlock.c_FileContentForSave.GetText("\n"), c_CompleteFileName,
-         "Saving CANopen manager data");
+      const C_SclString c_CompleteFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileNameWithPrefix);
+
+      if (c_CompleteFileName == orc_Config.c_ProjectEdsFilePath)
+      {
+         //The source file is the same as the target file.
+         //As EDS file content cannot be changed in the GUI there's no need to use "GetEdsFileContent"
+         // (which will load the file from disk if not done so yet) and re-save.
+         //Just leave the file system contents as they are.
+         osc_write_log_info("CANopen Manager project saving",
+                            "Location of EDS file \"" + c_CompleteFileName + "\" not changed. No need to re-save.");
+      }
+      else
+      {
+         //File path has changed. e.g.:
+         //* "save as"
+         //* file was newly added to configuration
+         const C_OscCanOpenObjectDictionary & rc_EdsFileContent = orc_Config.GetEdsFileContent();
+         //only use "\n" as separator; SaveStringToFile will add an \r anyways
+         s32_Retval = C_OscSystemFilerUtil::h_SaveStringToFile(
+            rc_EdsFileContent.c_TextFileContent.GetText("\n"), c_CompleteFileName,
+            "Saving CANopen manager data");
+      }
       if (opc_CreatedFiles != NULL)
       {
          opc_CreatedFiles->push_back(c_FileNameWithPrefix);
       }
    }
+
    return s32_Retval;
 }
 
@@ -917,7 +921,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerMappedSignals(
       s32_Retval = orc_XmlParser.GetAttributeUint32Error("length", u32_ExpectedSize);
       if (s32_Retval == C_NO_ERR)
       {
-         stw::scl::C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("mappable-signal");
+         C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("mappable-signal");
          if (c_NodeName == "mappable-signal")
          {
             orc_Config.reserve(u32_ExpectedSize);
@@ -937,7 +941,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerMappedSignals(
          }
          if (u32_ExpectedSize != orc_Config.size())
          {
-            stw::scl::C_SclString c_Tmp;
+            C_SclString c_Tmp;
             c_Tmp.PrintFormatted("Unexpected mappable signal count, expected: %u, got %u", u32_ExpectedSize,
                                  static_cast<uint32_t>(orc_Config.size()));
             orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
@@ -1036,10 +1040,10 @@ void C_OscCanOpenManagerFiler::mh_SaveManagerMappedSignal(const C_OscCanOpenMana
    Stringified can open manager info type
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw::scl::C_SclString C_OscCanOpenManagerFiler::mh_CanOpenManagerInfoTypeToString(
+C_SclString C_OscCanOpenManagerFiler::mh_CanOpenManagerInfoTypeToString(
    const C_OscCanOpenManagerInfo::E_NmtErrorBehaviourType & ore_Type)
 {
-   stw::scl::C_SclString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_Type)
    {
@@ -1070,7 +1074,7 @@ stw::scl::C_SclString C_OscCanOpenManagerFiler::mh_CanOpenManagerInfoTypeToStrin
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscCanOpenManagerFiler::mh_StringToCanOpenManagerInfoType(const stw::scl::C_SclString & orc_String,
+int32_t C_OscCanOpenManagerFiler::mh_StringToCanOpenManagerInfoType(const C_SclString & orc_String,
                                                                     C_OscCanOpenManagerInfo::E_NmtErrorBehaviourType & ore_Type)
 {
    int32_t s32_Retval = C_NO_ERR;

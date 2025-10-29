@@ -803,7 +803,6 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
       QStringList c_PathsAbsolute;
       QString c_InvalidPaths = "";
       QString c_Details;
-      bool q_RelativePossible = false;
 
       // Check first if all paths are valid paths with no unwanted characters
       for (s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
@@ -823,17 +822,13 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
       // make all paths relative
       for (s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
       {
-         if (C_Uti::h_IsPathRelativeToDir(c_Return[s32_Pos], orc_AbsoluteReferenceDir, c_PathAbsolute,
-                                          c_PathRelative) == true)
-         {
-            q_RelativePossible = true;
-         }
-
+         C_Uti::h_IsPathRelativeToDir(c_Return[s32_Pos], orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative);
          c_PathsAbsolute.append(c_PathAbsolute);
          c_PathsRelative.append(c_PathRelative);
       }
 
-      if (q_RelativePossible == true)
+      if ((C_UsHandler::h_GetInstance()->GetPathHandlingSelection() == "") ||
+          (C_UsHandler::h_GetInstance()->GetPathHandlingSelection() == "Ask User"))
       {
          // ask user
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION,
@@ -850,15 +845,29 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
          c_Message.SetDetails(c_Details);
          c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));
          c_Message.SetNoButtonText(C_GtGetText::h_GetText("Absolute"));
+         c_Message.SetCheckboxText(C_GtGetText::h_GetText("Remember this selection"));
+         c_Message.SetCheckboxTooltip(
+            C_GtGetText::h_GetText("Path handling"),
+            C_GtGetText::h_GetText(
+               "If checkbox is enabled the option you chose will be applied and this message will no longer appear.\n"
+               "This option can be reverted in Tool Settings"));
          c_Message.SetCustomMinHeight(230, 400);
 
          if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
          {
             c_Return = c_PathsRelative;
+            if (c_Message.GetCheckboxState() == true)
+            {
+               C_UsHandler::h_GetInstance()->SetPathHandlingSelection("Relative");
+            }
          }
          else
          {
             c_Return = c_PathsAbsolute;
+            if (c_Message.GetCheckboxState() == true)
+            {
+               C_UsHandler::h_GetInstance()->SetPathHandlingSelection("Absolute");
+            }
          }
       }
    }

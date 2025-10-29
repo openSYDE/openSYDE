@@ -50,10 +50,10 @@
       <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
+         <enum>QSizePolicy::Policy::Fixed</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -69,7 +69,7 @@
          <string>TextLabel</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -79,14 +79,14 @@
          <string>TextLabel</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="verticalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -120,13 +120,13 @@
       <item>
        <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="childrenCollapsible">
          <bool>false</bool>
         </property>
         <widget class="QWidget" name="pc_WiDevicesTree" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+         <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -143,26 +143,47 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
-              <height>31</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>31</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>-Overview</string>
-            </property>
+           <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiDevicesTreeContent" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
+               <property name="minimumSize">
+                <size>
+                 <width>300</width>
+                 <height>31</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>31</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>-Overview</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="stw::opensyde_gui::C_SdNdeCoConfigTreeView" name="pc_CoConfigTree"/>
+             </item>
+            </layout>
            </widget>
-          </item>
-          <item>
-           <widget class="stw::opensyde_gui::C_SdNdeCoConfigTreeView" name="pc_CoConfigTree"/>
           </item>
          </layout>
         </widget>
@@ -206,6 +227,22 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgePubHalcOverview</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubHalcOverview.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui::C_SdNdeCoOverviewWidget</class>
    <extends>QWidget</extends>
    <header>C_SdNdeCoOverviewWidget.hpp</header>
@@ -227,16 +264,6 @@
    <class>stw::opensyde_gui::C_SdNdeCoConfigTreeView</class>
    <extends>QTreeView</extends>
    <header>C_SdNdeCoConfigTreeView.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubHalcOverview</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubHalcOverview.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

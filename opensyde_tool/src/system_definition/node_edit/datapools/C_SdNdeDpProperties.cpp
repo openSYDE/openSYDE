@@ -10,6 +10,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <QRegularExpression>
+
 #include "C_SdNdeDpProperties.hpp"
 #include "ui_C_SdNdeDpProperties.h"
 #include "C_GtGetText.hpp"
@@ -331,6 +333,15 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
                                              C_GtGetText::h_GetText(" (Shared property)"));
       this->mpc_Ui->pc_LabelDatapoolSize->setText(this->mpc_Ui->pc_LabelDatapoolSize->text() +
                                                   C_GtGetText::h_GetText(" (Shared property)"));
+   }
+
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   if ((pc_Node->c_Properties.q_XappSupport == true) &&
+       (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased
+        ==
+        true))
+   {
+      this->mpc_Ui->pc_ComboBoxApplication->setEnabled(false);
    }
 
    // connects
@@ -655,7 +666,7 @@ void C_SdNdeDpProperties::m_OkClicked(void)
          tgl_assert(c_Version.size() <= 9);
          if (c_Version.size() <= 9)
          {
-            const QRegExp c_Separators("(\\.|r)");
+            const QRegularExpression c_Separators("(\\.|r)");
             const QStringList c_Parts = c_Version.remove(0, 1).split(c_Separators);
             tgl_assert(c_Parts.size() == 3);
             if (c_Parts.size() == 3)

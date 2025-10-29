@@ -13,6 +13,7 @@
 #include "precomp_headers.hpp"
 
 #include <QFileInfo>
+#include <QScreen>
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -497,8 +498,12 @@ void C_CamMainWindow::m_StartLogging(void)
          c_Text = C_GtGetText::h_GetText("No valid CAN DLL found.");
          break;
       case C_CONFIG:
-         c_Text = C_GtGetText::h_GetText("CAN DLL loading not successful.");
-         break;
+         {
+            const uint32_t u32_BITNESS = 8 * sizeof(size_t);
+            c_Text = static_cast<QString>(C_GtGetText::h_GetText("CAN DLL loading not successful. "
+                                                                 "Make sure to use a %1-bit DLL.")).arg(u32_BITNESS);
+            break;
+         }
       case C_COM:
          c_Text = C_GtGetText::h_GetText("CAN DLL initialization not successful.");
          break;
@@ -740,11 +745,20 @@ void C_CamMainWindow::m_LoadUserSettings(void)
    QPoint c_Position = C_UsHandler::h_GetInstance()->GetScreenPos();
    QSize c_Size = C_UsHandler::h_GetInstance()->GetAppSize();
 
-   C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700));
+   C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size,
+                                                   C_UsHandler::h_GetInstance()->GetAppScreenIndex(), QSize(1000, 700));
    this->setGeometry(c_Position.x(), c_Position.y(), c_Size.width(), c_Size.height());
 
    if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
    {
+      // move to correct screen on multi screen setups
+      const uint32_t u32_ScreenIndex = C_UsHandler::h_GetInstance()->GetAppScreenIndex();
+      const QScreen * const pc_Screen =
+         (static_cast<int32_t>(u32_ScreenIndex) < QGuiApplication::screens().size()) ?
+         QGuiApplication::screens().at(u32_ScreenIndex) : QGuiApplication::primaryScreen();
+
+      this->move(pc_Screen->geometry().topLeft());
+
       this->showMaximized();
    }
 
@@ -768,6 +782,7 @@ void C_CamMainWindow::m_SaveUserSettings(void)
    C_UsHandler::h_GetInstance()->SetScreenPos(this->normalGeometry().topLeft());
    C_UsHandler::h_GetInstance()->SetAppSize(this->normalGeometry().size());
    C_UsHandler::h_GetInstance()->SetAppMaximized(this->isMaximized());
+   C_UsHandler::h_GetInstance()->SetAppScreenIndex(QGuiApplication::screens().indexOf(this->screen()));
 
    // splitter
    // update to actual value if settings are not collapsed

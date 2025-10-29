@@ -127,7 +127,7 @@ private:
    bool mq_DragMouseCursorAdapted;
    QList<C_SyvDaChaPlotCursorItem * > mc_RegisteredCursorItems;
    C_SyvDaChaPlotCursorItem * mpc_ClickedCursor;
-   QMouseEvent mc_LastItemLineEvent;
+   QPoint mc_LastItemLineEventPos;
 
    //Avoid call
    C_SyvDaChaPlot(const C_SyvDaChaPlot &);

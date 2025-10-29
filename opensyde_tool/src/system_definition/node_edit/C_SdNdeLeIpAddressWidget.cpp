@@ -13,9 +13,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QRegularExpression>
+
 #include "C_SdNdeLeIpAddressWidget.hpp"
 #include "ui_C_SdNdeLeIpAddressWidget.h"
-#include <QRegularExpression>
 #include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -250,7 +251,7 @@ void C_SdNdeLeIpAddressWidget::m_RemoveLeadingZeroes(QLineEdit * const opc_LineE
    // remove leading zeros '0' from current cell
    QString c_Tmp =  opc_LineEdit->text();
 
-   c_Tmp = c_Tmp.remove(QRegExp("^[0]*"));
+   c_Tmp = c_Tmp.remove(QRegularExpression("^[0]*"));
    if (c_Tmp.isEmpty() == true)
    {
       // leave at least one '0' left

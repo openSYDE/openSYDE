@@ -68,6 +68,9 @@ C_SdBueCoAddSignalsView::C_SdBueCoAddSignalsView(QWidget * const opc_Parent) :
    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
    this->horizontalScrollBar()->hide();
 
+   //Tooltips
+   this->setMouseTracking(true);
+
    this->setDragEnabled(false);
    this->setSelectionBehavior(QAbstractItemView::SelectRows);
    this->setSelectionMode(QAbstractItemView::ExtendedSelection);

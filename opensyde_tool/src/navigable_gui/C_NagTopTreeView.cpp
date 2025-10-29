@@ -46,6 +46,7 @@ C_NagTopTreeView::C_NagTopTreeView(QWidget * const opc_Parent) :
 
    this->setHeaderHidden(true);
    this->setSelectionMode(QAbstractItemView::SingleSelection);
+   this->setMouseTracking(true);
 
    connect(this->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &C_NagTopTreeView::m_OnItemSelected);
 }

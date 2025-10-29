@@ -54,15 +54,15 @@ protected:
    void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
 
 private:
-   //Avoid call
-   C_SdNdeHalcOvTableView(const C_SdNdeHalcOvTableView &);
-   C_SdNdeHalcOvTableView & operator =(const C_SdNdeHalcOvTableView &) &;
-
-   void m_InitColumns(void);
-
    QSortFilterProxyModel mc_SortProxyModel;
    stw::opensyde_gui_logic::C_SdNdeHalcOvTableModel mc_Model;
    stw::opensyde_gui_logic::C_SdNdeHalcOvDelegate mc_Delegate;
+
+   void m_InitColumns(void);
+
+   //Avoid call
+   C_SdNdeHalcOvTableView(const C_SdNdeHalcOvTableView &);
+   C_SdNdeHalcOvTableView & operator =(const C_SdNdeHalcOvTableView &) &;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

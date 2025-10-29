@@ -14,7 +14,6 @@
 
 #include <QListWidgetItem>
 #include <QMimeData>
-#include <QDesktopWidget>
 
 #include "C_CamMosFilterWidget.hpp"
 #include "ui_C_CamMosFilterWidget.h"

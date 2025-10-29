@@ -123,7 +123,7 @@ protected:
    void paintEvent(QPaintEvent * const opc_Event) override;
    void dropEvent(QDropEvent * const opc_Event) override;
    void startDrag(const Qt::DropActions oc_SupportedActions) override;
-   QMimeData * mimeData(const QList<QTreeWidgetItem *> oc_Items) const override;
+   QMimeData * mimeData(const QList<QTreeWidgetItem *> & orc_Items) const override;
    QStringList mimeTypes(void) const override;
 
    void m_LastMinuteToolTipUpdate(void) override;

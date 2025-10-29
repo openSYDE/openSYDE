@@ -931,7 +931,7 @@ void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOpti
          c_Pen.setStyle(Qt::DashLine);
       }
 
-      opc_Painter->setRenderHint(QPainter::HighQualityAntialiasing);
+      opc_Painter->setRenderHint(QPainter::Antialiasing);
       opc_Painter->setClipRect(opc_Option->exposedRect);
       opc_Painter->setBrush(Qt::NoBrush);
       opc_Painter->setPen(c_Pen);

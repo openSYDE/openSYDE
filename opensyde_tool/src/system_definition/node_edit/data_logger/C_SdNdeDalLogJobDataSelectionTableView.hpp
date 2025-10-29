@@ -50,7 +50,7 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigDataChanged(const QModelIndex orc_Index, const QString oc_Data);
+   void SigDataChanged(const QModelIndex & orc_Index, const QString oc_Data);
    void SigDeleteSelectedElements();
 
 protected:

@@ -125,13 +125,13 @@ stw--opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item,
 stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView::item,
 stw--opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView::item
 {
-padding-top: 5px;
+padding-top: 4px;
 padding-bottom: 5px;
 }
 
 stw--opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item
 {
-padding-top: 2px;
-padding-bottom: 2px;
+padding-top: 1px;
+padding-bottom: 1px;
 }
 /* --------------------------------------------------------------------- */

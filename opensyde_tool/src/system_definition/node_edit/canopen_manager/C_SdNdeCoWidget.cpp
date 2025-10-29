@@ -64,6 +64,9 @@ C_SdNdeCoWidget::C_SdNdeCoWidget(QWidget * const opc_Parent) :
    this->InitStaticNames();
 
    // config the ui
+   this->mpc_Ui->pc_WiDevicesTreeContent->SetBackgroundColor(12);
+   // styling the tree's background via stylesheet background-color somehow effects the complete layout
+
    this->mpc_Ui->pc_PubOverview->setCheckable(true);
    this->mpc_Ui->pc_PubOverview->setChecked(true); // start with overview
 

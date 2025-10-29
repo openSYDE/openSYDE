@@ -235,7 +235,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OscCanMessageIdentificationIndi
       this->mq_MultiplexedMessage = oq_MultiplexedMessage;
       this->mu16_MultiplexerValue = ou16_MultiplexValue;
 
-      this->m_CoLoadEdsRestricitions();
+      this->m_CoLoadEdsRestrictions();
 
       this->mpc_AddMultiplexed->setVisible(this->mq_MultiplexedMessage);
 
@@ -816,7 +816,7 @@ void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
 /*! \brief   Load the EDS file restrictions and adapt the ui
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestricitions(void)
+void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestrictions(void)
 {
    this->mq_CoFixedMapping = false;
 
@@ -834,8 +834,8 @@ void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestricitions(void)
          {
             // Message Tx flag is relative to the device, not the manager when using the EDS file content
             // PDO Mapping
-            pc_Manager->c_EdsFileContent.IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
-                                                        !this->mc_MessageId.q_MessageIsTx, this->mq_CoFixedMapping);
+            pc_Manager->GetEdsFileContent().IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+                                                           !this->mc_MessageId.q_MessageIsTx, this->mq_CoFixedMapping);
          }
       }
    }

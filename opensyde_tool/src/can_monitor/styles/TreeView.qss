@@ -36,6 +36,12 @@ border-left-width: 0px;
 border-right-width: 0px;
 }
 
+stw--opensyde_gui--C_CamMetTreeView::item
+{
+border-style: none;
+outline: none;
+}
+
 stw--opensyde_gui--C_CamMosDatabaseSelectionView,
 stw--opensyde_gui--C_CamMetTreeView
 {
@@ -61,7 +67,9 @@ margin-bottom:3px;
 /* Icons */
 /* closed */
 stw--opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:closed,
-stw--opensyde_gui--C_CamMetTreeView::branch:closed:has-children:has-siblings
+stw--opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:closed:hover,
+stw--opensyde_gui--C_CamMetTreeView::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_CamMetTreeView::branch:closed:has-children:has-siblings:hover
 {
 border-image: none;
 image:url(:/images/IconArrowSmallOpen.png);
@@ -76,7 +84,9 @@ image:url(://images/IconArrowSmallOpenBlue.png);
 
 /* open */
 stw--opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:open,
-stw--opensyde_gui--C_CamMetTreeView::branch:open:has-children:has-siblings
+stw--opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:open:hover,
+stw--opensyde_gui--C_CamMetTreeView::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_CamMetTreeView::branch:open:has-children:has-siblings:hover
 {
 border-image: none;
 image:url(:/images/IconArrowSmallCloseGray.png);

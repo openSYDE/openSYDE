@@ -71,9 +71,9 @@ font-weight:normal;
 /* STYLE_GUIDE_FONT_SEMIBOLD_12 */
 stw--opensyde_gui_elements--C_OgePubConfigure
 {
-font-family:"Segoe UI Semibold";
+font-family:"Segoe UI";
 font-size:12px;
-font-weight:normal;
+font-weight:600; /*semibold*/
 }
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_13 */
@@ -102,9 +102,9 @@ stw--opensyde_gui_elements--C_OgePubDialog,
 stw--opensyde_gui_elements--C_OgePubMessageOk,
 stw--opensyde_gui_elements--C_OgePubMessageCancel
 {
-font-family:"Segoe UI Semibold";
+font-family:"Segoe UI";
 font-size:13px;
-font-weight:normal;
+font-weight:600; /*semibold*/
 }
 
 /* --------------------------------------------------------------------- */
@@ -123,9 +123,9 @@ font-weight:normal;
 stw--opensyde_gui_elements--C_OgeLabHeadingToolTip,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="true"][Bold="false"]
 {
-font-family:"Segoe UI Semibold";
+font-family:"Segoe UI";
 font-size:14px;
-font-weight:normal;
+font-weight:600; /*semibold*/
 }
 
 /* --------------------------------------------------------------------- */
@@ -142,9 +142,9 @@ stw--opensyde_gui_elements--C_CamOgePubAbout,
 stw--opensyde_gui_elements--C_CamOgePubProjOp,
 stw--opensyde_gui_elements--C_CamOgeTobRecentProjects
 {
-font-family:"Segoe UI Semibold";
+font-family:"Segoe UI";
 font-size:16px;
-font-weight:normal;
+font-weight:600; /*semibold*/
 }
 
 /* STYLE_GUIDE_FONT_BOLD_16 */
@@ -159,12 +159,10 @@ font-weight: bold;
 /* STYLE_GUIDE_FONT_SEMIBOLD_18 */
 stw--opensyde_gui_elements--C_OgePubIconText
 {
-font-family:"Segoe UI Semibold";
+font-family:"Segoe UI";
 font-size:18px;
-font-weight:normal;
+font-weight:600; /*semibold*/
 }
-
-
 
 /* --------------------------------------------------------------------- */
 /* Order distorted: first C_OgeLabPopUpTitle, then C_OgeLabPopUpSubTitle (see GUI project)

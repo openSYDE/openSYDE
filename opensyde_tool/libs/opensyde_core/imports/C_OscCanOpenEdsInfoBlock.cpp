@@ -42,8 +42,7 @@ using namespace stw::opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscCanOpenEdsInfoBlock::C_OscCanOpenEdsInfoBlock() :
-   u32_FileHash(0)
+C_OscCanOpenEdsInfoBlock::C_OscCanOpenEdsInfoBlock()
 {
 }
 
@@ -57,8 +56,6 @@ C_OscCanOpenEdsInfoBlock::C_OscCanOpenEdsInfoBlock() :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscCanOpenEdsInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_FileHash, sizeof(this->u32_FileHash),
-                                       oru32_HashValue);
    this->c_FileInfo.CalcHash(oru32_HashValue);
    this->c_DeviceInfo.CalcHash(oru32_HashValue);
 }
@@ -78,11 +75,8 @@ void C_OscCanOpenEdsInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscCanOpenEdsInfoBlock::LoadFromFile(C_SclIniFile & orc_File, C_SclString & orc_LastError)
 {
-   int32_t s32_Retval;
+   int32_t s32_Retval = this->c_FileInfo.LoadFromIni(orc_File, orc_LastError);
 
-   orc_File.GetFileAsStringList(this->c_FileContentForSave);
-   this->m_InitHash();
-   s32_Retval = this->c_FileInfo.LoadFromIni(orc_File, orc_LastError);
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = this->c_DeviceInfo.LoadFromIni(orc_File, orc_LastError);
@@ -100,20 +94,4 @@ int32_t C_OscCanOpenEdsInfoBlock::LoadFromFile(C_SclIniFile & orc_File, C_SclStr
 uint8_t C_OscCanOpenEdsInfoBlock::GetGranularity() const
 {
    return this->c_DeviceInfo.GetGranularity();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Init hash
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OscCanOpenEdsInfoBlock::m_InitHash()
-{
-   this->u32_FileHash = 0xFFFFFFFFU;
-
-   for (int32_t s32_Line = 0; s32_Line < this->c_FileContentForSave.Strings.GetLength(); s32_Line++)
-   {
-      stw::scl::C_SclChecksums::CalcCRC32(this->c_FileContentForSave.Strings[s32_Line].c_str(),
-                                          this->c_FileContentForSave.Strings[s32_Line].Length(),
-                                          this->u32_FileHash);
-   }
 }

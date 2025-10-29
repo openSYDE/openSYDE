@@ -15,9 +15,6 @@
 
 #include "C_SdNdeDalLogJobDataSelectionTableDelegate.hpp"
 #include "C_SdNdeDalLogJobDataSelectionTableModel.hpp"
-#include "C_OgeCbxMultiSelectTableHalc.hpp"
-#include "C_OgeCbxTableHalc.hpp"
-#include "C_OgeSpxTableHalc.hpp"
 #include "C_OgeLeTable.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */

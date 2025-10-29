@@ -134,19 +134,19 @@ const QFont mc_STYLE_GUIDE_FONT_REGULAR_10  = QFont("Segoe UI", 10);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_11  = QFont("Segoe UI", 11);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_12  = QFont("Segoe UI", 12);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_13  = QFont("Segoe UI", 13);
-const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_13 = QFont("Segoe UI Semibold", 13);
+const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_13 = QFont("Segoe UI", 13, static_cast<int32_t>(QFont::DemiBold));
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_14  = QFont("Segoe UI", 14);
-const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_14 = QFont("Segoe UI Semibold", 14);
+const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_14 = QFont("Segoe UI", 14, static_cast<int32_t>(QFont::DemiBold));
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_15  = QFont("Segoe UI", 15);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_16  = QFont("Segoe UI", 16);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_16_ITALIC  = QFont("Segoe UI", 16, -1, true);
-const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_16 = QFont("Segoe UI Semibold", 16);
+const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_16 = QFont("Segoe UI", 16, static_cast<int32_t>(QFont::DemiBold));
 const QFont mc_STYLE_GUIDE_FONT_BOLD_16 = QFont("Segoe UI", 16, static_cast<int32_t>(QFont::Bold));
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_18  = QFont("Segoe UI", 18);
 const QFont mc_STYLE_GUIDE_FONT_BOLD_18 = QFont("Segoe UI", 18, static_cast<int32_t>(QFont::Bold));
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_20  = QFont("Segoe UI", 20);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_23  = QFont("Segoe UI", 23);
-const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_24 = QFont("Segoe UI Semibold", 24);
+const QFont mc_STYLE_GUIDE_FONT_SEMIBOLD_24 = QFont("Segoe UI", 24, static_cast<int32_t>(QFont::DemiBold));
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_25  = QFont("Segoe UI", 25);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_28  = QFont("Segoe UI", 28);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_30  = QFont("Segoe UI", 30);
@@ -202,8 +202,8 @@ const QSize mc_ICON_SIZE_20 = QSize(20, 20);
 const QSize mc_ICON_SIZE_16 = QSize(16, 16);
 
 // Paths
-const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
-const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
+const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2_64.dll";
+const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec\\stwvec64.dll";
 
 // Identifier of update package subsections or items
 const uint32_t mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;

@@ -3,7 +3,7 @@ openSYDE
 openSYDE is provided under the "GPL V3" license.
 Please see the "gpl-3.0.txt" license file in this folder for the full license text.
 
-The "openSYDE GUI" and "openSYDE CAN Monitor" are based on the openSYDE Core library.
+The "openSYDE GUI", "openSYDE CAN Monitor" and "openSYDE SYDEflash" are based on the openSYDE Core library.
 This library can be alternatively licensed under a proprietary license.
 The "SYDE Coder C", "SYDE Gen X" and "SYDEsup" tools can also be licensed under that proprietary license.
 Please contact STW for details.
@@ -25,9 +25,9 @@ SYDE Coder C          GPL V3 or proprietary     opensyde_syde_coder_c
 SYDE Gen X            GPL V3 or proprietary     opensyde_syde_gen_x
 SYDEsup               GPL V3 or proprietary     opensyde_syde_sup                                  
 cmd_line_flash_tool   GPL V3 or proprietary     opensyde_cmd_line_flash_tool                       
-Qt 5.15.2             LGPL 3                    <no sources provided> (*)                                http://doc.qt.io/qt-5/licensing.html
-gettext               LPGL 2.1                  libraries\gettext-0.19.7                                 https://www.gnu.org/software/gettext/
-QCustomPlot           GPL 3                     libraries\qcustomplot-2.0.1                              https://www.qcustomplot.com/index.php/introduction
+Qt 6.8.3              LGPL 3                    <no sources provided> (*)                                http://doc.qt.io/qt-6/licensing.html
+gettext               LPGL 2.1                  libraries\gettext-0.24                                   https://www.gnu.org/software/gettext/
+QCustomPlot           GPL 3                     libraries\qcustomplot-2.1.1                              https://www.qcustomplot.com/index.php/introduction
 Vector::BLF Module    GPL 3                     libraries\vector_blf-1.0.0                               https://bitbucket.org/tobylorenz/vector_blf
 OpenSSL               Apache V2.0               libaries\openssl-3.0.0                                   https://www.openssl.org/source/license.html
 Vector::DBC Module    GPL 3                     opensyde_tool\libs\dbc_driver_library                    https://bitbucket.org/tobylorenz/vector_dbc
@@ -37,18 +37,19 @@ TinyXML-2             zlib license              opensyde_tool\libs\opensyde_core
 MinGW Runtime         MIT Style                 <no sources provided>                                    http://www.mingw.org/license
 Miniz                 MIT                       opensyde_tool\libs\opensyde_core\miniz                   https://github.com/richgel999/miniz
 AES                   MIT                       opensyde_tool\libs\opensyde_core\aes                     https://github.com/SergeyBel/AES
+zlib                  zlib license              opensyde_tool\libs\zlib                                  https://github.com/madler/zlib
 
 
 (*) Copies of the (unmodified) Qt library sources have not been placed in the openSYDE GitHub repository.
 These can be 
-- found e.g. under https://download.qt.io/archive/qt/5.15/5.15.2/
+- found e.g. under https://download.qt.io/archive/qt/6.8/6.8.3/
 - obtained by contacting STW
 
 The Qt libraries drag in a few other libraries with different licensing terms.
-For details see https://doc.qt.io/qt-5/licenses-used-in-qt.html and the license files distributed with the Qt sources.
+For details see https://doc.qt.io/qt-6/licenses-used-in-qt.html and the license files distributed with the Qt sources.
 
 Note:
-"openSYDE GUI", "openSYDE CAN Monitor", "SYDE Coder C", "SYDE X Gen", "SYDEsup" all are based on the "openSYDE Core".
+"openSYDE GUI", "openSYDE CAN Monitor", "openSYDE SYDEflash", "SYDE Coder C", "SYDE X Gen", "SYDEsup" all are based on the "openSYDE Core".
 A copy of the Core is provided with each of those tools.
 The version of the Core"s" may slightly differ.
 

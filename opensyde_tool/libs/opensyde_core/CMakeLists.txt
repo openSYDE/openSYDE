@@ -34,7 +34,7 @@ project("opensyde_core")
 # --- Project source files ---------------------------------------------------------------------------------------------
 #basic infrastructure (also requires Windows target layer, or a corresponding implementation for e.g. Linux)
 set(OPENSYDE_CORE_COMMON_SOURCES
-   ${CMAKE_CURRENT_SOURCE_DIR}/precomp_headers.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/precompiled_headers/precomp_headers.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscBinaryHash.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscChecksummedIniFile.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscUtils.cpp
@@ -68,8 +68,8 @@ set(OPENSYDE_CORE_COMMON_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/scl/C_SclString.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/scl/C_SclStringList.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/scl/C_SclDynamicArray.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/stwerrors.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/stwerrors.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/stwerrors/stwerrors.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/stwerrors/stwerrors.h
    ${CMAKE_CURRENT_SOURCE_DIR}/stwtypes/stwtypes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/stwtypes/stwtypes.h
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser/C_OscXmlParser.hpp
@@ -86,7 +86,9 @@ set(OPENSYDE_CORE_COMMON_INCLUDE_DIRECTORIES
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/stwcompid
    ${CMAKE_CURRENT_SOURCE_DIR}/logging
    ${CMAKE_CURRENT_SOURCE_DIR}/md5
+   ${CMAKE_CURRENT_SOURCE_DIR}/precompiled_headers
    ${CMAKE_CURRENT_SOURCE_DIR}/scl
+   ${CMAKE_CURRENT_SOURCE_DIR}/stwerrors
    ${CMAKE_CURRENT_SOURCE_DIR}/stwtypes
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser
    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser/tinyxml2
@@ -625,6 +627,24 @@ else()
    )
 endif()
 
+#communication protocol drivers monitor (openSYDE CAN Monitor basics)
+if(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_MONITOR)
+   message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_MONITOR detected ... skipping package")
+else()
+   message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_MONITOR not detected ... dragging in package")
+
+   set(OPENSYDE_CORE_PROTOCOL_DRIVERS_MONITOR_SOURCES
+     ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComDriverBase.cpp
+     ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComAutoSupport.cpp
+     ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComDriverBase.hpp
+     ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication/C_OscComAutoSupport.hpp
+   )
+
+   set(OPENSYDE_CORE_PROTOCOL_DRIVERS_MONITOR_INCLUDE_DIRECTORIES
+       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
+   )
+endif()
+
 #communication protocol drivers common (openSYDE, STW Flashloader, KEFEX, Data Dealer, Dispatcher interface)
 if(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON)
    message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON detected ... skipping package")
@@ -816,6 +836,7 @@ set(OPENSYDE_CORE_SOURCES
    ${OPENSYDE_CORE_X_CONFIG_GENERATION_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_SYSTEM_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_COMMON_SOURCES}
+   ${OPENSYDE_CORE_PROTOCOL_DRIVERS_MONITOR_SOURCES}
    ${OPENSYDE_CORE_WINDOWS_DRIVERS_SOURCES}
    ${OPENSYDE_CORE_WINDOWS_TARGET_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_LOGGING_SOURCES}
@@ -834,17 +855,20 @@ set(OPENSYDE_CORE_INCLUDE_DIRECTORIES
    ${OPENSYDE_CORE_X_CONFIG_GENERATION_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_SYSTEM_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_COMMON_INCLUDE_DIRECTORIES}
+   ${OPENSYDE_CORE_PROTOCOL_DRIVERS_MONITOR_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_WINDOWS_DRIVERS_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_WINDOWS_TARGET_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_LOGGING_INCLUDE_DIRECTORIES}
 )
 
-#deactivate warnings for miniz due to external component
-set_source_files_properties(
-  ${CMAKE_CURRENT_SOURCE_DIR}/miniz/miniz.c
-  PROPERTIES
-  COMPILE_FLAGS "-w"
-)
+#deactivate warnings for miniz due to external component; but only for GCC as the switch is compiler specific
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+   set_source_files_properties(
+     ${CMAKE_CURRENT_SOURCE_DIR}/miniz/miniz.c
+     PROPERTIES
+     COMPILE_FLAGS "-w"
+   )
+endif()
 
 # define library target including all sources
 add_library(opensyde_core ${OPENSYDE_CORE_SOURCES})
@@ -852,4 +876,4 @@ add_library(opensyde_core ${OPENSYDE_CORE_SOURCES})
 # add all include directories to library target and make public
 target_include_directories(opensyde_core PUBLIC ${OPENSYDE_CORE_INCLUDE_DIRECTORIES})
 
-target_precompile_headers(opensyde_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/precomp_headers.hpp)
+target_precompile_headers(opensyde_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/precompiled_headers/precomp_headers.hpp)

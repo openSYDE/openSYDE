@@ -2078,24 +2078,24 @@ void C_SdBueMessageSelectorTreeWidget::startDrag(const Qt::DropActions oc_Suppor
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overloaded function for stored mime data
 
-   \param[in]  oc_Items    Current selected items
+   \param[in]  orc_Items    Current selected items
 
    \return
    Mime data for drag event
 */
 //----------------------------------------------------------------------------------------------------------------------
-QMimeData * C_SdBueMessageSelectorTreeWidget::mimeData(const QList<QTreeWidgetItem *> oc_Items) const
+QMimeData * C_SdBueMessageSelectorTreeWidget::mimeData(const QList<QTreeWidgetItem *> & orc_Items) const
 {
    QMimeData * pc_Retval = NULL;
 
-   if ((oc_Items.size() > 0) && (this->mimeTypes().size() > 2))
+   if ((orc_Items.size() > 0) && (this->mimeTypes().size() > 2))
    {
       std::vector<C_OscCanMessageIdentificationIndices> c_MessageIds;
       std::vector<uint32_t> c_SignalIndices;
       bool q_SignalsOnly = true;
 
       //Get selected indices
-      for (QList<QTreeWidgetItem *>::const_iterator c_ItItem = oc_Items.begin(); c_ItItem != oc_Items.end();
+      for (QList<QTreeWidgetItem *>::const_iterator c_ItItem = orc_Items.begin(); c_ItItem != orc_Items.end();
            ++c_ItItem)
       {
          QTreeWidgetItem * const pc_Child = *c_ItItem;
@@ -2404,7 +2404,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32_t & oru32_Me
                                                                       // therefore this flag must be used inverse for
                                                                       // IsCobIdRo method
             bool q_IsPdoRo;
-            pc_Manager->c_EdsFileContent.IsCobIdRo(u16_PdoIndex, q_MessageIsTx, q_IsPdoRo);
+            pc_Manager->GetEdsFileContent().IsCobIdRo(u16_PdoIndex, q_MessageIsTx, q_IsPdoRo);
 
             if (q_IsPdoRo == true)
             {
@@ -2890,8 +2890,8 @@ void C_SdBueMessageSelectorTreeWidget::m_CoLoadEdsRestricitions(void)
 
                // Message Tx flag is relative to the device, not the manager when using the EDS file content
                // PDO Mapping
-               pc_Manager->c_EdsFileContent.IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
-                                                           !rc_MsgId.q_MessageIsTx, q_RoFlag);
+               pc_Manager->GetEdsFileContent().IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+                                                              !rc_MsgId.q_MessageIsTx, q_RoFlag);
 
                this->mc_CoUniqueMessagesPdoMappingRo.push_back(static_cast<uint8_t>(q_RoFlag));
             }

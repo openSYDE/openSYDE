@@ -154,6 +154,9 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    // Application maximizing flag
    orc_Ini.WriteBool("Screen", "Size_maximized", orc_UserSettings.GetAppMaximized());
 
+   // Application screen index
+   orc_Ini.WriteInteger("Screen", "Screen_index", orc_UserSettings.GetAppScreenIndex());
+
    // Settings splitter
    orc_Ini.WriteInteger("Layout", "SettingsSplitter_x", orc_UserSettings.GetSplitterSettingsHorizontal());
    orc_Ini.WriteBool("Layout", "Settings_expanded", orc_UserSettings.GetSettingsAreExpanded());
@@ -228,6 +231,10 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    // Application maximizing flag
    q_Flag = orc_Ini.ReadBool("Screen", "Size_maximized", true);
    orc_UserSettings.SetAppMaximized(q_Flag);
+
+   // Application screen index
+   s32_Value = orc_Ini.ReadInteger("Screen", "Screen_index", 0);
+   orc_UserSettings.SetAppScreenIndex(static_cast<uint32_t>(s32_Value));
 
    // Settings splitter
    s32_Value = orc_Ini.ReadInteger("Layout", "SettingsSplitter_x", 0);

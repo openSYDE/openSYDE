@@ -389,22 +389,25 @@ void C_SyvUpPacWidget::m_ButtonCreatePackage(void)
    bool q_SaveAsFile = true;
    bool q_Continue = false;
    bool q_SecureFile = false;
+   QString c_CurrentSelectedVersion = "";
 
    const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
    C_SyvUpPacServiceUpdatePackageDialog * const pc_ServiceUpdatePackageDialog =
       new C_SyvUpPacServiceUpdatePackageDialog(*c_PopUpDialog);
 
+   C_SyvUpPacServiceUpdatePackageDialog::E_PackageType e_Type = C_SyvUpPacServiceUpdatePackageDialog::eARCHIVE;
+
    //Resize
-   c_PopUpDialog->SetSize(QSize(700, 400));
+   c_PopUpDialog->SetSize(QSize(700, 435));
 
    Q_UNUSED(pc_ServiceUpdatePackageDialog)
 
    // "Continue" clicked
    if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
-      q_Continue = true;
-      const C_SyvUpPacServiceUpdatePackageDialog::E_PackageType e_Type =
+      e_Type =
          pc_ServiceUpdatePackageDialog->GetSelectedOption();
+      q_Continue = true;
       switch (e_Type)
       {
       case C_SyvUpPacServiceUpdatePackageDialog::eDIRECTORY:
@@ -419,6 +422,11 @@ void C_SyvUpPacWidget::m_ButtonCreatePackage(void)
          q_SaveAsFile = true;
          break;
       }
+
+      if (e_Type == C_SyvUpPacServiceUpdatePackageDialog::eARCHIVE)
+      {
+         c_CurrentSelectedVersion = pc_ServiceUpdatePackageDialog->GetSelectedVersion();
+      }
    }
    else // "Cancel" clicked
    {
@@ -432,7 +440,6 @@ void C_SyvUpPacWidget::m_ButtonCreatePackage(void)
       {
          QString c_Password = "";
          QString c_PrivateKeyPath = "";
-
          if ((this->m_ShowSecureArchiveFileDialog(c_Password, c_PrivateKeyPath)) == true)
          {
             // 1 indicates secure archive file for secure update.
@@ -440,7 +447,6 @@ void C_SyvUpPacWidget::m_ButtonCreatePackage(void)
             const std::vector<uint8_t> c_EncryptNodes = {q_SecureFile};
             const std::vector<C_SclString> c_EncryptNodesPassword = {c_Password.toStdString()};
             const std::vector<C_SclString> c_PemFilePath = {c_PrivateKeyPath.toStdString()};
-
             this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile, q_SecureFile, c_EncryptNodes,
                                                                     c_EncryptNodesPassword, c_EncryptNodes,
                                                                     c_PemFilePath);
@@ -449,7 +455,15 @@ void C_SyvUpPacWidget::m_ButtonCreatePackage(void)
       // Archive file / Directory
       else
       {
-         this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile, q_SecureFile);
+         if (e_Type == C_SyvUpPacServiceUpdatePackageDialog::eARCHIVE)
+         {
+            this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile, q_SecureFile, {}, {}, {}, {},
+                                                                    c_CurrentSelectedVersion);
+         }
+         else
+         {
+            this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile, q_SecureFile);
+         }
       }
    }
 

@@ -14,7 +14,6 @@
 
 #include <QScreen>
 #include <QGuiApplication>
-#include <QDesktopWidget>
 #include <QAbstractTextDocumentLayout>
 #include <QGraphicsDropShadowEffect>
 #include "stwtypes.hpp"

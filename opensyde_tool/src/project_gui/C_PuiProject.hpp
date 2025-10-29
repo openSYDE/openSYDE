@@ -34,7 +34,8 @@ public:
    int32_t Save(const bool oq_ForceSaveAll = false, const bool oq_UseDeprecatedFileFormatV2 = false);
    int32_t SaveCurrentProjectForServiceMode(const QString & orc_FilePath, const QString & orc_Password,
                                             const std::vector<std::array<bool, 3> > & orc_ViewConfigs);
-   int32_t Load(uint16_t * const opu16_FileVersion);
+   int32_t Load(uint16_t * const opu16_FileVersion,
+                std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices);
    bool HasHashChanged(void) const;
    void SetPath(const QString & orc_Path);
    bool IsPasswordNecessary(void);
@@ -47,7 +48,8 @@ public:
    static void h_Destroy(void);
    static uint64_t h_GetProjectSize(const QString & orc_ProjectPath);
    int32_t PrepareLoadInitialProject(void);
-   int32_t LoadInitialProject(uint16_t * const opu16_FileVersion, QString & orc_LoadedProject);
+   int32_t LoadInitialProject(uint16_t * const opu16_FileVersion, QString & orc_LoadedProject,
+                              std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices);
    void LoadEmpty(void);
    bool IsEmptyProject(void) const;
    static void h_HandlePendingEvents(void);
@@ -71,8 +73,10 @@ private:
 
    int32_t m_Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2);
    int32_t m_SaveServiceModeProject(const QString & orc_FilePath, const QString & orc_Password);
-   int32_t m_LoadProject(uint16_t * const opu16_FileVersion);
-   int32_t m_LoadServiceModeProject(const QString & orc_Password, uint16_t * const opu16_FileVersion);
+   int32_t m_LoadProject(uint16_t * const opu16_FileVersion,
+                         std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices);
+   int32_t m_LoadServiceModeProject(const QString & orc_Password, uint16_t * const opu16_FileVersion,
+                                    std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices);
    bool m_IsServiceModeProject(void) const;
    int32_t m_SaveAs(const QString & orc_FilePath, const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2,
                     const bool oq_UpdateInternalState);

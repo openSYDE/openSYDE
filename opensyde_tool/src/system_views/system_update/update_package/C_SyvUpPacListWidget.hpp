@@ -64,7 +64,7 @@ public:
 
    void CreateServiceUpdatePackage(const bool oq_SaveAsFile, const bool oq_SecureFile,
                                    const std::vector<uint8_t> & orc_EncryptNodes = std::vector<uint8_t>(),
-                                   const std::vector<stw::scl::C_SclString> & orc_EncryptNodesPassword = std::vector<stw::scl::C_SclString>(), const std::vector<uint8_t> & orc_AddSignatureNodes = std::vector<uint8_t>(), const std::vector<stw::scl::C_SclString> & orc_NodeSignaturePemFiles = std::vector<stw::scl::C_SclString>());
+                                   const std::vector<stw::scl::C_SclString> & orc_EncryptNodesPassword = std::vector<stw::scl::C_SclString>(), const std::vector<uint8_t> & orc_AddSignatureNodes = std::vector<uint8_t>(), const std::vector<stw::scl::C_SclString> & orc_NodeSignaturePemFiles = std::vector<stw::scl::C_SclString>(), const QString oc_CurrentSelectedVersion = "");
 
    int32_t CheckAllPaths(uint32_t & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
                          QStringList * const opc_MissingDataBlocks, QStringList * const opc_MissingParamFiles,

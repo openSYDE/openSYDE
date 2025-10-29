@@ -72,6 +72,7 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
    this->setEditTriggers(
       QAbstractItemView::CurrentChanged | QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked |
       QAbstractItemView::EditKeyPressed);
+   this->setMouseTracking(true);
 
    // track hover events for different cursors
    this->setAttribute(Qt::WA_Hover);

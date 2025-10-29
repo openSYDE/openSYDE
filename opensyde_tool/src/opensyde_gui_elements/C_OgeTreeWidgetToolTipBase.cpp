@@ -151,17 +151,6 @@ bool C_OgeTreeWidgetToolTipBase::m_BaseEvent(QEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Call native "setMouseTracking"
-
-   \param[in]  oq_Active   native parameter
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeTreeWidgetToolTipBase::m_SetMouseTracking(const bool oq_Active)
-{
-   this->setMouseTracking(oq_Active);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get index at global position
 
    \param[in]  orc_GlobalPos  Global pos

@@ -5,11 +5,12 @@ stw--opensyde_gui_elements--C_FlaOgeSpxDark
 {
 border-style:solid;
 border-width:1px;
-padding-left:6px;
-padding-right:6px;
+padding-left:2px;
+padding-right:2px;
 }
 
-/* Button offset */
+/* --------------------------------------------------------------------- */
+/* spinbox button sizes */
 stw--opensyde_gui_elements--C_CamOgeSpxProperties::down-button,
 stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-button
 {
@@ -18,6 +19,7 @@ border-top-width:1px;
 border-left-width:1px;
 border-bottom-width:0px;
 border-style:solid;
+width:19px;
 }
 
 stw--opensyde_gui_elements--C_CamOgeSpxProperties::up-button,
@@ -28,39 +30,62 @@ border-top-width:0px;
 border-left-width:1px;
 border-bottom-width:1px;
 border-style:solid;
+width:19px;
 }
 
-/* Default spin box icons */
 stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-button,
-stw--opensyde_gui_elements--C_CamOgeSpxProperties::down-button {
-image: url(://images/IconSpinBoxDown.svg) 0 0 0 0 stretch stretch;
-}
-
-stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-button:!enabled,
-stw--opensyde_gui_elements--C_CamOgeSpxProperties::down-button:!enabled,
-stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-button:!enabled
-{
-image: url(://images/IconSpinBoxDownDisabled.svg) 0 0 0 0 stretch stretch;
-}
-
 stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-button,
-stw--opensyde_gui_elements--C_CamOgeSpxProperties::up-button {
-image: url(://images/IconSpinBoxUp.svg) 0 0 0 0 stretch stretch;
-}
-
-stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-button:!enabled,
-stw--opensyde_gui_elements--C_CamOgeSpxProperties::up-button:!enabled,
-stw--opensyde_gui_elements--C_FlaOgeSpxDark::up-button:!enabled
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-button,
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::up-button
 {
-image: url(://images/IconSpinBoxUpDisabled.svg) 0 0 0 0 stretch stretch;
+width:19px;
 }
 
-/* Dark spin box icons */
-stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-button {
-image: url(://images/IconSpinBoxDownDark.svg) 0 0 0 0 stretch stretch;
+stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-arrow,
+stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-arrow,
+stw--opensyde_gui_elements--C_CamOgeSpxProperties::down-arrow,
+stw--opensyde_gui_elements--C_CamOgeSpxProperties::up-arrow,
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-arrow,
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::up-arrow
+{
+width: 14px;
 }
 
-stw--opensyde_gui_elements--C_FlaOgeSpxDark::up-button {
-image: url(://images/IconSpinBoxUpDark.svg) 0 0 0 0 stretch stretch;
+/* --------------------------------------------------------------------- */
+/* spinbox arrows */
+stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-arrow,
+stw--opensyde_gui_elements--C_CamOgeSpxProperties::down-arrow
+{
+image: url(://images/IconSpinBoxDown.svg);
+}
+
+stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-arrow:!enabled,
+stw--opensyde_gui_elements--C_CamOgeSpxProperties::down-arrow:!enabled,
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-arrow:!enabled
+{
+image: url(://images/IconSpinBoxDownDisabled.svg);
+}
+
+stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-arrow,
+stw--opensyde_gui_elements--C_CamOgeSpxProperties::up-arrow
+{
+image: url(://images/IconSpinBoxUp.svg);
+}
+
+stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-arrow:!enabled,
+stw--opensyde_gui_elements--C_CamOgeSpxProperties::up-arrow:!enabled,
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::up-arrow:!enabled
+{
+image: url(://images/IconSpinBoxUpDisabled.svg);
+}
+
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::down-arrow
+{
+image: url(://images/IconSpinBoxDownDark.svg);
+}
+
+stw--opensyde_gui_elements--C_FlaOgeSpxDark::up-arrow
+{
+image: url(://images/IconSpinBoxUpDark.svg);
 }
 

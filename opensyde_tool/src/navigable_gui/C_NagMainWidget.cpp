@@ -241,6 +241,8 @@ void C_NagMainWidget::LoadInitialProject(void)
    QString c_LoadedProject;
    int32_t s32_Error = C_NO_ERR;
 
+   std::vector<stw::scl::C_SclString> c_ErrorDetailsMissingDevices;
+
    if (C_PuiProject::h_GetInstance()->PrepareLoadInitialProject() == C_CHECKSUM)
    {
       QString c_Password;
@@ -256,18 +258,19 @@ void C_NagMainWidget::LoadInitialProject(void)
    if (s32_Error == C_NO_ERR)
    {
       // Initial load (command line or first recent project)
-      s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject);
+      s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject,
+                                                                    &c_ErrorDetailsMissingDevices);
    }
    else if (s32_Error == C_WARN)
    {
-      this->m_CancelPasswordDialog(u16_Version);
+      this->m_CancelPasswordDialog(u16_Version, &c_ErrorDetailsMissingDevices);
    }
    else
    {
       //No further steps necessary
    }
 
-   C_PopErrorHandling::h_ProjectLoadErr(s32_Error, c_LoadedProject, this, u16_Version);
+   C_PopErrorHandling::h_ProjectLoadErr(s32_Error, c_LoadedProject, this, u16_Version, c_ErrorDetailsMissingDevices);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -282,11 +285,14 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
    {
       uint16_t u16_Version = 0U;
       int32_t s32_Result;
+      std::vector<stw::scl::C_SclString> c_ErrorDetailsMissingDevices;
 
       Q_EMIT (this->SigBeforeOtherProjectLoad());
       C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
-      s32_Result = this->m_LoadConcreteProject(&u16_Version);
-      C_PopErrorHandling::h_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
+      s32_Result = this->m_LoadConcreteProject(&u16_Version, &c_ErrorDetailsMissingDevices);
+      C_PopErrorHandling::h_ProjectLoadErr(s32_Result,
+                                           C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version,
+                                           c_ErrorDetailsMissingDevices);
 
       if (s32_Result == C_NO_ERR)
       {
@@ -297,7 +303,7 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
       }
       else
       {
-         this->m_CancelPasswordDialog(u16_Version);
+         this->m_CancelPasswordDialog(u16_Version, NULL);
       }
    }
 
@@ -896,7 +902,8 @@ void C_NagMainWidget::m_OnIndexClicked(const QModelIndex & orc_ModelIndex)
    The functions checks if the project needs a password for opening. If necessary the dialog for the password
    will be opened.
 
-   \param[in]  opu16_FileVersion    Optional storage for system definition file version
+   \param[in]      opu16_FileVersion               Optional storage for system definition file version
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_RD_WR     Problems accessing file system (e.g. no read access to file)
@@ -910,7 +917,8 @@ void C_NagMainWidget::m_OnIndexClicked(const QModelIndex & orc_ModelIndex)
    C_WARN      User canceled the password dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_NagMainWidget::m_LoadConcreteProject(uint16_t * const opu16_FileVersion)
+int32_t C_NagMainWidget::m_LoadConcreteProject(uint16_t * const opu16_FileVersion,
+                                               std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Result = C_NO_ERR;
 
@@ -928,7 +936,7 @@ int32_t C_NagMainWidget::m_LoadConcreteProject(uint16_t * const opu16_FileVersio
          {
             // Load project with given password
             C_PuiProject::h_GetInstance()->SetPassword(c_Password);
-            s32_Result = C_PuiProject::h_GetInstance()->Load(opu16_FileVersion);
+            s32_Result = C_PuiProject::h_GetInstance()->Load(opu16_FileVersion, opc_ErrorDetailsMissingDevices);
 
             if (s32_Result == C_CHECKSUM)
             {
@@ -946,7 +954,7 @@ int32_t C_NagMainWidget::m_LoadConcreteProject(uint16_t * const opu16_FileVersio
    else
    {
       // No password, just load the project
-      s32_Result = C_PuiProject::h_GetInstance()->Load(opu16_FileVersion);
+      s32_Result = C_PuiProject::h_GetInstance()->Load(opu16_FileVersion, opc_ErrorDetailsMissingDevices);
    }
 
    return s32_Result;
@@ -983,10 +991,12 @@ int32_t C_NagMainWidget::m_GetPassword(QString & orc_Password)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Action that executed after cancel clicked on password dialog
 
-   \param[in]  ou16_ProjectFileVersion    Project file version
+   \param[in]      ou16_ProjectFileVersion         Project file version
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion)
+void C_NagMainWidget::m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion,
+                                             std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Result;
 
@@ -1014,7 +1024,7 @@ void C_NagMainWidget::m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion)
       }
    }
 
-   s32_Result = this->m_LoadConcreteProject(&ou16_ProjectFileVersion);
+   s32_Result = this->m_LoadConcreteProject(&ou16_ProjectFileVersion, opc_ErrorDetailsMissingDevices);
 
    // very unlikely, but the previous project could be corrupt -> check it and load empty project else
    if (s32_Result == C_NO_ERR)

@@ -615,8 +615,9 @@ void C_NagToolBarWidget::m_FocusOut(void)
 int32_t C_NagToolBarWidget::mh_GetButtonStringWidth(const QString & orc_Text)
 {
    int32_t s32_Retval;
-   QFont c_Font("Segoe UI Semibold");
+   QFont c_Font("Segoe UI");
 
+   c_Font.setWeight(QFont::DemiBold);
    c_Font.setPixelSize(13);
 
    if (orc_Text.compare("") == 0)

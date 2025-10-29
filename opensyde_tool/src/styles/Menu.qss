@@ -20,6 +20,7 @@ stw--opensyde_gui_elements--C_OgeContextMenu::separator
 {
 margin-top: 4px;
 margin-bottom: 4px;
+height: 1px;
 }
 
 /* --------------------------------------------------------------------- */

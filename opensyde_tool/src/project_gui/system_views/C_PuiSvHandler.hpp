@@ -50,6 +50,7 @@ public:
 
    //Set
    void SetServiceModeActive(const bool oq_NewValue);
+   void SetAllowViewHashCache(const bool oq_NewValue);
    int32_t SetViewName(const uint32_t ou32_Index, const QString & orc_Name);
    int32_t SetViewNodeCheckedState(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex, const bool oq_Checked);
    int32_t SetViewPcBox(const uint32_t ou32_Index, const C_PuiBsBox & orc_Box);
@@ -219,7 +220,7 @@ public:
                                                    const uint32_t ou32_ParamWidgetIndex,
                                                    const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_NewId,
                                                    const stw::opensyde_core::C_OscNodeDataPoolContent * const opc_Content);
-   uint32_t GetViewHash(const uint32_t ou32_ViewIndex) const;
+   uint32_t GetViewHash(const uint32_t ou32_ViewIndex);
 
    static C_PuiSvHandler * h_GetInstance(void);
    static void h_Destroy(void);

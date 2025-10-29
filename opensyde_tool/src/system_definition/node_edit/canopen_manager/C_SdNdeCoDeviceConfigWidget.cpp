@@ -581,7 +581,9 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
 
    if (pc_CanOpenDeviceInfo != NULL)
    {
-      std::set<uint8_t> c_Map = pc_CanOpenDeviceInfo->c_EdsFileContent.GetAllAvailableFactorySettingsSubIndices();
+      const C_OscCanOpenObjectDictionary & rc_EdsFileContent = pc_CanOpenDeviceInfo->GetEdsFileContent();
+
+      std::set<uint8_t> c_Map = rc_EdsFileContent.GetAllAvailableFactorySettingsSubIndices();
       std::set<uint8_t>::const_iterator c_ItResult;
 
       //Change range before setting value
@@ -675,12 +677,12 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
       }
 
       //heartbeat producing supported?
-      if (pc_CanOpenDeviceInfo->c_EdsFileContent.IsHeartbeatProducerSupported() == true)
+      if (rc_EdsFileContent.IsHeartbeatProducerSupported() == true)
       {
          //supported
          // check for read-only
          bool q_HbProducerRo = true;
-         tgl_assert(pc_CanOpenDeviceInfo->c_EdsFileContent.IsHeartbeatProducerRo(q_HbProducerRo) == C_NO_ERR);
+         tgl_assert(rc_EdsFileContent.IsHeartbeatProducerRo(q_HbProducerRo) == C_NO_ERR);
          this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing->setEnabled(!q_HbProducerRo);
 
          this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing->setChecked(pc_CanOpenDeviceInfo->q_EnableHeartbeatProducing);
@@ -693,13 +695,13 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
       }
 
       //heartbeat consuming supported and manager generates HB?
-      if ((pc_CanOpenDeviceInfo->c_EdsFileContent.GetNumHeartbeatConsumers() != 0) &&
+      if ((rc_EdsFileContent.GetNumHeartbeatConsumers() != 0) &&
           (pc_CanOpenManagerInfo->q_EnableHeartbeatProducing == true))
       {
          //supported
          // check for read-only
          bool q_HbConsumerRo = true;
-         tgl_assert(pc_CanOpenDeviceInfo->c_EdsFileContent.IsHeartbeatConsumerRo(q_HbConsumerRo) == C_NO_ERR);
+         tgl_assert(rc_EdsFileContent.IsHeartbeatConsumerRo(q_HbConsumerRo) == C_NO_ERR);
 
          this->mpc_Ui->pc_CheckBoxEnableHeartbeatConsuming->setEnabled(!q_HbConsumerRo);
 

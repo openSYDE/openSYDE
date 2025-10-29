@@ -699,6 +699,7 @@ void C_SyvUpPacListWidget::ImportConfig(void)
                                                {1} or {1,1,1} means add signature for all or individual nodes
    \param[in]  orc_NodeSignaturePemFiles  list of all nodes contains information which pem file to use for which node
                                           e.g. {pem} or {pem1, pem2, pem3} for all or individual nodes
+   \param[in]  oc_CurrentSelectedVersion    Current Selected Version of SydeFlash
 
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -706,7 +707,8 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile, 
                                                       const std::vector<uint8_t> & orc_EncryptNodes,
                                                       const std::vector<C_SclString> & orc_EncryptNodesPassword,
                                                       const std::vector<uint8_t> & orc_AddSignatureNodes,
-                                                      const std::vector<C_SclString> & orc_NodeSignaturePemFiles)
+                                                      const std::vector<C_SclString> & orc_NodeSignaturePemFiles,
+                                                      const QString oc_CurrentSelectedVersion)
 {
    const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -724,20 +726,28 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile, 
    // User has the option to save the update package in the new or old version
    if (oq_SaveAsFile)
    {
-      // New version
-      c_FilterName =
-         static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
-         " (*" +
-         static_cast<QString>(C_GtGetText::h_GetText(C_OscSupServiceUpdatePackageV1::
-                                                     h_GetPackageExtension().
-                                                     c_str())) + ")";
-      // Old version (called as "Version 1")
-      c_FilterName +=
-         static_cast<QString>(C_GtGetText::h_GetText(";;openSYDE Service Update Package File (Version 1)")) +
-         " (*" +
-         static_cast<QString>(C_GtGetText::h_GetText(C_OscSupServiceUpdatePackageV1::
-                                                     h_GetPackageExtension().
-                                                     c_str())) + ")";
+      if (oc_CurrentSelectedVersion == "Version 1")
+      {
+         c_FilterName =
+            static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File (Version 1)")) +
+            " (*" +
+            static_cast<QString>(C_GtGetText::h_GetText(C_OscSupServiceUpdatePackageV1::
+                                                        h_GetPackageExtension().
+                                                        c_str())) + ")";
+      }
+      else if (oc_CurrentSelectedVersion == "Version 2")
+      {
+         c_FilterName =
+            static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
+            " (*" +
+            static_cast<QString>(C_GtGetText::h_GetText(C_OscSupServiceUpdatePackageV1::
+                                                        h_GetPackageExtension().
+                                                        c_str())) + ")";
+      }
+      else
+      {
+         c_FilterName = "*";
+      }
 
       c_DefaultFilename += C_GtGetText::h_GetText("_ServiceUpdatePackage");
 

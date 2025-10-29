@@ -81,6 +81,8 @@ private:
    void m_ExpandInitial(void);
    void m_ExpandAllChildren(const QModelIndex & orc_Index, const uint32_t ou32_LayerCounter,
                             const uint32_t ou32_MaxLayer);
+   bool m_CheckIndicesMatchesCurrentSelection(
+      const std::vector<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> & orc_Indices) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

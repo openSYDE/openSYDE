@@ -159,7 +159,7 @@ C_OgeTreeViewToolTipBase::C_OgeTreeViewToolTipBase(QWidget * const opc_Parent) :
    QTreeView(opc_Parent),
    C_OgeTreeToolTipBase()
 {
-   this->setMouseTracking(true);
+   //Check mouse tracking active in all trees using this class? (just disable if using persistent editors)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -262,17 +262,6 @@ const QAbstractItemModel * C_OgeTreeViewToolTipBase::m_Model(void) const
 bool C_OgeTreeViewToolTipBase::m_BaseEvent(QEvent * const opc_Event)
 {
    return QTreeView::event(opc_Event);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Call native "setMouseTracking"
-
-   \param[in]  oq_Active   native parameter
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeTreeViewToolTipBase::m_SetMouseTracking(const bool oq_Active)
-{
-   this->setMouseTracking(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

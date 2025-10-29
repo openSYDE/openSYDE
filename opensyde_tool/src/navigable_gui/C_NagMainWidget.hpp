@@ -87,9 +87,11 @@ private:
    void m_OnEditFinished(void);
    void m_OnClear(void);
    void m_OnIndexClicked(const QModelIndex & orc_ModelIndex);
-   int32_t m_LoadConcreteProject(uint16_t * const opu16_FileVersion);
+   int32_t m_LoadConcreteProject(uint16_t * const opu16_FileVersion,
+                                 std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices);
    int32_t m_GetPassword(QString & orc_Password);
-   void m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion);
+   void m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion,
+                               std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices);
    void m_SetNameStringLength(void);
 
    Ui::C_NagMainWidget * mpc_Ui;

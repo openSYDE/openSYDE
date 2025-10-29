@@ -504,10 +504,24 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const int3
 
                break;
             case eFACTOR:
-               c_Retval = rc_Data.c_Factor;
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+               {
+                  c_Retval = rc_Data.c_FactorEdit;
+               }
+               else
+               {
+                  c_Retval = rc_Data.c_Factor;
+               }
                break;
             case eOFFSET:
-               c_Retval = rc_Data.c_Offset;
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
+               {
+                  c_Retval = rc_Data.c_OffsetEdit;
+               }
+               else
+               {
+                  c_Retval = rc_Data.c_Offset;
+               }
                break;
             case eUNIT:
                c_Retval = rc_Data.c_Unit;
@@ -2034,13 +2048,11 @@ void C_SdNdeDpListTableModel::m_FillDpListElementInfo(const uint32_t ou32_Elemen
       }
 
       // Various simple elements
-      C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OscElement, *pc_UiElement,
-                                               C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_FACTOR,
-                                               rc_Data.c_Factor, 0, 0);
+      rc_Data.c_Factor = m_GetFloatAsString(pc_OscElement->f64_Factor);
+      rc_Data.c_FactorEdit = pc_OscElement->f64_Factor;
 
-      C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OscElement, *pc_UiElement,
-                                               C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_OFFSET,
-                                               rc_Data.c_Offset, 0, 0);
+      rc_Data.c_Offset = m_GetFloatAsString(pc_OscElement->f64_Offset);
+      rc_Data.c_OffsetEdit = pc_OscElement->f64_Offset;
 
       C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OscElement, *pc_UiElement,
                                                C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_UNIT,
@@ -2395,4 +2407,22 @@ void C_SdNdeDpListTableModel::m_MoveItem(const uint32_t ou32_SourceIndex, const 
 {
    C_PuiSdHandler::h_GetInstance()->MoveDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                             this->mu32_ListIndex, ou32_SourceIndex, ou32_TargetIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get float as string
+
+   \param[in]  of64_Value  Value
+
+   \return
+   Float as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeDpListTableModel::m_GetFloatAsString(const float64_t of64_Value)
+{
+   QString c_Precison = QString::number(of64_Value, 'g', 17);
+
+   c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
+                      Qt::CaseInsensitive);
+   return c_Precison;
 }

@@ -37,6 +37,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS(
    "stw--opensyde_gui--C_SdBueSignalTableView",
    "stw--opensyde_gui--C_SdBueMessageTableView",
    "stw--opensyde_gui--C_SdNdeHalcOvTableView",
+   "stw--opensyde_gui--C_SdNdeDalLogJobsOvTableView",
    "stw--opensyde_gui--C_SdNdeCoOverviewTableView",
    "stw--opensyde_gui--C_SdNdeCoPdoTableView",
    "stw--opensyde_gui--C_SyvDaPeUpdateModeTableView",
@@ -139,6 +140,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
    "stw--opensyde_gui--C_SdBueSignalTableView QScrollBar",
    "stw--opensyde_gui--C_SdBueMessageTableView QScrollBar",
    "stw--opensyde_gui--C_SdNdeHalcOvTableView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDalLogJobsOvTableView QScrollBar",
    "stw--opensyde_gui--C_SdNdeCoOverviewTableView QScrollBar",
    "stw--opensyde_gui--C_SdNdeCoPdoTableView QScrollBar",
    "stw--opensyde_gui--C_SyvDaItPaListTreeWidget QScrollBar",
@@ -181,7 +183,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
    "stw--opensyde_gui--C_SyvDcConnectedNodeList QScrollBar",
    "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar",
    "stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView QScrollBar",
-   "stw--opensyde_gui--C_SdNdeDalLogJobsListView QScrollbar"
+   "stw--opensyde_gui--C_SdNdeDalLogJobsListView QScrollBar"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT(

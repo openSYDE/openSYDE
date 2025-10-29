@@ -23,6 +23,8 @@
 #include "C_OscUtils.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 
+#include <cmath>
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
 using namespace stw::tgl;
@@ -227,7 +229,8 @@ void C_SdNdeDalLogJobPropertiesWidget::InitStaticNames() const
    this->mpc_Ui->pc_LabelLogDuration->SetToolTipInformation(C_GtGetText::h_GetText("Log Duration"),
                                                             C_GtGetText::h_GetText(
                                                                "Relevant when log mode 'Interval' is selected.\n"
-                                                               "Max log duration of a file before starting a new one."));
+                                                               "Max log duration of a file before starting a new one. \n\n"
+                                                               "Value shall be greater than the logging interval."));
    this->mpc_Ui->pc_LabelMaxLogEntries->SetToolTipInformation(C_GtGetText::h_GetText("Max Log Entries"),
                                                               C_GtGetText::h_GetText(
                                                                  "Relevant when log mode 'Interval' is selected.\n"
@@ -439,6 +442,10 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged()
       this->mc_Properties.e_LocalLogTrigger =
          static_cast<C_OscDataLoggerJobProperties::E_LocalLogTrigger>(this->mpc_Ui->pc_ComboBoxLocalData->
                                                                       currentIndex());
+      const float64_t f64_DurationSec =
+         (static_cast<float64_t>(this->mpc_Ui->pc_SpinBoxLoggingInterval->value()) + 999.0) / 1000.0;
+      this->mpc_Ui->pc_SpinBoxLogDuration->SetMinimumCustom(static_cast<int32_t>(f64_DurationSec));
+
       this->mc_Properties.u32_LogIntervalMs = this->mpc_Ui->pc_SpinBoxLoggingInterval->value();
       this->mc_Properties.u32_MaxLogDurationSec = this->mpc_Ui->pc_SpinBoxLogDuration->value();
       this->Save();

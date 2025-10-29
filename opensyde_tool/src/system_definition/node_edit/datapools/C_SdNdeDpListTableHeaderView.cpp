@@ -83,19 +83,16 @@ C_SdNdeDpListTableHeaderView::~C_SdNdeDpListTableHeaderView(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten view options event slot
 
-   \return
-   Currently active view options
+   \param[in,out]  opc_Option    Currently active view options
 */
 //----------------------------------------------------------------------------------------------------------------------
-QStyleOptionViewItem C_SdNdeDpListTableHeaderView::viewOptions(void) const
+void C_SdNdeDpListTableHeaderView::initViewItemOption(QStyleOptionViewItem * const opc_Option) const
 {
    //Seems to ignore drawing delegate which might be the only use for this virtual function
-   QStyleOptionViewItem c_Retval = QHeaderView::viewOptions();
+   QHeaderView::initViewItemOption(opc_Option);
 
-   c_Retval.decorationAlignment = Qt::AlignVCenter | Qt::AlignRight;
-   c_Retval.decorationPosition = QStyleOptionViewItem::Right;
-
-   return c_Retval;
+   opc_Option->decorationAlignment = Qt::AlignVCenter | Qt::AlignRight;
+   opc_Option->decorationPosition = QStyleOptionViewItem::Right;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -135,7 +132,7 @@ void C_SdNdeDpListTableHeaderView::paintSection(QPainter * const opc_Painter, co
    \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableHeaderView::enterEvent(QEvent * const opc_Event)
+void C_SdNdeDpListTableHeaderView::enterEvent(QEnterEvent * const opc_Event)
 {
    QHeaderView::enterEvent(opc_Event);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "IsHovered", true);

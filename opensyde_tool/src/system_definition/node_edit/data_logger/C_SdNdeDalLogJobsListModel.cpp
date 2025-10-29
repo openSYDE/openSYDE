@@ -15,6 +15,7 @@
 #include "stwtypes.hpp"
 #include "C_SdNdeDalLogJobsListModel.hpp"
 #include "C_PuiSdHandler.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_logic;
@@ -73,17 +74,35 @@ void C_SdNdeDalLogJobsListModel::UpdateData(const uint32_t ou32_NodeIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Remove row at given index
+/*! \brief  Remove one or more rows at given indexes
 
-   \param[in]       ou32_ElementIndex     The index of the element to be deleted
+   \param[in]       orc_DataLoggerJobIndices     Indexes to be deleted
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobsListModel::DoRemoveRow(const uint32_t ou32_ElementIndex)
+void C_SdNdeDalLogJobsListModel::DoRemoveRows(const std::vector<uint32_t> & orc_DataLoggerJobIndices)
 {
-   beginRemoveRows(QModelIndex(), ou32_ElementIndex, ou32_ElementIndex);
-   this->mc_LogJobsList.erase(this->mc_LogJobsList.begin() + ou32_ElementIndex);
-   endRemoveRows();
+   // Save the selected indexes in reverse order to avoid errors on deletion
+   const std::vector<uint32_t> c_DataLoggerJobIndicesSortedDescending = C_Uti::h_UniquifyAndSortDescending(
+      orc_DataLoggerJobIndices);
+
+   if (orc_DataLoggerJobIndices.size() > 0L)
+   {
+      //
+      const uint32_t u32_StartIndex =
+         c_DataLoggerJobIndicesSortedDescending[c_DataLoggerJobIndicesSortedDescending.size() - 1UL];
+      const uint32_t u32_LastIndex = c_DataLoggerJobIndicesSortedDescending[0];
+
+      // ensure that the start index is always lesser than last index
+      beginRemoveRows(QModelIndex(), u32_StartIndex, u32_LastIndex);
+
+      for (uint32_t u32_Index = 0; u32_Index < c_DataLoggerJobIndicesSortedDescending.size(); u32_Index++)
+      {
+         this->mc_LogJobsList.erase(this->mc_LogJobsList.begin() +
+                                    c_DataLoggerJobIndicesSortedDescending.at(u32_Index));
+      }
+      endRemoveRows();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

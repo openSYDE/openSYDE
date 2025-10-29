@@ -70,7 +70,7 @@ void C_SdNdeHalcChannelTreeDelegate::paint(QPainter * const opc_Painter, const Q
       const QStringList c_Texts = c_Option.text.split(' ');
       const QFontMetrics c_FontMetrics = QFontMetrics(C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13));
       const QRect c_Rect = QRect(orc_Option.rect.x() + 23 /*16px icon + 7px padding*/, orc_Option.rect.y() + 4,
-                                 c_FontMetrics.boundingRect(c_Texts[0]).width() + 5, 18);
+                                 c_FontMetrics.boundingRect(c_Texts[0]).width() + 6, 18);
 
       opc_Painter->save();
 

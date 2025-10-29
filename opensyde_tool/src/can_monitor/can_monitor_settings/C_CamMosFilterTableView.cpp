@@ -49,7 +49,10 @@ C_CamMosFilterTableView::C_CamMosFilterTableView(QWidget * const opc_Parent) :
 
    //Configure
    this->setShowGrid(false);
-   this->verticalHeader()->setDefaultSectionSize(20);
+   this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+   this->verticalHeader()->setMinimumSectionSize(21);
+   this->verticalHeader()->setMaximumSectionSize(21);
+   this->verticalHeader()->setDefaultSectionSize(21); // after min & max size!
 
    //Deactivate
    this->verticalHeader()->setVisible(false);

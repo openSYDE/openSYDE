@@ -24,6 +24,8 @@
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_OscSystemDefinitionFiler.hpp"
 
+#include <unordered_set>
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw::errors;
@@ -47,14 +49,16 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load with error handling
 
-   \param[in] ors32_Err                    Load error
-   \param[in] orc_Path                     path of project to load
-   \param[in] opc_Parent                   parent widget
-   \param[in] ou16_SystemDefinitionVersion System definition version
+   \param[in]  ors32_Err                        Load error
+   \param[in]  orc_Path                         path of project to load
+   \param[in]  opc_Parent                       parent widget
+   \param[in]  ou16_SystemDefinitionVersion     System definition version
+   \param[in]  orc_ErrorDetailsMissingDevices   if C_OVERFLOW contains types of all missing devices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QString & orc_Path,
-                                          QWidget * const opc_Parent, const uint16_t ou16_SystemDefinitionVersion)
+                                          QWidget * const opc_Parent, const uint16_t ou16_SystemDefinitionVersion,
+                                          const std::vector<stw::scl::C_SclString> & orc_ErrorDetailsMissingDevices)
 {
    if (ors32_Err == C_WARN)
    {
@@ -64,11 +68,13 @@ void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QStri
    }
    else if ((ors32_Err != C_NO_ERR) && (ors32_Err != C_WARN))
    {
+      std::unordered_set<std::string> c_UniqueDeviceNames;
       QString c_Details;
+      QString c_Description;
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Failed to load project: ") + orc_Path);
-      c_Message.SetCustomMinHeight(250, 300);
+      c_Description = C_GtGetText::h_GetText("Failed to load project: ") + orc_Path;
+      c_Message.SetCustomMinHeight(250, 425);
 
       switch (ors32_Err)
       {
@@ -90,7 +96,21 @@ void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QStri
          c_Details = C_GtGetText::h_GetText("UI part does not match core part.");
          break;
       case C_COM:
-         c_Details = C_GtGetText::h_GetText("The device definition for the project was not found.");
+         c_Details = C_GtGetText::h_GetText("List of not found nodes in the toolbox:");
+         for (const auto & rc_Device : orc_ErrorDetailsMissingDevices)
+         {
+            if (c_UniqueDeviceNames.emplace(rc_Device.c_str()).second)
+            {
+               c_Details += C_GtGetText::h_GetText("<br/> - ");
+               c_Details += rc_Device.c_str();
+            }
+         }
+         c_Description += C_GtGetText::h_GetText(
+            "<br/><br/>The project contains nodes which are not part of the toolbox.");
+         c_Details += "<br/><br/>Possible reasons: <br/>";
+         c_Details +=
+            " - User nodes are used in the project. If yes: Add these missing user nodes in the toolbox and retry. <br/>"
+            " - Project was created with newer version. If yes: Use a newer version of openSYDE where these nodes are supported. <br/>";
          break;
       case C_BUSY:
          c_Details = C_GtGetText::h_GetText("Problems with cleaning up temporary folders.");
@@ -108,6 +128,7 @@ void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QStri
       c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
                                     C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       c_Details += ".";
+      c_Message.SetDescription(c_Description);
       c_Message.SetDetails(c_Details);
       c_Message.Execute();
    }

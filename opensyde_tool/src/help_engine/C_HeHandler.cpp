@@ -10,14 +10,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"
-
 //Html help
 #include <windows.h>
 #include <htmlhelp.h>
 #include <QProcess>
 #include <QKeyEvent>
-#include <iostream>
 #include "C_HeHandler.hpp"
 #include "TglUtils.hpp"
 #include "C_Uti.hpp"
@@ -103,7 +100,7 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
          //this->mpr_HtmlHelp(GetDesktopWindow(), mh_GetHelpLocation().toStdString().c_str(), HH_DISPLAY_TOPIC, 0);
          //lint -e{923,1924,9091} Required by API interface
          this->mpr_HtmlHelp(GetDesktopWindow(),
-                            this->m_GetHelpLocation().toStdString().c_str(), HH_KEYWORD_LOOKUP, (DWORD) &c_Link);
+                            this->m_GetHelpLocation().toStdString().c_str(), HH_KEYWORD_LOOKUP, (DWORD_PTR) &c_Link);
          delete[] (pcn_Text);
       }
    }
@@ -160,8 +157,8 @@ C_HeHandler::C_HeHandler() :
    if (this->mpc_InstHtmlHelp != NULL)
    {
       //Load function
-      //lint -e{740,929,1924,9176} Working code
-      (FARPROC &)mpr_HtmlHelp = GetProcAddress(this->mpc_InstHtmlHelp, "HtmlHelpA");
+      const FARPROC pc_Temp = GetProcAddress(this->mpc_InstHtmlHelp, "HtmlHelpA");
+      memcpy(&mpr_HtmlHelp, &pc_Temp, sizeof(mpr_HtmlHelp));
    }
    else
    {

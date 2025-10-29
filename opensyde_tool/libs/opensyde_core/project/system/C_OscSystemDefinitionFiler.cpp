@@ -55,20 +55,21 @@ using namespace stw::scl;
    skip unnecessary content (oq_SkipContent) and to load only given node (opc_ExpectedNodeName),
    as alternative to list of active nodes, are supported.
 
-   \param[out]     orc_SystemDefinition         Pointer to storage
-   \param[in]      orc_PathSystemDefinition     Path to system definition
-   \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
-   \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions, if the flag is false
-                                                orc_PathDeviceDefinitions can be an empty string.
-                                                It is highly recommended to use the device definitions.
-                                                Purpose for not using the device definition is when only read
-                                                access to a part of the system definition is necessary.
-   \param[in,out]  opu16_ReadFileVersion        Optional storage for read file version (only use in C_NO_ERR case)
-   \param[in]      opc_NodesToLoad              (Optional parameter) only load content of nodes which are active in sysdef
-   \param[in]      oq_SkipContent               (Optional parameter) skip content when not needed (datapools, halc etc.)
-                                                (default = false)
-   \param[in]      opc_ExpectedNodeName         (Optional parameter) only load node content of given node. Parameter is
-                                                used if no node index is available to fill opc_NodesToLoad parameter.
+   \param[out]     orc_SystemDefinition            Pointer to storage
+   \param[in]      orc_PathSystemDefinition        Path to system definition
+   \param[in]      orc_PathDeviceDefinitions       Path to device definition description file
+   \param[in]      oq_UseDeviceDefinitions         Flag for using device definitions, if the flag is false
+                                                   orc_PathDeviceDefinitions can be an empty string.
+                                                   It is highly recommended to use the device definitions.
+                                                   Purpose for not using the device definition is when only read
+                                                   access to a part of the system definition is necessary.
+   \param[in,out]  opu16_ReadFileVersion           Optional storage for read file version (only use in C_NO_ERR case)
+   \param[in]      opc_NodesToLoad                 (Optional parameter) only load content of nodes which are active in sysdef
+   \param[in]      oq_SkipContent                  (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                                   (default = false)
+   \param[in]      opc_ExpectedNodeName            (Optional parameter) only load node content of given node. Parameter is
+                                                   used if no node index is available to fill opc_NodesToLoad parameter.
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    data read
@@ -86,7 +87,8 @@ int32_t C_OscSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OscSystemDefini
                                                                uint16_t * const opu16_ReadFileVersion,
                                                                const std::vector<uint8_t> * const opc_NodesToLoad,
                                                                const bool oq_SkipContent,
-                                                               const stw::scl::C_SclString * const opc_ExpectedNodeName)
+                                                               const stw::scl::C_SclString * const opc_ExpectedNodeName,
+                                                               std::vector<C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -100,7 +102,7 @@ int32_t C_OscSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OscSystemDefini
          s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XmlParser, orc_PathDeviceDefinitions,
                                              orc_PathSystemDefinition, oq_UseDeviceDefinitions,
                                              opu16_ReadFileVersion, opc_NodesToLoad, oq_SkipContent,
-                                             opc_ExpectedNodeName);
+                                             opc_ExpectedNodeName, opc_ErrorDetailsMissingDevices);
       }
       else
       {
@@ -194,19 +196,20 @@ int32_t C_OscSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OscSystem
     The caller is responsible to provide a static life-time of orc_DeviceDefinitions.
     Otherwise the "device definition" pointers in C_OscNode will point to invalid data.
 
-   \param[out]     orc_Nodes                 data storage
-   \param[in,out]  orc_XmlParser             XML with "nodes" active
-   \param[in]      orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
-   \param[in]      orc_BasePath              Base path
-   \param[in]      oq_UseDeviceDefinitions   Flag for using device definitions
-   \param[in]      oq_UseFileInterface       Flag for switching between multiple file and single file interface
-                                             True: Assume content is split over multiple files
-                                             False: Assume all relevant content is in this file
-   \param[in]      opc_NodesToLoad           (Optional parameter) only load content of nodes which are active in sysdef
-   \param[in]      oq_SkipContent            (Optional parameter) skip content when not needed (datapools, halc etc.)
-                                             (default = false)
-   \param[in]      opc_ExpectedNodeName      (Optional parameter) only load node content of given node. Parameter is
-                                             used if no node index is available to fill opc_NodesToLoad parameter.
+   \param[out]     orc_Nodes                       data storage
+   \param[in,out]  orc_XmlParser                   XML with "nodes" active
+   \param[in]      orc_DeviceDefinitions           List of known devices (must contain all device types used by nodes)
+   \param[in]      orc_BasePath                    Base path
+   \param[in]      oq_UseDeviceDefinitions         Flag for using device definitions
+   \param[in]      oq_UseFileInterface             Flag for switching between multiple file and single file interface
+                                                   True: Assume content is split over multiple files
+                                                   False: Assume all relevant content is in this file
+   \param[in]      opc_NodesToLoad                 (Optional parameter) only load content of nodes which are active in sysdef
+   \param[in]      oq_SkipContent                  (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                                   (default = false)
+   \param[in]      opc_ExpectedNodeName            (Optional parameter) only load node content of given node. Parameter is
+                                                   used if no node index is available to fill opc_NodesToLoad parameter.
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    no error
@@ -220,7 +223,8 @@ int32_t C_OscSystemDefinitionFiler::h_LoadNodes(std::vector<C_OscNode> & orc_Nod
                                                 const bool oq_UseDeviceDefinitions, const bool oq_UseFileInterface,
                                                 const std::vector<uint8_t> * const opc_NodesToLoad,
                                                 const bool oq_SkipContent,
-                                                const stw::scl::C_SclString * const opc_ExpectedNodeName)
+                                                const stw::scl::C_SclString * const opc_ExpectedNodeName,
+                                                std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices)
 
 {
    int32_t s32_Retval = C_NO_ERR;
@@ -356,7 +360,14 @@ int32_t C_OscSystemDefinitionFiler::h_LoadNodes(std::vector<C_OscNode> & orc_Nod
                                       "System Definition contains node \"" + orc_Nodes[u32_NodeIndex].c_Properties.c_Name +
                                       "\" of device type \"" +
                                       orc_Nodes[u32_NodeIndex].c_DeviceType + "\" which is not a known device.");
-                  break;
+                  if (opc_ErrorDetailsMissingDevices == NULL)
+                  {
+                     break;
+                  }
+                  else
+                  {
+                     opc_ErrorDetailsMissingDevices->push_back(orc_Nodes[u32_NodeIndex].c_DeviceType);
+                  }
                }
                else
                {
@@ -537,17 +548,18 @@ void C_OscSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OscSystemBus> &
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]     orc_SystemDefinition         Pointer to storage
-   \param[in,out]  orc_XmlParser                XML with default state
-   \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
-   \param[in]      orc_BasePath                 Base path
-   \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions
-   \param[in,out]  opu16_ReadFileVersion        Optional storage for read file version (only use in C_NO_ERR case)
-   \param[in]      opc_NodesToLoad              (Optional parameter) only load content of nodes which are active in sysdef
-   \param[in]      oq_SkipContent               (Optional parameter) skip content when not needed (datapools, halc etc.)
-                                                (default = false)
-   \param[in]      opc_ExpectedNodeName         (Optional parameter) only load node content of given node. Parameter is
-                                                used if no node index is available to fill opc_NodesToLoad parameter.
+   \param[out]     orc_SystemDefinition            Pointer to storage
+   \param[in,out]  orc_XmlParser                   XML with default state
+   \param[in]      orc_PathDeviceDefinitions       Path to device definition description file
+   \param[in]      orc_BasePath                    Base path
+   \param[in]      oq_UseDeviceDefinitions         Flag for using device definitions
+   \param[in,out]  opu16_ReadFileVersion           Optional storage for read file version (only use in C_NO_ERR case)
+   \param[in]      opc_NodesToLoad                 (Optional parameter) only load content of nodes which are active in sysdef
+   \param[in]      oq_SkipContent                  (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                                   (default = false)
+   \param[in]      opc_ExpectedNodeName            (Optional parameter) only load node content of given node. Parameter is
+                                                   used if no node index is available to fill opc_NodesToLoad parameter.
+   \param[in,out]  opc_ErrorDetailsMissingDevices  (Optional parameter) if C_OVERFLOW contains types of all missing devices
 
    \return
    C_NO_ERR    data read
@@ -564,7 +576,8 @@ int32_t C_OscSystemDefinitionFiler::h_LoadSystemDefinition(C_OscSystemDefinition
                                                            uint16_t * const opu16_ReadFileVersion,
                                                            const std::vector<uint8_t> * const opc_NodesToLoad,
                                                            const bool oq_SkipContent,
-                                                           const stw::scl::C_SclString * const opc_ExpectedNodeName)
+                                                           const stw::scl::C_SclString * const opc_ExpectedNodeName,
+                                                           std::vector<C_SclString> * const opc_ErrorDetailsMissingDevices)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -642,7 +655,8 @@ int32_t C_OscSystemDefinitionFiler::h_LoadSystemDefinition(C_OscSystemDefinition
             //Completely rely on V2 loader
             s32_Retval = C_OscSystemDefinitionFilerV2::h_LoadSystemDefinition(orc_SystemDefinition, orc_XmlParser,
                                                                               orc_PathDeviceDefinitions,
-                                                                              oq_UseDeviceDefinitions);
+                                                                              oq_UseDeviceDefinitions,
+                                                                              opc_ErrorDetailsMissingDevices);
          }
          if (q_UseV3Filer)
          {
@@ -666,7 +680,8 @@ int32_t C_OscSystemDefinitionFiler::h_LoadSystemDefinition(C_OscSystemDefinition
                {
                   s32_Retval = h_LoadNodes(orc_SystemDefinition.c_Nodes, orc_XmlParser,
                                            C_OscSystemDefinition::hc_Devices, orc_BasePath, oq_UseDeviceDefinitions,
-                                           true, opc_NodesToLoad, oq_SkipContent, opc_ExpectedNodeName);
+                                           true, opc_NodesToLoad, oq_SkipContent, opc_ExpectedNodeName,
+                                           opc_ErrorDetailsMissingDevices);
                   if (s32_Retval == C_NO_ERR)
                   {
                      //Return

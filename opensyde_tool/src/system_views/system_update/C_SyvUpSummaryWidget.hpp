@@ -13,7 +13,6 @@
 #include <QTimer>
 #include <QWidget>
 #include <QElapsedTimer>
-#include <QWinTaskbarProgress>
 #include "stwtypes.hpp"
 #include "C_OscSuSequences.hpp"
 

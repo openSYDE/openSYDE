@@ -40,7 +40,7 @@
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -53,7 +53,7 @@
      <item>
       <widget class="stw::opensyde_gui_elements::C_OgePubUpdate" name="pc_PubImportConfig">
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::FocusPolicy::NoFocus</enum>
        </property>
        <property name="text">
         <string>-Import Config</string>
@@ -63,7 +63,7 @@
      <item>
       <widget class="stw::opensyde_gui_elements::C_OgePubUpdate" name="pc_PubExportConfig">
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::FocusPolicy::NoFocus</enum>
        </property>
        <property name="text">
         <string>-Export Config</string>
@@ -120,14 +120,14 @@
            <string>-my_description.xyz</string>
           </property>
           <property name="textInteractionFlags">
-           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
           </property>
          </widget>
         </item>
         <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Orientation::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -140,7 +140,7 @@
         <item>
          <widget class="stw::opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubSelect">
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="text">
            <string>-Select</string>
@@ -150,7 +150,7 @@
         <item>
          <widget class="stw::opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubUpdate">
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="text">
            <string>-Update</string>
@@ -160,7 +160,7 @@
         <item>
          <widget class="stw::opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubCleanUp">
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="text">
            <string>-Delete</string>
@@ -175,7 +175,7 @@
    <item>
     <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="childrenCollapsible">
       <bool>false</bool>
@@ -198,26 +198,47 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
-         <property name="minimumSize">
-          <size>
-           <width>300</width>
-           <height>31</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>31</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>-Overview</string>
-         </property>
+        <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiChannelTreeContent" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>-Overview</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="stw::opensyde_gui::C_SdNdeHalcChannelTreeView" name="pc_TreeChannels"/>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <widget class="stw::opensyde_gui::C_SdNdeHalcChannelTreeView" name="pc_TreeChannels"/>
        </item>
       </layout>
      </widget>

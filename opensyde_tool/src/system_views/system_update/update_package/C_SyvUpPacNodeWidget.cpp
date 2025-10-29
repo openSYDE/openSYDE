@@ -1211,13 +1211,12 @@ void C_SyvUpPacNodeWidget::dropEvent(QDropEvent * const opc_Event)
   // Datablock only
 
                // Check if relative paths are possible and appreciated
-
                c_TimerFilePathsDatablocks[0] =
-                  C_ImpUtil::h_AskUserToSaveRelativePath(this, c_TimerFilePathsDatablocks[0], c_Folder);
-
-               if (c_FilePathsDatablocks[0] != "")
+                  C_ImpUtil::h_AskUserToSaveRelativePath(this, c_TimerFilePathsDatablocks[0],
+                                                         c_Folder);
+               if (c_TimerFilePathsDatablocks[0] != "")
                {
-                  this->AdaptFile(c_FilePathsDatablocks[0], pc_TimerApp);
+                  this->AdaptFile(c_TimerFilePathsDatablocks[0], pc_TimerApp);
                }
 
                if (pc_TimerApp != NULL)

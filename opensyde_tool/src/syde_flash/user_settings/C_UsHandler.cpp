@@ -79,6 +79,7 @@ void C_UsHandler::SetDefault(void)
    this->mc_ScreenPos = QPoint(50, 50);
    this->mc_AppSize = QSize(1000, 700);
    this->mq_AppMaximized = true;
+   this->mu32_ScreenIndex = 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,6 +116,18 @@ QSize C_UsHandler::GetAppSize(void) const
 bool C_UsHandler::GetAppMaximized(void) const
 {
    return this->mq_AppMaximized;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get recent application screen index (for multi screen setup)
+
+   \return
+   Screen index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t C_UsHandler::GetAppScreenIndex(void) const
+{
+   return this->mu32_ScreenIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -382,6 +395,17 @@ void C_UsHandler::SetAppSize(const QSize & orc_New)
 void C_UsHandler::SetAppMaximized(const bool oq_New)
 {
    this->mq_AppMaximized = oq_New;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set recent application screen index (for multi screen setup)
+
+   \param[in]  ou32_New    New screen index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetAppScreenIndex(const uint32_t ou32_New)
+{
+   this->mu32_ScreenIndex = ou32_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

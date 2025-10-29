@@ -2166,7 +2166,7 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const int32_t os32_MaxLength)
 {
-   orc_Str.resize(std::min(orc_Str.count(), static_cast<int32_t>(os32_MaxLength)));
+   orc_Str.resize(std::min(static_cast<int32_t>(orc_Str.count()), static_cast<int32_t>(os32_MaxLength)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

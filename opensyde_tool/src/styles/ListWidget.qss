@@ -14,17 +14,13 @@ stw--opensyde_gui--C_NagViewList,
 stw--opensyde_gui--C_SyvDcConnectedNodeList,
 stw--opensyde_gui--C_SyvDcExistingNodeList,
 stw--opensyde_gui--C_SdTopologyListWidget,
-stw--opensyde_gui--C_SdTopologyListWidget::item:selected,
-stw--opensyde_gui--C_SdTopologyListWidget::item:hover,
+stw--opensyde_gui--C_SdTopologyListWidget::item,
 stw--opensyde_gui--C_SdNdeDbListWidget,
-stw--opensyde_gui--C_SdNdeDbListWidget::item:selected,
-stw--opensyde_gui--C_SdNdeDbListWidget::item:hover,
+stw--opensyde_gui--C_SdNdeDbListWidget::item,
 stw--opensyde_gui--C_SdNdeDpSelectorListWidget,
-stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item:selected,
-stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item:hover,
+stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item,
 stw--opensyde_gui--C_SyvUpPacListWidget,
-stw--opensyde_gui--C_SyvUpPacListWidget::item:selected,
-stw--opensyde_gui--C_SyvUpPacListWidget::item:hover,
+stw--opensyde_gui--C_SyvUpPacListWidget::item,
 stw--opensyde_gui--C_SdNdeDalLogJobsListView,
 stw--opensyde_gui--C_SdNdeDalLogJobsListView::item
 {
@@ -66,7 +62,9 @@ height: 30px
 
 stw--opensyde_gui--C_SdNdeDalLogJobsListView
 {
-padding: 9px;
+margin-top: 9px;
+margin-bottom: 9px;
+margin-left: 18px;
 }
 
 /* --------------------------------------------------------------------- */

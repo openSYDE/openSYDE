@@ -137,6 +137,20 @@ C_OscDcDeviceOldComConfig::C_OscDcDeviceOldComConfig(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy constructor
+
+   \param[in]  orc_Source  instance to copy from
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscDcDeviceOldComConfig::C_OscDcDeviceOldComConfig(const C_OscDcDeviceOldComConfig & orc_Source) :
+   u8_OldNodeId(orc_Source.u8_OldNodeId),
+   q_OldIpAddressValid(orc_Source.q_OldIpAddressValid)
+
+{
+   memcpy(&this->au8_OldIpAddress, &orc_Source.au8_OldIpAddress, 4);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Assignment operator.
 
    \param[in]  orc_Source  instance to assign

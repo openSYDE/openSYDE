@@ -13,7 +13,6 @@
 #include <QScreen>
 #include <QMimeData>
 #include <QGraphicsItem>
-#include <QDesktopWidget>
 #include <QGuiApplication>
 
 #include "stwtypes.hpp"

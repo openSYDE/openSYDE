@@ -56,6 +56,7 @@ class C_OscDcDeviceOldComConfig
 {
 public:
    C_OscDcDeviceOldComConfig(void);
+   C_OscDcDeviceOldComConfig(const C_OscDcDeviceOldComConfig & orc_Source);
    C_OscDcDeviceOldComConfig & operator =(const C_OscDcDeviceOldComConfig & orc_Source);
 
    void SetContent(const uint8_t ou8_OldNodeId, const bool oq_OldIpAddressValid,

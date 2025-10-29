@@ -428,11 +428,11 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
 {
    int32_t s32_Return = C_NO_ERR;
 
-   for (const auto c_CieSignal : orc_CieSignals)
+   for (const auto & rc_CieSignal : orc_CieSignals)
    {
       Vector::DBC::Signal c_DbcSignal;
       // set byte order
-      if (c_CieSignal.e_ComByteOrder == stw::opensyde_core::C_OscCanSignal::eBYTE_ORDER_INTEL)
+      if (rc_CieSignal.e_ComByteOrder == stw::opensyde_core::C_OscCanSignal::eBYTE_ORDER_INTEL)
       {
          c_DbcSignal.byteOrder = Vector::DBC::ByteOrder::Intel;
       }
@@ -441,11 +441,11 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
          c_DbcSignal.byteOrder = Vector::DBC::ByteOrder::Motorola;
       }
       // set start bit pos and length
-      c_DbcSignal.startBit = c_CieSignal.u16_ComBitStart;
-      c_DbcSignal.bitSize = c_CieSignal.u16_ComBitLength;
+      c_DbcSignal.startBit = rc_CieSignal.u16_ComBitStart;
+      c_DbcSignal.bitSize = rc_CieSignal.u16_ComBitLength;
 
       // set multiplexing information
-      switch (c_CieSignal.e_MultiplexerType)
+      switch (rc_CieSignal.e_MultiplexerType)
       {
       case C_OscCanSignal::eMUX_DEFAULT:
          c_DbcSignal.multiplexor = Vector::DBC::Signal::Multiplexor::NoMultiplexor;
@@ -457,17 +457,17 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
          break;
       case C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL:
          c_DbcSignal.multiplexor = Vector::DBC::Signal::Multiplexor::MultiplexedSignal;
-         c_DbcSignal.multiplexerSwitchValue = c_CieSignal.u16_MultiplexValue;
+         c_DbcSignal.multiplexerSwitchValue = rc_CieSignal.u16_MultiplexValue;
          break;
       default:
          tgl_assert(false);
          break;
       }
 
-      C_CieExportDbc::mh_SetSignalSpnValue(c_CieSignal, c_DbcSignal);
+      C_CieExportDbc::mh_SetSignalSpnValue(rc_CieSignal, c_DbcSignal);
 
       // set signal values
-      const C_CieConverter::C_CieDataPoolElement & rc_Element = c_CieSignal.c_Element;
+      const C_CieConverter::C_CieDataPoolElement & rc_Element = rc_CieSignal.c_Element;
       s32_Return = mh_SetSignalValues(rc_Element, c_DbcSignal);
       tgl_assert(s32_Return == C_NO_ERR);
 

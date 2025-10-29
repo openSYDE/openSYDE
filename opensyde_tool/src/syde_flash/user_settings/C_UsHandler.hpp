@@ -20,7 +20,6 @@
 #include <QPoint>
 #include <QSize>
 #include <QMap>
-#include "stwtypes.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -59,6 +58,7 @@ public:
    QPoint GetScreenPos(void) const;
    QSize GetAppSize(void) const;
    bool GetAppMaximized(void) const;
+   uint32_t GetAppScreenIndex(void) const;
    int32_t GetSplitterSettingsHorizontal(void) const;
    bool GetSettingsAreExpanded(void) const;
    bool GetWiProgressExpanded(void) const;
@@ -82,6 +82,7 @@ public:
    void SetScreenPos(const QPoint & orc_New);
    void SetAppSize(const QSize & orc_New);
    void SetAppMaximized(const bool oq_New);
+   void SetAppScreenIndex(const uint32_t ou32_New);
    void SetSplitterSettingsHorizontal(const int32_t os32_New);
    void SetSettingsAreExpanded(const bool oq_New);
    void SetWiProgressExpanded(const bool oq_New);
@@ -116,8 +117,9 @@ private:
 
    const QString mc_IniPathAndName;                 ///< Fix location of user settings
    QPoint mc_ScreenPos;                             ///< History of last known screen position
-   QSize mc_AppSize;                                ///< History of last known openSyde window size
-   bool mq_AppMaximized;                            ///< History of openSyde window state
+   QSize mc_AppSize;                                ///< History of last known window size
+   bool mq_AppMaximized;                            ///< History of window state
+   uint32_t mu32_ScreenIndex;                       ///< History of last known screen (multiple monitor setup)
    int32_t ms32_SplitterSettingsHorizontal;         ///< History of last known settings-splitter position x value
    bool mq_SettingsAreExpanded;                     ///< History of last known settings state
                                                     // (collapsed/expanded)

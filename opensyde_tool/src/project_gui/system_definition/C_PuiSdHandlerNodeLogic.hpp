@@ -9,6 +9,8 @@
 #define C_PUISDHANDLERNODELOGIC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QMap>
+
 #include "C_PuiSdHandlerData.hpp"
 #include "C_OscNodeDataPoolListElementId.hpp"
 
@@ -66,7 +68,7 @@ public:
                                 const std::vector<QString> & orc_NodeNames, const QString & orc_MainDevice,
                                 const QString & orc_NameProposal = "");
    void RemoveNode(const uint32_t ou32_NodeIndex);
-   bool CheckNodeConflict(const uint32_t & oru32_NodeIndex) const;
+   bool CheckNodeConflict(const uint32_t & oru32_NodeIndex);
    void GetSupportedCanBitrates(const std::vector<uint32_t> & orc_Nodes, std::vector<uint32_t> & orc_Bitrates) const;
    void GetSupportedCanFdBitrates(const std::vector<uint32_t> & orc_Nodes, std::vector<uint32_t> & orc_Bitrates) const;
    bool NodeSupportsCanFd(const std::vector<uint32_t> & orc_Nodes,
@@ -324,6 +326,7 @@ public:
                                                   const uint32_t & oru32_ListIndex,
                                                   const stw::scl::C_SclString & orc_Name, const uint32_t * const opu32_DataPoolListElementIndexToSkip =
                                                      NULL) const;
+   void Clear(const bool oq_TriggerSyncSignals) override;
 
 protected:
    C_PuiSdHandlerNodeLogic(QObject * const opc_Parent = NULL);
@@ -357,6 +360,8 @@ protected:
                                       const uint8_t ou8_NewNodeId) = 0;
 
 private:
+   QMap<uint32_t, bool> mc_PreviousNodeErrorCheckResult;
+
    // NVM base Datapool helper functions
    static void mh_GetNodeNvmDataPoolAreas(const stw::opensyde_core::C_OscNode & orc_Node,
                                           std::vector<C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas);

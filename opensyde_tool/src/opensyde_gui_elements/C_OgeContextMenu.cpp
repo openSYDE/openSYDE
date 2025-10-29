@@ -15,7 +15,6 @@
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
 #include <QFile>
-#include <QDesktopWidget>
 #include <QApplication>
 #include "C_OgeContextMenu.hpp"
 #include "constants.hpp"

@@ -14,7 +14,6 @@
 #include "precomp_headers.hpp"
 
 #include <QDir>
-#include <QDirModel>
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QDateTime>

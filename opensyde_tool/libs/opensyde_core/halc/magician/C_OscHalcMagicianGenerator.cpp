@@ -1100,12 +1100,16 @@ int32_t C_OscHalcMagicianGenerator::mh_ConvertToDatapoolAndAssign(const C_OscHal
    C_OscNodeDataPoolContent c_ApplyValue;
    int32_t s32_Retval = mh_ConvertToDatapoolWithoutArray(orc_HalcContent, c_ApplyValue);
 
-   if ((s32_Retval == C_NO_ERR) && (orc_HalcContent.GetComplexType() != C_OscHalcDefContent::eCT_STRING))
+   if (s32_Retval == C_NO_ERR)
    {
-      if (((orc_HalcContent.GetArray()) || (c_ApplyValue.GetArray())) ||
-          ((orc_HalcContent.GetComplexType() == C_OscHalcDefContent::eCT_BIT_MASK) &&
-           ((orc_HalcContent.GetType() == C_OscNodeDataPoolContent::eFLOAT32) ||
-            (orc_HalcContent.GetType() == C_OscNodeDataPoolContent::eFLOAT64))))
+      if ((orc_HalcContent.GetComplexType() != C_OscHalcDefContent::eCT_STRING) &&
+          (((orc_HalcContent.GetArray()) || (c_ApplyValue.GetArray())) ||
+           ((orc_HalcContent.GetComplexType() ==
+             C_OscHalcDefContent::eCT_BIT_MASK) &&
+            ((orc_HalcContent.GetType() ==
+              C_OscNodeDataPoolContent::eFLOAT32) ||
+             (orc_HalcContent.GetType() ==
+              C_OscNodeDataPoolContent::eFLOAT64)))))
       {
          s32_Retval = C_CONFIG;
          osc_write_log_warning("HALC datapool generation",
@@ -1113,7 +1117,7 @@ int32_t C_OscHalcMagicianGenerator::mh_ConvertToDatapoolAndAssign(const C_OscHal
       }
       else
       {
-         if (orc_DpContent.GetArray())
+         if ((orc_DpContent.GetArray()) && (orc_HalcContent.GetComplexType() != C_OscHalcDefContent::eCT_STRING))
          {
             if (ou32_Index < orc_DpContent.GetArraySize())
             {

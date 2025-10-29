@@ -53,6 +53,8 @@ C_TblTreDataElementView::C_TblTreDataElementView(QWidget * const opc_Parent) :
    this->C_TblTreDataElementView::setModel(&this->mc_SortModel);
 
    this->setHeaderHidden(true);
+   this->setMouseTracking(true);
+
    //Configure filter
    this->mc_SortModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
 
@@ -159,7 +161,7 @@ void C_TblTreDataElementView::InitSv(const uint32_t ou32_ViewIndex, const bool o
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::Search(const QString & orc_Text)
 {
-   const bool q_StartIsEmpty = this->mc_SortModel.filterRegExp().isEmpty();
+   const bool q_StartIsEmpty = this->mc_SortModel.filterRegularExpression().pattern().isEmpty();
 
    //If it was empty and will soon not be empty: remember the expanded indices before filtering anything
    if (q_StartIsEmpty)
@@ -168,7 +170,7 @@ void C_TblTreDataElementView::Search(const QString & orc_Text)
    }
    this->mc_SortModel.SetFilter(orc_Text);
    //If it is empty after previously not being empty restore the last known state
-   if (this->mc_SortModel.filterRegExp().isEmpty())
+   if (this->mc_SortModel.filterRegularExpression().pattern().isEmpty())
    {
       if (q_StartIsEmpty == false)
       {
@@ -300,9 +302,15 @@ void C_TblTreDataElementView::mouseDoubleClickEvent(QMouseEvent * const opc_Even
    QTreeView::mouseDoubleClickEvent(opc_Event);
    if ((c_Index.isValid() == true) && (this->selectedIndexes().size() > 0))
    {
-      if (this->mc_Model.GetDataElements(this->mc_SortModel.mapToSource(c_Index)).size() == 1UL)
+      const std::vector<C_PuiSvDbNodeDataPoolListElementId> c_IdsForIndex = this->mc_Model.GetDataElements(this->mc_SortModel.mapToSource(
+                                                                                                              c_Index));
+      if (c_IdsForIndex.size() == 1UL)
       {
-         Q_EMIT this->SigAccept();
+         const bool q_Match = m_CheckIndicesMatchesCurrentSelection(c_IdsForIndex);
+         if (q_Match)
+         {
+            Q_EMIT this->SigAccept();
+         }
       }
    }
 }
@@ -392,7 +400,8 @@ QModelIndex C_TblTreDataElementView::m_ManualMapFromSource(const QModelIndex & o
 {
    QModelIndex c_Retval;
 
-   if ((orc_Index.parent().isValid() == true) || (this->mc_SortModel.filterRegExp().isEmpty() == false))
+   if ((orc_Index.parent().isValid() == true) ||
+       (this->mc_SortModel.filterRegularExpression().pattern().isEmpty() == false))
    {
       c_Retval = this->mc_SortModel.mapFromSource(orc_Index);
    }
@@ -437,4 +446,46 @@ void C_TblTreDataElementView::m_ExpandAllChildren(const QModelIndex & orc_Index,
          m_ExpandAllChildren(c_ModelIndex, ou32_LayerCounter + 1UL, ou32_MaxLayer);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check indices matches current selection
+
+   \param[in]  orc_Indices    Indices
+
+   \return
+   Flags
+
+   \retval   True    Indices match
+   \retval   False   Indices don't match
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_TblTreDataElementView::m_CheckIndicesMatchesCurrentSelection(
+   const std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_Indices) const
+{
+   bool q_Match = false;
+   const std::vector<C_PuiSvDbNodeDataPoolListElementId> c_SelectedIndices = this->GetSelectedDataElements();
+
+   if (orc_Indices.size() == c_SelectedIndices.size())
+   {
+      q_Match = true;
+      for (uint32_t u32_ItIndexId = 0UL; (u32_ItIndexId < orc_Indices.size()) && (q_Match); ++u32_ItIndexId)
+      {
+         bool q_Found = false;
+         for (uint32_t u32_ItSelectedIndex = 0UL;
+              (u32_ItSelectedIndex < c_SelectedIndices.size()) && (q_Found == false);
+              ++u32_ItSelectedIndex)
+         {
+            if (orc_Indices[u32_ItIndexId] == c_SelectedIndices[u32_ItSelectedIndex])
+            {
+               q_Found = true;
+            }
+         }
+         if (!q_Found)
+         {
+            q_Match = false;
+         }
+      }
+   }
+   return q_Match;
 }

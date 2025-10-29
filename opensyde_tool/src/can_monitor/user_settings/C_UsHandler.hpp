@@ -57,6 +57,7 @@ public:
    QPoint GetScreenPos(void) const;
    QSize GetAppSize(void) const;
    bool GetAppMaximized(void) const;
+   uint32_t GetAppScreenIndex(void) const;
    bool GetButtonHexActive(void) const;
    bool GetButtonRelativeTimeStampActive(void) const;
    bool GetButtonUniqueViewActive(void) const;
@@ -89,6 +90,7 @@ public:
    void SetScreenPos(const QPoint & orc_New);
    void SetAppSize(const QSize & orc_New);
    void SetAppMaximized(const bool oq_New);
+   void SetAppScreenIndex(const uint32_t ou32_New);
    void SetButtonHexActive(const bool oq_New);
    void SetButtonRelativeTimeStampActive(const bool oq_New);
    void SetButtonUniqueViewActive(const bool oq_New);
@@ -141,8 +143,9 @@ private:
    QString mc_LastKnownDatabasePath;                      ///< History of last known database path
    QStringList mc_RecentProjects;                         ///< Unique history of recent projects
    QPoint mc_ScreenPos;                                   ///< History of last known screen position
-   QSize mc_AppSize;                                      ///< History of last known openSyde window size
-   bool mq_AppMaximized;                                  ///< History of openSyde window state
+   QSize mc_AppSize;                                      ///< History of last known window size
+   bool mq_AppMaximized;                                  ///< History of window state
+   uint32_t mu32_ScreenIndex;                             ///< History of last known screen (multiple monitor setup)
    bool mq_ButtonHexActive;                               ///< History of last known button hex state
    bool mq_ButtonRelativeTimeStampActive;                 ///< History of last known button time stamp state
    bool mq_ButtonUniqueViewActive;                        ///< History last known button unique state

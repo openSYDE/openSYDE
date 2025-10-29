@@ -11,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
+#include <QRegularExpression>
 
 #include "stwtypes.hpp"
 #include "C_TblTreMultiColumnLeafSortFilter.hpp"
@@ -58,7 +59,7 @@ bool C_TblTreMultiColumnLeafSortFilter::m_Contains(const QModelIndex & orc_Index
    {
       const QModelIndex c_Index = orc_Index.model()->index(orc_Index.row(), s32_Col, orc_Index.parent());
       const QString c_Name = orc_Index.model()->data(c_Index, static_cast<int32_t>(Qt::DisplayRole)).toString();
-      q_Retval = c_Name.contains(filterRegExp());
+      q_Retval = c_Name.contains(filterRegularExpression());
    }
 
    return q_Retval;

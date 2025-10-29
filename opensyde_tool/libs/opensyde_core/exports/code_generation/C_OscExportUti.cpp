@@ -408,6 +408,17 @@ C_SclString C_OscExportUti::h_FloatToStrGe(const float32_t of32_Value, bool * co
    {
       h_AddDecimalPointIfNone(c_Return);
    }
+   else
+   {
+      //"A double argument representing a NaN is converted in one of the styles [-]nan or [-]nan(n-char-sequence) —
+      // which style, and the meaning of any n-char-sequence, is implementation-defined."
+      //The actual parsing might even be done by a DLL. So even with the same compiler behavior might
+      // differ on different systems. So be defensive and make sure to only return plain "nan".
+      if (c_Return.LowerCase().Pos("nan") > 0)
+      {
+         c_Return = "nan";
+      }
+   }
 
    return c_Return;
 }
@@ -442,6 +453,17 @@ C_SclString C_OscExportUti::h_FloatToStrGe(const float64_t of64_Value, bool * co
    if (q_InfOrNan == false)
    {
       h_AddDecimalPointIfNone(c_Return);
+   }
+   else
+   {
+      //"A double argument representing a NaN is converted in one of the styles [-]nan or [-]nan(n-char-sequence) —
+      // which style, and the meaning of any n-char-sequence, is implementation-defined."
+      //The actual parsing might even be done by a DLL. So even with the same compiler behavior might
+      // differ on different systems. So be defensive and make sure to only return plain "nan".
+      if (c_Return.LowerCase().Pos("nan") > 0)
+      {
+         c_Return = "nan";
+      }
    }
 
    return c_Return;

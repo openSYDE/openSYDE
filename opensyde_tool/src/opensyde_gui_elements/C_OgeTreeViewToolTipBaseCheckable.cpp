@@ -51,6 +51,7 @@ C_OgeTreeViewToolTipBaseCheckable::C_OgeTreeViewToolTipBaseCheckable(QWidget * c
    this->setItemDelegate(&this->mc_Delegate);
 
    this->setHeaderHidden(true);
+   this->setMouseTracking(true);
 
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);

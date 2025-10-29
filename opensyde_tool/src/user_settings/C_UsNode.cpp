@@ -38,6 +38,8 @@ C_UsNode::C_UsNode(void) :
    mu8_DeviceInterfaceNumber(0),
    mu32_CanOpenDeviceUseCaseIndex(0),
    mq_IsUseCaseIndexSelected(false),
+   ms32_SelectedDataLoggerLogJobIndex(-1),
+   mq_IsOverviewWidgetSelected(false),
    me_SelectedProtocol(stw::opensyde_core::C_OscCanProtocol::eLAYER2),
    mu32_SelectedInterface(0)
 {
@@ -273,6 +275,30 @@ QString C_UsNode::GetSelectedHalcDomainName(void) const
 QString C_UsNode::GetSelectedHalcChannel(void) const
 {
    return this->mc_SelectedHalcChannelId;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get selected DataLogger Log Job Index
+
+   \return
+   Selected Log Job Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_UsNode::GetSelectedDataLoggerLogJobIndex(void) const
+{
+   return this->ms32_SelectedDataLoggerLogJobIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get Is DataLogger Overview Widget selected
+
+   \return
+   Selected Is Overview Widget selected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsNode::GetIsOverviewWidgetSelected() const
+{
+   return this->mq_IsOverviewWidgetSelected;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -626,4 +652,26 @@ void C_UsNode::SetSelectedHalcDomain(const QString & orc_Value)
 void C_UsNode::SetSelectedHalcChannel(const QString & orc_Value)
 {
    this->mc_SelectedHalcChannelId = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected Data Logger LogJob Index
+
+   \param[in]  os32_Value   LogJob Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedDataLoggerLogJobIndex(const int32_t os32_Value)
+{
+   this->ms32_SelectedDataLoggerLogJobIndex = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set Is DataLogger Overview Widget selected
+
+   \param[in]  oq_IsOverviewWidgetSelected   IsOverviewWidgetSelected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetIsOverviewWidgetSelected(const bool oq_IsOverviewWidgetSelected)
+{
+   this->mq_IsOverviewWidgetSelected = oq_IsOverviewWidgetSelected;
 }

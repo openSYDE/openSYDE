@@ -565,23 +565,25 @@ void C_SdBueMessagePropertiesWidget::m_CoLoadEdsRestricitions(const C_OscCanMess
          {
             bool q_RoFlag = false;
 
+            const C_OscCanOpenObjectDictionary & rc_EdsContent = pc_Device->GetEdsFileContent();
+
             // Message Tx flag is relative to the device, not the manager when using the EDS file content
             // COB ID
-            pc_Device->c_EdsFileContent.IsCobIdRo(opc_Message->u16_CanOpenManagerPdoIndex,
-                                                  this->mq_CoDeviceIsTransmitter, q_RoFlag);
+            rc_EdsContent.IsCobIdRo(opc_Message->u16_CanOpenManagerPdoIndex,
+                                    this->mq_CoDeviceIsTransmitter, q_RoFlag);
 
             this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(!q_RoFlag);
             this->mpc_Ui->pc_SpinBoxCobId->setEnabled(!q_RoFlag);
             this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setEnabled(!q_RoFlag);
 
             // Transmission type
-            pc_Device->c_EdsFileContent.IsTransmissionTypeRo(opc_Message->u16_CanOpenManagerPdoIndex,
-                                                             this->mq_CoDeviceIsTransmitter, q_RoFlag);
+            rc_EdsContent.IsTransmissionTypeRo(opc_Message->u16_CanOpenManagerPdoIndex,
+                                               this->mq_CoDeviceIsTransmitter, q_RoFlag);
 
             this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(!q_RoFlag);
 
             // Disable SYNC Tx methods in combobox if device does not support the SYNC feature, else enable.
-            if (pc_Device->c_EdsFileContent.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_SYNC) == NULL)
+            if (rc_EdsContent.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_SYNC) == NULL)
             {
                this->mpc_Ui->pc_ComboBoxTxMethod->SetItemState(ms32_TX_TYPE_INDEX_CAN_OPEN_TYPE_1_TO_240, false);
                this->mpc_Ui->pc_ComboBoxTxMethod->SetItemState(ms32_TX_TYPE_INDEX_CAN_OPEN_TYPE_0, false);
@@ -596,16 +598,16 @@ void C_SdBueMessagePropertiesWidget::m_CoLoadEdsRestricitions(const C_OscCanMess
             this->mpc_Ui->pc_SpinBoxCoPdoSyncNumber->setEnabled(!q_RoFlag);
 
             // Inhibit time
-            pc_Device->c_EdsFileContent.IsInhibitTimeRo(opc_Message->u16_CanOpenManagerPdoIndex,
-                                                        this->mq_CoDeviceIsTransmitter, q_RoFlag);
+            rc_EdsContent.IsInhibitTimeRo(opc_Message->u16_CanOpenManagerPdoIndex,
+                                          this->mq_CoDeviceIsTransmitter, q_RoFlag);
 
             this->mpc_Ui->pc_SpinBoxEarly->setEnabled(!q_RoFlag);
 
             // Event time
             // Special case: If the value is 0, the event time is already marked as read only
 
-            pc_Device->c_EdsFileContent.IsEventTimerRo(opc_Message->u16_CanOpenManagerPdoIndex,
-                                                       this->mq_CoDeviceIsTransmitter, q_RoFlag);
+            rc_EdsContent.IsEventTimerRo(opc_Message->u16_CanOpenManagerPdoIndex,
+                                         this->mq_CoDeviceIsTransmitter, q_RoFlag);
 
             if (this->mq_CoDeviceIsTransmitter == true)
             {

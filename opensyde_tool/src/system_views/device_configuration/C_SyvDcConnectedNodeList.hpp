@@ -53,7 +53,7 @@ Q_SIGNALS:
 
 protected:
    void startDrag(const Qt::DropActions oc_Actions) override;
-   QMimeData * mimeData(const QList<QListWidgetItem *> oc_Items) const override;
+   QMimeData * mimeData(const QList<QListWidgetItem *> & orc_Items) const override;
 
 private:
    bool mq_GridSizeSet;

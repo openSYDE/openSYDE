@@ -16,8 +16,6 @@
 #include <QWidget>
 #include <QTimer>
 
-#include "stwtypes.hpp"
-
 #include "C_OgeWiHover.hpp"
 #include "C_SyvUpScene.hpp"
 #include "C_GiSvNodeData.hpp"

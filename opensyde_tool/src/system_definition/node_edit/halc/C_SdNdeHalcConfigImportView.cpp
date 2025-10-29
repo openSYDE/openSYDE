@@ -45,6 +45,7 @@ C_SdNdeHalcConfigImportView::C_SdNdeHalcConfigImportView(QWidget * const opc_Par
    this->setItemDelegate(&this->mc_Delegate);
 
    this->setHeaderHidden(true);
+   this->setMouseTracking(true);
 
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);

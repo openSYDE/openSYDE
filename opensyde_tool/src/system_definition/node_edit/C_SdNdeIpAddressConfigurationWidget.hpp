@@ -14,7 +14,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QLineEdit>
-#include <QRegExpValidator>
 #include "stwtypes.hpp"
 #include "C_OgePopUpDialog.hpp"
 

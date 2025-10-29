@@ -150,12 +150,16 @@
         <file>images/system_views/IconTabCloseClickedDark.svg</file>
         <file>images/system_views/IconTabCloseDark.svg</file>
         <file>images/system_views/IconTabCloseHoverDark.svg</file>
-        <file>images/system_views/dashboards/icons/SpinBoxDownBlue.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxDownDarkBlue.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxDownWhite.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxUpBlue.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxUpDarkBlue.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxUpWhite.png</file>
+        <file>images/system_views/dashboards/icons/SpinBoxDownBlue.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxDownDarkBlue.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxDownGreen.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxDownGrey.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxDownWhite.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxUpBlue.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxUpDarkBlue.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxUpGreen.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxUpGrey.svg</file>
+        <file>images/system_views/dashboards/icons/SpinBoxUpWhite.svg</file>
         <file>images/system_views/dashboards/icons/ProgressBarDownPointerDarkBlue.png</file>
         <file>images/system_views/dashboards/icons/ProgressBarDownPointerGrey.png</file>
         <file>images/system_views/dashboards/icons/ProgressBarDownPointerWhite.png</file>
@@ -171,10 +175,6 @@
         <file>images/STW_Logo_Dark.png</file>
         <file>images/openSYDE_logo.ico</file>
         <file>images/system_views/Device.svg</file>
-        <file>images/system_views/dashboards/icons/SpinBoxDownGreen.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxDownGrey.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxUpGreen.png</file>
-        <file>images/system_views/dashboards/icons/SpinBoxUpGrey.png</file>
         <file>images/IconArrowLeftActiveDark.png</file>
         <file>images/IconArrowRightActiveDark.png</file>
         <file>images/BtnWidgetMaxDark.png</file>

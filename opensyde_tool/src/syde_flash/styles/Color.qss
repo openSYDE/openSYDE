@@ -76,8 +76,11 @@ stw--opensyde_gui_elements--C_OgePubCancel:enabled,
 stw--opensyde_gui_elements--C_OgePubMessageCancel:enabled,
 stw--opensyde_gui_elements--C_OgeTebMessageDetails,
 stw--opensyde_gui_elements--C_CamOgeCbxTable QListView,
+stw--opensyde_gui_elements--C_CamOgeCbxTable QListView::item,
 stw--opensyde_gui_elements--C_CamOgeCbxWhite QListView,
+stw--opensyde_gui_elements--C_CamOgeCbxWhite QListView::item,
 stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView,
+stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView::item,
 stw--opensyde_gui_elements--C_CamOgeGbxMessageGeneratorBackground,
 stw--opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox,
 stw--opensyde_gui_elements--C_OgeGbx,
@@ -432,6 +435,7 @@ stw--opensyde_gui_elements--C_OgeRabProperties[BrightBackground="true"]::indicat
 stw--opensyde_gui_elements--C_OgeChxProperties::indicator:disabled,
 stw--opensyde_gui_elements--C_OgeCbxText,
 stw--opensyde_gui_elements--C_OgeCbxText QListView,
+stw--opensyde_gui_elements--C_OgeCbxText QListView::item,
 stw--opensyde_gui_elements--C_OgeLeProperties,
 stw--opensyde_gui--C_SyvDcConnectedNodeList::item:alternate
 {
@@ -660,7 +664,8 @@ stw--opensyde_gui_elements--C_OgeMuSections,
 stw--opensyde_gui_elements--C_FlaOgePubPathVariables,
 stw--opensyde_gui_elements--C_FlaOgeLeFilePath,
 stw--opensyde_gui_elements--C_CamOgeCbxDark,
-stw--opensyde_gui_elements--C_CamOgeCbxDark QListView
+stw--opensyde_gui_elements--C_CamOgeCbxDark QListView,
+stw--opensyde_gui_elements--C_CamOgeCbxDark QListView::item
 {
 background-color:rgb(59, 59, 81);
 }

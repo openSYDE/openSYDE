@@ -185,6 +185,9 @@ void C_SyvHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t o
    {
       int32_t s32_Index;
 
+      //Store hash during load
+      C_PuiSvHandler::h_GetInstance()->SetAllowViewHashCache(true);
+
       // Deactivate all buttons in the first step
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false));
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, false));
@@ -324,6 +327,9 @@ void C_SyvHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t o
          this->mpc_DashboardsWidget->CheckError();
          this->mpc_DashboardsWidget->show();
       }
+
+      //Reset
+      C_PuiSvHandler::h_GetInstance()->SetAllowViewHashCache(false);
 
       // update of the index values
       this->ms32_SubMode = os32_SubMode;

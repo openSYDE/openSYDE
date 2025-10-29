@@ -314,7 +314,7 @@ void C_SyvUpPacPemFilesListWidget::m_AddFile(const QString & orc_File, const int
       {
          const C_SyvUpPacPemFileEntry * const pc_ItemWidget =
             dynamic_cast<C_SyvUpPacPemFileEntry *>(this->itemWidget(pc_CurrentItem));
-         if ((pc_ItemWidget != NULL) && (pc_ItemWidget->c_FilePath != NULL))
+         if ((pc_ItemWidget != NULL) && (pc_ItemWidget->c_FilePath.isEmpty() == false))
          {
             const QFileInfo c_ExistingFileInfo(pc_ItemWidget->c_FilePath);
             const QString c_AbsoluteExistingFilePath = c_ExistingFileInfo.absoluteFilePath();

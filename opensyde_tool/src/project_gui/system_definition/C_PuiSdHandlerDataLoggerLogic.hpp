@@ -32,7 +32,8 @@ public:
 
    int32_t AddDataLogger(const uint32_t ou32_NodeIndex, const stw::opensyde_core::C_OscDataLoggerJob & orc_Data,
                          const QString * const opc_Name = NULL);
-   int32_t DeleteDataLogger(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
+   int32_t DeleteMultipleDataLoggers(const uint32_t ou32_NodeIndex,
+                                     const std::vector<uint32_t> & orc_DataLoggerJobIndices);
    int32_t SetDataLoggerEnabled(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
                                 const bool oq_Enabled);
    int32_t SetDataLoggerProperties(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex,
@@ -59,6 +60,8 @@ public:
    const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
                   C_PuiSdLastKnownHalElementId> & GetLastKnownHalcCrcs(void) const;
    int32_t CheckAndHandleNewElement(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_NewId);
+   static bool h_RemoveAllIdsForInvalidRoutesForOneNode(const uint32_t ou32_Index,
+                                                        std::vector<stw::opensyde_core::C_OscDataLoggerJob> & orc_Data);
 
 protected:
    C_PuiSdHandlerDataLoggerLogic(QObject * const opc_Parent);

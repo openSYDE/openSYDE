@@ -724,7 +724,8 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
          pc_FileWidget->SetDefaultFile(c_Path);
 
          // Check if a specific path is available
-         if (c_ViewDatablockPaths[this->mu32_DataBlockPathNumber] != "")
+         if ((c_ViewDatablockPaths[this->mu32_DataBlockPathNumber] != "") &&
+             (c_ViewDatablockPaths[this->mu32_DataBlockPathNumber] != c_Path.toStdString()))
          {
             pc_FileWidget->SetAppFile(c_ViewDatablockPaths[this->mu32_DataBlockPathNumber].c_str(), false);
          }

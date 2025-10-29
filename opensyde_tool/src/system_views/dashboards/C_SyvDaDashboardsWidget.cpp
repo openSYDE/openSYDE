@@ -837,10 +837,43 @@ int32_t C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       }
       break;
    case C_COM:
-      orc_Message =
-         static_cast<QString>(C_GtGetText::h_GetText(
-                                 "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                                 "double-click on PC)."));
+      {
+         bool q_IsEthernet = false;
+
+         //Check if ethernet
+         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+         if (pc_View != NULL)
+         {
+            if (pc_View->GetOscPcData().GetConnected())
+            {
+               const C_OscSystemBus * const pc_Bus =
+                  C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
+               if (pc_Bus != NULL)
+               {
+                  if (pc_Bus->e_Type == C_OscSystemBus::eETHERNET)
+                  {
+                     q_IsEthernet = true;
+                  }
+               }
+            }
+         }
+         if (q_IsEthernet)
+         {
+            orc_Message =
+               static_cast<QString>(
+                  C_GtGetText::h_GetText(
+                     "Ethernet initialization failed. Check your Ethernet adapter settings in Windows system network"
+                     " configuration."));
+         }
+         else
+         {
+            orc_Message =
+               static_cast<QString>(C_GtGetText::h_GetText(
+                                       "CAN initialization failed. Check your PC CAN interface configuration "
+                                       "(System View setup - double-click on PC)."));
+         }
+      }
       break;
    case C_CHECKSUM:
       orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal buffer overflow detected."));

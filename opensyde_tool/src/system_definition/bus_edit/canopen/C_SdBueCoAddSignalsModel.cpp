@@ -529,6 +529,10 @@ void C_SdBueCoAddSignalsModel::m_InitSignalNodeContent(C_TblTreItem & orc_Signal
 void C_SdBueCoAddSignalsModel::mh_DecodeIndex(const QModelIndex & orc_ModelIndex, uint32_t & oru32_ObjectIndex,
                                               uint32_t & oru32_SignalIndex, bool & orq_IsSignal)
 {
+   oru32_ObjectIndex = 0UL;
+   oru32_SignalIndex = 0UL;
+   orq_IsSignal = false;
+
    if (orc_ModelIndex.isValid())
    {
       //lint -e{9079} Result of Qt interface restrictions, set by index function
@@ -557,12 +561,6 @@ void C_SdBueCoAddSignalsModel::mh_DecodeIndex(const QModelIndex & orc_ModelIndex
             orq_IsSignal = false;
          }
       }
-   }
-   else
-   {
-      oru32_ObjectIndex = 0UL;
-      oru32_SignalIndex = 0UL;
-      orq_IsSignal = false;
    }
 }
 
@@ -692,7 +690,7 @@ const C_OscCanOpenObjectDictionary * C_SdBueCoAddSignalsModel::m_GetEdsDictionar
 
    if (pc_Device != NULL)
    {
-      pc_Retval = &pc_Device->c_EdsFileContent;
+      pc_Retval = &pc_Device->GetEdsFileContent();
    }
 
    return pc_Retval;

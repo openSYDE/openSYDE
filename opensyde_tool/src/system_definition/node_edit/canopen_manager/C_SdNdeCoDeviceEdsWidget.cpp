@@ -233,11 +233,10 @@ void C_SdNdeCoDeviceEdsWidget::m_SetDetails(void)
 
    if (pc_CanOpenDeviceInfo != NULL)
    {
-      const C_OscCanOpenObjectDictionary c_CanOpenObjDictionary = pc_CanOpenDeviceInfo->c_EdsFileContent;
+      const C_OscCanOpenObjectDictionary c_CanOpenObjDictionary = pc_CanOpenDeviceInfo->GetEdsFileContent();
 
-      this->mpc_Ui->pc_LabFileCurrent->setText(C_GtGetText::h_GetText(pc_CanOpenDeviceInfo->c_EdsFileName.AsStdString()
-                                                                      ->
-                                                                      c_str()));
+      this->mpc_Ui->pc_LabFileCurrent->setText(
+         C_GtGetText::h_GetText(pc_CanOpenDeviceInfo->c_OriginalEdsFileName.AsStdString()->c_str()));
 
       if (C_SdUtil::h_GetEdsFileDetails(c_CanOpenObjDictionary) != "")
       {

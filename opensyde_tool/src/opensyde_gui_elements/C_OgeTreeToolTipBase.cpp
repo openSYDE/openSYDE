@@ -106,7 +106,7 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
                   {
                      this->ms32_HoveredHorzHeader = s32_LogicalIndex;
                      //Update text
-                     this->m_SetMouseTracking(true);
+                     // Do not set mouse tracking here as it could disturb focus handling of persistent editor widgets
                      this->m_GetToolTip()->SetHeading(c_Heading);
                      this->m_GetToolTip()->SetContent(c_Content);
                      this->m_GetToolTip()->SetType(e_Type);
@@ -134,7 +134,7 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
                      this->ms32_HoveredCol = s32_ToolTipCol;
                      this->ms32_HoveredNumberOfParents = mh_CountParents(c_Index);
                      //Update text
-                     this->m_SetMouseTracking(true);
+                     // Do not set mouse tracking here as it could disturb focus handling of persistent editor widgets
                      this->m_GetToolTip()->SetHeading(c_Heading);
                      this->m_GetToolTip()->SetContent(c_Content);
                      this->m_GetToolTip()->SetType(e_Type);

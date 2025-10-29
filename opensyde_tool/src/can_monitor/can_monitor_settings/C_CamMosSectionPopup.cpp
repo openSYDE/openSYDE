@@ -42,7 +42,7 @@ C_CamMosSectionPopup::C_CamMosSectionPopup(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Layout(new QVBoxLayout(this))
 {
-   this->mpc_Layout->setMargin(1); // to make border visible
+   this->mpc_Layout->setContentsMargins(1, 1, 1, 1); // to make border visible
    this->setLayout(mpc_Layout);
 
    //shadow (adopted from context menu)

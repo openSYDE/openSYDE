@@ -15,7 +15,6 @@
 
 #include <vector>
 #include <QItemSelection>
-#include <QRect>
 #include <QPainter>
 #include <QWidget>
 #include <QAbstractItemModel>
@@ -24,7 +23,8 @@
 #include <QAbstractTableModel>
 #include "stwtypes.hpp"
 #include "C_PuiSdNodeDataPoolListElement.hpp"
-#include "C_OscNodeDataPool.hpp"
+#include "C_OscNodeDataPoolListElement.hpp"
+#include "C_OscNodeDataPoolContent.hpp"
 #include "C_OscNodeDataPoolId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */

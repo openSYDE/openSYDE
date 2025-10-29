@@ -488,7 +488,8 @@ int32_t C_OgeWiSpinBoxGroup::m_GetSpinButtonWidth(void) const
    {
       s32_LineEditWidth = this->mpc_Ui->pc_SpinBox64->GetLineEditWidth();
    }
-   s32_Retval = (this->width() - 2) - s32_LineEditWidth;
+   s32_Retval = ((this->width() - 2) - s32_LineEditWidth) + 10 /*10 = padding plus some magic offset*/;
+
    return s32_Retval;
 }
 

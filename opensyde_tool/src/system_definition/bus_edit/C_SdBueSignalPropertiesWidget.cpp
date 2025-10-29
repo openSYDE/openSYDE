@@ -21,12 +21,10 @@
 #include "TglUtils.hpp"
 #include "C_SdUtil.hpp"
 #include "stwerrors.hpp"
-#include "C_OscUtils.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_SdTooltipUtil.hpp"
-#include "C_OgeSpxInt64Table.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_OscNodeDataPoolContentUtil.hpp"
@@ -505,8 +503,8 @@ void C_SdBueSignalPropertiesWidget::m_CoLoadEdsRestricitions(void)
 
             // Message Tx flag is relative to the device, not the manager when using the EDS file content
             // PDO Mapping
-            pc_Manager->c_EdsFileContent.IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
-                                                        !this->mc_MessageId.q_MessageIsTx, q_RoFlag);
+            pc_Manager->GetEdsFileContent().IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+                                                           !this->mc_MessageId.q_MessageIsTx, q_RoFlag);
 
             this->mpc_Ui->pc_SpinBoxStartBit->setEnabled(!q_RoFlag);
          }

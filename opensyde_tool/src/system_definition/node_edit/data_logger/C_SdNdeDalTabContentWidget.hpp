@@ -41,6 +41,7 @@ public:
    void SetNode(const uint32_t ou32_NodeIndex);
    void Save(void);
    void SetNodeDataLoggerJob(const uint32_t ou32_LogJobIndex);
+   void LoadSelectedLogJob(const uint32_t ou32_LogJobIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -56,6 +57,7 @@ private:
    void m_UpdateUi(void);
    void m_NumDataLoggersChanged(void);
    void m_HandleNoDataLoggersLabel(void);
+   void m_ShowOverview(const bool oq_Show);
 
    //Avoid call
    C_SdNdeDalTabContentWidget(const C_SdNdeDalTabContentWidget &);

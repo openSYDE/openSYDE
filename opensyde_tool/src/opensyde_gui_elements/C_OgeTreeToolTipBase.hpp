@@ -41,7 +41,6 @@ protected:
    virtual const QHeaderView * m_Header(void) const = 0;
    virtual const QAbstractItemModel * m_Model(void) const = 0;
    virtual bool m_BaseEvent(QEvent * const opc_Event) = 0;
-   virtual void m_SetMouseTracking(const bool oq_Active) = 0;
    virtual QModelIndex m_IndexAtGlobalPos(const QPoint & orc_GlobalPos) const = 0;
 
 private:

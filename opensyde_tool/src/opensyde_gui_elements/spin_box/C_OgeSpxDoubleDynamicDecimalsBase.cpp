@@ -66,7 +66,7 @@ C_OgeSpxDoubleDynamicDecimalsBase::C_OgeSpxDoubleDynamicDecimalsBase(QWidget * c
 QString C_OgeSpxDoubleDynamicDecimalsBase::textFromValue(const float64_t of64_Value) const
 {
    QString c_StringFromValue;
-   QChar c_DecimalSeparator;
+   QString c_DecimalSeparator;
 
    c_StringFromValue = C_Uti::h_GetStringFromDouble(of64_Value);
 

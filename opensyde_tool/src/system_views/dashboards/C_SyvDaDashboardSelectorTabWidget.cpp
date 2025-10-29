@@ -1318,7 +1318,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32_t ou32_Data
          {
             // Only check the coordinates when loading the tear off state. It can be possible, that the
             // monitor setup of the user has changed
-            C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Pos, c_Size, QSize(1000, 800));
+            C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(
+               c_Pos, c_Size, QGuiApplication::screens().indexOf(this->screen()), QSize(1000, 800));
          }
          pc_Widget->setGeometry(QRect(c_Pos, c_Size));
          pc_Widget->SetEditMode(this->mq_EditMode);

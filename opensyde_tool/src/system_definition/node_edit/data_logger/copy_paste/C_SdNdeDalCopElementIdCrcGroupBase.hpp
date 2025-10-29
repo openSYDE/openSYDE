@@ -10,6 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
+#include "C_OscNodeDataPoolListElementOptArrayId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -36,6 +37,8 @@ protected:
    uint32_t mu32_Crc;
 
    virtual int32_t m_CalcCrc(uint32_t & oru32_Result) const = 0;
+   static int32_t mh_CalcCrcDataPoolElement(uint32_t & oru32_Result,
+                                            const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

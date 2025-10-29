@@ -45,5 +45,4 @@ C_OgeTawSelector::C_OgeTawSelector(QWidget * const opc_Parent) :
 {
    //This property holds when expanding is true QTabBar will expand the tabs to use the empty space.
    this->tabBar()->setExpanding(false);
-   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->tabBar(), "C_OgeTawSelector", true);
 }

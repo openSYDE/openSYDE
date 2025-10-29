@@ -11,7 +11,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMainWindow>
 #include <QTimer>
-#include <QWinTaskbarProgress>
 
 #include "C_Can.hpp"
 #include "C_FlaSenDcBasicSequences.hpp"
@@ -41,7 +40,6 @@ public:
    ~C_FlaMainWindow(void) override;
 
 protected:
-   void showEvent(QShowEvent * const opc_Event) override;
    void closeEvent(QCloseEvent * const opc_Event) override;
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
 
@@ -73,11 +71,9 @@ private:
    void m_SetProgressBarColor(const bool & orq_Success) const;
 
    uint32_t m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage);
-   void m_InitWinTaskbar(void);
    bool m_ErrorDetected(const bool & orq_ShowErrorMessage);
    void m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage);
    void m_UpdateFileIcon(const uint32_t & oru32_FileIndex, const uint8_t & oru8_ProgressState) const;
-   void m_UpdateWinProgress(const bool & orq_Visible, const uint8_t & oru8_Value);
    uint8_t m_CalcualteTotalProgressInPercentage(void) const;
    void m_ResetProgressBar();
    void m_ResetFileIcons() const;
@@ -103,8 +99,6 @@ private:
    uint64_t mu64_FlashedBytes;
    uint32_t mu32_FlashedBytesTmp;
    bool mq_NewFile;
-
-   QWinTaskbarProgress * mpc_Progress;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

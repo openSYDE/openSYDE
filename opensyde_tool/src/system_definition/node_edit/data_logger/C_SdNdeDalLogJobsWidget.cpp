@@ -19,12 +19,14 @@
 #include "C_SdNdeDalLogJobsWidget.hpp"
 #include "ui_C_SdNdeDalLogJobsWidget.h"
 #include "C_OscDataLoggerJob.hpp"
+#include "C_SdNdeDalCopClipBoardHelper.hpp"
 #include "C_OscDataLoggerJobProperties.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_Uti.hpp"
 #include "TglUtils.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_core;
@@ -57,7 +59,9 @@ C_SdNdeDalLogJobsWidget::C_SdNdeDalLogJobsWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDalLogJobsWidget),
    mu32_NodeIndex(0),
-   mpc_ContextMenu(NULL)
+   mu32_CurrentLogJobIndex(0),
+   mpc_ContextMenu(NULL),
+   mq_IsOverviewVisible(false)
 {
    this->mpc_Ui->setupUi(this);
    this->InitStaticNames();
@@ -65,7 +69,6 @@ C_SdNdeDalLogJobsWidget::C_SdNdeDalLogJobsWidget(QWidget * const opc_Parent) :
 
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "C_SdNdeDalLogJobsWidget", true);
 
-   this->mpc_Ui->pc_WidgetBackground->SetBackgroundColor(11);
    const QSize c_ICON_SIZE(16, 16);
    this->mpc_Ui->pc_PushButtonAdd->setIconSize(c_ICON_SIZE);
    this->mpc_Ui->pc_PushButtonAdd->SetSvg("://images/IconAddEnabled.svg", "://images/IconAddDisabled.svg",
@@ -74,17 +77,19 @@ C_SdNdeDalLogJobsWidget::C_SdNdeDalLogJobsWidget(QWidget * const opc_Parent) :
 
    this->mpc_Ui->pc_JobsListView->setFrameStyle(static_cast<int32_t>(QFrame::NoFrame));
 
-   //   this->mpc_Ui->pc_LabelLogJobs->setFont(mc_STYLE_GUIDE_FONT_SEMIBOLD_13);
-   //   this->mpc_Ui->pc_LabelLogJobs->setFont(C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_24));
-   this->mpc_Ui->pc_LabelLogJobs->SetFontPixel(13, true, false);
-   this->mpc_Ui->pc_LabelLogJobs->SetForegroundColor(4);
+   // overview button
+   this->mpc_Ui->pc_PbLogJobsOverview->setCheckable(true);
+   this->mpc_Ui->pc_PbLogJobsOverview->setChecked(true); // start with overview
+   this->mq_IsOverviewVisible = true;
 
    connect(this->mpc_Ui->pc_JobsListView, &C_SdNdeDalLogJobsListView::SigDataChanged, this,
            &C_SdNdeDalLogJobsWidget::m_OnLogJobStateChanged);
    connect(this->mpc_Ui->pc_JobsListView, &C_SdNdeDalLogJobsListView::SigSelectionChanged, this,
-           &C_SdNdeDalLogJobsWidget::SigSelectionChanged);
+           &C_SdNdeDalLogJobsWidget::m_LogJobSelectionChanged);
 
    connect(this->mpc_Ui->pc_PushButtonAdd, &QPushButton::clicked, this, &C_SdNdeDalLogJobsWidget::m_OnAddLogJob);
+   connect(this->mpc_Ui->pc_PbLogJobsOverview, &QPushButton::clicked, this,
+           &C_SdNdeDalLogJobsWidget::m_OnOverviewClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -103,27 +108,68 @@ C_SdNdeDalLogJobsWidget::~C_SdNdeDalLogJobsWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobsWidget::InitStaticNames() const
 {
-   this->mpc_Ui->pc_LabelLogJobs->setText(C_GtGetText::h_GetText("Log Jobs"));
+   // overview
+   this->mpc_Ui->pc_PbLogJobsOverview->setText(C_GtGetText::h_GetText("Log Jobs"));
+   this->mpc_Ui->pc_PbLogJobsOverview->
+   SetToolTipInformation(C_GtGetText::h_GetText("Log Jobs Overview"),
+                         C_GtGetText::h_GetText("Show overview of all Log Jobs."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{9175} TODO
-void C_SdNdeDalLogJobsWidget::LoadUserSettings() const
+void C_SdNdeDalLogJobsWidget::LoadUserSettings()
 {
-   //TODO
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      const C_UsNode c_UsNode = C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
+
+      // If a valid log job index exists in user settings
+      if (c_UsNode.GetSelectedDataLoggerLogJobIndex() >= 0)
+      {
+         this->mu32_CurrentLogJobIndex = c_UsNode.GetSelectedDataLoggerLogJobIndex();
+      }
+
+      // if log jobs overview was previously Not selected
+      if (!c_UsNode.GetIsOverviewWidgetSelected())
+      {
+         this->mpc_Ui->pc_JobsListView->SetSelection(C_SdNdeDalLogJobsListView::eSELECTINDEX,
+                                                     this->mu32_CurrentLogJobIndex);
+         this->m_ShowOverview(false);
+      }
+      else
+      {
+         this->m_ShowOverview(true);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Save user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{9175} TODO
 void C_SdNdeDalLogJobsWidget::SaveUserSettings() const
 {
-   //TODO
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      if (!this->mpc_Ui->pc_PbLogJobsOverview->isChecked())
+      {
+         C_UsHandler::h_GetInstance()->SetProjSdNodeSelectedDataLoggerLogJobIndex(
+            pc_Node->c_Properties.c_Name.c_str(), this->mu32_CurrentLogJobIndex);
+      }
+      else
+      {
+         C_UsHandler::h_GetInstance()->SetProjSdNodeSelectedDataLoggerLogJobIndex(
+            pc_Node->c_Properties.c_Name.c_str(), -1);
+      }
+      C_UsHandler::h_GetInstance()->SetProjSdNodeIsOverviewWidgetSelected(
+         pc_Node->c_Properties.c_Name.c_str(), this->mpc_Ui->pc_PbLogJobsOverview->isChecked());
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -164,7 +210,7 @@ void C_SdNdeDalLogJobsWidget::LoadLogJobs(void)
       }
       else
       {
-         this->mpc_Ui->pc_LabelLogJobs->setText(C_GtGetText::h_GetText("Log Jobs"));
+         this->mpc_Ui->pc_PbLogJobsOverview->setText(C_GtGetText::h_GetText("Log Jobs"));
          this->mpc_Ui->pc_PushButtonAdd->setVisible(false);
          this->mpc_Ui->pc_JobsListView->setVisible(false);
       }
@@ -186,6 +232,17 @@ void C_SdNdeDalLogJobsWidget::OnLogJobNameModified()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load selected LogJob from Overview widget
+
+   \param[in]  ou32_LogJobIndex     LogJob index to load
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::LoadSelectedLogJob(const uint32_t ou32_LogJobIndex)
+{
+   this->mpc_Ui->pc_JobsListView->SetSelection(C_SdNdeDalLogJobsListView::eSELECTINDEX, ou32_LogJobIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot for Log job state change.
  *
  *  \param[in]  orc_Index     Index of the selected log job in the list view
@@ -193,7 +250,7 @@ void C_SdNdeDalLogJobsWidget::OnLogJobNameModified()
  *
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobsWidget::m_OnLogJobStateChanged(const QModelIndex orc_Index, const bool oq_IsEnabled)
+void C_SdNdeDalLogJobsWidget::m_OnLogJobStateChanged(const QModelIndex & orc_Index, const bool oq_IsEnabled)
 {
    const C_OscDataLoggerJob * const pc_Retval = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
       this->mu32_NodeIndex, static_cast<uint32_t>(orc_Index.row()));
@@ -223,6 +280,77 @@ void C_SdNdeDalLogJobsWidget::m_OnAddLogJob()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On cut log job
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_OnCutLogJob()
+{
+   m_OnCopyLogJob();
+   m_OnDeleteLogJob();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On copy log job
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_OnCopyLogJob()
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      const QModelIndexList c_SelectedIndexes = this->mpc_Ui->pc_JobsListView->selectionModel()->selectedIndexes();
+      if (c_SelectedIndexes.size() > 0L)
+      {
+         std::vector<C_OscDataLoggerJob> c_Data;
+         for (QModelIndexList::ConstIterator c_It = c_SelectedIndexes.cbegin(); c_It != c_SelectedIndexes.cend();
+              ++c_It)
+         {
+            const uint32_t u32_SelectedLogJobIndex = c_It->row();
+            if (u32_SelectedLogJobIndex < pc_Node->c_DataLoggerJobs.size())
+            {
+               c_Data.push_back(pc_Node->c_DataLoggerJobs[u32_SelectedLogJobIndex]);
+            }
+         }
+         if (c_Data.size() > 0UL)
+         {
+            C_SdNdeDalCopClipBoardHelper::h_StoreDataloggerToClipboard(c_Data);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On paste log job
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_OnPasteLogJob()
+{
+   std::vector<C_OscDataLoggerJob> c_Data;
+   if (C_SdNdeDalCopClipBoardHelper::h_LoadDataloggerFromClipboardRemoveInvalidIdsAndReportChanges(
+          mu32_NodeIndex,
+          c_Data,
+          this) ==
+       C_NO_ERR)
+   {
+      if (c_Data.size() > 0UL)
+      {
+         for (uint32_t u32_ItNew = 0UL; u32_ItNew < c_Data.size(); ++u32_ItNew)
+         {
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->AddDataLogger(mu32_NodeIndex, c_Data[u32_ItNew],
+                                                                      NULL) == C_NO_ERR);
+         }
+
+         this->LoadLogJobs();
+
+         this->mpc_Ui->pc_JobsListView->SetSelection(C_SdNdeDalLogJobsListView::eLOGJOB_ADDED);
+
+         Q_EMIT this->SigNumLogJobsChanged();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete data logger job
 
 */
@@ -231,17 +359,37 @@ void C_SdNdeDalLogJobsWidget::m_OnDeleteLogJob()
 {
    if (this->mpc_Ui->pc_JobsListView->IsEmpty() == false)
    {
-      const uint32_t u32_SelectedLogJobIndex = this->mpc_Ui->pc_JobsListView->currentIndex().row();
-      const int32_t s32_Retval = C_PuiSdHandler::h_GetInstance()->DeleteDataLogger(this->mu32_NodeIndex,
-                                                                                   u32_SelectedLogJobIndex);
-      if (s32_Retval == C_NO_ERR)
+      const QModelIndexList c_SelectedIndexes = this->mpc_Ui->pc_JobsListView->selectionModel()->selectedIndexes();
+
+      if (c_SelectedIndexes.size() > 0L)
       {
-         this->mpc_Ui->pc_JobsListView->DeleteLogJob(u32_SelectedLogJobIndex);
+         std::vector<uint32_t> c_SelectedItems;
+         for (QModelIndexList::ConstIterator c_It = c_SelectedIndexes.cbegin(); c_It != c_SelectedIndexes.cend();
+              ++c_It)
+         {
+            c_SelectedItems.push_back(c_It->row());
+         }
 
-         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-         this->m_UpdateLogJobCountLabel(pc_Node->c_DataLoggerJobs.size());
+         // Delete log jobs from backend i.e. data repository
+         const int32_t s32_Retval = C_PuiSdHandler::h_GetInstance()->DeleteMultipleDataLoggers(this->mu32_NodeIndex,
+                                                                                               c_SelectedItems);
+         // Delete log jobs from front end i.e model / view
+         if (s32_Retval == C_NO_ERR)
+         {
+            this->mpc_Ui->pc_JobsListView->DeleteLogJobs(c_SelectedItems);
 
-         Q_EMIT this->SigNumLogJobsChanged();
+            const C_OscNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+            this->m_UpdateLogJobCountLabel(pc_Node->c_DataLoggerJobs.size());
+
+            // if all log jobs are deleted, show the overview
+            if (pc_Node->c_DataLoggerJobs.size() == 0)
+            {
+               this->m_ShowOverview(true);
+            }
+
+            Q_EMIT this->SigNumLogJobsChanged();
+         }
       }
    }
 }
@@ -259,6 +407,19 @@ void C_SdNdeDalLogJobsWidget::m_SetupContextMenu()
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                        "Add new Log Job"), this, &C_SdNdeDalLogJobsWidget::m_OnAddLogJob,
                                     static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_Plus));
+
+   // separating line
+   this->mpc_ContextMenu->addSeparator();
+
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                       "Cut"), this, &C_SdNdeDalLogJobsWidget::m_OnCutLogJob,
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_X));
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                       "Copy"), this, &C_SdNdeDalLogJobsWidget::m_OnCopyLogJob,
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
+   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                       "Paste"), this, &C_SdNdeDalLogJobsWidget::m_OnPasteLogJob,
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_V));
 
    // separating line
    this->mpc_ContextMenu->addSeparator();
@@ -300,11 +461,64 @@ void C_SdNdeDalLogJobsWidget::m_UpdateLogJobCountLabel(const uint32_t ou32_LogJo
    const QString c_LogJobsCount = static_cast<QString>(C_GtGetText::h_GetText("Log Jobs (%1)")).arg(
       ou32_LogJobCount);
 
-   this->mpc_Ui->pc_LabelLogJobs->setText(c_LogJobsCount);
+   this->mpc_Ui->pc_PbLogJobsOverview->setText(c_LogJobsCount);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  brief  Overwritten key press event slot
+/*! \brief  Show or hide overview widget
+
+   Show or hide log job edit widget inversely.
+
+   \param[in]  oq_Show  true: show overview widget and hide log job edit widget; false inverse
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_ShowOverview(const bool oq_Show)
+{
+   if (oq_Show == true)
+   {
+      this->mpc_Ui->pc_WidgetBackground->SetBackgroundColor(10);
+      this->mpc_Ui->pc_JobsListView->selectionModel()->clearSelection();
+      this->mpc_Ui->pc_JobsListView->setCurrentIndex(QModelIndex()); // reset
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetBackground->SetBackgroundColor(11);
+   }
+   this->mpc_Ui->pc_PbLogJobsOverview->setChecked(oq_Show);
+   this->mq_IsOverviewVisible = oq_Show;
+
+   Q_EMIT this->SigShowOverview(oq_Show);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for overview button click.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_OnOverviewClicked()
+{
+   this->m_ShowOverview(true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load selected LogJob on Selection changed
+
+   \param[in]  ou32_LogJobIndex     LogJob index to load
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsWidget::m_LogJobSelectionChanged(const uint32_t ou32_LogJobIndex)
+{
+   this->mu32_CurrentLogJobIndex = ou32_LogJobIndex;
+
+   // If Overview widget not already hidden, hide it
+   if (this->mq_IsOverviewVisible)
+   {
+      this->m_ShowOverview(false);
+   }
+   Q_EMIT (this->SigSelectionChanged(ou32_LogJobIndex));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
@@ -325,6 +539,27 @@ void C_SdNdeDalLogJobsWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          this->m_OnAddLogJob();
       }
       break;
+   case Qt::Key_V:
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOriginal = false;
+         this->m_OnPasteLogJob();
+      }
+      break;
+   case Qt::Key_C:
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOriginal = false;
+         this->m_OnCopyLogJob();
+      }
+      break;
+   case Qt::Key_X:
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOriginal = false;
+         this->m_OnCutLogJob();
+      }
+      break;
    case Qt::Key_Delete:
       q_CallOriginal = false;
       this->m_OnDeleteLogJob();
@@ -333,7 +568,7 @@ void C_SdNdeDalLogJobsWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       break;
    }
 
-   if (q_CallOriginal == true)
+   if (q_CallOriginal)
    {
       QWidget::keyPressEvent(opc_KeyEvent);
    }

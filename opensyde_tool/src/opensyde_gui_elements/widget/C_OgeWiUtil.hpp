@@ -40,7 +40,7 @@ public:
                                                                const QVariant & orc_Value);
    static void h_SetWindowIcon(QWidget * const opc_Widget);
    static void h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition, QSize & orc_Size,
-                                                  const QSize & orc_DefaultSize,
+                                                  const uint32_t ou32_ScreenIndex, const QSize & orc_DefaultSize,
                                                   const bool oq_AddLogEntryForWindowSize = false);
    static int32_t h_UpdateFontSize(QWidget * const opc_Widget, const QString & orc_Text,
                                    const float32_t of32_HeightScaling = 1.0F,

@@ -34,7 +34,7 @@
    </font>
   </property>
   <property name="focusPolicy">
-   <enum>Qt::ClickFocus</enum>
+   <enum>Qt::FocusPolicy::ClickFocus</enum>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -68,10 +68,10 @@
        <item>
         <spacer name="pc_HorizontalSpacerTop1">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Fixed</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -100,7 +100,7 @@
        <item>
         <spacer name="pc_HorizontalSpacerTop2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -115,10 +115,10 @@
      <item>
       <spacer name="pc_VerticalSpacer">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>QSizePolicy::Policy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -188,7 +188,7 @@
         <item>
          <widget class="stw::opensyde_gui_elements::C_OgeSaNaviBar" name="pc_ScrollArea">
           <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
+           <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
@@ -199,7 +199,7 @@
              <x>0</x>
              <y>0</y>
              <width>284</width>
-             <height>360</height>
+             <height>359</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="pc_VerticalLayout2" stretch="1,1">
@@ -282,7 +282,7 @@
                   <item>
                    <widget class="stw::opensyde_gui_elements::C_OgeSpiHorizontalNavigation" name="pc_Splitter">
                     <property name="orientation">
-                     <enum>Qt::Vertical</enum>
+                     <enum>Qt::Orientation::Vertical</enum>
                     </property>
                     <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="groupBox_8">
                      <property name="title">
@@ -361,7 +361,7 @@
                             <item>
                              <spacer name="horizontalSpacer_3">
                               <property name="orientation">
-                               <enum>Qt::Horizontal</enum>
+                               <enum>Qt::Orientation::Horizontal</enum>
                               </property>
                               <property name="sizeHint" stdset="0">
                                <size>
@@ -407,7 +407,7 @@
                                <item>
                                 <spacer name="horizontalSpacer_8">
                                  <property name="orientation">
-                                  <enum>Qt::Horizontal</enum>
+                                  <enum>Qt::Orientation::Horizontal</enum>
                                  </property>
                                  <property name="sizeHint" stdset="0">
                                   <size>
@@ -419,6 +419,18 @@
                                </item>
                                <item>
                                 <widget class="stw::opensyde_gui_elements::C_OgeLabNavigationSubHeading" name="pc_LabelNodes">
+                                 <property name="minimumSize">
+                                  <size>
+                                   <width>0</width>
+                                   <height>14</height>
+                                  </size>
+                                 </property>
+                                 <property name="maximumSize">
+                                  <size>
+                                   <width>16777215</width>
+                                   <height>14</height>
+                                  </size>
+                                 </property>
                                  <property name="text">
                                   <string>TextLabel</string>
                                  </property>
@@ -427,7 +439,7 @@
                                <item>
                                 <spacer name="horizontalSpacer_7">
                                  <property name="orientation">
-                                  <enum>Qt::Horizontal</enum>
+                                  <enum>Qt::Orientation::Horizontal</enum>
                                  </property>
                                  <property name="sizeHint" stdset="0">
                                   <size>
@@ -537,7 +549,7 @@
                             <item>
                              <spacer name="horizontalSpacer_4">
                               <property name="orientation">
-                               <enum>Qt::Horizontal</enum>
+                               <enum>Qt::Orientation::Horizontal</enum>
                               </property>
                               <property name="sizeHint" stdset="0">
                                <size>
@@ -583,7 +595,7 @@
                                <item>
                                 <spacer name="horizontalSpacer_6">
                                  <property name="orientation">
-                                  <enum>Qt::Horizontal</enum>
+                                  <enum>Qt::Orientation::Horizontal</enum>
                                  </property>
                                  <property name="sizeHint" stdset="0">
                                   <size>
@@ -603,7 +615,7 @@
                                <item>
                                 <spacer name="horizontalSpacer_5">
                                  <property name="orientation">
-                                  <enum>Qt::Horizontal</enum>
+                                  <enum>Qt::Orientation::Horizontal</enum>
                                  </property>
                                  <property name="sizeHint" stdset="0">
                                   <size>
@@ -740,7 +752,7 @@
               <item>
                <spacer name="horizontalSpacer">
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -755,10 +767,10 @@
                 <item>
                  <spacer name="verticalSpacer_2">
                   <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                   <enum>Qt::Orientation::Vertical</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
+                   <enum>QSizePolicy::Policy::Fixed</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -790,7 +802,7 @@
                 <item>
                  <spacer name="verticalSpacer">
                   <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                   <enum>Qt::Orientation::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -805,7 +817,7 @@
               <item>
                <spacer name="horizontalSpacer_2">
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -944,10 +956,10 @@
              <item>
               <spacer name="pc_HorizontalSpacerLogoLeft">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -970,7 +982,7 @@
              <item>
               <spacer name="pc_HorizontalSpacerLogoRight">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>

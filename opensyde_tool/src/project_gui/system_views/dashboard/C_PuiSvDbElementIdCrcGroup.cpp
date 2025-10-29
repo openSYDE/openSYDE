@@ -13,7 +13,6 @@
 #include "precomp_headers.hpp"
 
 #include "stwerrors.hpp"
-#include "C_SclChecksums.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_PuiSvDbElementIdCrcGroup.hpp"
 
@@ -92,42 +91,9 @@ int32_t C_PuiSvDbElementIdCrcGroup::m_CalcCrc(uint32_t & oru32_Result) const
 {
    int32_t s32_Retval = C_NO_ERR;
 
-   oru32_Result = 0xFFFFFFFFU;
-
    if (this->mc_ElementId.GetIsValid())
    {
-      const C_OscNodeDataPoolListElement * const pc_OscListElement =
-         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_ElementId.u32_NodeIndex,
-                                                                    this->mc_ElementId.u32_DataPoolIndex,
-                                                                    this->mc_ElementId.u32_ListIndex,
-                                                                    this->mc_ElementId.u32_ElementIndex);
-      const C_PuiSdNodeDataPoolListElement * const pc_UiListElement =
-         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(this->mc_ElementId.u32_NodeIndex,
-                                                                   this->mc_ElementId.u32_DataPoolIndex,
-                                                                   this->mc_ElementId.u32_ListIndex,
-                                                                   this->mc_ElementId.u32_ElementIndex);
-
-      if ((pc_OscListElement != NULL) && (pc_UiListElement != NULL))
-      {
-         const uint32_t u32_Val = pc_OscListElement->GetArraySize();
-         //Data element core
-         if (this->mc_ElementId.GetUseArrayElementIndex())
-         {
-            pc_OscListElement->CalcHashElement(oru32_Result, this->mc_ElementId.GetArrayElementIndexOrZero());
-         }
-         else
-         {
-            pc_OscListElement->CalcHash(oru32_Result);
-         }
-         //Include array size
-         stw::scl::C_SclChecksums::CalcCRC32(&u32_Val, sizeof(u32_Val), oru32_Result);
-         //Data element UI
-         pc_UiListElement->CalcHash(oru32_Result);
-      }
-      else
-      {
-         s32_Retval = C_CONFIG;
-      }
+      s32_Retval = mh_CalcCrcDataPoolElement(oru32_Result, this->mc_ElementId);
       //Signal part
       if (this->mc_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)
       {
@@ -153,6 +119,7 @@ int32_t C_PuiSvDbElementIdCrcGroup::m_CalcCrc(uint32_t & oru32_Result) const
    else
    {
       //No error because these can be copied
+      oru32_Result = 0xFFFFFFFFU;
    }
 
    return s32_Retval;

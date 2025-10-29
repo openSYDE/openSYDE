@@ -131,7 +131,7 @@ void C_GiSyBaseWidget::SetWidget(QWidget * const opc_Widget)
       pc_Layout->addWidget(opc_Widget);
       s32_Index = pc_Layout->indexOf(opc_Widget);
       pc_Layout->setStretch(s32_Index, 1);
-      pc_Layout->setMargin(0);
+      pc_Layout->setContentsMargins(0, 0, 0, 0);
    } //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
 }
 

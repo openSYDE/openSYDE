@@ -13,7 +13,6 @@
 #include <QWidget>
 #include <QTimer>
 #include <QWindow>
-#include <QScreen>
 
 #include "stwtypes.hpp"
 

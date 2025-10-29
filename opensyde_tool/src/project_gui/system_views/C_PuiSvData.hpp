@@ -20,6 +20,7 @@
 #include "C_PuiSvPc.hpp"
 #include "C_PuiSvDashboard.hpp"
 #include "C_OscViewNodeUpdate.hpp"
+#include "C_PuiSvHashCacheHandling.hpp"
 #include "C_PuiSvReadDataConfiguration.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -44,6 +45,7 @@ public:
    C_PuiSvData(void);
 
    void CalcHash(uint32_t & oru32_HashValue) const override;
+   uint32_t GetHash(void);
 
    bool GetServiceModeActive(void) const;
    bool GetServiceModeSetupActive(void) const;
@@ -163,6 +165,7 @@ public:
    void SetPcConnection(const C_PuiBsLineBase & orc_Line);
    void SetPcCanDllType(const C_PuiSvPc::E_CanDllType oe_DllType);
    void SetPcCanDllPath(const QString & orc_DllPath);
+   void SetAllowHashCache(const bool oq_NewValue);
 
    //Add
    int32_t AddReadRailItem(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id,
@@ -225,6 +228,7 @@ protected:
    std::vector<C_PuiSvDashboard> mc_Dashboards; ///< Dashboard data
 
 private:
+   C_PuiSvHashCacheHandling mc_ViewHashCache;
    C_PuiSvPc mc_PuiPcData; ///< Data for PC element
 
    uint16_t mu16_UpdateRateFast;

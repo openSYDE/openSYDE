@@ -22,6 +22,7 @@
 #include "C_SdBueJ1939AddMessagesFromCatalogTreeModel.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OscCanUtil.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -123,7 +124,8 @@ void C_SdBueJ1939AddMessagesFromCatalogTreeModel::m_FillMessageInfo()
          C_TblTreeModelCheckableItem * const pc_MessageItem = new C_TblTreeModelCheckableItem();
          pc_MessageItem->c_Name = c_MessageData.c_J1939Pgn.toString();
          pc_MessageItem->u32_Index = u32_MessageIndex; // Message index in the vector
-         pc_MessageItem->c_Icon = QIcon(":images/system_definition/IconMessage.svg");
+         pc_MessageItem->c_Icon =
+            C_SdUtil::h_InitStaticIconSvg(":images/system_definition/IconMessage.svg", QSize(16, 16));
 
          pc_MessageItem->q_CheckBoxVisible = true;
          pc_MessageItem->e_CheckState = Qt::Unchecked;

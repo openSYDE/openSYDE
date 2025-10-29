@@ -402,6 +402,21 @@ void C_PuiSvHandler::SetServiceModeActive(const bool oq_NewValue)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set allow view hash cache
+
+   \param[in]  oq_NewValue    New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::SetAllowViewHashCache(const bool oq_NewValue)
+{
+   for (uint32_t u32_ViewIndex = 0UL; u32_ViewIndex < this->mc_Views.size(); ++u32_ViewIndex)
+   {
+      C_PuiSvData & rc_View = this->mc_Views[u32_ViewIndex];
+      rc_View.SetAllowHashCache(oq_NewValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view name
 
    \param[in]  ou32_Index  View index
@@ -3295,14 +3310,14 @@ int32_t C_PuiSvHandler::AddViewDashboardParamNewDataPoolElement(const uint32_t o
    Hash for view
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32_t C_PuiSvHandler::GetViewHash(const uint32_t ou32_ViewIndex) const
+uint32_t C_PuiSvHandler::GetViewHash(const uint32_t ou32_ViewIndex)
 {
    uint32_t u32_Retval = 0xFFFFFFFFU;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      const C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      rc_View.CalcHash(u32_Retval);
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      u32_Retval = rc_View.GetHash();
    }
    return u32_Retval;
 }

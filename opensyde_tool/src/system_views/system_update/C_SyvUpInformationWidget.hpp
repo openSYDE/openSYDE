@@ -12,7 +12,6 @@
 #include <QWidget>
 #include <QTimer>
 #include <QElapsedTimer>
-#include <QWinTaskbarProgress>
 
 #include "C_OscSuSequences.hpp"
 #include "C_SyvUpDeviceInfo.hpp"
@@ -96,7 +95,6 @@ private:
    void m_UpdateLabel(void) const;
    void m_UpdateEstimatedWaitTime(const bool oq_IncludesCurrentNodeStatus);
    void m_UpdateDataRate(void);
-   void m_UpdateWinProgress(const bool oq_Visible, const int32_t os32_Value);
    void m_UpdateProgressVisualization(const uint16_t ou16_Progress100, const bool oq_Finished = false) const;
 
    void m_HideBigUpdateSummary(void) const;
@@ -107,7 +105,6 @@ private:
 
    QTimer mc_Timer;
    QElapsedTimer mc_ElapsedTimer;
-   QWinTaskbarProgress * mpc_Progress;
    stw::opensyde_gui_logic::C_SyvUpFileSizeInformation mc_FileSizeInformation;
    uint32_t mu32_ItFile;
    uint32_t mu32_ItParamFile;

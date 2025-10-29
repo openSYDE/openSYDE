@@ -68,7 +68,7 @@ min-height: 17px;
 /* NaviPage TabWidget */
 stw--opensyde_gui_elements--C_OgeTawPageNavi QTabBar,
 stw--opensyde_gui_elements--C_OgeTawAlternative QTabBar,
-stw--opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"],
+stw--opensyde_gui_elements--C_OgeTawSelector QTabBar,
 stw--opensyde_gui--C_SyvDaDashboardSelectorTabBar,
 stw--opensyde_gui--C_SyvDaDashboardSelectorTabWidget::pane,
 stw--opensyde_gui_elements--C_OgeTawPageNavi::pane,
@@ -101,17 +101,18 @@ stw--opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab[OnlyOneItem="true"]
 margin-left: 20px;
 }
 
-stw--opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab,
-stw--opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab:selected
+stw--opensyde_gui_elements--C_OgeTawSelector QTabBar::tab,
+stw--opensyde_gui_elements--C_OgeTawSelector QTabBar::tab:selected
 {
 border-style: none;
 margin-right: 5px;
+padding-top: 1px;
 padding-bottom: 4px;
 min-height: 36px;
 min-width: 200px;
 }
 
-stw--opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab:first
+stw--opensyde_gui_elements--C_OgeTawSelector QTabBar::tab:first
 {
 margin-left: 9px;
 }

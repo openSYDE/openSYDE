@@ -73,9 +73,8 @@ private:
    bool mq_IsShown;
 
    // react on changes of the item checkbox
-   void m_ScanItemSelect(const QListWidgetItem * const opc_Item);
+   void m_ListWidgetItemClicked(QListWidgetItem * const opc_Item);
    void m_UpdateDisplayName(void);
-   void m_ListWidgetItemClicked(const QModelIndex & orc_ModelIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
