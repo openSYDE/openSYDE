@@ -112,6 +112,7 @@ set(SYDESUP_LINK_LIBRARIES_WINDOWS
 set(SYDESUP_LINK_LIBRARIES_LINUX
    pthread
    rt
+   dl
    opensyde_core
    OpenSSL::Crypto
 )

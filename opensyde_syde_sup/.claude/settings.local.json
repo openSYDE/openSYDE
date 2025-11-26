@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./build.sh:*)",
+      "Bash(brew list:*)",
+      "Read(//opt/homebrew/Cellar/openssl@3/3.5.2/include/openssl/**)",
+      "Bash(chmod:*)",
+      "Bash(./build_openssl_for_arm.sh:*)",
+      "Bash(dos2unix:*)",
+      "Bash(tee:*)",
+      "Read(//private/tmp/**)",
+      "Bash(aarch64-linux-gnu-readelf:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
