@@ -768,6 +768,8 @@ void C_SyvDaItPaTreeView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
    }
    else
    {
+      // The event should not be handled here. The editor in the delegate would get problems see #111266 for details
+      opc_Event->ignore();
       C_OgeTreeViewToolTipBase::mouseDoubleClickEvent(opc_Event);
    }
 }

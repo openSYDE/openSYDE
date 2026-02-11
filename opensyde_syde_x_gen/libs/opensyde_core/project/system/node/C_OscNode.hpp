@@ -138,6 +138,7 @@ public:
    void ReCalcCanProtocolDataPoolIndices(void);
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const;
+   bool IsDiagnosisAvailable(const C_OscSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
    uint32_t CountAllLocalMessages(void) const;
    void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,

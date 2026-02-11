@@ -259,7 +259,7 @@ void C_SdNdeHalcOvTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcOvTableView::m_InitColumns(void)
 {
-   this->setColumnWidth(C_SdNdeHalcOvTableModel::h_EnumToColumn(C_SdNdeHalcOvTableModel::eINDEX), 44);
+   this->setColumnWidth(C_SdNdeHalcOvTableModel::h_EnumToColumn(C_SdNdeHalcOvTableModel::eINDEX), 51);
    this->setColumnWidth(C_SdNdeHalcOvTableModel::h_EnumToColumn(C_SdNdeHalcOvTableModel::eTYPE), 44);
    this->setColumnWidth(C_SdNdeHalcOvTableModel::h_EnumToColumn(C_SdNdeHalcOvTableModel::eDOMAIN), 85);
    this->setColumnWidth(C_SdNdeHalcOvTableModel::h_EnumToColumn(C_SdNdeHalcOvTableModel::eCHANNEL), 144);

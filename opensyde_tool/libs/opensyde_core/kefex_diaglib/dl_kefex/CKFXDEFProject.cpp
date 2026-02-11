@@ -17,7 +17,7 @@
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "CKFXDEFProject.hpp"
-#include "C_OscChecksummedIniFile.hpp"
+#include "C_OscUtilChecksummedIniFile.hpp"
 #include "C_SclString.hpp"
 #include "TglFile.hpp"
 #include "TglUtils.hpp"
@@ -100,7 +100,7 @@ int32_t C_KFXDEFProject::m_LoadRAMListFromFile(const C_SclString & orc_FilePath,
                                                C_SclString & orc_ErrorText)
 {
    uint16_t u16_NumVars;
-   C_OscChecksummedIniFile * pc_IniFile;
+   C_OscUtilChecksummedIniFile * pc_IniFile;
    C_SclStringList c_StringList;
    C_KFXVariableBase * pt_Entry;
    C_SclString c_Section;
@@ -121,7 +121,7 @@ int32_t C_KFXDEFProject::m_LoadRAMListFromFile(const C_SclString & orc_FilePath,
    //read out RAM file
    try
    {
-      pc_IniFile = new C_OscChecksummedIniFile(orc_FilePath);
+      pc_IniFile = new C_OscUtilChecksummedIniFile(orc_FilePath);
    }
    catch (...)
    {
@@ -672,7 +672,7 @@ int32_t C_KFXDEFProject::m_FindRelatedFiles(const C_SclString & orc_Directory, c
 {
    C_SclString c_Device;
    C_SclString c_Dir;
-   C_OscChecksummedIniFile * pc_IniFile;
+   C_OscUtilChecksummedIniFile * pc_IniFile;
    bool q_Return;
    int32_t s32_Index;
 
@@ -684,7 +684,7 @@ int32_t C_KFXDEFProject::m_FindRelatedFiles(const C_SclString & orc_Directory, c
    TglFileFind(c_Dir + "*." + macnc_RAM_FILE_EXTENSION, c_FoundFiles);
    for (s32_Index = 0; s32_Index < c_FoundFiles.GetLength(); s32_Index++)
    {
-      pc_IniFile = new C_OscChecksummedIniFile(c_Dir + c_FoundFiles[s32_Index].c_FileName);
+      pc_IniFile = new C_OscUtilChecksummedIniFile(c_Dir + c_FoundFiles[s32_Index].c_FileName);
       //first check device match, then Checksum (performance reasons)
       c_Device = pc_IniFile->ReadString("CONFIG", "DEVICE", "");
       if (c_Device == orc_DeviceName)
@@ -851,7 +851,7 @@ int32_t C_KFXDEFProject::LoadComments(const C_SclString & orc_FileName, const C_
    \param[out]    orc_VariableLists variable lists instance to place the names into
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_KFXDEFProject::LoadDefaultNames(C_OscChecksummedIniFile * const opc_IniFile,
+void C_KFXDEFProject::LoadDefaultNames(C_OscUtilChecksummedIniFile * const opc_IniFile,
                                        C_KFXVariableLists & orc_VariableLists)
 {
    int32_t i;

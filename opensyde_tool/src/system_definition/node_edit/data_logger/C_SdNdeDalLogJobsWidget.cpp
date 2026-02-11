@@ -207,6 +207,9 @@ void C_SdNdeDalLogJobsWidget::LoadLogJobs(void)
          this->m_UpdateLogJobCountLabel(u32_LogJobCount);
 
          this->mpc_Ui->pc_JobsListView->LoadLogJobs(this->mu32_NodeIndex);
+
+         this->mpc_Ui->pc_JobsListView->SetSelection(C_SdNdeDalLogJobsListView::eSELECTINDEX,
+                                                     this->mu32_CurrentLogJobIndex);
       }
       else
       {
@@ -220,14 +223,17 @@ void C_SdNdeDalLogJobsWidget::LoadLogJobs(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Called when log job name in the properties is edited by user
 
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobsWidget::OnLogJobNameModified()
+void C_SdNdeDalLogJobsWidget::OnLogJobNameModified(const uint32_t ou32_NodeIndex,
+                                                   const uint32_t ou32_DataLoggerJobIndex)
 {
    // reload the list when a log job name is  modified
    if (this->mpc_Ui->pc_JobsListView->IsEmpty() == false)
    {
-      this->mpc_Ui->pc_JobsListView->LoadLogJobs(this->mu32_NodeIndex);
+      this->mpc_Ui->pc_JobsListView->LoadSelectedLogJobName(ou32_NodeIndex, ou32_DataLoggerJobIndex);
    }
 }
 

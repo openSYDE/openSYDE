@@ -6,9 +6,13 @@ project("console_system_updater_sydesup")
 #include script to generate PC-lint configuration files
 include(lint_config.cmake)
 
-if (NOT WIN32)
+# Static linking can be configured for Linux targets.
+if (${LNX_LINK_OPENSSL_STATIC})
    #link OpenSSL statically
    set(OPENSSL_USE_STATIC_LIBS TRUE) 
+endif()
+
+if (NOT WIN32)
    find_package(OpenSSL REQUIRED)
 endif()
 
@@ -78,17 +82,20 @@ set(SYDESUP_API_HEADERS_STWTYPES
 
 # OPENSYDE CORE
 # only include relevant modules (include directories and source files)
-set(OPENSYDE_CORE_SKIP_ZIPPING          0)
-set(OPENSYDE_CORE_SKIP_IMPORTS          1)
-set(OPENSYDE_CORE_SKIP_CODE_GENERATION  1)
-set(OPENSYDE_CORE_SKIP_PROJECT_HANDLING 0)
-set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION 1)
-set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING 0)
-set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION 1)
+set(OPENSYDE_CORE_SKIP_ZIPPING                     0)
+set(OPENSYDE_CORE_SKIP_IMPORTS                     1)
+set(OPENSYDE_CORE_SKIP_CODE_GENERATION             1)
+set(OPENSYDE_CORE_SKIP_PROJECT_HANDLING            0)
+set(OPENSYDE_CORE_SKIP_PARAM_SET                   0)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_BASIC      1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM     0)
+set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_MONITOR    1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON     0)
-set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING 1)
+set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING            1)
+set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION         1)
+set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION   1)
+set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING     0)
+set(OPENSYDE_CORE_SKIP_SECURITY                    0)
 
 if(WIN32)
    set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS  0)
@@ -172,9 +179,9 @@ if(COMMAND add_pc_lint)
 endif(COMMAND add_pc_lint)
 
 # --- INSTALL RESULTS --------------------------------------------------------------------------------------------------
-install(TARGETS SYDEsup DESTINATION ${PROJECT_ROOT}/result/${INSTALL_SUBDIR})
-if (NOT WIN32)
-   install(TARGETS sydesuplib DESTINATION ${PROJECT_ROOT}/result/${INSTALL_SUBDIR}/sydesup_lib)
-   install(FILES ${SYDESUP_API_HEADERS} DESTINATION ${PROJECT_ROOT}/result/${INSTALL_SUBDIR}/sydesup_lib)
-   install(FILES ${SYDESUP_API_HEADERS_STWTYPES} DESTINATION ${PROJECT_ROOT}/result/${INSTALL_SUBDIR}/sydesup_lib/stwtypes)
+install(TARGETS SYDEsup DESTINATION ${CMAKE_INSTALL_BINDIR})
+if (${INSTALL_SYDESUP_LIB})
+   install(TARGETS sydesuplib DESTINATION ${CMAKE_INSTALL_BINDIR}/sydesup_lib)
+   install(FILES ${SYDESUP_API_HEADERS} DESTINATION ${CMAKE_INSTALL_BINDIR}/sydesup_lib)
+   install(FILES ${SYDESUP_API_HEADERS_STWTYPES} DESTINATION ${CMAKE_INSTALL_BINDIR}/sydesup_lib/stwtypes)
 endif()

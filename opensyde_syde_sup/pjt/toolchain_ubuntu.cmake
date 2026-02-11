@@ -13,3 +13,8 @@ set(CMAKE_CXX_FLAGS "-m64 -Wno-deprecated-declarations -fPIC")
 
 set(CMAKE_SHARED_LINKER_FLAGS "-m64")
 
+set(LNX_LINK_OPENSSL_STATIC ON CACHE BOOL "Linking the openSSL library static")
+set(INSTALL_SYDESUP_LIB ON CACHE BOOL "Installing SYDEsup lib to the result")
+
+# install paths
+set(CMAKE_INSTALL_BINDIR ${PROJECT_SOURCE_DIR}/../result/${INSTALL_SUBDIR} CACHE PATH "Installing path")

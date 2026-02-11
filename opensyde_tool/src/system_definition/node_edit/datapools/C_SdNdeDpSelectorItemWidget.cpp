@@ -709,9 +709,8 @@ void C_SdNdeDpSelectorItemWidget::m_UpdateLabel(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::m_UpdateName(void) const
 {
-   this->mpc_Ui->pc_TextEditDpName->setText(static_cast<QString>("#") + QString::number(
-                                               this->mu32_Number) + static_cast<QString>(" - ") +
-                                            this->mc_Name);
+   this->mpc_Ui->pc_TextEditDpName->setText(
+      static_cast<QString>("#") + QString::number(this->mu32_Number) + static_cast<QString>(" - ") + this->mc_Name);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -734,8 +733,10 @@ void C_SdNdeDpSelectorItemWidget::m_SetSelectColor(const bool oq_Active)
    }
    else
    {
-      // reset stylesheet
-      this->setStyleSheet("");
+      // reset stylesheet (somehow for text necessary, frame defaults to color in color.qss)
+      this->setStyleSheet("QTextEdit#pc_TextEditDpName {"
+                          "color: " + mc_STYLESHEET_GUIDE_COLOR_3 + ";"
+                          "}");
    }
 }
 

@@ -291,7 +291,7 @@ void C_SdBueSignalTableView::m_InitColumns(void)
 std::map<C_SdBueSignalTableModel::E_Columns, uint32_t> C_SdBueSignalTableView::mh_GetDefaultColumnWidths()
 {
    std::map<C_SdBueSignalTableModel::E_Columns, uint32_t> c_ColumnWidths;
-   c_ColumnWidths[C_SdBueSignalTableModel::eINDEX] = 40;
+   c_ColumnWidths[C_SdBueSignalTableModel::eINDEX] = 51;
    c_ColumnWidths[C_SdBueSignalTableModel::eICON] = 26;
    c_ColumnWidths[C_SdBueSignalTableModel::eMESSAGE] = 138;
    c_ColumnWidths[C_SdBueSignalTableModel::eNAME] = 148;

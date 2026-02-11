@@ -562,7 +562,6 @@ void C_FlaUpListWidget::m_AddFile(const QString & orc_File, const bool oq_IsActi
          if (!oq_IsActionForExistingFile)
          {
             this->addItem(pc_Item);
-            Q_EMIT (this->SigUpdateFileCounter());
          }
          else
          {
@@ -571,7 +570,10 @@ void C_FlaUpListWidget::m_AddFile(const QString & orc_File, const bool oq_IsActi
          }
          this->setItemWidget(pc_Item, pc_FileWidget);
          this->show();
-
+         if (!oq_IsActionForExistingFile)
+         {
+            Q_EMIT (this->SigUpdateFileCounter());
+         }
          connect(pc_FileWidget, &C_FlaUpListItemWidget::SigDeleteItemWidget, this, &C_FlaUpListWidget::m_DeleteItem);
 
          connect(pc_FileWidget, &C_FlaUpListItemWidget::SigSelectFile, this, &C_FlaUpListWidget::m_SelectFile);

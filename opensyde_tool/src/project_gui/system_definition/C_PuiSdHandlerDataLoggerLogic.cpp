@@ -328,6 +328,86 @@ int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerAdditionalTriggerProperties(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set data logger additional trigger expert mode enabled
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+   \param[in]  oq_Data                    Data
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerAdditionalTriggerExpertModeEnabled(const uint32_t ou32_NodeIndex,
+                                                                                       const uint32_t ou32_DataLoggerJobIndex,
+                                                                                       const bool oq_Data)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
+         rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ExpertMode.q_Enable = oq_Data;
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set data logger additional trigger expert mode string
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+   \param[in]  orc_Data                   Data
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_PuiSdHandlerDataLoggerLogic::SetDataLoggerAdditionalTriggerExpertModeString(const uint32_t ou32_NodeIndex,
+                                                                                      const uint32_t ou32_DataLoggerJobIndex,
+                                                                                      const scl::C_SclString & orc_Data)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      if (ou32_DataLoggerJobIndex < rc_Node.c_DataLoggerJobs.size())
+      {
+         C_OscDataLoggerJob & rc_DataLoggerJob = rc_Node.c_DataLoggerJobs[ou32_DataLoggerJobIndex];
+         rc_DataLoggerJob.c_Properties.c_AdditionalTriggerProperties.c_ExpertMode.c_TriggerConfiguration = orc_Data;
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set X-app interface
 
    \param[in]  ou32_NodeIndex                Node index

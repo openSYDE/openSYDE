@@ -489,6 +489,16 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
                                        const QModelIndex & orc_Index) const
 {
    bool q_CallOriginal = true;
+   QStyleOptionViewItem c_Option = orc_Option;
+
+   // Special handling for disabled cells in a selected row
+   // Unfortunately disabled cells can not get the property "selected", so we need to check for another
+   // sibling in the same row - just take the one in the second column.
+   if (orc_Index.isValid() && orc_Index.siblingAtColumn(1).isValid() &&
+       mc_Selection.contains(orc_Index.siblingAtColumn(1)))
+   {
+      c_Option.state = c_Option.state | QStyle::State_Selected;
+   }
 
    if (orc_Index.isValid() == true)
    {
@@ -512,9 +522,9 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
             q_Edit = false;
          }
          //Background
-         QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
+         QStyledItemDelegate::paint(opc_Painter, c_Option, orc_Index);
          //Content
-         C_SdNdeDpUtil::h_DrawTableBoolean(opc_Painter, orc_Option, orc_Index, this->mc_CheckMark, q_Edit);
+         C_SdNdeDpUtil::h_DrawTableBoolean(opc_Painter, c_Option, orc_Index, this->mc_CheckMark, q_Edit);
 
          q_CallOriginal = false;
       }
@@ -558,26 +568,26 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
             QPixmap c_ScaledDisabledPixmap;
             //Draw manually
             //Draw background
-            C_SdNdeDpUtil::h_DrawTableBackground(opc_Painter, orc_Option, true);
+            C_SdNdeDpUtil::h_DrawTableBackground(opc_Painter, c_Option, true);
             //Draw disabled symbol
-            if (orc_Option.state.testFlag(QStyle::State_Selected) == true)
+            if (c_Option.state.testFlag(QStyle::State_Selected) == true)
             {
                c_ScaledDisabledPixmap = mc_DisabledPixmapLight.scaled(
-                  orc_Option.rect.size(),
+                  c_Option.rect.size(),
                   Qt::KeepAspectRatio,
                   Qt::SmoothTransformation);
             }
             else
             {
                c_ScaledDisabledPixmap = mc_DisabledPixmapDark.scaled(
-                  orc_Option.rect.size(),
+                  c_Option.rect.size(),
                   Qt::KeepAspectRatio,
                   Qt::SmoothTransformation);
             }
             //Checked symbol
             //Offset 3: align with check mark
-            opc_Painter->drawPixmap(orc_Option.rect.topLeft().x() + 3,
-                                    orc_Option.rect.topLeft().y(),
+            opc_Painter->drawPixmap(c_Option.rect.topLeft().x() + 3,
+                                    c_Option.rect.topLeft().y(),
                                     c_ScaledDisabledPixmap.width(),
                                     c_ScaledDisabledPixmap.height(), c_ScaledDisabledPixmap);
 
@@ -589,8 +599,8 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
    if (q_CallOriginal == true)
    {
       //Original
-      QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
-      C_TblTreDelegateUtil::h_PaintIcon(opc_Painter, orc_Option, orc_Index);
+      QStyledItemDelegate::paint(opc_Painter, c_Option, orc_Index);
+      C_TblTreDelegateUtil::h_PaintIcon(opc_Painter, c_Option, orc_Index);
    }
 }
 
@@ -617,11 +627,22 @@ void C_SdNdeDpListTableDelegate::SetUndoStack(QUndoStack * const opc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected rows: remember for background painting on disabled cells that are "not selectable"
+
+   \param[in]  orc_Selection  Selection
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListTableDelegate::SetSelectedRows(const QModelIndexList & orc_Selection)
+{
+   this->mc_Selection = orc_Selection;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create widget to use for editing this value
 
-   \param[in,out] opc_Parent Parent widget
-   \param[in]     orc_Index  Correlating index
-   \param[in]     oe_Col     Optional indicator which column this editor is for
+   \param[in,out]  opc_Parent    Parent widget
+   \param[in]      orc_Index     Correlating index
+   \param[in]      oe_Col        Optional indicator which column this editor is for
 
    \return
    Editor widget

@@ -112,9 +112,13 @@ C_SydeSup::E_Result C_SydeSupWindows::m_OpenCan(const C_SclString & orc_CanDrive
          e_Result = eERR_CAN_IF_LOAD_FAILED;
          break;
       case CAN_COMP_ERR_DLL_FORMAT:
-         h_WriteLog("Setup CAN", "CAN opening failed because DLL is not in correct format.", true);
-         e_Result = eERR_CAN_IF_LOAD_FAILED;
-         break;
+         {
+            const C_SclString c_Bitness = static_cast<C_SclString>(8 * sizeof(size_t));
+            h_WriteLog("Setup CAN", "CAN opening failed because DLL is not in correct format. "
+                       "Make sure to use a " + c_Bitness + "-bit DLL.", true);
+            e_Result = eERR_CAN_IF_LOAD_FAILED;
+            break;
+         }
       default:
          h_WriteLog("Setup CAN", "CAN opening failed because of unknown reason.", true);
          e_Result = eERR_CAN_IF_LOAD_FAILED;

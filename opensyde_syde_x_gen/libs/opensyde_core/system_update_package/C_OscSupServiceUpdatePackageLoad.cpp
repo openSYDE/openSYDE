@@ -31,7 +31,7 @@
 #include "C_OscSuSequences.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscZipFile.hpp"
-#include "C_OscAesFile.hpp"
+#include "C_OscSecurityAesFile.hpp"
 #include "C_OscSupSignatureFiler.hpp"
 #include "C_OscSupDefinitionFiler.hpp"
 #include "C_OscSecurityPemSecUpdate.hpp"
@@ -573,9 +573,9 @@ int32_t C_OscSupServiceUpdatePackageLoad::mh_UnpackNodes(const std::vector<uint8
          {
             if (c_DecryptNodes[u32_ItPackage] == C_OscSupNodeDefinitionFiler::hu8_ACTIVE_NODE)
             {
-               s32_Return = C_OscAesFile::h_UnpackEncryptedZipFile(c_FinalZipPath, c_TargetFolder,
-                                                                   c_DecryptNodesPassword[u32_ItPackage],
-                                                                   &mhc_ErrorMessage);
+               s32_Return = C_OscSecurityAesFile::h_UnpackEncryptedZipFile(c_FinalZipPath, c_TargetFolder,
+                                                                           c_DecryptNodesPassword[u32_ItPackage],
+                                                                           &mhc_ErrorMessage);
             }
             else
             {

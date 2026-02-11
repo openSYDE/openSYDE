@@ -74,6 +74,33 @@ void C_SdNdeDalLogJobsListModel::UpdateData(const uint32_t ou32_NodeIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update name
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsListModel::UpdateName(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex)
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      if ((ou32_DataLoggerJobIndex < pc_Node->c_DataLoggerJobs.size()) &&
+          (ou32_DataLoggerJobIndex < this->mc_LogJobsList.size()))
+      {
+         const C_OscDataLoggerJob & rc_LogJobData = pc_Node->c_DataLoggerJobs[ou32_DataLoggerJobIndex];
+         C_DalLogJob & rc_LogJob = this->mc_LogJobsList[ou32_DataLoggerJobIndex];
+         rc_LogJob.c_Name = rc_LogJobData.c_Properties.c_Name;
+
+         Q_EMIT this->dataChanged(this->index(ou32_DataLoggerJobIndex), this->index(
+                                     ou32_DataLoggerJobIndex),
+                                  QList<int32_t>() << static_cast<int32_t>(Qt::DisplayRole));
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remove one or more rows at given indexes
 
    \param[in]       orc_DataLoggerJobIndices     Indexes to be deleted

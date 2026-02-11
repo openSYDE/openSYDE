@@ -14,3 +14,5 @@ set(CMAKE_SHARED_LINKER_FLAGS "-m32")
 # link standard libraries statically
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
 
+# install paths
+set(CMAKE_INSTALL_BINDIR ${PROJECT_SOURCE_DIR}/../result/${INSTALL_SUBDIR} CACHE PATH "Installing path")

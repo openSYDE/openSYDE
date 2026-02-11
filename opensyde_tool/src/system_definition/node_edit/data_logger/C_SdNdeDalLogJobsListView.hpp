@@ -45,6 +45,7 @@ public:
    void LoadLogJobs(const uint32_t ou32_NodeIndex);
    void SetSelection(const E_LogJobSelection & ore_Selection, const uint32_t ou32_LogJobIndex = 0);
    void LoadSelectedLogJob(const uint32_t ou32_LogJobIndex);
+   void LoadSelectedLogJobName(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
    void DeleteLogJobs(const std::vector<uint32_t> & orc_DataLoggerJobIndices);
 
    //The signals keyword is necessary for Qt signal slot functionality

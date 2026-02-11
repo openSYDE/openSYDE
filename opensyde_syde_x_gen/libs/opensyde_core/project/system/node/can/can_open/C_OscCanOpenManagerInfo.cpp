@@ -21,6 +21,7 @@
 
 using namespace stw::errors;
 using namespace stw::opensyde_core;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -64,31 +65,21 @@ C_OscCanOpenManagerInfo::C_OscCanOpenManagerInfo(void) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscCanOpenManagerInfo::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_UseOpenSydeNodeId, sizeof(this->q_UseOpenSydeNodeId),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_NodeIdValue, sizeof(this->u8_NodeIdValue),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_GlobalSdoTimeoutMs, sizeof(this->u16_GlobalSdoTimeoutMs),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_AutostartCanOpenManager, sizeof(this->q_AutostartCanOpenManager),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_StartDevices, sizeof(this->q_StartDevices),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_NmtStartAll, sizeof(this->q_NmtStartAll),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->e_NmtErrorBehaviour, sizeof(this->e_NmtErrorBehaviour),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_EnableHeartbeatProducing, sizeof(this->q_EnableHeartbeatProducing),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_HeartbeatProducerTimeMs, sizeof(this->u16_HeartbeatProducerTimeMs),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_ProduceSyncMessage,
-                                       sizeof(this->q_ProduceSyncMessage),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_SyncCyclePeriodUs, sizeof(this->u32_SyncCyclePeriodUs),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_SyncWindowLengthUs, sizeof(this->u32_SyncWindowLengthUs),
-                                       oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_UseOpenSydeNodeId, sizeof(this->q_UseOpenSydeNodeId), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u8_NodeIdValue, sizeof(this->u8_NodeIdValue), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u16_GlobalSdoTimeoutMs, sizeof(this->u16_GlobalSdoTimeoutMs), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_AutostartCanOpenManager, sizeof(this->q_AutostartCanOpenManager),
+                             oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_StartDevices, sizeof(this->q_StartDevices), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_NmtStartAll, sizeof(this->q_NmtStartAll), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->e_NmtErrorBehaviour, sizeof(this->e_NmtErrorBehaviour), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_EnableHeartbeatProducing, sizeof(this->q_EnableHeartbeatProducing),
+                             oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u16_HeartbeatProducerTimeMs, sizeof(this->u16_HeartbeatProducerTimeMs),
+                             oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_ProduceSyncMessage, sizeof(this->q_ProduceSyncMessage), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u32_SyncCyclePeriodUs, sizeof(this->u32_SyncCyclePeriodUs), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u32_SyncWindowLengthUs, sizeof(this->u32_SyncWindowLengthUs), oru32_HashValue);
    for (std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_It =
            this->c_CanOpenDevices.begin();
         c_It != this->c_CanOpenDevices.end(); ++c_It)

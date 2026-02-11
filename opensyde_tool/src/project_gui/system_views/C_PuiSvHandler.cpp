@@ -3476,6 +3476,9 @@ int32_t C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
    }
    else
    {
+      osc_write_log_error("Loading views",
+                          static_cast<stw::scl::C_SclString>("Could not find system views file \"") + orc_Path.toStdString().c_str() +
+                          "\".");
       s32_Retval = C_RANGE;
    }
 

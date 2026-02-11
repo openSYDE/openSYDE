@@ -31,7 +31,7 @@
 #include "C_OscSuSequences.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscZipFile.hpp"
-#include "C_OscAesFile.hpp"
+#include "C_OscSecurityAesFile.hpp"
 #include "C_OscSupSignatureFiler.hpp"
 #include "C_OscSupDefinitionFiler.hpp"
 #include "C_OscSecurityPemSecUpdate.hpp"
@@ -924,10 +924,10 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_CreateNodesZip(const std::vector<
             if (c_EncryptNodes[u32_File] == C_OscSupNodeDefinitionFiler::hu8_ACTIVE_NODE)
             {
                s32_Return =
-                  C_OscAesFile::h_CreateEncryptedZipFile(orc_NodeFoldersAbs[u32_File], orc_SecFiles[u32_File],
-                                                         orc_SecPackageFilesAbs[u32_File],
-                                                         c_EncryptNodesPassword[u32_File], &mhc_ErrorMessage
-                                                         );
+                  C_OscSecurityAesFile::h_CreateEncryptedZipFile(orc_NodeFoldersAbs[u32_File], orc_SecFiles[u32_File],
+                                                                 orc_SecPackageFilesAbs[u32_File],
+                                                                 c_EncryptNodesPassword[u32_File], &mhc_ErrorMessage
+                                                                 );
             }
             else
             {

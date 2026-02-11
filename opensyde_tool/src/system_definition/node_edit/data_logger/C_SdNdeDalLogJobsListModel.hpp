@@ -35,6 +35,7 @@ class C_SdNdeDalLogJobsListModel :
 public:
    explicit C_SdNdeDalLogJobsListModel(QObject * const opc_Parent = NULL);
    void UpdateData(const uint32_t ou32_NodeIndex);
+   void UpdateName(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
    void DoRemoveRows(const std::vector<uint32_t> & orc_DataLoggerJobIndices);
 
    QVariant data(const QModelIndex & orc_Index, const int32_t os32_Role =

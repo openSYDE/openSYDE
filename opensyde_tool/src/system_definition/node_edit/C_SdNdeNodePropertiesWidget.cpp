@@ -324,10 +324,10 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LabelProtocol->SetToolTipInformation(C_GtGetText::h_GetText("Protocol Support"),
                                                          C_GtGetText::h_GetText(
-                                                            "Type of flashloader and diagnostic server.\n"
+                                                            "Type of Flashloader and diagnostic server.\n"
                                                             "Options:\n"
-                                                            "   - openSYDE: openSYDE Server and openSYDE Flashloader support\n"
-                                                            "   - KEFEX: KEFEX server and STW Flashloader support\n"
+                                                            "   - openSYDE: openSYDE server and openSYDE Flashloader support\n"
+                                                            "   - KEFEX: STW Flashloader support\n"
                                                             "   - none: no STW protocol support (e.g.: 3rd party node)\n"
                                                             "\nSupported protocols defined in read only "
                                                             "*.syde_devdef file."));
@@ -661,16 +661,14 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                   q_IsUpdateAvailable =
                      pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(C_OscSystemBus::eCAN);
                   q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(C_OscSystemBus::eCAN);
-                  q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
-                     C_OscSystemBus::eCAN);
+                  q_IsDiagnosisAvailable = pc_Node->IsDiagnosisAvailable(C_OscSystemBus::eCAN);
                }
                else
                {
                   q_IsUpdateAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(
                      C_OscSystemBus::eETHERNET);
                   q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(C_OscSystemBus::eETHERNET);
-                  q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
-                     C_OscSystemBus::eETHERNET);
+                  q_IsDiagnosisAvailable = pc_Node->IsDiagnosisAvailable(C_OscSystemBus::eETHERNET);
                }
 
                QString c_IpAddressString;
@@ -918,6 +916,8 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                   //disable
                   this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, s32_COL_DIAGNOSTIC)->
                   setEnabled(false);
+                  dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                    ->cellWidget(u8_ComIfCnt, s32_COL_DIAGNOSTIC))->setChecked(false);
                }
 
                //connect to RegisterChange
@@ -1055,7 +1055,7 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void)
                break;
             case mu8_FL_INDEX_STW:
                e_FlashLoader = C_OscNodeProperties::eFL_STW;
-               e_DiagnosticServer = C_OscNodeProperties::eDS_KEFEX;
+               e_DiagnosticServer = C_OscNodeProperties::eDS_NONE;
                break;
             default:
                //Not supported
@@ -1076,8 +1076,7 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void)
                const bool q_IsUpdateAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(
                   rc_CurInterface.e_InterfaceType);
                const bool q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
-               const bool q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
-                  rc_CurInterface.e_InterfaceType);
+               const bool q_IsDiagnosisAvailable = pc_Node->IsDiagnosisAvailable(rc_CurInterface.e_InterfaceType);
                //node id
                c_NodeIds.push_back(
                   static_cast<uint8_t>((this->mpc_Ui->pc_TableWidgetComIfSettings->
@@ -1180,7 +1179,7 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
    // Save the data
    this->m_RegisterChange();
 
-   // Update the com interface routing settings in the table
+   // Update the com interface routing and dashboard settings in the table
    if (pc_Node != NULL)
    {
       const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
@@ -1198,19 +1197,26 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
             const C_OscNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt];
             const int32_t s32_COL_ROUTING = static_cast<int32_t>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
             const int32_t s32_COL_UPDATE = static_cast<int32_t>(C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+            const int32_t s32_COL_DIAGNOSTIC = static_cast<int32_t>(C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
             const bool q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
+            const bool q_IsDiagAvailable = pc_Node->IsDiagnosisAvailable(rc_CurInterface.e_InterfaceType);
 
-            C_OgeChxTristate * const pc_Tristate =
+            C_OgeChxTristate * const pc_TristateRouting =
                dynamic_cast<C_OgeChxTristate *>(this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
                                                                                                       s32_COL_ROUTING));
             C_OgeChxTristate * const pc_TristateUpdate =
                dynamic_cast<C_OgeChxTristate *>(this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
                                                                                                       s32_COL_UPDATE));
+            C_OgeChxTristate * const pc_TristateDiag =
+               dynamic_cast<C_OgeChxTristate *>(this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
+                                                                                                      s32_COL_DIAGNOSTIC));
 
-            if (pc_Tristate != NULL)
+            if (pc_TristateRouting != NULL)
             {
                this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, s32_COL_ROUTING)->setEnabled(
                   q_IsRoutingAvailable);
+               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, s32_COL_DIAGNOSTIC)->setEnabled(
+                  q_IsDiagAvailable);
 
                // if KEFEX is set update shall be disabled for eth interfaces
                if ((rc_CurInterface.e_InterfaceType == C_OscSystemBus::eETHERNET) &&
@@ -1218,7 +1224,7 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
                {
                   this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
                                                                         s32_COL_UPDATE)->setEnabled(false);
-                  pc_Tristate->setChecked(false);
+                  pc_TristateRouting->setChecked(false);
                   pc_TristateUpdate->setChecked(false);
                }
                // if protocol switches to opensyde enable and check update for eth interfaces again
@@ -1231,12 +1237,23 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
                if (q_IsRoutingAvailable == true)
                {
                   //set node value
-                  pc_Tristate->setChecked(rc_CurInterface.q_IsRoutingEnabled);
+                  pc_TristateRouting->setChecked(rc_CurInterface.q_IsRoutingEnabled);
                }
                else
                {
                   // Setting is disabled, so it has to be unchecked too
-                  pc_Tristate->setChecked(false);
+                  pc_TristateRouting->setChecked(false);
+               }
+
+               if (q_IsDiagAvailable == true)
+               {
+                  //set node value
+                  pc_TristateDiag->setChecked(rc_CurInterface.q_IsDiagnosisEnabled);
+               }
+               else
+               {
+                  // Setting is disabled, so it has to be unchecked too
+                  pc_TristateDiag->setChecked(false);
                }
             }
          }

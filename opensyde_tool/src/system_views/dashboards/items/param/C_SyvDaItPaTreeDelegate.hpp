@@ -72,6 +72,7 @@ protected:
    bool eventFilter(QObject * const opc_Object, QEvent * const opc_Event) override;
 
 private:
+   void m_DelayedFocus(void);
    void m_SetNewEditor(QWidget * const opc_Editor);
    QWidget * m_CreateEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index) const;
 

@@ -16,6 +16,7 @@
 #include "constants.hpp"
 #include "C_TblDelegateUtil.hpp"
 #include "C_CamGenTableDelegate.hpp"
+#include "C_CamGenTableModel.hpp"
 #include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -44,12 +45,22 @@ const QFont C_CamGenTableDelegate::mhc_HIGHLIGHT_FONT = C_Uti::h_GetFontPixel(mc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableDelegate::C_CamGenTableDelegate(QObject * const opc_Parent) :
    C_CamTblDelegate(opc_Parent)
 {
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected rows: remember for background painting on disabled cells that are "not selectable"
+
+   \param[in]  orc_Selection  Selection
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableDelegate::SetSelectedRows(const QModelIndexList & orc_Selection)
+{
+   this->mc_Selection = orc_Selection;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,9 +68,9 @@ C_CamGenTableDelegate::C_CamGenTableDelegate(QObject * const opc_Parent) :
 
    Here: paint data manually (for alignment)
 
-   \param[in,out] opc_Painter Painter
-   \param[in]     orc_Option  Option
-   \param[in]     orc_Index   Index
+   \param[in,out]  opc_Painter   Painter
+   \param[in]      orc_Option    Option
+   \param[in]      orc_Index     Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
@@ -67,9 +78,20 @@ void C_CamGenTableDelegate::paint(QPainter * const opc_Painter, const QStyleOpti
 {
    const QRect c_PaddedCellRect = orc_Option.rect.adjusted(3, 1, -3, -2);
    const bool q_Selected = orc_Option.state.testFlag(QStyle::State_Selected);
+   QStyleOptionViewItem c_Option = orc_Option;
+
+   // Adapt the paint option to get the selected style background for a disabled cell in a selected row.
+   // Unfortunately disabled cells can not get the property "selected", so we need to check for another
+   // sibling in the same row - just take the one in the first column.
+   if (orc_Index.isValid() && orc_Index.siblingAtColumn(0).isValid() &&
+       mc_Selection.contains(orc_Index.siblingAtColumn(0)))
+   {
+      c_Option.state = c_Option.state | QStyle::State_Selected;
+   }
 
    //Always draw cell (should only be background if any additional paint operations are done)
-   QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
+   QStyledItemDelegate::paint(opc_Painter, c_Option, orc_Index);
+
    if (C_TblDelegateUtil::h_PaintMarkedCell(opc_Painter, c_PaddedCellRect, orc_Index, q_Selected,
                                             C_CamGenTableDelegate::mhc_DEFAULT_BACKGROUND_COLOR,
                                             C_CamGenTableDelegate::mhc_DEFAULT_BORDER_COLOR,

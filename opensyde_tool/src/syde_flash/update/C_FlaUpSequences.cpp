@@ -15,6 +15,8 @@
 #include "C_OscLoggingHandler.hpp"
 #include "C_FlaUpSequences.hpp"
 
+#include <cmath>
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
 using namespace stw::errors;
@@ -45,6 +47,9 @@ C_FlaUpSequences::C_FlaUpSequences(void) :
    mc_HexFilePath(""),
    mu32_RequestDownloadTimeout(40000),
    mu32_TransferDataTimeout(1000),
+   mu64_TotalHexFilesSizeInBytes(0),
+   mu64_CurrentHexFileSizeInBytes(0),
+   mu64_PreviousFilesSizeInBytes(0),
    ms32_Result(C_NOACT)
 {
    mpc_Thread = new C_SyvComDriverThread(&C_FlaUpSequences::mh_ThreadFunc, this);
@@ -157,8 +162,8 @@ int32_t C_FlaUpSequences::StartUpdateNode(const QString & orc_HexFilePath, const
       this->mu32_RequestDownloadTimeout = ou32_RequestDownloadTimeout;
       this->mu32_TransferDataTimeout = ou32_TransferDataTimeout;
       this->mpc_Thread->start();
+      this->mu64_PreviousFilesSizeInBytes += this->mu64_CurrentHexFileSizeInBytes;
    }
-
    return s32_Return;
 }
 
@@ -218,14 +223,88 @@ int32_t C_FlaUpSequences::GetResults(int32_t & ors32_Result) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get All Hex Files Size
+
+   \param[in]  orc_HexFiles       List of all HEX file paths
+
+   \return
+   uint64_t    return All Hex Files size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint64_t C_FlaUpSequences::h_GetAllHexFileSize(const QStringList & orc_HexFiles)
+{
+   std::vector<std::string> c_HexFiles;
+   c_HexFiles.reserve(orc_HexFiles.size());
+   for (const auto & rc_CurrentFile : orc_HexFiles)
+   {
+      c_HexFiles.push_back(rc_CurrentFile.toStdString());
+   }
+   return C_FlaUpSequences::h_GetAllHexFilesSize(c_HexFiles);
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get All Hex Files Size
+
+   \param[in]  orc_HexFiles       List of all HEX file paths
+
+   \return
+   uint64_t    return All Hex Files size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint64_t C_FlaUpSequences::GetTotalHexFilesSize(const QStringList & orc_HexFiles)
+{
+   std::vector<std::string> c_HexFiles;
+   c_HexFiles.reserve(orc_HexFiles.size());
+   for (const auto & rc_CurrentFile : orc_HexFiles)
+   {
+      c_HexFiles.push_back(rc_CurrentFile.toStdString());
+   }
+   this->mu64_TotalHexFilesSizeInBytes = C_FlaUpSequences::h_GetAllHexFilesSize(c_HexFiles);
+   return this->mu64_TotalHexFilesSizeInBytes;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Reports progress in percentage
 
    \param[in]  ou8_ProgressInPercentage       Progress in percentage
+   \param[in]  oq_IsCaluclatedPercentage       Is the ou8_ProgressInPercentage is caluclated or default
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaUpSequences::m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage)
+void C_FlaUpSequences::m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage,
+                                                  const bool oq_IsCaluclatedPercentage)
 {
-   Q_EMIT (this->SigReportFlashingProgress(ou8_ProgressInPercentage));
+   uint8_t u8_TotalProgress = 0;
+
+   if (mu64_TotalHexFilesSizeInBytes > 0)
+   {
+      // Calculate bytes flashed in current file
+      const float64_t f64_CurrentFileProgressBytes =
+         (static_cast<float64_t>(ou8_ProgressInPercentage) / 100.0) *
+         static_cast<float64_t>(mu64_CurrentHexFileSizeInBytes);
+
+      const float64_t f64_TotalFlashedBytes = static_cast<float64_t>(mu64_PreviousFilesSizeInBytes) +
+                                              f64_CurrentFileProgressBytes;
+
+      u8_TotalProgress = static_cast<uint8_t>(std::round(
+                                                 (f64_TotalFlashedBytes /
+                                                  static_cast<float64_t>(mu64_TotalHexFilesSizeInBytes)) * 100.0
+                                                 ));
+
+      if (u8_TotalProgress > 100)
+      {
+         u8_TotalProgress = 100;
+      }
+   }
+   if (ou8_ProgressInPercentage == 100)
+   {
+      if (oq_IsCaluclatedPercentage)
+      {
+         Q_EMIT (this->SigReportFlashingProgress(u8_TotalProgress, ou8_ProgressInPercentage));
+      }
+   }
+   else
+   {
+      Q_EMIT (this->SigReportFlashingProgress(u8_TotalProgress, ou8_ProgressInPercentage));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -300,6 +379,18 @@ void C_FlaUpSequences::m_ReportFlashloaderInformationRead(const stw::scl::C_SclS
 
    Q_EMIT (this->SigReportFlashloaderInformationText(c_ProgressText));
    Q_EMIT (this->SigReportDeviceName(orc_DeviceName.c_str()));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get total number of current Hex File size in bytes
+
+   \param[in]       ou64_CurrentHexFileSizeInBytes     Amount of hex file size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpSequences::m_CurrentHexFileSizeInBytes(const uint64_t ou64_CurrentHexFileSizeInBytes)
+{
+   this->mu64_CurrentHexFileSizeInBytes = ou64_CurrentHexFileSizeInBytes;
+   Q_EMIT (this->SigTotalHexFileSizeInBytes(mu64_TotalHexFilesSizeInBytes));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

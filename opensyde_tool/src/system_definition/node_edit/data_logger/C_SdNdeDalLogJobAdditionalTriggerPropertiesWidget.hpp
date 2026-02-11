@@ -49,6 +49,13 @@ private:
    std::vector<std::pair<QString, QString> > mc_MapCoreOperationToUi;
    QMap<QString, stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId> mc_MapDataElement;
    Ui::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget * mpc_Ui;
+   enum E_ConnectState
+   {
+      eCS_DISCONNECTED,
+      eCS_CONNECTED
+   };
+
+   E_ConnectState me_ConnectState;
 
    //Avoid call
    C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget(const C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget &);
@@ -82,6 +89,8 @@ private:
    bool m_CurrentElementIsString(void) const;
    stw::opensyde_core::C_OscNodeDataPoolContent m_GetCurrentMinValue(void) const;
    QString m_GetOperationForCore(void) const;
+   void m_SetConnectDisconnectExpertView(void);
+   void m_OnEditClicked(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

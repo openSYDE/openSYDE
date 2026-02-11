@@ -12,7 +12,6 @@
 /* STYLE_GUIDE_COLOR_TRANSPARENT */
 stw--opensyde_gui_elements--C_OgeSaMain,
 stw--opensyde_gui--C_CamGenKeySelect,
-stw--opensyde_gui--C_CamGenTableView,
 stw--opensyde_gui--C_CamGenSigTableView,
 stw--opensyde_gui--C_CamMosFilterTableView,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Background="-1"],
@@ -80,8 +79,7 @@ color:rgb(255, 255, 255);
 
 stw--opensyde_gui--C_CamMetTreeView,
 stw--opensyde_gui--C_CamMetTreeView::item:hover,
-stw--opensyde_gui--C_CamMetTreeView::branch:has-children,
-stw--opensyde_gui--C_CamMetTreeView::branch:has-children:hover,
+stw--opensyde_gui--C_CamMetTreeView::branch,
 stw--opensyde_gui_elements--C_CamOgeCbxTable,
 stw--opensyde_gui_elements--C_CamOgeCbxWhite,
 stw--opensyde_gui_elements--C_CamOgeLeTableEdit,
@@ -95,6 +93,8 @@ stw--opensyde_gui_elements--C_CamOgeCbxWhite QListView,
 stw--opensyde_gui_elements--C_CamOgeCbxWhite QListView::item,
 stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView,
 stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView::item,
+stw--opensyde_gui--C_CamGenTableView,
+stw--opensyde_gui--C_CamGenTableView::item:hover,
 stw--opensyde_gui--C_CamGenTableView::indicator:unchecked,
 stw--opensyde_gui--C_CamGenTableView::indicator:checked:!enabled,
 stw--opensyde_gui--C_CamGenSigTableView::indicator,
@@ -107,7 +107,6 @@ stw--opensyde_gui_elements--C_CamOgeMuRecentProjects
 background-color:rgb(255, 255, 255);
 }
 
-stw--opensyde_gui--C_CamGenTableView::item:!selected,
 stw--opensyde_gui--C_CamGenTableView::item:selected:focus,
 stw--opensyde_gui--C_CamMosFilterTableView::item:!selected
 {

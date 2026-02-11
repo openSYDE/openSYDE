@@ -70,9 +70,10 @@ private:
    void m_SetHeadingIcon(const uint8_t & oru8_State) const;
    void m_SetProgressBarColor(const bool & orq_Success) const;
 
-   uint32_t m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage);
+   uint64_t m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage) const;
    bool m_ErrorDetected(const bool & orq_ShowErrorMessage);
-   void m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage);
+   void m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage,
+                          const uint8_t & oru8_CurrentFileProgressInPercentage);
    void m_UpdateFileIcon(const uint32_t & oru32_FileIndex, const uint8_t & oru8_ProgressState) const;
    uint8_t m_CalcualteTotalProgressInPercentage(void) const;
    void m_ResetProgressBar();
@@ -85,6 +86,7 @@ private:
    void m_StartElapsedTimer(void);
    void m_RestartElapsedTimer(void);
    bool m_ShowErrorMessage(void);
+   void m_SetTotalHexFileSizeInBytes(const uint64_t ou64_TotalHexFileSizeInBytes);
 
    stw::opensyde_gui_logic::C_FlaUpSequences * mpc_UpSequences;
    stw::can::C_Can * mpc_CanDispatcher;
@@ -97,8 +99,10 @@ private:
 
    uint32_t mu32_FlashedFilesCounter;
    uint64_t mu64_FlashedBytes;
-   uint32_t mu32_FlashedBytesTmp;
+   uint64_t mu64_FlashedBytesTmp;
    bool mq_NewFile;
+   uint64_t mu64_TotalHexFileSizeInBytes;
+   uint64_t mu64_AllHexFilesSizeInBytes;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

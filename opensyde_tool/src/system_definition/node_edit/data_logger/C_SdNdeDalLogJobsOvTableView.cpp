@@ -264,7 +264,7 @@ void C_SdNdeDalLogJobsOvTableView::mouseDoubleClickEvent(QMouseEvent * const opc
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobsOvTableView::m_InitColumns()
 {
-   this->setColumnWidth(C_SdNdeDalLogJobsOvTableModel::h_EnumToColumn(C_SdNdeDalLogJobsOvTableModel::eINDEX), 44);
+   this->setColumnWidth(C_SdNdeDalLogJobsOvTableModel::h_EnumToColumn(C_SdNdeDalLogJobsOvTableModel::eINDEX), 51);
    this->setColumnWidth(C_SdNdeDalLogJobsOvTableModel::h_EnumToColumn(C_SdNdeDalLogJobsOvTableModel::eICON), 44);
    this->setColumnWidth(C_SdNdeDalLogJobsOvTableModel::h_EnumToColumn(C_SdNdeDalLogJobsOvTableModel::eNAME), 174);
    this->setColumnWidth(C_SdNdeDalLogJobsOvTableModel::h_EnumToColumn(C_SdNdeDalLogJobsOvTableModel::eCOMMENT), 174);

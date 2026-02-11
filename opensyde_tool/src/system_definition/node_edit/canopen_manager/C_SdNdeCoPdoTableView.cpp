@@ -256,7 +256,7 @@ void C_SdNdeCoPdoTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoTableView::m_InitColumns(void)
 {
-   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eINDEX), 44);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eINDEX), 51);
    this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eENABLED), 60);
    this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eNAME), 180);
    this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eCOMMENT), 200);

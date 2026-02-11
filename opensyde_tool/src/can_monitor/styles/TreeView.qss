@@ -1,6 +1,12 @@
 /* --------------------------------------------------------------------- */
 stw--opensyde_gui--C_CamMetTreeView
 {
+   show-decoration-selected: 0;
+}
+
+
+stw--opensyde_gui--C_CamMetTreeView
+{
 border-style: solid;
 border-top-width: 0px;
 border-bottom-width: 1px;

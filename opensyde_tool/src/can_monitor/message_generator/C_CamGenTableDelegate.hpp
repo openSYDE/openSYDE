@@ -29,6 +29,8 @@ class C_CamGenTableDelegate :
 public:
    C_CamGenTableDelegate(QObject * const opc_Parent = NULL);
 
+   void SetSelectedRows(const QModelIndexList & orc_Selection);
+
    void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
               const QModelIndex & orc_Index) const override;
 
@@ -40,6 +42,8 @@ private:
    static const QColor mhc_HIGHLIGHT_FOREGROUND_COLOR;
    static const QColor mhc_HIGHLIGHT_BORDER_COLOR;
    static const QFont mhc_HIGHLIGHT_FONT;
+
+   QModelIndexList mc_Selection;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

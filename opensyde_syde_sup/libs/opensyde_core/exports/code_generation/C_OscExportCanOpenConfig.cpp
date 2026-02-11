@@ -1239,13 +1239,13 @@ void C_OscExportCanOpenConfig::mh_CollectDeviceSpecificConciseData(
    const C_OscCanOpenManagerDeviceInfo & orc_DeviceInfo, const uint8_t ou8_ManagerId, const uint32_t ou32_CyclePeriod,
    const uint32_t ou32_WindowLength)
 {
-   const C_OscCanOpenObjectDictionary c_Od = orc_DeviceInfo.c_EdsFileContent;
+   const C_OscCanOpenObjectDictionary & rc_Od = orc_DeviceInfo.GetEdsFileContent();
    const C_OscCanOpenObjectData * pc_OdObject;
    C_OscExportCanOpenConciseEntry c_Entry = C_OscExportCanOpenConciseEntry();
    C_SclString c_Comment;
 
    //SYNC (_538)
-   pc_OdObject = c_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_SYNC);
+   pc_OdObject = rc_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_SYNC);
 
    //write if the objects exists and is writable:
    if ((pc_OdObject != NULL) && (pc_OdObject->IsWriteable() == true))
@@ -1256,7 +1256,7 @@ void C_OscExportCanOpenConfig::mh_CollectDeviceSpecificConciseData(
    }
 
    //COMMUNICATION CYCLE PERIOD (_539)
-   pc_OdObject = c_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_CYCLE_PERIOD);
+   pc_OdObject = rc_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_CYCLE_PERIOD);
 
    //write if the objects exists and is writable:
    if ((pc_OdObject != NULL) && (pc_OdObject->IsWriteable() == true))
@@ -1267,7 +1267,7 @@ void C_OscExportCanOpenConfig::mh_CollectDeviceSpecificConciseData(
    }
 
    //SYNC WINDOW LENGTH (_540)
-   pc_OdObject = c_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_SYNC_WINDOW_LENGTH);
+   pc_OdObject = rc_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_SYNC_WINDOW_LENGTH);
 
    //write if the objects exists and is writable:
    if ((pc_OdObject != NULL) && (pc_OdObject->IsWriteable() == true))
@@ -1278,7 +1278,7 @@ void C_OscExportCanOpenConfig::mh_CollectDeviceSpecificConciseData(
    }
 
    //EMCY (_526)
-   pc_OdObject = c_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_EMCY);
+   pc_OdObject = rc_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_EMCY);
 
    //write if the objects exists and is writable:
    if ((pc_OdObject != NULL) && (pc_OdObject->IsWriteable() == true))
@@ -1290,13 +1290,13 @@ void C_OscExportCanOpenConfig::mh_CollectDeviceSpecificConciseData(
    }
 
    //Heartbeat Consumer (_522)
-   const uint8_t u8_NumHbConsumer = c_Od.GetNumHeartbeatConsumers();
+   const uint8_t u8_NumHbConsumer = rc_Od.GetNumHeartbeatConsumers();
    if (u8_NumHbConsumer > 0U) //at least one HB consumer supported ?
    {
       for (uint8_t u8_It = 1U; u8_It <= u8_NumHbConsumer; ++u8_It)
       {
-         pc_OdObject = c_Od.GetCanOpenSubIndexObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_CONSUMER,
-                                                     u8_It);
+         pc_OdObject = rc_Od.GetCanOpenSubIndexObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_CONSUMER,
+                                                      u8_It);
          if ((pc_OdObject != NULL) && (pc_OdObject->IsWriteable() == true))
          {
             uint32_t u32_Value;
@@ -1322,9 +1322,9 @@ void C_OscExportCanOpenConfig::mh_CollectDeviceSpecificConciseData(
    }
 
    //Heartbeat Producer (_524)
-   if (c_Od.IsHeartbeatProducerSupported() == true)
+   if (rc_Od.IsHeartbeatProducerSupported() == true)
    {
-      pc_OdObject = c_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_PRODUCER);
+      pc_OdObject = rc_Od.GetCanOpenObject(C_OscCanOpenObjectDictionary::hu16_OD_INDEX_HEARTBEAT_PRODUCER);
       if ((pc_OdObject != NULL) && (pc_OdObject->IsWriteable() == true))
       {
          uint16_t u16_Value;
@@ -1376,7 +1376,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
          uint16_t u16_ObjectIndex;
          int32_t s32_Return;
          C_SclString c_PdoCommentText;
-         const C_OscCanOpenObjectDictionary c_OD = orc_DeviceInfo.c_EdsFileContent;
+         const C_OscCanOpenObjectDictionary & rc_Od = orc_DeviceInfo.GetEdsFileContent();
          C_OscExportCanOpenConciseEntry c_Entry = C_OscExportCanOpenConciseEntry();
          bool q_CobIdIsRo;
 
@@ -1396,7 +1396,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
             C_SclString::IntToStr(static_cast<uint32_t>(rc_CurrentPdo.u16_CanOpenManagerPdoIndex) + 1U);
 
          //check if COB-ID is missing or RO
-         s32_Return = c_OD.IsCobIdRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_CobIdIsRo);
+         s32_Return = rc_Od.IsCobIdRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_CobIdIsRo);
          if (s32_Return != C_NO_ERR)
          {
             //if there is no entry we cannot assume it is writable
@@ -1429,7 +1429,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
          {
             bool q_SectionRo;
             //check if transmission type is missing or RO
-            s32_Return = c_OD.IsTransmissionTypeRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
+            s32_Return = rc_Od.IsTransmissionTypeRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
 
             // _525
             if ((s32_Return == C_NO_ERR) && (q_SectionRo == false))
@@ -1467,7 +1467,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
             }
 
             //check if inhibit time is missing or RO
-            s32_Return = c_OD.IsInhibitTimeRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
+            s32_Return = rc_Od.IsInhibitTimeRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
 
             if ((s32_Return == C_NO_ERR) && (q_SectionRo == false))
             {
@@ -1482,7 +1482,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
             }
 
             //check if event time is missing or RO
-            s32_Return = c_OD.IsEventTimerRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
+            s32_Return = rc_Od.IsEventTimerRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
 
             if ((s32_Return == C_NO_ERR) && (q_SectionRo == false))
             {
@@ -1512,7 +1512,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
             if (oq_IsTx)
             {
                //check if sync start value is missing or RO (_525)
-               s32_Return = c_OD.IsSyncStartRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
+               s32_Return = rc_Od.IsSyncStartRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
 
                if ((s32_Return == C_NO_ERR) && (q_SectionRo == false))
                {
@@ -1536,7 +1536,7 @@ void C_OscExportCanOpenConfig::mh_CollectPdoConciseData(
             u16_ObjectIndex += rc_CurrentPdo.u16_CanOpenManagerPdoIndex;
 
             //check if PDO mapping is missing or RO
-            s32_Return = c_OD.IsPdoMappingRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
+            s32_Return = rc_Od.IsPdoMappingRo(rc_CurrentPdo.u16_CanOpenManagerPdoIndex, oq_IsTx, q_SectionRo);
 
             //mapping can only be changed if the COB-ID is writable; otherwise the PDO is still active and cannot be
             // remapped

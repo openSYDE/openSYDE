@@ -52,6 +52,54 @@ C_SdTopologyDataSnapshot::~C_SdTopologyDataSnapshot(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default copy constructor
+
+   \param[in]  orc_Source   Instance to copy
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SdTopologyDataSnapshot::C_SdTopologyDataSnapshot(const C_SdTopologyDataSnapshot & orc_Source) :
+   C_PuiBsElements(orc_Source),
+   // Call base class copy constructor
+   c_BusTextElements(orc_Source.c_BusTextElements),
+   c_UiNodes(orc_Source.c_UiNodes),
+   c_UiBuses(orc_Source.c_UiBuses),
+   c_OscNodes(orc_Source.c_OscNodes),
+   c_OscNodeGroups(orc_Source.c_OscNodeGroups),
+   c_OscBuses(orc_Source.c_OscBuses),
+   c_BusConnections(orc_Source.c_BusConnections)
+{
+   // No additional logic needed for default member-wise copy
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default copy assignment operator (implemented to avoid compiler complaining)
+
+   \param[in]  orc_Source  Source where to copy from
+
+   \return
+   Instance with new values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SdTopologyDataSnapshot & C_SdTopologyDataSnapshot::operator =(const C_SdTopologyDataSnapshot & orc_Source) &
+{
+   if (this != &orc_Source) // Protect against self-assignment
+   {
+      // Call base class's copy assignment operator
+      C_PuiBsElements::operator =(orc_Source);
+
+      // Copy all member variables
+      c_BusTextElements = orc_Source.c_BusTextElements;
+      c_UiNodes = orc_Source.c_UiNodes;
+      c_UiBuses = orc_Source.c_UiBuses;
+      c_OscNodes = orc_Source.c_OscNodes;
+      c_OscNodeGroups = orc_Source.c_OscNodeGroups;
+      c_OscBuses = orc_Source.c_OscBuses;
+      c_BusConnections = orc_Source.c_BusConnections;
+   }
+   return (*this);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all data storage
 */
 //----------------------------------------------------------------------------------------------------------------------

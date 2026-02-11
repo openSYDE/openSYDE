@@ -45,11 +45,11 @@ public:
               const QModelIndex & orc_Index) const override;
 
    void SetModel(C_SdNdeDpListTableModel * const opc_Value);
-
    void SetUndoStack(QUndoStack * const opc_Value);
+   void SetSelectedRows(const QModelIndexList & orc_Selection);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
-
 Q_SIGNALS:
    //lint -restore
    void SigLinkClicked(const QModelIndex & orc_Index) const;
@@ -71,6 +71,7 @@ private:
    bool mq_ChangeInProgress;
    bool mq_Inital;
    bool mq_ChangeDetected;
+   QModelIndexList mc_Selection;
 
    QWidget * m_CreateEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
                             const C_SdNdeDpListTableModel::E_Columns oe_Col) const;

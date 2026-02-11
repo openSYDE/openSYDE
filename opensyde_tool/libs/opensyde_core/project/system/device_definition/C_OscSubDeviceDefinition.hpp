@@ -46,8 +46,6 @@ public:
    ///is programming supported enabled?
    bool q_ProgrammingSupport;
 
-   ///is the KEFEX protocol supported (on CAN bus) ?
-   bool q_DiagnosticProtocolKefex;
    ///is the openSYDE protocol supported on CAN bus ?
    bool q_DiagnosticProtocolOpenSydeCan;
    ///is the openSYDE protocol supported on ethernet ?

@@ -276,6 +276,98 @@ template <typename T> void C_OscNodeDataPoolContent::m_GetValue(const E_Type oe_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value to a specific type
+
+   \param[in]  orc_Output     Output value
+   \param[in]  ou32_Index     Optional fallback index if array
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{8058,8080} //template parameter names are not properly handled by naming convention check
+template <typename T> void C_OscNodeDataPoolContent::m_GetAnyValueAsTemplate(T & orc_Output,
+                                                                             const uint32_t ou32_Index) const
+{
+   if (this->GetArray() == true)
+   {
+      if (ou32_Index < this->GetArraySize())
+      {
+         switch (this->GetType())
+         {
+         case C_OscNodeDataPoolContent::eUINT8:
+            orc_Output = static_cast<T>(this->GetValueArrU8Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eUINT16:
+            orc_Output = static_cast<T>(this->GetValueArrU16Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eUINT32:
+            orc_Output = static_cast<T>(this->GetValueArrU32Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eUINT64:
+            orc_Output = static_cast<T>(this->GetValueArrU64Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eSINT8:
+            orc_Output = static_cast<T>(this->GetValueArrS8Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eSINT16:
+            orc_Output = static_cast<T>(this->GetValueArrS16Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eSINT32:
+            orc_Output = static_cast<T>(this->GetValueArrS32Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eSINT64:
+            orc_Output = static_cast<T>(this->GetValueArrS64Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eFLOAT32:
+            orc_Output = static_cast<T>(this->GetValueArrF32Element(ou32_Index));
+            break;
+         case C_OscNodeDataPoolContent::eFLOAT64:
+            orc_Output = static_cast<T>(this->GetValueArrF64Element(ou32_Index));
+            break;
+         default:
+            break;
+         }
+      }
+   }
+   else
+   {
+      switch (this->GetType())
+      {
+      case C_OscNodeDataPoolContent::eUINT8:
+         orc_Output = static_cast<T>(this->GetValueU8());
+         break;
+      case C_OscNodeDataPoolContent::eUINT16:
+         orc_Output = static_cast<T>(this->GetValueU16());
+         break;
+      case C_OscNodeDataPoolContent::eUINT32:
+         orc_Output = static_cast<T>(this->GetValueU32());
+         break;
+      case C_OscNodeDataPoolContent::eUINT64:
+         orc_Output = static_cast<T>(this->GetValueU64());
+         break;
+      case C_OscNodeDataPoolContent::eSINT8:
+         orc_Output = static_cast<T>(this->GetValueS8());
+         break;
+      case C_OscNodeDataPoolContent::eSINT16:
+         orc_Output = static_cast<T>(this->GetValueS16());
+         break;
+      case C_OscNodeDataPoolContent::eSINT32:
+         orc_Output = static_cast<T>(this->GetValueS32());
+         break;
+      case C_OscNodeDataPoolContent::eSINT64:
+         orc_Output = static_cast<T>(this->GetValueS64());
+         break;
+      case C_OscNodeDataPoolContent::eFLOAT32:
+         orc_Output = static_cast<T>(this->GetValueF32());
+         break;
+      case C_OscNodeDataPoolContent::eFLOAT64:
+         orc_Output = static_cast<T>(this->GetValueF64());
+         break;
+      default:
+         break;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for uint8 type
 
    \param[in]  ou8_Value   New assignment value
@@ -2966,6 +3058,19 @@ void C_OscNodeDataPoolContent::GetValueAsScaledString(const float64_t of64_Facto
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value to float32
+
+   \param[in]  orf32_Output   Output value
+   \param[in]  ou32_Index     Optional fallback index if array
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNodeDataPoolContent::GetAnyValueAsFloat32(float32_t & orf32_Output, const uint32_t ou32_Index) const
+{
+   orf32_Output = 0.0F;
+   m_GetAnyValueAsTemplate(orf32_Output, ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert value to float64
 
    \param[in]  orf64_Output   Output value
@@ -2975,86 +3080,7 @@ void C_OscNodeDataPoolContent::GetValueAsScaledString(const float64_t of64_Facto
 void C_OscNodeDataPoolContent::GetAnyValueAsFloat64(float64_t & orf64_Output, const uint32_t ou32_Index) const
 {
    orf64_Output = 0.0;
-
-   if (this->GetArray() == true)
-   {
-      if (ou32_Index < this->GetArraySize())
-      {
-         switch (this->GetType())
-         {
-         case C_OscNodeDataPoolContent::eUINT8:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrU8Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eUINT16:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrU16Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eUINT32:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrU32Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eUINT64:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrU64Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eSINT8:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrS8Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eSINT16:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrS16Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eSINT32:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrS32Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eSINT64:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrS64Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eFLOAT32:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrF32Element(ou32_Index));
-            break;
-         case C_OscNodeDataPoolContent::eFLOAT64:
-            orf64_Output = static_cast<float64_t>(this->GetValueArrF64Element(ou32_Index));
-            break;
-         default:
-            break;
-         }
-      }
-   }
-   else
-   {
-      switch (this->GetType())
-      {
-      case C_OscNodeDataPoolContent::eUINT8:
-         orf64_Output = static_cast<float64_t>(this->GetValueU8());
-         break;
-      case C_OscNodeDataPoolContent::eUINT16:
-         orf64_Output = static_cast<float64_t>(this->GetValueU16());
-         break;
-      case C_OscNodeDataPoolContent::eUINT32:
-         orf64_Output = static_cast<float64_t>(this->GetValueU32());
-         break;
-      case C_OscNodeDataPoolContent::eUINT64:
-         orf64_Output = static_cast<float64_t>(this->GetValueU64());
-         break;
-      case C_OscNodeDataPoolContent::eSINT8:
-         orf64_Output = static_cast<float64_t>(this->GetValueS8());
-         break;
-      case C_OscNodeDataPoolContent::eSINT16:
-         orf64_Output = static_cast<float64_t>(this->GetValueS16());
-         break;
-      case C_OscNodeDataPoolContent::eSINT32:
-         orf64_Output = static_cast<float64_t>(this->GetValueS32());
-         break;
-      case C_OscNodeDataPoolContent::eSINT64:
-         orf64_Output = static_cast<float64_t>(this->GetValueS64());
-         break;
-      case C_OscNodeDataPoolContent::eFLOAT32:
-         orf64_Output = static_cast<float64_t>(this->GetValueF32());
-         break;
-      case C_OscNodeDataPoolContent::eFLOAT64:
-         orf64_Output = static_cast<float64_t>(this->GetValueF64());
-         break;
-      default:
-         break;
-      }
-   }
+   m_GetAnyValueAsTemplate(orf64_Output, ou32_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

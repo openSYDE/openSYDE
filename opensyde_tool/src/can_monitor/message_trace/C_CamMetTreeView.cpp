@@ -608,6 +608,9 @@ void C_CamMetTreeView::keyPressEvent(QKeyEvent * const opc_Event)
 void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & orc_Rect,
                                     const QModelIndex & orc_Index) const
 {
+   // first call original (mainly background)
+   QTreeView::drawBranches(opc_Painter, orc_Rect, orc_Index);
+
    // Adapt the color
    QPen c_Pen = opc_Painter->pen();
    const QPoint c_TopLeft = orc_Rect.topLeft();
@@ -718,8 +721,6 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       }
    }
    opc_Painter->restore();
-
-   QTreeView::drawBranches(opc_Painter, orc_Rect, orc_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

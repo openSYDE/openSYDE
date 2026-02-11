@@ -31,7 +31,7 @@
 #include "C_OscSuSequences.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscZipFile.hpp"
-#include "C_OscAesFile.hpp"
+#include "C_OscSecurityAesFile.hpp"
 #include "C_OscSupSignatureFiler.hpp"
 #include "C_OscSupDefinitionFiler.hpp"
 #include "C_OscSecurityPemSecUpdate.hpp"

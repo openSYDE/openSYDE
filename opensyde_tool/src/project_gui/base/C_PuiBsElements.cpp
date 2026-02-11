@@ -43,22 +43,37 @@ C_PuiBsElements::C_PuiBsElements(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default copy constructor (implemented to avoid compiler complaining)
+
+   \param[in]  orc_Source  Source where to copy from
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiBsElements::C_PuiBsElements(const C_PuiBsElements & orc_Source) :
+   c_Boundaries(orc_Source.c_Boundaries),
+   c_Images(orc_Source.c_Images),
+   c_LineArrows(orc_Source.c_LineArrows),
+   c_TextElements(orc_Source.c_TextElements)
+{
+   // No additional logic needed for default member-wise copy
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Assignment operator
 
-   \param[in]  orc_Snapshot   Instance to copy
+   \param[in]  orc_Source  Instance to copy
 
    \return
    Instance with new values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsElements & C_PuiBsElements::operator =(const C_PuiBsElements & orc_Snapshot) &
+C_PuiBsElements & C_PuiBsElements::operator =(const C_PuiBsElements & orc_Source) &
 {
-   if (&orc_Snapshot != this)
+   if (&orc_Source != this)
    {
-      this->c_Boundaries = orc_Snapshot.c_Boundaries;
-      this->c_Images = orc_Snapshot.c_Images;
-      this->c_LineArrows = orc_Snapshot.c_LineArrows;
-      this->c_TextElements = orc_Snapshot.c_TextElements;
+      this->c_Boundaries = orc_Source.c_Boundaries;
+      this->c_Images = orc_Source.c_Images;
+      this->c_LineArrows = orc_Source.c_LineArrows;
+      this->c_TextElements = orc_Source.c_TextElements;
    }
    return *this;
 }

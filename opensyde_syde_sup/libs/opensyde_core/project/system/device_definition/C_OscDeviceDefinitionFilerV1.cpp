@@ -302,28 +302,6 @@ int32_t C_OscDeviceDefinitionFilerV1::h_Load(C_OscDeviceDefinition & orc_DeviceD
       else
       {
          //get sub-node
-         c_Text = orc_Parser.SelectNodeChild("kefex");
-         if (c_Text != "kefex")
-         {
-            //Optional: Use default values
-         }
-         else
-         {
-            const std::vector<C_OscXmlAttribute> c_Attributes = orc_Parser.GetAttributes();
-            for (uint16_t u16_Index = 0U; u16_Index < c_Attributes.size(); u16_Index++)
-            {
-               if (c_Attributes[u16_Index].c_Name == "support")
-               {
-                  c_SubDevice.q_DiagnosticProtocolKefex = (c_Attributes[u16_Index].c_Value == "1");
-               }
-               else
-               {
-                  //unknown attribute; nothing we can do with it
-               }
-            }
-            c_Text = orc_Parser.SelectNodeParent(); //back to parent ...
-            tgl_assert(c_Text == "protocols-diagnostics");
-         }
          c_Text = orc_Parser.SelectNodeChild("opensyde");
          if (c_Text != "opensyde")
          {

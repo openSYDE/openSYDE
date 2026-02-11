@@ -27,7 +27,7 @@
 #include "TglTime.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "C_OscBinaryHash.hpp"
+#include "C_OscUtilBinaryHash.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
@@ -1112,7 +1112,7 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetHashValueAsQtString(void)
 {
-   return QString::fromStdString(stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash().c_str());
+   return QString::fromStdString(stw::opensyde_core::C_OscUtilBinaryHash::h_CreateBinaryHash().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

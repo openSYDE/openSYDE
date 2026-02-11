@@ -196,7 +196,8 @@ bool C_OscRoutingCalculation::CheckItfNumberForRouting(const uint32_t ou32_Targe
             // At least one com interface is relevant
             q_Return = true;
          }
-         else if (this->me_Mode == C_OscRoutingCalculation::eROUTING_CHECK)
+         else if ((this->me_Mode == C_OscRoutingCalculation::eROUTING_CHECK) ||
+                  (this->me_Mode == C_OscRoutingCalculation::eROUTING_CHECK_DIAG))
          {
             // Independent of any update or diagnostic functionality of the interface
             q_Return = true;
@@ -341,6 +342,20 @@ int32_t C_OscRoutingCalculation::m_CheckTargetNodeConfig(void) const
                {
                   // Independent of any update or diagnostic functionality of the interface, but the error must be
                   // detected, so handle it as interface with active functionality
+                  q_AtLeastOneFunctionActive = true;
+
+                  if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
+                  {
+                     // Minimum one com interface is relevant
+                     q_UsableBusFound = true;
+                  }
+               }
+               else if ((this->me_Mode == eROUTING_CHECK_DIAG) &&
+                        (pc_Node->c_Properties.e_DiagnosticServer != C_OscNodeProperties::eDS_NONE))
+               {
+                  // Dependent only of diagnostic support of the node and not the concrete interface configuration.
+                  // In case of a principle diagnostic support the error must be detected,
+                  // so handle it as interface with active functionality
                   q_AtLeastOneFunctionActive = true;
 
                   if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)

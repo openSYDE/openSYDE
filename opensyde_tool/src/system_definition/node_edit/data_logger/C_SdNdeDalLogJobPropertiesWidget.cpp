@@ -24,6 +24,7 @@
 #include "C_OgeWiCustomMessage.hpp"
 
 #include <cmath>
+#include <QRegularExpression>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -89,6 +90,9 @@ C_SdNdeDalLogJobPropertiesWidget::C_SdNdeDalLogJobPropertiesWidget(QWidget * con
 
    connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::editingFinished,
            this, &C_SdNdeDalLogJobPropertiesWidget::m_TrimLogJobName);
+
+   connect(this->mpc_Ui->pc_LineEditLogDestination, &QLineEdit::editingFinished,
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnLogDestinationEditFinished);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,9 +136,9 @@ void C_SdNdeDalLogJobPropertiesWidget::SetNodeDataLoggerJob(const uint32_t ou32_
       this->mpc_Ui->pc_SpxBoxMaxLogEntries->setValue(pc_Retval->c_Properties.u32_MaxLogEntries);
       this->m_OnLogJobUseCaseChanged(this->mpc_Ui->pc_ComboBoxLogJobUseCase->currentIndex());
       this->m_OnLocalDataChanged(this->mpc_Ui->pc_ComboBoxLocalData->currentIndex());
+      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->SetNodeDataLoggerJob(ou32_NodeIndex, ou32_DataLoggerJobIndex);
    }
    this->m_ReconnectChangeTriggers();
-   this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->SetNodeDataLoggerJob(ou32_NodeIndex, ou32_DataLoggerJobIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -215,7 +219,12 @@ void C_SdNdeDalLogJobPropertiesWidget::InitStaticNames() const
    this->mpc_Ui->pc_LabelLogDestination->SetToolTipInformation(C_GtGetText::h_GetText("Log Destination"),
                                                                C_GtGetText::h_GetText(
                                                                   "Log Destination, relevant when log job use-case 'Manual' is selected.\n"
-                                                                  "Sub-folder name where the log files are stored."));
+                                                                  "Sub-folder name where the log files are stored.\n\n"
+                                                                  "Format: \n"
+                                                                  "- Must start with ./\n"
+                                                                  "- Only alphanumeric characters, dots, hyphens, and underscores allowed\n"
+                                                                  "- No leading/trailing dots or double slashes\n\n"
+                                                                  "Examples: ./LogFiles, ./my-folder/sub_dir"));
 
    this->mpc_Ui->pc_LabelMode->SetToolTipInformation(C_GtGetText::h_GetText("Mode"),
                                                      C_GtGetText::h_GetText(
@@ -400,13 +409,13 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged(const int32_t os32_N
    case 0:
       this->mpc_Ui->pc_GbxLoggingInterval->setVisible(false);
       this->mpc_Ui->pc_GbxLogDuration->setVisible(false);
-      this->mpc_Ui->pc_GroupBoxMaxLogEntries->setVisible(true);
+      this->mpc_Ui->pc_GbxMaxLogEntries->setVisible(true);
       this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->setVisible(false);
       break;
    case 1:
       this->mpc_Ui->pc_GbxLoggingInterval->setVisible(true);
       this->mpc_Ui->pc_GbxLogDuration->setVisible(true);
-      this->mpc_Ui->pc_GroupBoxMaxLogEntries->setVisible(false);
+      this->mpc_Ui->pc_GbxMaxLogEntries->setVisible(false);
       this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->setVisible(true);
       this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->Reload();
       break;
@@ -448,6 +457,7 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged()
 
       this->mc_Properties.u32_LogIntervalMs = this->mpc_Ui->pc_SpinBoxLoggingInterval->value();
       this->mc_Properties.u32_MaxLogDurationSec = this->mpc_Ui->pc_SpinBoxLogDuration->value();
+      this->mc_Properties.u32_MaxLogEntries = this->mpc_Ui->pc_SpxBoxMaxLogEntries->value();
       this->Save();
    }
 }
@@ -522,6 +532,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_DisconnectChangeTriggers() const
    disconnect(this->mpc_Ui->pc_SpinBoxLogDuration,
               static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
               this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+   disconnect(this->mpc_Ui->pc_SpxBoxMaxLogEntries,
+              static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
+              this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -553,6 +566,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_ReconnectChangeTriggers() const
            static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
            this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
    connect(this->mpc_Ui->pc_SpinBoxLogDuration,
+           static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
+           this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
+   connect(this->mpc_Ui->pc_SpxBoxMaxLogEntries,
            static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
            this, &C_SdNdeDalLogJobPropertiesWidget::m_OnXappSettingsChanged);
 }
@@ -631,7 +647,7 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnNameEditingFinished()
       else
       {
          this->m_OnXappSettingsChanged();
-         Q_EMIT this->SigLogJobNameModified();
+         Q_EMIT this->SigLogJobNameModified(this->mu32_NodeIndex, this->mu32_DataLoggerJobIndex);
       }
       hq_InProgress = false; //lint !e838 its static and could be used on strange second call
    }
@@ -646,4 +662,49 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnNameEditingFinished()
 void C_SdNdeDalLogJobPropertiesWidget::m_TrimLogJobName() const
 {
    this->mpc_Ui->pc_LineEditName->setText(this->mpc_Ui->pc_LineEditName->text().trimmed());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for log destination editing finished
+
+   Validates the log destination path against a regular expression.
+   Shows error message if invalid.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobPropertiesWidget::m_OnLogDestinationEditFinished(void)
+{
+   const QString c_Input = this->mpc_Ui->pc_LineEditLogDestination->text();
+   static const QRegularExpression hc_Regex(
+      R"(^$|^\./([A-Za-z0-9_-](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?)(/([A-Za-z0-9_-](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?))*$)");
+
+   const QRegularExpressionMatch c_Match = hc_Regex.match(c_Input);
+   bool q_ResetInput = false;
+
+   C_OgeWiCustomMessage c_Message(this);
+
+   if (c_Match.hasMatch() == false)
+   {
+      // Invalid input
+      c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+      c_Message.SetCustomMinWidth(700);
+      c_Message.SetCustomMinHeight(300, 300);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Log Destination Input"));
+      c_Message.SetDescription(C_GtGetText::h_GetText("Invalid log destination path format. \n\n"
+                                                      "Required format: \n"
+                                                      "- Must start with ./\n"
+                                                      "- Only alphanumeric characters, dots, hyphens, and underscores allowed\n"
+                                                      "- No leading/trailing dots or double slashes\n\n"
+                                                      "Examples: ./LogFiles, ./my-folder/sub_dir\n\n"));
+
+      // Reset input?
+      q_ResetInput = true;
+
+      c_Message.Execute();
+   }
+
+   if (q_ResetInput == true)
+   {
+      // Reset input
+      this->mpc_Ui->pc_LineEditLogDestination->setText("");
+   }
 }

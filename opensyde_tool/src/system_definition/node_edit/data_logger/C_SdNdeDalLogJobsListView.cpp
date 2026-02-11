@@ -174,6 +174,19 @@ void C_SdNdeDalLogJobsListView::LoadSelectedLogJob(const uint32_t ou32_LogJobInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload selected LogJob name
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataLoggerJobIndex    Data logger job index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobsListView::LoadSelectedLogJobName(const uint32_t ou32_NodeIndex,
+                                                       const uint32_t ou32_DataLoggerJobIndex)
+{
+   this->mc_Model.UpdateName(ou32_NodeIndex, ou32_DataLoggerJobIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overwritten selection changed event slot
 
    Here: Emit signal with new number of selected items
@@ -257,6 +270,13 @@ void C_SdNdeDalLogJobsListView::selectionChanged(const QItemSelection & orc_Sele
 
       QListView::selectionChanged(orc_Selected, orc_Deselected);
       Q_EMIT this->SigSelectionChanged(u32_ListIndex);
+   }
+   else
+   {
+      if (this->IsEmpty() == false)
+      {
+         this->selectionModel()->select(this->currentIndex(), QItemSelectionModel::Select);
+      }
    }
 }
 

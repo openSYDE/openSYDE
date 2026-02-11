@@ -141,6 +141,7 @@ set (OPENSYDE_GUI_LIB_INCLUDES
    ${PROJECT_ROOT}/libs/dbc_driver_library/src/
    ${PROJECT_ROOT}/libs/dbc_driver_library/src/Vector
    ${PROJECT_ROOT}/libs/dbc_driver_library/src/Vector/DBC
+   ${PROJECT_ROOT}/libs/osy_git_data_model_monitor/includes
 )
 
 # --- PROJECT SOURCE FILE PATHS ----------------------------------------------------------------------------------------
@@ -204,6 +205,7 @@ set(OPENSYDE_SOURCES
    ${PROJECT_ROOT}/src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.cpp
+   ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerDialog.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableDelegate.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.cpp
@@ -218,6 +220,7 @@ set(OPENSYDE_SOURCES
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsOvWidget.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.cpp
+   ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalTriggerCheckHelper.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopClipBoardHelper.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroup.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroupBase.cpp
@@ -1102,6 +1105,7 @@ set(OPENSYDE_HEADERS
    ${PROJECT_ROOT}/src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.hpp
+   ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerDialog.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableDelegate.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableModel.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobDataSelectionTableView.hpp
@@ -1116,6 +1120,7 @@ set(OPENSYDE_HEADERS
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsOvWidget.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.hpp
+   ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalTriggerCheckHelper.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopClipBoardHelper.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroup.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/copy_paste/C_SdNdeDalCopElementIdCrcGroupBase.hpp
@@ -1979,6 +1984,8 @@ set(OPENSYDE_FORMS
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsOvWidget.ui
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobsWidget.ui
    ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalTabContentWidget.ui
+   ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.ui
+   ${PROJECT_ROOT}/src/system_definition/node_edit/data_logger/C_SdNdeDalLogJobAdditionalTriggerDialog.ui
    ${PROJECT_ROOT}/src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.ui
    ${PROJECT_ROOT}/src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.ui
    ${PROJECT_ROOT}/src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.ui
@@ -2144,16 +2151,18 @@ set(OPENSYDE_CORE_SKIP_ZIPPING                     0)
 set(OPENSYDE_CORE_SKIP_IMPORTS                     0)
 set(OPENSYDE_CORE_SKIP_CODE_GENERATION             0)
 set(OPENSYDE_CORE_SKIP_PROJECT_HANDLING            0)
+set(OPENSYDE_CORE_SKIP_PARAM_SET                   0)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_BASIC      1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM     0)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_MONITOR    1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON     0)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING            0)
 set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION         1)
+set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION   0)
 set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING     0)
-set(OPENSYDE_CORE_SKIP_XAPP_BASIC_FILE_HANDLING    1)
 set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS             0)
 set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET              0)
+set(OPENSYDE_CORE_SKIP_SECURITY                    0)
 
 add_subdirectory(${PROJECT_ROOT}/libs/opensyde_core ${CMAKE_BINARY_DIR}/opensyde_core)
 
@@ -2173,6 +2182,7 @@ set(OPENSYDE_LINK_LIBRARIES
    ${PROJECT_ROOT}/libs/openssl/libssl.a
    ${PROJECT_ROOT}/libs/openssl/libcrypto.a
    ${PROJECT_ROOT}/libs/gettext/libintl.a
+   ${PROJECT_ROOT}/libs/osy_git_data_model_monitor/libosy_git_data_model_monitor.a
 )
 
 # COMPILER SWITCHES

@@ -112,6 +112,7 @@ private:
    void m_RegisterAllCyclicMessages(void);
    void m_Report(const stw::opensyde_gui_elements::C_OgeWiCustomMessage::E_Type oe_Type, const QString & orc_Heading,
                  const QString & orc_Description);
+   void m_OnSortModelLayoutChange(void);
 
    //Avoid call
    C_CamGenTableView(const C_CamGenTableView &);

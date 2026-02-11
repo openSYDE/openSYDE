@@ -1098,7 +1098,7 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
 
    this->beginResetModel();
    //Clear
-   delete (this->mpc_InvisibleRootItem);
+   m_DelayedDelete(this->mpc_InvisibleRootItem);
    this->mpc_InvisibleRootItem = new C_TblTreItem();
    this->mpc_DataWidget = opc_DataWidget;
    this->mc_EcuValuesString.clear();

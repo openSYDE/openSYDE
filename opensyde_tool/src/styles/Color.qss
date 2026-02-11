@@ -211,7 +211,8 @@ stw--opensyde_gui--C_NagUnUsedProjectFilesPopUpDialog,
 stw--opensyde_gui--C_SyvUpPacSecurityCertificatePackageDialog,
 stw--opensyde_gui--C_SyvUpPacPemFilesListWidget::item,
 stw--opensyde_gui--C_SdNdeDalLogJobsListView,
-stw--opensyde_gui--C_SdNdeDalLogJobsListView::item
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item,
+stw--opensyde_gui--C_SdNdeDalLogJobAdditionalTriggerDialog
 {
 background-color: transparent;
 }
@@ -842,7 +843,8 @@ stw--opensyde_gui_elements--C_OgeLabNodePropComIfTable[COMIF_TableCell_Hyperlink
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="6"],
 stw--opensyde_gui_elements--C_OgePubTextOnly,
 stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="6"],
-stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:enabled:selected:!focus
+stw--opensyde_gui--C_SdNdeDalLogJobDataSelectionTableView::item:enabled:selected:!focus,
+stw--opensyde_gui_elements--C_OgePubTextOnly[Edit_Hyperlink="true"]:enabled
 {
 color: rgb(86, 86, 104);
 }
@@ -953,7 +955,8 @@ stw--opensyde_gui--C_SdNdeHalcChannelTreeView::item:!selected,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView::item:!selected,
 stw--opensyde_gui--C_SdNdeCoOverviewTableView::item:!selected,
 stw--opensyde_gui--C_SdNdeCoPdoTableView::item:!selected,
-stw--opensyde_gui--C_SdNdeDalLogJobsListView::item::!selected
+stw--opensyde_gui--C_SdNdeDalLogJobsListView::item::!selected,
+stw--opensyde_gui_elements--C_OgePubTextOnly[Edit_Hyperlink="true"]:disabled
 {
 color: rgb(130, 130, 143);
 }

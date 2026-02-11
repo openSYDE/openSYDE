@@ -19,7 +19,6 @@
 
 #include "C_OscComDriverProtocol.hpp"
 #include "C_SyvComDataDealer.hpp"
-#include "C_OscDiagProtocolKfx.hpp"
 #include "C_SyvComPollingThreadDiag.hpp"
 #include "C_SyvComDriverThread.hpp"
 #include "C_Can.hpp"
@@ -53,7 +52,7 @@ public:
    int32_t SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                                     std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> & orc_FailedIdRegisters, std::vector<QString> & orc_FailedIdErrorDetails, std::map<uint32_t, uint32_t> & orc_FailedNodesElementNumber, std::map<uint32_t, uint32_t> & orc_NodesElementNumber);
    int32_t StopCyclicTransmissions(void);
-   int32_t StopDiagnosisServer(void);
+   void StopDiagnosisServer(void);
 
    int32_t StartCycling(void);
    void StopCycling(void);
@@ -109,9 +108,9 @@ protected:
    bool m_GetRoutingMode(stw::opensyde_core::C_OscRoutingCalculation::E_Mode & ore_Mode) const override;
    uint8_t m_GetRoutingSessionId(void) const override;
    bool m_IsRoutingSpecificNecessary(const stw::opensyde_core::C_OscNode & orc_Node) const override;
-   int32_t m_StartRoutingSpecific(const uint32_t ou32_ActiveNode, const stw::opensyde_core::C_OscNode * const opc_Node,
-                                  const stw::opensyde_core::C_OscRoutingRoutePoint & orc_LastNodeOfRouting,
-                                  stw::opensyde_core::C_OscProtocolDriverOsy * const opc_ProtocolOsyOfLastNodeOfRouting,
+   int32_t m_StartRoutingSpecific(const uint32_t ou32_ActiveNode, const stw::opensyde_core::C_OscNode * const
+                                  opc_Node, const stw::opensyde_core::C_OscRoutingRoutePoint & orc_LastNodeOfRouting, stw::opensyde_core::C_OscProtocolDriverOsy * const
+                                  opc_ProtocolOsyOfLastNodeOfRouting,
                                   stw::opensyde_core::C_OscCanDispatcherOsyRouter ** const oppc_RoutingDispatcher)
    override;
 
@@ -178,7 +177,6 @@ private:
    stw::opensyde_core::C_OscSecurityPemDatabase mc_PemDatabase;
 
    int32_t m_InitDiagNodes(void);
-   void m_InitDiagProtocolKfx(stw::opensyde_core::C_OscDiagProtocolKfx * const opc_DiagProtocolKefex) const;
    int32_t m_InitDiagProtocol(void);
    int32_t m_InitDataDealer(void);
    int32_t m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<uint32_t> & orc_ErrorActiveNodes);

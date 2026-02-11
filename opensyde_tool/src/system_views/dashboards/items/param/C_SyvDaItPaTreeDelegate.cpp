@@ -14,6 +14,7 @@
 
 #include <QSvgRenderer>
 #include <QEvent>
+#include <QTimer>
 
 #include "TglUtils.hpp"
 #include "constants.hpp"
@@ -383,6 +384,18 @@ bool C_SyvDaItPaTreeDelegate::eventFilter(QObject * const opc_Object, QEvent * c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delayed focus
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeDelegate::m_DelayedFocus(void)
+{
+   if (this->mpc_Editor != NULL)
+   {
+      this->mpc_Editor->setFocus();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set editor
 
    \param[in] opc_Editor New editor
@@ -428,6 +441,11 @@ QWidget * C_SyvDaItPaTreeDelegate::m_CreateEditor(QWidget * const opc_Parent, co
             {
                //Send link click
                Q_EMIT this->SigLinkClicked(orc_Index);
+            }
+            else
+            {
+               //Delayed focus necessary for proxy widgets, see #111266
+               QTimer::singleShot(200, this, &C_SyvDaItPaTreeDelegate::m_DelayedFocus);
             }
          }
       }

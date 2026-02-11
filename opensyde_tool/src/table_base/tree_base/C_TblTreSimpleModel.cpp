@@ -12,6 +12,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <QTimer>
+
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "C_TblTreSimpleModel.hpp"
@@ -147,7 +149,7 @@ int32_t C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
          static_cast<const C_TblTreSimpleItem *>(orc_Parent.internalPointer());
       if (pc_TreeItem != NULL)
       {
-         s32_Retval = pc_TreeItem->c_Children.size();
+         s32_Retval = static_cast<int32_t>(pc_TreeItem->c_Children.size());
       }
    }
    else
@@ -155,7 +157,7 @@ int32_t C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
       if (this->mpc_InvisibleRootItem != NULL)
       {
          //Top level
-         s32_Retval = this->mpc_InvisibleRootItem->c_Children.size();
+         s32_Retval = static_cast<int32_t>(this->mpc_InvisibleRootItem->c_Children.size());
       }
    }
 
@@ -201,4 +203,33 @@ int32_t C_TblTreSimpleModel::m_CountLayers(const QModelIndex & orc_Index, uint32
       oru32_ValidLayers = 0UL;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delayed delete
+
+   Use case: trigger delayed delete (end of Qt queue) for tree item, usually root,
+   when rebuilding tree to ensure delete but also availability during all queued actions
+
+   \param[in,out]  opc_Object    Object
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreSimpleModel::m_DelayedDelete(C_TblTreSimpleItem * const opc_Object) const
+{
+   QTimer::singleShot(50, this, [opc_Object] ()
+   {
+      C_TblTreSimpleModel::mh_DelayedDeleteExecute(opc_Object);
+   }
+                      );
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delayed delete execute
+
+   \param[in,out]  opc_Object    Object
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreSimpleModel::mh_DelayedDeleteExecute(C_TblTreSimpleItem * const opc_Object)
+{
+   delete (opc_Object);
 }

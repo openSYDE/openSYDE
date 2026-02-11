@@ -26,6 +26,7 @@
 #include "C_FlaUpListItemWidget.hpp"
 
 #include "ui_C_FlaUpProperties.h"
+#include "C_FlaUpSequences.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -54,7 +55,8 @@ using namespace stw::opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_FlaUpProperties::C_FlaUpProperties(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_FlaUpProperties)
+   mpc_Ui(new Ui::C_FlaUpProperties),
+   mu64_TotalHexFileSizeInBytes(0)
 {
    this->mpc_Ui->setupUi(this);
    this->mpc_ScrollLayout = new QVBoxLayout(this->mpc_Ui->pc_ScrollAreaWidget);
@@ -108,9 +110,9 @@ C_FlaUpProperties::C_FlaUpProperties(QWidget * const opc_Parent) :
 
    connect(this->mpc_ListWidget, &C_FlaUpListWidget::SigUpdateFileCounter, this,
            &C_FlaUpProperties::m_UpdateLabelTitleWithFileCounter);
-
    this->setAcceptDrops(true);
    this->ResetSummary();
+   this->GetAllHexFilesSizeInBytes();
    this->UpdateDataTransfer();
 }
 
@@ -256,6 +258,29 @@ void C_FlaUpProperties::SetProgressBarColor(const bool & orq_Success) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set total number of Hex File size in bytes
+
+   \param[in]       ou64_TotalHexFileSizeInBytes     Amount of hex file size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpProperties::SetTotalHexFileSizeInBytes(const uint64_t ou64_TotalHexFileSizeInBytes)
+{
+   this->mu64_TotalHexFileSizeInBytes = ou64_TotalHexFileSizeInBytes;
+   this->UpdateDataTransfer();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all hex-files size in bytes.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaUpProperties::GetAllHexFilesSizeInBytes()
+{
+   const QStringList & rc_HexFiles = this->GetHexFilePaths();
+
+   this->SetTotalHexFileSizeInBytes(C_FlaUpSequences::h_GetAllHexFileSize(rc_HexFiles));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update progress bar
 
    \param[in]       oru32_ProgressInPercentage     Percentage (0% - 100%)
@@ -291,7 +316,7 @@ void C_FlaUpProperties::UpdateDataTransfer(void) const
    QString c_DataTransfer;
 
    const float64_t f64_BYTE = 1024.0;
-   const float64_t f64_OverallFilesSize = static_cast<float64_t>(this->mpc_ListWidget->GetTotalHexFileSize());
+   const float64_t f64_OverallFilesSize = static_cast<float64_t>(this->mu64_TotalHexFileSizeInBytes);
 
    if (f64_OverallFilesSize > (pow(f64_BYTE, 3.)))
    {
@@ -346,7 +371,7 @@ void C_FlaUpProperties::UpdateDataTransfer(const uint64_t & oru64_FlashedBytes) 
 
    const float64_t f64_BYTE = 1024.0;
    const float64_t f64_OverallFlashedBytes = static_cast<float64_t>(oru64_FlashedBytes);
-   const float64_t f64_OverallFilesSize = static_cast<float64_t>(this->mpc_ListWidget->GetTotalHexFileSize());
+   const float64_t f64_OverallFilesSize = static_cast<float64_t>(mu64_TotalHexFileSizeInBytes);
 
    if (f64_OverallFilesSize > (pow(f64_BYTE, 3.)))
    {
@@ -477,6 +502,7 @@ void C_FlaUpProperties::dragMoveEvent(QDragMoveEvent * const opc_Event)
 void C_FlaUpProperties::dropEvent(QDropEvent * const opc_Event)
 {
    this->mpc_ListWidget->DropEvent(opc_Event);
+   this->GetAllHexFilesSizeInBytes();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -501,6 +527,8 @@ void C_FlaUpProperties::m_UpdateLabelTitleWithFileCounter(void)
       this->mpc_Ui->pc_GroupBoxNoMessages->setVisible(false);
       this->mpc_Ui->pc_Seperator->setVisible(true);
    }
+
+   this->GetAllHexFilesSizeInBytes();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

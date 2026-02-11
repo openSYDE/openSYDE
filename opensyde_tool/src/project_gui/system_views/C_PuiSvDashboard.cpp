@@ -12,10 +12,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
-#include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "TglUtils.hpp"
-#include "C_CieUtil.hpp"
 #include "C_GtGetText.hpp"
 #include "C_SclChecksums.hpp"
 #include "C_PuiSdHandler.hpp"
@@ -54,6 +52,66 @@ C_PuiSvDashboard::C_PuiSvDashboard(void) :
    ms32_TabIndex(-1),
    me_Type(eSCENE)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default copy constructor (implemented to avoid compiler complaining)
+
+   \param[in]  orc_Source  Source where to copy from
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDashboard::C_PuiSvDashboard(const C_PuiSvDashboard & orc_Source) :
+   C_PuiBsElements(orc_Source) /*Call base class copy constructor*/,
+   mc_Charts(orc_Source.mc_Charts),
+   mc_Labels(orc_Source.mc_Labels),
+   mc_PieCharts(orc_Source.mc_PieCharts),
+   mc_ProgressBars(orc_Source.mc_ProgressBars),
+   mc_SpinBoxes(orc_Source.mc_SpinBoxes),
+   mc_Sliders(orc_Source.mc_Sliders),
+   mc_Tables(orc_Source.mc_Tables),
+   mc_Toggles(orc_Source.mc_Toggles),
+   mc_ParamWidgets(orc_Source.mc_ParamWidgets),
+   mc_TabChart(orc_Source.mc_TabChart),
+   mc_Name(orc_Source.mc_Name),
+   mc_Comment(orc_Source.mc_Comment),
+   mq_Active(orc_Source.mq_Active),
+   ms32_TabIndex(orc_Source.ms32_TabIndex),
+   me_Type(orc_Source.me_Type)
+{
+   // No additional logic needed for default member-wise copy
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default copy assignment operator (implemented to avoid compiler complaining)
+
+   \param[in]  orc_Source  Source where to copy from
+
+   \return
+   Instance with new values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDashboard & C_PuiSvDashboard::operator =(const C_PuiSvDashboard & orc_Source) &
+{
+   if (this != &orc_Source) // Protect against self-assignment
+   {
+      C_PuiBsElements::operator =(orc_Source); // Call base class copy assignment
+      mc_Name = orc_Source.mc_Name;
+      mc_Comment = orc_Source.mc_Comment;
+      mq_Active = orc_Source.mq_Active;
+      ms32_TabIndex = orc_Source.ms32_TabIndex;
+      me_Type = orc_Source.me_Type;
+      mc_Charts = orc_Source.mc_Charts;
+      mc_Labels = orc_Source.mc_Labels;
+      mc_PieCharts = orc_Source.mc_PieCharts;
+      mc_ProgressBars = orc_Source.mc_ProgressBars;
+      mc_SpinBoxes = orc_Source.mc_SpinBoxes;
+      mc_Sliders = orc_Source.mc_Sliders;
+      mc_Tables = orc_Source.mc_Tables;
+      mc_Toggles = orc_Source.mc_Toggles;
+      mc_ParamWidgets = orc_Source.mc_ParamWidgets;
+      mc_TabChart = orc_Source.mc_TabChart;
+   }
+   return (*this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

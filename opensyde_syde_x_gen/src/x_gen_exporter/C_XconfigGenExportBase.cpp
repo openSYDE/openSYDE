@@ -26,7 +26,7 @@
 #include "TglFile.hpp"
 #include "C_XconfigGenExportBase.hpp"
 #include "C_OscUtils.hpp"
-#include "C_OscBinaryHash.hpp"
+#include "C_OscUtilBinaryHash.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -157,7 +157,7 @@ C_XconfigGenExportBase::E_ResultCode C_XconfigGenExportBase::Init(const int32_t 
 
    mc_ExeName = acn_ApplicationName;
    mc_ExeVersion = h_GetApplicationVersion(mc_ExeName);
-   mc_BinaryHash = stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash();
+   mc_BinaryHash = stw::opensyde_core::C_OscUtilBinaryHash::h_CreateBinaryHash();
 
    mc_LogFileName = TglChangeFileExtension(mc_ExeName, ".log");
    mc_ListOfFilesFileName = TglChangeFileExtension(mc_ExeName, "") + "_file_list.txt";

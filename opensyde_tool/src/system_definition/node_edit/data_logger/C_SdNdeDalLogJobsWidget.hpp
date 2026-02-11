@@ -41,7 +41,7 @@ public:
    void SaveUserSettings(void) const;
    void SetNode(const uint32_t ou32_NodeIndex);
    void LoadLogJobs(void);
-   void OnLogJobNameModified();
+   void OnLogJobNameModified(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
    void LoadSelectedLogJob(const uint32_t ou32_LogJobIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality

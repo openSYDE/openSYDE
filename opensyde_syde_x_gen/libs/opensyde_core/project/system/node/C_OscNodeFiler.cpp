@@ -1912,9 +1912,6 @@ C_SclString C_OscNodeFiler::mh_DiagnosticServerToString(
    case C_OscNodeProperties::eDS_OPEN_SYDE:
       c_Retval = "open-syde";
       break;
-   case C_OscNodeProperties::eDS_KEFEX:
-      c_Retval = "kefex";
-      break;
    case C_OscNodeProperties::eDS_NONE:
       c_Retval = "none";
       break;
@@ -1941,13 +1938,14 @@ int32_t C_OscNodeFiler::mh_StringToDiagnosticServer(const C_SclString & orc_Stri
 {
    int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_String == "kefex")
-   {
-      ore_Type = C_OscNodeProperties::eDS_KEFEX;
-   }
-   else if (orc_String == "open-syde")
+   if (orc_String == "open-syde")
    {
       ore_Type = C_OscNodeProperties::eDS_OPEN_SYDE;
+   }
+   else if (orc_String == "kefex")
+   {
+      // remnants from when KEFEX protocol support was still planned.
+      ore_Type = C_OscNodeProperties::eDS_NONE;
    }
    else if (orc_String == "none")
    {

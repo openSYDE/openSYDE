@@ -120,6 +120,7 @@ const QColor mc_STYLE_GUIDE_COLOR_CH4 = QColor(140, 140, 141);
 
 //Style guide colors (design studio) for dynamic stylesheets
 const QString mc_STYLESHEET_GUIDE_COLOR_0 = "rgb(255, 255, 255)";
+const QString mc_STYLESHEET_GUIDE_COLOR_3 = "rgb(42, 42, 91)";
 const QString mc_STYLESHEET_GUIDE_COLOR_4 = "rgb(57, 57, 109)";
 const QString mc_STYLESHEET_GUIDE_COLOR_8 = "rgb(130, 130, 143)";
 const QString mc_STYLESHEET_GUIDE_COLOR_10 = "rgb(206, 206, 217)";

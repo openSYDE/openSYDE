@@ -3901,11 +3901,6 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OscNode & orc_OscNode, const Q
             //openSYDE
             orc_OscNode.c_Properties.e_DiagnosticServer = C_OscNodeProperties::eDS_OPEN_SYDE;
          }
-         else if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_DiagnosticProtocolKefex == true)
-         {
-            //KEFEX
-            orc_OscNode.c_Properties.e_DiagnosticServer = C_OscNodeProperties::eDS_KEFEX;
-         }
          else
          {
             //not supported
@@ -3936,9 +3931,7 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OscNode & orc_OscNode, const Q
             const bool q_IsUpdateAvailable    = pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(
                rc_CurInterface.e_InterfaceType);
             const bool q_IsRoutingAvailable   = orc_OscNode.IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
-            const bool q_IsDiagnosisAvailable =
-               pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
-                  rc_CurInterface.e_InterfaceType);
+            const bool q_IsDiagnosisAvailable = orc_OscNode.IsDiagnosisAvailable(rc_CurInterface.e_InterfaceType);
             rc_CurInterface.q_IsUpdateEnabled = q_IsUpdateAvailable;
             rc_CurInterface.q_IsRoutingEnabled = q_IsRoutingAvailable;
             rc_CurInterface.q_IsDiagnosisEnabled = q_IsDiagnosisAvailable;

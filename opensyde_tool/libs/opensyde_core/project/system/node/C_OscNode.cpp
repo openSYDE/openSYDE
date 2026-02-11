@@ -2210,6 +2210,33 @@ bool C_OscNode::IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the node supports protocol diagnostics
+
+   Special case: Hybrid nodes can be used with openSYDE or KEFEX server,
+   but diagnosis is available with the openSYDE server only.
+
+   \param[in]  oe_Type  Interface type
+
+   \return
+   true  Diagnosis is available
+   false Diagnosis is not available
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscNode::IsDiagnosisAvailable(const C_OscSystemBus::E_Type oe_Type) const
+{
+   bool q_Return = false;
+
+   if ((this->pc_DeviceDefinition != NULL) &&
+       (this->c_Properties.e_DiagnosticServer == C_OscNodeProperties::eDS_OPEN_SYDE))
+   {
+      tgl_assert(this->u32_SubDeviceIndex < this->pc_DeviceDefinition->c_SubDevices.size());
+      q_Return = this->pc_DeviceDefinition->c_SubDevices[this->u32_SubDeviceIndex].IsDiagnosisAvailable(oe_Type);
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Recalculate data pool addresses
 */
 //----------------------------------------------------------------------------------------------------------------------

@@ -21,6 +21,8 @@
 #include "C_OscNodeDataPoolContentUtil.hpp"
 #include "C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.hpp"
 #include "ui_C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_SdNdeDalLogJobAdditionalTriggerDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -55,7 +57,8 @@ C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::C_SdNdeDalLogJobAdditionalTri
    QWidget(opc_Parent),
    mu32_NodeIndex(0UL),
    mu32_DataLoggerJobIndex(0UL),
-   mpc_Ui(new Ui::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget)
+   mpc_Ui(new Ui::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget),
+   me_ConnectState(eCS_DISCONNECTED)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -96,6 +99,18 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save()
       C_PuiSdHandler::h_GetInstance()->SetDataLoggerAdditionalTriggerProperties(mu32_NodeIndex,
                                                                                 mu32_DataLoggerJobIndex,
                                                                                 c_NewValues);
+      if (this->me_ConnectState == eCS_CONNECTED)
+      {
+         C_PuiSdHandler::h_GetInstance()->SetDataLoggerAdditionalTriggerExpertModeEnabled(mu32_NodeIndex,
+                                                                                          mu32_DataLoggerJobIndex,
+                                                                                          true);
+      }
+      else
+      {
+         C_PuiSdHandler::h_GetInstance()->SetDataLoggerAdditionalTriggerExpertModeEnabled(mu32_NodeIndex,
+                                                                                          mu32_DataLoggerJobIndex,
+                                                                                          false);
+      }
    }
 }
 
@@ -105,7 +120,7 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::InitStaticNames() const
 {
-   this->mpc_Ui->pc_ChkBoxAdditionalTrigger->setText(C_GtGetText::h_GetText("Additional Trigger"));
+   this->mpc_Ui->pc_ChkBoxAdditionalTrigger->setText(C_GtGetText::h_GetText("Enabled"));
    this->mpc_Ui->pc_ChkBoxAdditionalTrigger->SetToolTipInformation(C_GtGetText::h_GetText("Additional Trigger"),
                                                                    C_GtGetText::h_GetText(
                                                                       "Activate additional data trigger for logging"));
@@ -121,6 +136,15 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::InitStaticNames() const
    this->mpc_Ui->pc_LabelThreshold->SetToolTipInformation(C_GtGetText::h_GetText("Threshold"),
                                                           C_GtGetText::h_GetText(
                                                              "Threshold for configured data element to reach to trigger logging"));
+
+   this->mpc_Ui->pc_LabelExpertView->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabelExpertView->SetFontPixel(12, false, false);
+   this->mpc_Ui->pc_LabelExpertView->setText(C_GtGetText::h_GetText("Expert View"));
+   this->mpc_Ui->pc_LabelCondition->setText(C_GtGetText::h_GetText("Condition"));
+   this->mpc_Ui->pc_PubEdit->setText(C_GtGetText::h_GetText("Edit"));
+
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PubEdit, "Edit_Hyperlink", true);
+   this->mpc_Ui->pc_PubEdit->setCursor(Qt::PointingHandCursor);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -135,6 +159,33 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::SetNodeDataLoggerJob(con
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu32_DataLoggerJobIndex = ou32_DataLoggerJobIndex;
+   const auto & rc_Expert =
+      C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                        mu32_DataLoggerJobIndex)->c_Properties.
+      c_AdditionalTriggerProperties.c_ExpertMode;
+   if (rc_Expert.q_Enable == true)
+   {
+      this->me_ConnectState = eCS_CONNECTED;
+      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOnMsgTransmission.svg");
+      if (rc_Expert.c_TriggerConfiguration.IsEmpty() || (rc_Expert.c_TriggerConfiguration == " "))
+      {
+         this->mpc_Ui->pc_LabelConditionExp->setText("Empty condition");
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelConditionExp->setText(rc_Expert.c_TriggerConfiguration.c_str());
+      }
+      this->mpc_Ui->pc_WidgetCondition->setVisible(true);
+      this->mpc_Ui->pc_DataWidget->setVisible(false);
+   }
+   else
+   {
+      this->me_ConnectState = eCS_DISCONNECTED;
+      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOffMsgTransmission.svg");
+      this->mpc_Ui->pc_WidgetCondition->setVisible(false);
+      this->mpc_Ui->pc_DataWidget->setVisible(true);
+   }
+   this->mpc_Ui->pc_PbExpertView->update();
    this->Reload();
 }
 
@@ -214,6 +265,7 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_HandleEditFieldsEnable
    this->mpc_Ui->pc_ComboBoxDataElement->setEnabled(oq_Enabled);
    this->mpc_Ui->pc_WidgetThreshold->setEnabled(oq_Enabled);
    this->mpc_Ui->pc_LineEditStringEdit->setEnabled(oq_Enabled);
+   this->mpc_Ui->pc_PubEdit->setEnabled(oq_Enabled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -459,6 +511,10 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_AdditionalTriggerEnabl
       //Triggers save
       m_DataElementChanged();
    }
+   else
+   {
+      Save();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -532,6 +588,10 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DisconnectChangeTrigge
               this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged);
    disconnect(this->mpc_Ui->pc_WidgetThreshold, &C_OgeWiSpinBoxGroup::SigValueChanged,
               this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
+   disconnect(this->mpc_Ui->pc_PbExpertView, &QPushButton::clicked, this,
+              &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetConnectDisconnectExpertView);
+   disconnect(this->mpc_Ui->pc_PubEdit, &QPushButton::clicked, this,
+              &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -550,6 +610,10 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ReconnectChangeTrigger
            this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged);
    connect(this->mpc_Ui->pc_WidgetThreshold, &C_OgeWiSpinBoxGroup::SigValueChanged,
            this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
+   connect(this->mpc_Ui->pc_PbExpertView, &QPushButton::clicked, this,
+           &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetConnectDisconnectExpertView);
+   connect(this->mpc_Ui->pc_PubEdit, &QPushButton::clicked, this,
+           &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -676,3 +740,79 @@ QString C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_GetOperationForCore
 
    return c_Retval;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! Handle push button Expert View press
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetConnectDisconnectExpertView()
+{
+   if (this->me_ConnectState == eCS_DISCONNECTED)
+   {
+      const auto & rc_Expert =
+         C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                           mu32_DataLoggerJobIndex)->c_Properties.
+         c_AdditionalTriggerProperties.c_ExpertMode;
+      this->me_ConnectState = eCS_CONNECTED;
+      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOnMsgTransmission.svg");
+      if (rc_Expert.c_TriggerConfiguration.IsEmpty() || (rc_Expert.c_TriggerConfiguration == " "))
+      {
+         this->mpc_Ui->pc_LabelConditionExp->setText("Empty condition");
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelConditionExp->setText(rc_Expert.c_TriggerConfiguration.c_str());
+      }
+      this->mpc_Ui->pc_WidgetCondition->setVisible(true);
+      this->mpc_Ui->pc_DataWidget->setVisible(false);
+   }
+   else
+   {
+      this->me_ConnectState = eCS_DISCONNECTED;
+      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOffMsgTransmission.svg");
+      this->mpc_Ui->pc_WidgetCondition->setVisible(false);
+      this->mpc_Ui->pc_DataWidget->setVisible(true);
+   }
+   this->mpc_Ui->pc_PbExpertView->update();
+   this->Save();
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! Handle slot on Edit Clicked
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked()
+{
+   // Fetch log job name
+   const C_OscDataLoggerJob * const pc_DataLoggerJob = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
+      this->mu32_NodeIndex,
+      this->mu32_DataLoggerJobIndex);
+
+   // Display trigger edit dialog if log job name is valid
+   if (pc_DataLoggerJob != NULL)
+   {
+      const QPointer<C_OgePopUpDialog> c_PopUpCatalog = new C_OgePopUpDialog(this, this);
+
+      C_SdNdeDalLogJobAdditionalTriggerDialog * const pc_AdditionalTriggerDialog =
+         new C_SdNdeDalLogJobAdditionalTriggerDialog(*c_PopUpCatalog, pc_DataLoggerJob->c_Properties.c_Name.c_str());
+
+      //Resize
+      c_PopUpCatalog->SetSize(QSize(900, 500));
+      pc_AdditionalTriggerDialog->SetNodeDataLoggerJob(this->mu32_NodeIndex, this->mu32_DataLoggerJobIndex);
+
+      Q_UNUSED(pc_AdditionalTriggerDialog)
+      if (c_PopUpCatalog->exec() == static_cast<int32_t>(QDialog::Accepted))
+      {
+         const auto & rc_Expert =
+            C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                              mu32_DataLoggerJobIndex)->c_Properties.
+            c_AdditionalTriggerProperties.c_ExpertMode;
+         this->mpc_Ui->pc_LabelConditionExp->setText(rc_Expert.c_TriggerConfiguration.c_str());
+      }
+
+      if (c_PopUpCatalog != NULL)
+      {
+         c_PopUpCatalog->HideOverlay();
+         c_PopUpCatalog->deleteLater();
+      }
+   }
+} //lint !e429  //no memory leak because of the parent of pc_AdditionalTriggerDialog and the Qt memory management

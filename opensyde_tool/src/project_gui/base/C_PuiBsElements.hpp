@@ -31,7 +31,8 @@ class C_PuiBsElements
 {
 public:
    C_PuiBsElements(void);
-   C_PuiBsElements & operator =(const C_PuiBsElements & orc_Snapshot) &;
+   C_PuiBsElements(const C_PuiBsElements & orc_Source);
+   C_PuiBsElements & operator =(const C_PuiBsElements & orc_Source) &;
    virtual ~C_PuiBsElements(void);
    virtual void Clear(void);
    void ReplaceSnapshotElements(C_PuiBsElements & orc_Snapshot) const;

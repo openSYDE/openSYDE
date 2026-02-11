@@ -36,6 +36,10 @@ protected:
    C_TblTreSimpleItem * mpc_InvisibleRootItem;
 
    int32_t m_CountLayers(const QModelIndex & orc_Index, uint32_t & oru32_ValidLayers) const;
+   void m_DelayedDelete(C_TblTreSimpleItem * const opc_Object) const;
+
+private:
+   static void mh_DelayedDeleteExecute(C_TblTreSimpleItem * const opc_Object);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -29,7 +29,7 @@
 #include "TglFile.hpp"
 #include "C_SupSuSequences.hpp"
 #include "C_SupCreatePackage.hpp"
-#include "C_OscBinaryHash.hpp"
+#include "C_OscUtilBinaryHash.hpp"
 #include "C_OscHexFile.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -126,7 +126,7 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
    bool q_ShowManPage = false;
    bool q_ShowVersionOnly = false;
    const C_SclString c_Version = m_GetApplicationVersion(TglGetExePath());
-   const C_SclString c_BinaryHash = C_OscBinaryHash::h_CreateBinaryHash();
+   const C_SclString c_BinaryHash = C_OscUtilBinaryHash::h_CreateBinaryHash();
 
    mq_Quiet = false;
 

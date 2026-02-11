@@ -59,4 +59,5 @@ void C_OscDataLoggerJobAdditionalTriggerProperties::CalcHash(uint32_t & oru32_Ha
    stw::scl::C_SclChecksums::CalcCRC32(
       this->c_Operation.c_str(),
       this->c_Operation.Length(), oru32_HashValue);
+   this->c_ExpertMode.CalcHash(oru32_HashValue);
 }

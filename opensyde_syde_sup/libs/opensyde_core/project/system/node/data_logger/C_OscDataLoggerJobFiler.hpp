@@ -51,6 +51,10 @@ private:
                                                         C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveJobAdditionalTriggerProperties(const C_OscDataLoggerJobAdditionalTriggerProperties & orc_Config,
                                                      C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadJobAdditionalTriggerExpertMode(C_OscDataLoggerJobAdditionalTriggerExpertMode & orc_Config,
+                                                        C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveJobAdditionalTriggerExpertMode(const C_OscDataLoggerJobAdditionalTriggerExpertMode & orc_Config,
+                                                     C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadConfiguredDataElements(std::vector<C_OscDataLoggerDataElementReference> & orc_Config,
                                                 C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveConfiguredDataElements(const std::vector<C_OscDataLoggerDataElementReference> & orc_Config,

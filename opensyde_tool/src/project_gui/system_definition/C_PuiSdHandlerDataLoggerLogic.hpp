@@ -43,6 +43,11 @@ public:
    int32_t SetDataLoggerAdditionalTriggerProperties(const uint32_t ou32_NodeIndex,
                                                     const uint32_t ou32_DataLoggerJobIndex,
                                                     const stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Data);
+   int32_t SetDataLoggerAdditionalTriggerExpertModeEnabled(const uint32_t ou32_NodeIndex,
+                                                           const uint32_t ou32_DataLoggerJobIndex, const bool oq_Data);
+   int32_t SetDataLoggerAdditionalTriggerExpertModeString(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataLoggerJobIndex,
+                                                          const stw::scl::C_SclString & orc_Data);
    int32_t SetXappInterface(const uint32_t ou32_NodeIndex,
                             const opensyde_core::C_OscSystemBus::E_Type oe_ConnectedInterfaceType,
                             const uint8_t ou8_ConnectedInterfaceNumber);

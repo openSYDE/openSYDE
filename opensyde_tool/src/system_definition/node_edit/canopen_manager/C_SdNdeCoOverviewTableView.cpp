@@ -267,7 +267,7 @@ void C_SdNdeCoOverviewTableView::mouseDoubleClickEvent(QMouseEvent * const opc_E
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewTableView::m_InitColumns()
 {
-   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eINDEX), 44);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eINDEX), 51);
    this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eINTERFACE), 120);
    this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eLINKEDTO), 120);
    this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eNODE), 140);

@@ -64,8 +64,10 @@ C_FlaMainWindow::C_FlaMainWindow(QWidget * const opc_Parent) :
    mq_ContinueUpdate(false),
    mu32_FlashedFilesCounter(0),
    mu64_FlashedBytes(0),
-   mu32_FlashedBytesTmp(0),
-   mq_NewFile(true)
+   mu64_FlashedBytesTmp(0),
+   mq_NewFile(true),
+   mu64_TotalHexFileSizeInBytes(0),
+   mu64_AllHexFilesSizeInBytes(0)
 {
    const uint16_t u16_COUTER_TIMEOUT_IN_MILLIS = 1000;
 
@@ -376,6 +378,8 @@ void C_FlaMainWindow::m_OnUpdateNode()
    {
       if (this->m_InitUpdateSequence() == C_NO_ERR)
       {
+         const QStringList & rc_HexFiles = this->mpc_Ui->pc_UpdateWidget->GetHexFilePaths();
+         this->mu64_AllHexFilesSizeInBytes = this->mpc_UpSequences->GetTotalHexFilesSize(rc_HexFiles);
          QApplication::setOverrideCursor(Qt::WaitCursor);
          orc_Text = "Entering update mode ...";
 
@@ -549,24 +553,24 @@ void C_FlaMainWindow::m_SetProgressBarColor(const bool & orq_Success) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Calcualte how many bytes of a specific file have been flashed
 
-   \param[in]       s32_FlashableBytesPerFile     Amount of flashable bytes
    \param[in]       oru8_ProgressInPercentage     Progress in percentage
 
    \return
-   uint32_t
+   uint64_t
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32_t stw::opensyde_gui::C_FlaMainWindow::m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage)
+uint64_t stw::opensyde_gui::C_FlaMainWindow::m_CalculateFileBytesFlashed(const uint8_t & oru8_ProgressInPercentage)
+const
 {
    const uint8_t u8_MAX_PERCENTAGE = 100;
 
-   const uint32_t u32_FlashableBytesPerFile = this->mpc_Ui->pc_UpdateWidget->GetHexFileSize(mu32_FlashedFilesCounter);
-   const float32_t f32_PercentageDecimal = static_cast<float32_t>(oru8_ProgressInPercentage) /
-                                           static_cast<float32_t>(u8_MAX_PERCENTAGE);
-   const float32_t f32_FlashedBytes = f32_PercentageDecimal * static_cast<float32_t>(u32_FlashableBytesPerFile);
-   const uint32_t u32_FlashedBytes = static_cast<uint32_t>(f32_FlashedBytes);
+   const uint64_t u64_FlashableBytesPerFile = this->mu64_TotalHexFileSizeInBytes;
+   const float64_t f64_PercentageDecimal = static_cast<float64_t>(oru8_ProgressInPercentage) /
+                                           static_cast<float64_t>(u8_MAX_PERCENTAGE);
+   const float64_t f64_FlashedBytes = f64_PercentageDecimal * static_cast<float64_t>(u64_FlashableBytesPerFile);
+   const uint64_t u64_FlashedBytes = static_cast<uint64_t>(f64_FlashedBytes);
 
-   return u32_FlashedBytes;
+   return u64_FlashedBytes;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -619,33 +623,37 @@ bool C_FlaMainWindow::m_ErrorDetected(const bool & orq_ShowErrorMessage)
 
    Update progress bar and the data transfer
 
-   \param[in]       oru8_ProgressInPercentage     Progress in percentage
+   \param[in]       oru8_ProgressInPercentage                   Progress in percentage
+   \param[in]       oru8_CurrentFileProgressInPercentage        current file Progress in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage)
+void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentage,
+                                        const uint8_t & oru8_CurrentFileProgressInPercentage)
 {
    const uint8_t u8_MAX_PERCENTAGE = 100;
+   const uint8_t u8_STATE_PROGRESS = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_IN_PROGRESS);
 
-   if ((oru8_ProgressInPercentage == 0) && mq_NewFile)
+   if (mq_NewFile)
    {
-      const uint8_t u8_STATE_PROGRESS = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_IN_PROGRESS);
+      m_UpdateFileIcon(mu32_FlashedFilesCounter, u8_STATE_PROGRESS);
+      mq_NewFile = false;
       const QString orc_Text = "Updating Node ...";
       m_SetHeadingText(orc_Text, u8_STATE_PROGRESS);
-      m_UpdateFileIcon(mu32_FlashedFilesCounter, u8_STATE_PROGRESS);
-
-      mu32_FlashedBytesTmp = 0;
-      mq_NewFile = false;
+   }
+   if ((oru8_ProgressInPercentage == 0) && mq_NewFile)
+   {
+      mu64_FlashedBytesTmp = 0;
    }
 
-   const uint32_t u32_CalculateFileBytesFlashed = m_CalculateFileBytesFlashed(oru8_ProgressInPercentage);
-   if ((u32_CalculateFileBytesFlashed > 0) && (u32_CalculateFileBytesFlashed > mu32_FlashedBytesTmp))
+   const uint64_t u64_CalculateFileBytesFlashed = m_CalculateFileBytesFlashed(oru8_ProgressInPercentage);
+   if ((u64_CalculateFileBytesFlashed > 0) && (u64_CalculateFileBytesFlashed > mu64_FlashedBytesTmp))
    {
       uint8_t u8_TotalProgressInPercentage;
 
-      const uint32_t u32_Differences = u32_CalculateFileBytesFlashed - mu32_FlashedBytesTmp;
+      const uint64_t u64_Differences = u64_CalculateFileBytesFlashed - mu64_FlashedBytesTmp;
 
-      mu32_FlashedBytesTmp += u32_Differences;
-      mu64_FlashedBytes += u32_Differences;
+      mu64_FlashedBytesTmp += u64_Differences;
+      mu64_FlashedBytes += u64_Differences;
 
       u8_TotalProgressInPercentage = m_CalcualteTotalProgressInPercentage();
 
@@ -654,7 +662,7 @@ void C_FlaMainWindow::m_UpdateBottomBar(const uint8_t & oru8_ProgressInPercentag
    }
 
    //Calculate the total file bytes percentage
-   if (oru8_ProgressInPercentage == u8_MAX_PERCENTAGE)
+   if (oru8_CurrentFileProgressInPercentage == u8_MAX_PERCENTAGE)
    {
       const uint8_t u8_STATE_FINISHED = static_cast<uint8_t>(C_FlaUpListItemWidget::hu32_STATE_FINISHED);
       m_UpdateFileIcon(mu32_FlashedFilesCounter, u8_STATE_FINISHED);
@@ -687,9 +695,9 @@ uint8_t C_FlaMainWindow::m_CalcualteTotalProgressInPercentage(void) const
    const uint8_t u8_MINIMUM_PROGRESS_PERCENTAGE = 2; // defined in C_OscBuSequences
 
    const uint8_t u8_MAX_PERCENTAGE = 100;
-   const uint32_t u32_TotalNumberOfFlashableSize = this->mpc_Ui->pc_UpdateWidget->GetHexFileSize();
+   const uint64_t u64_TotalNumberOfFlashableSize = this->mu64_TotalHexFileSizeInBytes;
    uint8_t u8_ProgressInPercentage =
-      static_cast<uint8_t>((u8_MAX_PERCENTAGE * mu64_FlashedBytes) / u32_TotalNumberOfFlashableSize);
+      static_cast<uint8_t>((u8_MAX_PERCENTAGE * mu64_FlashedBytes) / u64_TotalNumberOfFlashableSize);
 
    if (u8_ProgressInPercentage < (u8_MAX_PERCENTAGE - u8_MINIMUM_PROGRESS_PERCENTAGE))
    {
@@ -779,6 +787,8 @@ int32_t C_FlaMainWindow::m_InitUpdateSequence(void)
       connect(mpc_UpSequences, &C_FlaUpSequences::SigReportFlashloaderInformationText,
               this, &C_FlaMainWindow::m_ShowProgress);
       connect(mpc_UpSequences, &C_FlaUpSequences::SigReportDeviceName, this, &C_FlaMainWindow::m_CheckDeviceName);
+      connect(mpc_UpSequences, &C_FlaUpSequences::SigTotalHexFileSizeInBytes, this,
+              &C_FlaMainWindow::m_SetTotalHexFileSizeInBytes);
    }
 
    // disable UI
@@ -977,7 +987,8 @@ void C_FlaMainWindow::m_TimerUpdate(void)
       {
          mu32_FlashedFilesCounter = 0;
          mu64_FlashedBytes = 0;
-         mu32_FlashedBytesTmp = 0;
+         mu64_FlashedBytesTmp = 0;
+
          this->me_UpdateStep = C_FlaUpSequences::eRESETSYSTEM;
          this->ms32_NextHexFile = 0; // reset
          s32_ThreadResult = this->mpc_UpSequences->StartResetSystem();
@@ -1118,4 +1129,16 @@ bool stw::opensyde_gui::C_FlaMainWindow::m_ShowErrorMessage(void)
    }
 
    return q_CallReset;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set total number of Hex File size in bytes
+
+   \param[in]       ou64_TotalHexFileSizeInBytes     Amount of hex file size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_FlaMainWindow::m_SetTotalHexFileSizeInBytes(const uint64_t ou64_TotalHexFileSizeInBytes)
+{
+   this->mu64_TotalHexFileSizeInBytes = ou64_TotalHexFileSizeInBytes;
+   this->mpc_Ui->pc_UpdateWidget->SetTotalHexFileSizeInBytes(this->mu64_TotalHexFileSizeInBytes);
 }

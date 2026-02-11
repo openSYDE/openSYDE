@@ -36,7 +36,8 @@ public:
    static int32_t h_LoadSystemDefinitionFile(C_OscSystemDefinition & orc_SystemDefinition,
                                              const stw::scl::C_SclString & orc_PathSystemDefinition,
                                              const stw::scl::C_SclString & orc_PathDeviceDefinitions,
-                                             const bool oq_UseDeviceDefinitions = true);
+                                             const bool oq_UseDeviceDefinitions = true,
+                                             std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices = NULL);
    static int32_t h_SaveSystemDefinitionFile(const C_OscSystemDefinition & orc_SystemDefinition,
                                              const stw::scl::C_SclString & orc_Path);
    static int32_t h_LoadSystemDefinitionString(C_OscSystemDefinition & orc_SystemDefinition,
@@ -47,14 +48,16 @@ public:
                                             stw::scl::C_SclString & orc_Content);
    static int32_t h_LoadNodes(const uint16_t ou16_XmlFormatVersion, std::vector<C_OscNode> & orc_Nodes,
                               C_OscXmlParserBase & orc_XmlParser, const C_OscDeviceManager & orc_DeviceDefinitions,
-                              const bool oq_UseDeviceDefinitions = true);
+                              const bool oq_UseDeviceDefinitions = true,
+                              std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices = NULL);
    static int32_t h_LoadBuses(std::vector<C_OscSystemBus> & orc_Buses, C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveNodes(const std::vector<C_OscNode> & orc_Nodes, C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveBuses(const std::vector<C_OscSystemBus> & orc_Buses, C_OscXmlParserBase & orc_XmlParser);
    static int32_t h_LoadSystemDefinition(C_OscSystemDefinition & orc_SystemDefinition,
                                          C_OscXmlParserBase & orc_XmlParser,
                                          const stw::scl::C_SclString & orc_PathDeviceDefinitions,
-                                         const bool oq_UseDeviceDefinitions = true);
+                                         const bool oq_UseDeviceDefinitions = true,
+                                         std::vector<stw::scl::C_SclString> * const opc_ErrorDetailsMissingDevices = NULL);
    static void h_SaveSystemDefinition(const C_OscSystemDefinition & orc_SystemDefinition,
                                       C_OscXmlParserBase & orc_XmlParser);
 

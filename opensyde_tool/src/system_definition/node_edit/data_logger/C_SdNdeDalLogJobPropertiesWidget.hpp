@@ -47,7 +47,7 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void SigLogJobNameModified();
+   void SigLogJobNameModified(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
 
 private:
    Ui::C_SdNdeDalLogJobPropertiesWidget * mpc_Ui;
@@ -78,6 +78,7 @@ private:
    void m_ReconnectChangeTriggers(void) const;
    void m_OnNameEditingFinished();
    void m_TrimLogJobName(void) const;
+   void m_OnLogDestinationEditFinished(void);
 
    uint32_t mu32_NodeIndex;
    uint32_t mu32_DataLoggerJobIndex;

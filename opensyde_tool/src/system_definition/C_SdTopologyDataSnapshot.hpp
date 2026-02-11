@@ -36,6 +36,8 @@ class C_SdTopologyDataSnapshot :
 public:
    C_SdTopologyDataSnapshot(void);
    ~C_SdTopologyDataSnapshot(void) override;
+   C_SdTopologyDataSnapshot(const C_SdTopologyDataSnapshot & orc_Source);
+   C_SdTopologyDataSnapshot & operator =(const C_SdTopologyDataSnapshot & orc_Source) &;
 
    std::vector<C_PuiSdTextElementBus> c_BusTextElements; ///< UI information for bus text elements
    std::vector<C_PuiSdNode> c_UiNodes;                   ///< UI information for nodes (should always

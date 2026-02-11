@@ -11,6 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OscNodeDataPoolContent.hpp"
 #include "C_OscNodeDataPoolListElementOptArrayId.hpp"
+#include "C_OscDataLoggerJobAdditionalTriggerExpertMode.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -28,10 +29,12 @@ public:
 
    void CalcHash(uint32_t & oru32_HashValue) const;
 
-   bool q_Enable;                                      ///< flag to enable additional trigger
-   C_OscNodeDataPoolListElementOptArrayId c_ElementId; ///< Selected element for additional trigger
-   C_OscNodeDataPoolContent c_Threshold;               ///< Selected threshold for additional trigger
-   stw::scl::C_SclString c_Operation;                  ///< Which operator to use for additional trigger threshold
+   bool q_Enable;                                              ///< flag to enable additional trigger
+   C_OscNodeDataPoolListElementOptArrayId c_ElementId;         ///< Selected element for additional trigger
+   C_OscNodeDataPoolContent c_Threshold;                       ///< Selected threshold for additional trigger
+   stw::scl::C_SclString c_Operation;                          ///< Which operator to use for additional trigger
+                                                               // threshold
+   C_OscDataLoggerJobAdditionalTriggerExpertMode c_ExpertMode; ///< Expert mode properties
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

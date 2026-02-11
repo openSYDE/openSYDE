@@ -39,6 +39,8 @@ public:
    int32_t StartResetSystem(void);
 
    int32_t GetResults(int32_t & ors32_Result) const;
+   static uint64_t h_GetAllHexFileSize(const QStringList & orc_HexFiles);
+   uint64_t GetTotalHexFilesSize(const QStringList & orc_HexFiles);
 
    enum E_Sequence
    {
@@ -54,16 +56,19 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigReportProgress(const QString & orc_Information);
-   void SigReportFlashingProgress(const uint8_t ou8_Progress);
+   void SigReportFlashingProgress(const uint8_t ou8_TotalProgress, const uint8_t ou8_CurrentFileProgress);
    void SigReportFlashloaderInformationText(const QString & orc_Information);
    void SigReportDeviceName(const QString & orc_DeviceName);
+   void SigTotalHexFileSizeInBytes(const uint64_t ou64_TotalHexFileSizeInBytes);
 
 protected:
-   void m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage) override;
+   void m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage,
+                                   const bool oq_IsCaluclatedPercentage) override;
    void m_ReportProgress(const int32_t os32_Result, const stw::scl::C_SclString & orc_Information) override;
    void m_ReportFlashloaderInformationRead(const stw::scl::C_SclString & orc_DeviceName,
                                            const stw::opensyde_core::C_OscComFlashloaderInformation & orc_Information)
    override;
+   void m_CurrentHexFileSizeInBytes(const uint64_t ou64_CurrentHexFileSizeInBytes) override;
 
 private:
    //Avoid call
@@ -83,7 +88,9 @@ private:
    QString mc_HexFilePath;
    uint32_t mu32_RequestDownloadTimeout;
    uint32_t mu32_TransferDataTimeout;
-
+   uint64_t mu64_TotalHexFilesSizeInBytes;
+   uint64_t mu64_CurrentHexFileSizeInBytes;
+   uint64_t mu64_PreviousFilesSizeInBytes;
    // Service execution result
    int32_t ms32_Result;
 };

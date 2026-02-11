@@ -540,6 +540,10 @@ int32_t C_OscDataLoggerJobFiler::mh_LoadJobAdditionalTriggerProperties(
             tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
          }
       }
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = mh_LoadJobAdditionalTriggerExpertMode(orc_Config.c_ExpertMode, orc_XmlParser);
+      }
       tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
    }
    return s32_Retval;
@@ -565,7 +569,57 @@ void C_OscDataLoggerJobFiler::mh_SaveJobAdditionalTriggerProperties(
    C_OscNodeDataPoolFiler::h_SaveDataPoolContentV1(orc_Config.c_Threshold, orc_XmlParser);
    tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
    orc_XmlParser.CreateNodeChild("operation", orc_Config.c_Operation);
+   mh_SaveJobAdditionalTriggerExpertMode(orc_Config.c_ExpertMode, orc_XmlParser);
    tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load job additional trigger expert mode properties
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    Data loggers file content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscDataLoggerJobFiler::mh_LoadJobAdditionalTriggerExpertMode(
+   C_OscDataLoggerJobAdditionalTriggerExpertMode & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.SelectNodeChild("expert-settings") == "expert-settings")
+   {
+      s32_Retval = orc_XmlParser.GetAttributeBoolError("is-enabled", orc_Config.q_Enable);
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XmlParser.SelectNodeChildError("trigger-configuration");
+         if (s32_Retval == C_NO_ERR)
+         {
+            orc_Config.c_TriggerConfiguration = orc_XmlParser.GetNodeContent();
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "expert-settings");
+         }
+      }
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save job additional trigger expert mode
+
+   \param[in]      orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscDataLoggerJobFiler::mh_SaveJobAdditionalTriggerExpertMode(
+   const C_OscDataLoggerJobAdditionalTriggerExpertMode & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.CreateAndSelectNodeChild("expert-settings");
+   orc_XmlParser.SetAttributeBool("is-enabled", orc_Config.q_Enable);
+   orc_XmlParser.CreateNodeChild("trigger-configuration", orc_Config.c_TriggerConfiguration);
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

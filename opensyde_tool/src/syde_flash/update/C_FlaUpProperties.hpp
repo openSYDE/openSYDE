@@ -55,6 +55,8 @@ public:
    uint32_t GetHexFileSize(const uint32_t & oru32_HexFileIndex) const;
    void SetHeadingIcon(const uint8_t & oru8_ProgressState) const;
    void SetProgressBarColor(const bool & orq_Success) const;
+   void SetTotalHexFileSizeInBytes(const uint64_t ou64_TotalHexFileSizeInBytes);
+   void GetAllHexFilesSizeInBytes(void);
 
 protected:
    void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
@@ -68,6 +70,8 @@ private:
    Ui::C_FlaUpProperties * mpc_Ui;
    QVBoxLayout * mpc_ScrollLayout;
    C_FlaUpListWidget * mpc_ListWidget;
+
+   uint64_t mu64_TotalHexFileSizeInBytes;
 
    //Avoid call
    C_FlaUpProperties(const C_FlaUpProperties &);

@@ -222,6 +222,7 @@ int32_t C_SyvComDriverDiag::InitDiag(void)
    if (s32_Return == C_NO_ERR)
    {
       s32_Return = m_InitDiagProtocol();
+
       if (s32_Return == C_NO_ERR)
       {
          s32_Return = m_InitDataDealer();
@@ -612,43 +613,15 @@ int32_t C_SyvComDriverDiag::StopCyclicTransmissions(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Close the com driver
 
-   All KEFEX servers will be logged off and if used the routing to KEFEX servers will be closed and deactivated.
-   The openSYDE protocol server will not be closed. The session timeout is used to close all connections.
-
    \return
-   C_NO_ERR   request sent, positive response received
-   C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send protocol request
-   C_WARN     error response
-   C_CONFIG   CAN dispatcher not installed
+   C_NO_ERR   request sent
+
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_SyvComDriverDiag::StopDiagnosisServer(void)
+void C_SyvComDriverDiag::StopDiagnosisServer(void)
 {
-   int32_t s32_Return = C_NO_ERR;
-
    if (this->mq_Initialized == true)
    {
-      uint32_t u32_Counter;
-
-      for (u32_Counter = 0U; u32_Counter < this->mc_DiagProtocols.size(); ++u32_Counter)
-      {
-         C_OscDiagProtocolKfx * const pc_DiagProtocolKfx =
-            dynamic_cast<C_OscDiagProtocolKfx *>(this->mc_DiagProtocols[u32_Counter]);
-
-         if (pc_DiagProtocolKfx != NULL)
-         {
-            int32_t s32_ReturnLogoff;
-            s32_ReturnLogoff = pc_DiagProtocolKfx->Logoff(false);
-
-            if (s32_ReturnLogoff != C_NO_ERR)
-            {
-               // We must logoff all nodes, but want to know an error. No break.
-               s32_Return = s32_ReturnLogoff;
-            }
-         }
-      }
-
       // Stop cyclic transmissions due to problems when closing TCP sockets.
       // If a socket was closed by client and a cyclic transmission was sent by server before the close was processed
       // a socket reset will occur
@@ -658,8 +631,6 @@ int32_t C_SyvComDriverDiag::StopDiagnosisServer(void)
 
       this->mq_Initialized = false;
    }
-
-   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1427,7 +1398,7 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::m_GetRoutingMode(C_OscRoutingCalculation::E_Mode & ore_Mode) const
 {
-   ore_Mode = C_OscRoutingCalculation::eROUTING_CHECK;
+   ore_Mode = C_OscRoutingCalculation::eROUTING_CHECK_DIAG;
 
    return true;
 }
@@ -1456,14 +1427,10 @@ uint8_t C_SyvComDriverDiag::m_GetRoutingSessionId(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::m_IsRoutingSpecificNecessary(const C_OscNode & orc_Node) const
 {
-   bool q_Return = false;
+   (void) orc_Node;
 
-   if (orc_Node.c_Properties.e_DiagnosticServer == C_OscNodeProperties::eDS_KEFEX)
-   {
-      q_Return = true;
-   }
-
-   return q_Return;
+   // We do not support any other diagnosis protocols
+   return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1487,34 +1454,13 @@ int32_t C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32_t ou32_ActiveNod
                                                    C_OscProtocolDriverOsy * const opc_ProtocolOsyOfLastNodeOfRouting,
                                                    C_OscCanDispatcherOsyRouter ** const oppc_RoutingDispatcher)
 {
-   int32_t s32_Return = C_NOACT;
+   (void) ou32_ActiveNode;
+   (void) opc_Node;
+   (void) orc_LastNodeOfRouting;
+   (void) opc_ProtocolOsyOfLastNodeOfRouting;
+   (void) oppc_RoutingDispatcher;
 
-   if (opc_Node->c_Properties.e_DiagnosticServer == C_OscNodeProperties::eDS_KEFEX)
-   {
-      C_OscDiagProtocolKfx * const pc_DiagProtocolKfx =
-         dynamic_cast<C_OscDiagProtocolKfx * const>(this->mc_DiagProtocols[ou32_ActiveNode]);
-
-      if ((pc_DiagProtocolKfx != NULL) &&
-          (opc_ProtocolOsyOfLastNodeOfRouting != NULL))
-      {
-         (*oppc_RoutingDispatcher) = new C_OscCanDispatcherOsyRouter(*opc_ProtocolOsyOfLastNodeOfRouting);
-         // TODO Filter settings?
-         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000000,
-                                                        0x00000000);
-
-         this->mc_LegacyRouterDispatchers[ou32_ActiveNode] = (*oppc_RoutingDispatcher);
-         // Set the new dispatcher
-         pc_DiagProtocolKfx->SetDispatcher(*oppc_RoutingDispatcher);
-
-         s32_Return = C_NO_ERR;
-      }
-      else
-      {
-         s32_Return = C_CONFIG;
-      }
-   }
-
-   return s32_Return;
+   return C_NOACT;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1525,20 +1471,6 @@ int32_t C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32_t ou32_ActiveNod
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32_t ou32_ActiveNode)
 {
-   if ((this->mc_ActiveNodesIndexes[ou32_ActiveNode] < this->mpc_SysDef->c_Nodes.size()) &&
-       (this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]].c_Properties.e_DiagnosticServer ==
-        C_OscNodeProperties::eDS_KEFEX))
-   {
-      C_OscDiagProtocolKfx * const pc_DiagProtocolKfx =
-         dynamic_cast<C_OscDiagProtocolKfx * const>(this->mc_DiagProtocols[ou32_ActiveNode]);
-
-      if (pc_DiagProtocolKfx != NULL)
-      {
-         // Remove dispatcher
-         pc_DiagProtocolKfx->SetDispatcher(NULL);
-      }
-   }
-
    C_OscComDriverProtocol::m_StopRoutingSpecific(ou32_ActiveNode);
 }
 
@@ -1761,23 +1693,6 @@ int32_t C_SyvComDriverDiag::m_InitDiagNodes(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComDriverDiag::m_InitDiagProtocolKfx(C_OscDiagProtocolKfx * const opc_DiagProtocolKefex) const
-{
-   stw::diag_lib::C_KFXCommConfiguration c_CommConfig;
-
-   // TODO Init KEFEX protocol dynamically
-   c_CommConfig.SetBaseID(6);
-   c_CommConfig.SetClientAddress(100);
-   c_CommConfig.SetServerAddress(0);
-   c_CommConfig.SetBSMax(20);
-   c_CommConfig.SetSTMin(0);
-   c_CommConfig.SetTimeout(200);
-
-   opc_DiagProtocolKefex->SetNvmValidFlagUsed(false);
-   opc_DiagProtocolKefex->SetCommunicationParameters(c_CommConfig);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize diagnostic protocols
 
    The functions fills the vector mc_OsyProtocols of the base class too.
@@ -1809,7 +1724,6 @@ int32_t C_SyvComDriverDiag::m_InitDiagProtocol(void)
          {
             //Diagnostic protocol initialization
             C_OscDiagProtocolOsy * pc_DiagProtocolOsy = NULL;
-            C_OscDiagProtocolKfx * pc_DiagProtocolKefex = NULL;
             C_OscDiagProtocolBase * pc_DiagProtocol = NULL;
 
             switch (pc_Node->c_Properties.e_DiagnosticServer)
@@ -1836,12 +1750,6 @@ int32_t C_SyvComDriverDiag::m_InitDiagProtocol(void)
                }
                pc_DiagProtocol = pc_DiagProtocolOsy;
                this->mc_OsyProtocols[u32_ItActiveNode] = pc_DiagProtocolOsy;
-               break;
-            case C_OscNodeProperties::eDS_KEFEX:
-               pc_DiagProtocolKefex = new C_OscDiagProtocolKfx();
-               pc_DiagProtocolKefex->SetDispatcher(this->m_GetCanDispatcher());
-               pc_DiagProtocol = pc_DiagProtocolKefex;
-               this->m_InitDiagProtocolKfx(pc_DiagProtocolKefex);
                break;
             case C_OscNodeProperties::eDS_NONE:
             default:
@@ -2054,67 +1962,21 @@ int32_t C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 
             if (pc_Node != NULL)
             {
-               if (pc_Node->c_Properties.e_DiagnosticServer == C_OscNodeProperties::eDS_KEFEX)
+               int32_t s32_Return;
+
+               // Get all Datapool names on node to create the mapping
+               s32_Return = this->m_GetAllDatapoolMetadata(u32_DiagNodeCounter, orc_ErrorDetails);
+
+               if (s32_Return == C_NO_ERR)
                {
-                  // Activate when supporting Kefex on dashboard
-                  /*
-                  uint8_t u8_DataPoolIndex;
-                  uint16_t u16_NumberOfDataPoolElements;
-                  uint16_t u16_DataPoolVersion;
-
-                  u8_DataPoolIndex = 0U;
-                  u16_NumberOfDataPoolElements = 0x0049U;
-                  u16_DataPoolVersion = 0x0000U;
-                  u32_DataPoolChecksum = 0xC4CBU;
-                  s32_Return = this->mc_DiagProtocols[u32_Counter]->DataPoolVerify(u8_DataPoolIndex,
-                                                                                   u16_NumberOfDataPoolElements,
-                                                                                   u16_DataPoolVersion,
-                                                                                   u32_DataPoolChecksum,
-                                                                                   q_Match);
-
-                  if ((s32_Return != C_NO_ERR) || (q_Match == false))
-                  {
-                     if ((s32_Return == C_NO_ERR) && (q_Match == false))
-                     {
-                        stw::scl::C_SclString c_Error;
-                        c_Error.PrintFormatted("Datapool verify failed between client and server. Node: %s " \
-                                               "Datapool: %s", pc_Node->c_Properties.c_Name.c_str(),
-                                               pc_Node->c_DataPools[u8_DataPoolIndex].c_Name.c_str());
-                        osc_write_log_error("Starting diagnostics", c_Error);
-                        // Datapool checksum does not match
-                        s32_Retval = C_DEFAULT;
-                     }
-                     else
-                     {
-                        s32_Retval = s32_Return;
-                     }
-                     if (s32_Retval != C_NO_ERR)
-                     {
-                        orc_ErrorDetails += static_cast<QString>("- ") + pc_Node->c_Properties.c_Name.c_str() +
-                                            ", Datapool: \"" +
-                                            pc_Node->c_DataPools[u8_DataPoolIndex].c_Name.c_str() + "\"\n";
-                     }
-                  }
-                  */
+                  // Verify all used Datapools for checksum and version
+                  s32_Return = this->m_CheckOsyDatapoolsAndCreateMapping(u32_DiagNodeCounter, orc_ErrorDetails);
                }
-               else
+
+               if (s32_Return != C_NO_ERR)
                {
-                  int32_t s32_Return;
-
-                  // Get all Datapool names on node to create the mapping
-                  s32_Return = this->m_GetAllDatapoolMetadata(u32_DiagNodeCounter, orc_ErrorDetails);
-
-                  if (s32_Return == C_NO_ERR)
-                  {
-                     // Verify all used Datapools for checksum and version
-                     s32_Return = this->m_CheckOsyDatapoolsAndCreateMapping(u32_DiagNodeCounter, orc_ErrorDetails);
-                  }
-
-                  if (s32_Return != C_NO_ERR)
-                  {
-                     // Do not overwrite previous errors with C_NO_ERR
-                     s32_Retval = s32_Return;
-                  }
+                  // Do not overwrite previous errors with C_NO_ERR
+                  s32_Retval = s32_Return;
                }
             }
             else

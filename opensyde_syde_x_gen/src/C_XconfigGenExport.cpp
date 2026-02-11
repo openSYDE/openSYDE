@@ -27,7 +27,7 @@
 #include "C_XconfigGenExportBase.hpp"
 #include "C_OscXcoCreate.hpp"
 
-#include "C_OscBinaryHash.hpp"
+#include "C_OscUtilBinaryHash.hpp"
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw::errors;

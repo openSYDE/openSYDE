@@ -54,7 +54,6 @@ public:
    enum E_DiagnosticServerProtocol
    {
       eDS_NONE,     ///< No diagnostic server available
-      eDS_KEFEX,    ///< Diagnostic server protocol type KEFEX
       eDS_OPEN_SYDE ///< Diagnostic server protocol type openSYDE
    };
 

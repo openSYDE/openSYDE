@@ -48,6 +48,8 @@ public:
    };
 
    C_PuiSvDashboard(void);
+   C_PuiSvDashboard(const C_PuiSvDashboard & orc_Source);
+   C_PuiSvDashboard & operator =(const C_PuiSvDashboard & orc_Source) &;
 
    void CalcHash(uint32_t & oru32_HashValue) const override;
 

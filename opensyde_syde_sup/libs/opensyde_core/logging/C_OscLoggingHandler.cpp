@@ -34,7 +34,8 @@ using namespace stw::opensyde_core;
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 bool C_OscLoggingHandler::mhq_WriteToFile = false;
-bool C_OscLoggingHandler::mhq_AutoFlushFile = false;
+bool C_OscLoggingHandler::mhq_AutoFlushAllFile = false;
+bool C_OscLoggingHandler::mhq_AutoFlushWarningsAndErrorsFile = false;
 bool C_OscLoggingHandler::mhq_WriteToConsole = true;
 bool C_OscLoggingHandler::mhq_MeasureTime = false;
 bool C_OscLoggingHandler::mhq_LogInitErrorsToConsole = false;
@@ -51,21 +52,25 @@ std::ofstream C_OscLoggingHandler::mhc_File;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set write to file active flag
 
-   \param[in] oq_Active     New write to file active flag
-   \param[in] oq_AutoFlush  true: flush output file after each write
-                            false: do not automatically flush (= default)
-   \param[in] oq_LogInitErrorsToConsole  true: if opening log file fails print a log entry to console
+   \param[in]  oq_Active                        New write to file active flag
+   \param[in]  oq_AutoFlushAll                  true: flush output file after each write
+                                                false: do not automatically flush (= default)
+   \param[in]  oq_LogInitErrorsToConsole        true: if opening log file fails print a log entry to console
+   \param[in]  oq_AutoFlushWarningsAndErrors    true: flush output file after write of warnings and errors
+                                                false: do not automatically flush (= default)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscLoggingHandler::h_SetWriteToFileActive(const bool oq_Active, const bool oq_AutoFlush,
-                                                 const bool oq_LogInitErrorsToConsole)
+void C_OscLoggingHandler::h_SetWriteToFileActive(const bool oq_Active, const bool oq_AutoFlushAll,
+                                                 const bool oq_LogInitErrorsToConsole,
+                                                 const bool oq_AutoFlushWarningsAndErrors)
 {
    if (C_OscLoggingHandler::mhc_File.is_open() == true)
    {
       C_OscLoggingHandler::mhc_File.close();
    }
    C_OscLoggingHandler::mhq_WriteToFile = oq_Active;
-   C_OscLoggingHandler::mhq_AutoFlushFile = oq_AutoFlush;
+   C_OscLoggingHandler::mhq_AutoFlushAllFile = oq_AutoFlushAll;
+   C_OscLoggingHandler::mhq_AutoFlushWarningsAndErrorsFile = oq_AutoFlushWarningsAndErrors;
    C_OscLoggingHandler::mhq_LogInitErrorsToConsole = oq_LogInitErrorsToConsole;
    mh_OpenFile();
 }
@@ -416,7 +421,9 @@ void C_OscLoggingHandler::mh_WriteLog(const C_SclString & orc_Type, const C_SclS
 
       //TGL critical section -> file
       C_OscLoggingHandler::mhc_File.write(c_Message.c_str(), c_Message.size());
-      if (mhq_AutoFlushFile == true)
+      if ((mhq_AutoFlushAllFile == true) ||
+          ((C_OscLoggingHandler::mhq_AutoFlushWarningsAndErrorsFile == true) &&
+           ((orc_Type == "WARNING") || (orc_Type == "ERROR"))))
       {
          C_OscLoggingHandler::mhc_File.flush();
       }

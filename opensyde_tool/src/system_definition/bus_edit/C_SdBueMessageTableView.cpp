@@ -291,7 +291,7 @@ void C_SdBueMessageTableView::m_InitColumns(void)
 std::map<C_SdBueMessageTableModel::E_Columns, uint32_t> C_SdBueMessageTableView::mh_GetDefaultColumnWidths()
 {
    std::map<C_SdBueMessageTableModel::E_Columns, uint32_t> c_ColumnWidths;
-   c_ColumnWidths[C_SdBueMessageTableModel::eINDEX] = 40;
+   c_ColumnWidths[C_SdBueMessageTableModel::eINDEX] = 51;
    c_ColumnWidths[C_SdBueMessageTableModel::eICON] = 26;
    c_ColumnWidths[C_SdBueMessageTableModel::eENABLED] = 54;
    c_ColumnWidths[C_SdBueMessageTableModel::eNAME] = 206;

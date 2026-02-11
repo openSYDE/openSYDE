@@ -109,6 +109,8 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    connect(&this->mc_Model, &C_CamGenTableModel::SigReport, this, &C_CamGenTableView::m_Report);
    connect(&this->mc_Model, &C_CamGenTableModel::SigAutoProtocolSupport, this,
            &C_CamGenTableView::SigAutoProtocolSupport);
+   connect(&this->mc_SortProxyModel, &QSortFilterProxyModel::layoutChanged,
+           this, &C_CamGenTableView::m_OnSortModelLayoutChange);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -615,6 +617,8 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    {
       Q_EMIT (this->SigSelected(c_Selection.size(), 0UL));
    }
+
+   this->mc_Delegate.SetSelectedRows(this->selectedIndexes());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -623,7 +627,7 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    Will be used when resizeColumnToContents is used for the specific column.
    resizeColumnToContents is used by double click on the separator in the header too.
 
-   \param[in]  os32_Column  Index of column
+   \param[in]  os32_Column    Index of column
 
    \return
    Width of column in pixel
@@ -1245,4 +1249,15 @@ void C_CamGenTableView::m_Report(const C_OgeWiCustomMessage::E_Type oe_Type, con
    c_Message.SetHeading(orc_Heading);
    c_Message.SetDescription(orc_Description);
    c_Message.Execute();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for the signal layoutChanged() of the sort proxy model.
+
+    Here: Tell delegate about selection update (necessary for painting selected background of disabled cells)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableView::m_OnSortModelLayoutChange(void)
+{
+   this->mc_Delegate.SetSelectedRows(this->selectedIndexes());
 }
