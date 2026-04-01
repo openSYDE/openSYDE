@@ -23,10 +23,16 @@
 #include "C_OscSystemDefinition.hpp"
 #include "C_OscSystemDefinitionFiler.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "TGLFile.hpp"
+#include "TglFile.hpp"
 #include "C_OsyCodeExportBase.hpp"
 #include "C_OscUtils.hpp"
 #include "C_OscBinaryHash.hpp"
+#include "version_config.hpp"
+
+#ifndef _WIN32
+#include <linux/limits.h>
+#define MAX_PATH PATH_MAX
+#endif
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -82,8 +88,6 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
 
    Extracts the windows version number of the specified file and returns it
     in the commonly used STW format: "Vx.yyrz".
-   This function is Windows specific and needs to be replaced by another solution
-    when porting to a non-Windows system
 
    \param[in]   orc_FileName    file name to get version from
 
@@ -93,13 +97,12 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SclString & orc_FileName)
 {
+   C_SclString c_Version = "V?.\?\?r?";
+#ifdef _WIN32
    VS_FIXEDFILEINFO * pc_Info;
    uint32_t u32_ValSize;
    int32_t s32_InfoSize;
    uint8_t * pu8_Buffer;
-   C_SclString c_Version;
-
-   c_Version = "V?.\?\?r?";
 
    s32_InfoSize = GetFileVersionInfoSizeA(orc_FileName.c_str(), NULL);
    if (s32_InfoSize != 0)
@@ -120,6 +123,15 @@ C_SclString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SclString & orc
       delete[] pu8_Buffer;
    }
    return c_Version;
+#else
+   (void)orc_FileName;
+
+   c_Version.PrintFormatted("V%d.%02dr%d",
+                            PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR,
+                            PROJECT_VERSION_RELEASE);
+
+   return c_Version;
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -142,14 +154,10 @@ C_OsyCodeExportBase::~C_OsyCodeExportBase(void)
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 {
    E_ResultCode e_Return = eRESULT_OK;
-   char_t acn_ApplicationName[MAX_PATH + 1];
-   uint32_t u32_Return = GetModuleFileNameA(NULL, &acn_ApplicationName[0], MAX_PATH + 1);
-
-   tgl_assert(u32_Return != 0);
-
+   uint32_t u32_Return;
    mq_EraseTargetFolder = false;
 
-   mc_ExeName = acn_ApplicationName;
+   mc_ExeName = TglGetExePath();
    mc_ExeVersion = h_GetApplicationVersion(mc_ExeName);
    mc_BinaryHash = stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash();
 
