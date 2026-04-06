@@ -28,8 +28,16 @@ set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION         1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM     1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON     1)
 set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS             1)
-set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET              0)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING            1)
+
+if(WIN32)
+   set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET   0)
+   set(OPENSYDE_CORE_SKIP_LINUX_TARGET     1)
+else()
+   set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET   1)
+   set(OPENSYDE_CORE_SKIP_LINUX_TARGET     0)
+endif()
+
 add_subdirectory(../libs/osy_core ${CMAKE_BINARY_DIR}/osy_core)
 
 # --- Project source file ----------------------------------------------------------------------------------------------
@@ -49,8 +57,13 @@ add_executable(osy_syde_coder_c ${OPENSYDE_SYDE_CODER_C_SOURCES})
 # add required libraries
 target_link_libraries(osy_syde_coder_c
    opensyde_core
-   version
 )
+
+if(WIN32)
+   target_link_libraries(osy_syde_coder_c
+      version
+   )
+endif()
 
 # define precompiled headers for core and application
 target_precompile_headers(opensyde_core PRIVATE ../src/precomp_headers.hpp)

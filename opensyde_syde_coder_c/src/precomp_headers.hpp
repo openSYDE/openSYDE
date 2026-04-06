@@ -25,12 +25,15 @@
 #if defined __cplusplus
 /* Add C++ includes here */
 
-#include <windows.h>
 #include <cstdio>
 #include <cstring>
 #include <vector>
 #include <map>
 #include <list>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #include "C_SclString.hpp"
 

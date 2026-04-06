@@ -23,7 +23,7 @@
 #include "C_OscSystemDefinitionFiler.hpp"
 #include "C_OscExportNode.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "TGLFile.hpp"
+#include "TglFile.hpp"
 #include "C_OsyCodeExportBase.hpp"
 
 #include "C_OscBinaryHash.hpp"
