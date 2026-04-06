@@ -161,8 +161,9 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    mc_ExeVersion = h_GetApplicationVersion(mc_ExeName);
    mc_BinaryHash = stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash();
 
-   mc_LogFileName = TglChangeFileExtension(mc_ExeName, ".log");
-   mc_ListOfFilesFileName = TglChangeFileExtension(mc_ExeName, "") + "_file_list.txt";
+   // Relative to present working directory
+   mc_LogFileName = "osy_syde_coder_c.log";
+   mc_ListOfFilesFileName = "osy_syde_coder_c_file_list.txt";
 
    m_PrintBanner();
 
