@@ -156,11 +156,12 @@ void C_TblTreDataElementModel::InitSd(const uint32_t ou32_NodeIndex, const int32
 
       //Data pools
       pc_NodeItem->ReserveChildrenSpace(4UL);
-      pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-      pc_NvmItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-      pc_ComItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-      pc_HalcItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-      for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      pc_DiagItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+      pc_NvmItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+      pc_ComItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+      pc_HalcItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+      for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < static_cast<uint32_t>(pc_Node->c_DataPools.size());
+           ++u32_ItDataPool)
       {
          const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          C_TblTreItem * const pc_DataPoolItem = new C_TblTreItem();
@@ -294,12 +295,14 @@ void C_TblTreDataElementModel::InitSd(const uint32_t ou32_NodeIndex, const int32
    \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
    \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
                                           will be marked as used an will be disabled
+   \param[in]  oq_ShowStringElements      Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mode oe_Mode,
                                       const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                       const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
-                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                      const bool oq_ShowStringElements)
 {
    const uint16_t u16_TimerId = osc_write_log_performance_start();
 
@@ -322,13 +325,14 @@ void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mod
          C_TblTreDataElementModel::mh_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                             oq_ShowArrayIndexElements,
                                                             oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                            this->mpc_InvisibleRootItem);
+                                                            this->mpc_InvisibleRootItem, oq_ShowStringElements);
       }
       else
       {
          this->mpc_InvisibleRootItem = new C_TblTreItem();
          m_InitDatapoolElements(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
-                                oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements);
+                                oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements, true, 0UL,
+                                oq_ShowStringElements);
          //Clean up (old values probably not necessary in future);
          mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDe);
          //Directly store the model (after filling it-> for sync managers)
@@ -346,13 +350,13 @@ void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mod
          C_TblTreDataElementModel::mh_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                             oq_ShowArrayIndexElements,
                                                             oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                            this->mpc_InvisibleRootItem);
+                                                            this->mpc_InvisibleRootItem, oq_ShowStringElements);
       }
       else
       {
          this->mpc_InvisibleRootItem = new C_TblTreItem();
          m_InitBusSignal(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
-                         oq_Show64BitValues, opc_AlreasyUsedElements);
+                         oq_Show64BitValues, opc_AlreasyUsedElements, oq_ShowStringElements);
          //Clean up (old values probably not necessary in future);
          mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsBs);
          //Directly store the model (after filling it-> for sync managers)
@@ -370,7 +374,7 @@ void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mod
          C_TblTreDataElementModel::mh_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                             oq_ShowArrayIndexElements,
                                                             oq_Show64BitValues, NULL,
-                                                            this->mpc_InvisibleRootItem);
+                                                            this->mpc_InvisibleRootItem, oq_ShowStringElements);
       }
       else
       {
@@ -405,6 +409,7 @@ void C_TblTreDataElementModel::InitSv(const uint32_t ou32_ViewIndex, const E_Mod
    \param[in]  oq_Show64BitValues                  Optional flag to hide all 64 bit elements (if false)
    \param[in]  opc_AlreasyUsedElements             Optional pointer to vector with already used elements. All added elements
                                                    will be marked as used an will be disabled
+   \param[in]  oq_ShowStringElements               Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::InitSdDatapoolElements(const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
@@ -412,7 +417,8 @@ void C_TblTreDataElementModel::InitSdDatapoolElements(const uint32_t ou32_SdData
                                                       const bool oq_ShowArrayElements,
                                                       const bool oq_ShowArrayIndexElements,
                                                       const bool oq_Show64BitValues,
-                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                      const bool oq_ShowStringElements)
 {
    const uint16_t u16_TimerId = osc_write_log_performance_start();
    const std::vector<uint32_t> c_Hashes = C_TblTreDataElementModel::mh_GetViewSdHash(0U);
@@ -423,7 +429,7 @@ void C_TblTreDataElementModel::InitSdDatapoolElements(const uint32_t ou32_SdData
    this->mpc_InvisibleRootItem = new C_TblTreItem();
    m_InitDatapoolElements(0U, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                           oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements, false,
-                          ou32_SdDataLoggerUseCaseNodeIndex);
+                          ou32_SdDataLoggerUseCaseNodeIndex, oq_ShowStringElements);
    //Clean up (old values probably not necessary in future);
    mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDe);
    //Directly store the model (after filling it-> for sync managers)
@@ -695,12 +701,14 @@ C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
    \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
    \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
                                           will be marked as used an will be disabled
+   \param[in]  oq_ShowStringElements      Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  const bool oq_ShowOnlyWriteElements,
                                                const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
                                                const bool oq_Show64BitValues,
-                                               const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                               const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                               const bool oq_ShowStringElements)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
@@ -783,7 +791,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
                if (mh_AddCommMessageItems(pc_ProtocolItem, c_UniqueMessages,
                                           C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL, oq_ShowOnlyWriteElements,
                                           oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
-                                          opc_AlreasyUsedElements) == true)
+                                          opc_AlreasyUsedElements, oq_ShowStringElements) == true)
                {
                   q_BusValid = true;
                   q_ProtocolValid = true;
@@ -822,6 +830,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
                                                    will be marked as used an will be disabled
    \param[in]  oq_IsModelUsedInSysViews            True if the model is used for a view in system views, false otherwise
    \param[in]  ou32_SdDataLoggerUseCaseNodeIndex   System definition data logger use case: node index
+   \param[in]  oq_ShowStringElements               Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIndex,
@@ -829,8 +838,8 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                                       const bool oq_ShowArrayElements,
                                                       const bool oq_ShowArrayIndexElements,
                                                       const bool oq_Show64BitValues,
-                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_IsModelUsedInSysViews,
-                                                      const uint32_t ou32_SdDataLoggerUseCaseNodeIndex)
+                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_IsModelUsedInSysViews, const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
+                                                      const bool oq_ShowStringElements)
 {
    std::vector<uint8_t> c_NodeActiveFlags;
    const int32_t s32_Retval = C_TblTreDataElementModel::mh_GetCurrentNodeActiveFlags(ou32_ViewIndex,
@@ -910,10 +919,10 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                pc_NodeItem->c_ToolTipContent = pc_Node->c_Properties.c_Comment.c_str();
                //Data pools
                pc_NodeItem->ReserveChildrenSpace(4UL);
-               pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-               pc_NvmItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-               pc_ComItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-               pc_HalcItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+               pc_DiagItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+               pc_NvmItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+               pc_ComItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+               pc_HalcItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
                for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
                {
                   const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
@@ -944,7 +953,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                                                         oq_ShowArrayElements,
                                                                         oq_ShowArrayIndexElements,
                                                                         oq_Show64BitValues,
-                                                                        opc_AlreasyUsedElements);
+                                                                        opc_AlreasyUsedElements, oq_ShowStringElements);
                   if (q_DataPoolValid == true)
                   {
                      q_NodeValid = true;
@@ -958,7 +967,8 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                                                            oq_ShowArrayElements,
                                                                            oq_ShowArrayIndexElements,
                                                                            oq_Show64BitValues,
-                                                                           opc_AlreasyUsedElements);
+                                                                           opc_AlreasyUsedElements,
+                                                                           oq_ShowStringElements);
                      if (q_DataPoolValid == true)
                      {
                         q_NodeValid = true;
@@ -970,7 +980,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                         if ((rc_DataPool.e_Type == C_OscNodeDataPool::eDIAG) ||
                             (rc_DataPool.e_Type == C_OscNodeDataPool::eNVM))
                         {
-                           pc_DataPoolItem->ReserveChildrenSpace(rc_DataPool.c_Lists.size());
+                           pc_DataPoolItem->ReserveChildrenSpace(static_cast<uint32_t>(rc_DataPool.c_Lists.size()));
                            for (uint32_t u32_ItList = 0; u32_ItList < rc_DataPool.c_Lists.size(); ++u32_ItList)
                            {
                               const C_OscNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u32_ItList];
@@ -988,7 +998,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                               //Flag
                               q_ListValid = false;
                               //Elements
-                              pc_ListItem->ReserveChildrenSpace(rc_List.c_Elements.size());
+                              pc_ListItem->ReserveChildrenSpace(static_cast<uint32_t>(rc_List.c_Elements.size()));
                               for (uint32_t u32_ItElement = 0; u32_ItElement < rc_List.c_Elements.size();
                                    ++u32_ItElement)
                               {
@@ -1033,7 +1043,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                                                       oq_ShowArrayElements,
                                                                       oq_ShowArrayIndexElements,
                                                                       oq_Show64BitValues,
-                                                                      opc_AlreasyUsedElements);
+                                                                      opc_AlreasyUsedElements, oq_ShowStringElements);
 
                                  //Array elements and check for usage
                                  C_TblTreDataElementModel::mh_CreateArrayElementNodes(
@@ -1043,7 +1053,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
                                     oq_Show64BitValues, rc_Element,
                                     oq_IsString, pc_ElementItem,
                                     c_Id,
-                                    opc_AlreasyUsedElements);
+                                    opc_AlreasyUsedElements, oq_ShowStringElements);
 
                                  //Add
                                  pc_ListItem->AddChild(pc_ElementItem);
@@ -1148,6 +1158,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32_t ou32_ViewIn
    \param[in]      oq_Show64BitValues           Show64 bit values
    \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
                                                 will be marked as used an will be disabled
+   \param[in]      oq_ShowStringElements        Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsHalc(C_TblTreItem * const opc_DpItem, bool & orq_HalcValid,
@@ -1157,7 +1168,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalc(C_TblTreItem * const 
                                                            const bool oq_ShowArrayElements,
                                                            const bool oq_ShowArrayIndexElements,
                                                            const bool oq_Show64BitValues,
-                                                           const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                           const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                           const bool oq_ShowStringElements)
 {
    if ((opc_DpItem != NULL) &&
        ((orc_Dp.e_Type == C_OscNodeDataPool::eHALC) || (orc_Dp.e_Type == C_OscNodeDataPool::eHALC_NVM)))
@@ -1225,7 +1237,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalc(C_TblTreItem * const 
                                                                                  oq_ShowArrayIndexElements,
                                                                                  oq_Show64BitValues, c_DpHandler,
                                                                                  opc_AlreasyUsedElements,
-                                                                                 u32_DatapoolUniqueChannelCounter);
+                                                                                 u32_DatapoolUniqueChannelCounter,
+                                                                                 oq_ShowStringElements);
                      //Iterate channel
                      ++u32_DatapoolUniqueChannelCounter;
                      ++u32_RelevantChannelIndex;
@@ -1262,7 +1275,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalc(C_TblTreItem * const 
                                                                               oq_ShowArrayIndexElements,
                                                                               oq_Show64BitValues, c_DpHandler,
                                                                               opc_AlreasyUsedElements,
-                                                                              u32_DatapoolUniqueChannelCounter);
+                                                                              u32_DatapoolUniqueChannelCounter,
+                                                                              oq_ShowStringElements);
                   //Iterate channel
                   ++u32_DatapoolUniqueChannelCounter;
                }
@@ -1307,6 +1321,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalc(C_TblTreItem * const 
    \param[in]      opc_AlreasyUsedElements            Optional pointer to vector with already used elements. All added elements
                                                       will be marked as used an will be disabled
    \param[in]      ou32_DatapoolUniqueChannelCounter  Datapool unique channel counter
+   \param[in]      oq_ShowStringElements              Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * const opc_DpItem, bool & orq_HalcValid,
@@ -1328,8 +1343,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * 
                                                                  const bool oq_ShowArrayElements,
                                                                  const bool oq_ShowArrayIndexElements,
                                                                  const bool oq_Show64BitValues,
-                                                                 const stw::opensyde_core::C_OscHalcMagicianDatapoolListHandler & orc_DpHandler, const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
-                                                                 const uint32_t ou32_DatapoolUniqueChannelCounter)
+                                                                 const stw::opensyde_core::C_OscHalcMagicianDatapoolListHandler & orc_DpHandler, const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const uint32_t ou32_DatapoolUniqueChannelCounter,
+                                                                 const bool oq_ShowStringElements)
 {
    const bool q_ChanNumVarNecessary = orc_DpHandler.CheckChanNumVariableNecessary(orc_DomainConfig);
    const bool q_UseCaseVarNecessary = orc_DpHandler.CheckUseCaseVariableNecessary(orc_DomainConfig);
@@ -1386,7 +1401,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * 
                                                                          oq_ShowArrayElements,
                                                                          oq_ShowArrayIndexElements,
                                                                          oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                                         c_HalChannelOrDomainName);
+                                                                         c_HalChannelOrDomainName,
+                                                                         oq_ShowStringElements);
       }
       else if (rc_List.c_Name == C_OscHalcMagicianUtil::h_GetListName(C_OscHalcDefDomain::eVA_INPUT))
       {
@@ -1404,7 +1420,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * 
                                                                          oq_ShowArrayElements,
                                                                          oq_ShowArrayIndexElements,
                                                                          oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                                         c_HalChannelOrDomainName);
+                                                                         c_HalChannelOrDomainName,
+                                                                         oq_ShowStringElements);
       }
       else if (rc_List.c_Name == C_OscHalcMagicianUtil::h_GetListName(C_OscHalcDefDomain::eVA_OUTPUT))
       {
@@ -1423,7 +1440,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * 
                                                                          oq_ShowArrayElements,
                                                                          oq_ShowArrayIndexElements,
                                                                          oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                                         c_HalChannelOrDomainName);
+                                                                         c_HalChannelOrDomainName,
+                                                                         oq_ShowStringElements);
       }
       else if (rc_List.c_Name == C_OscHalcMagicianUtil::h_GetListName(C_OscHalcDefDomain::eVA_STATUS))
       {
@@ -1442,7 +1460,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * 
                                                                          oq_ShowArrayElements,
                                                                          oq_ShowArrayIndexElements,
                                                                          oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                                         c_HalChannelOrDomainName);
+                                                                         c_HalChannelOrDomainName,
+                                                                         oq_ShowStringElements);
       }
       else
       {
@@ -1488,6 +1507,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfig(C_TblTreItem * 
    \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
                                                 will be marked as used an will be disabled
    \param[in]      orc_HalChannelOrDomainName   Hal channel or domain name
+   \param[in]      oq_ShowStringElements        Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreItem * const opc_ChannelItem,
@@ -1505,8 +1525,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                                      const bool oq_UseCaseVarNecessary,
                                                                      const bool oq_SafetyFlagVarNecessary,
                                                                      const bool oq_IsParam,
-                                                                     const stw::scl::C_SclString & orc_DomainSingularName, const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues, const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
-                                                                     const QString & orc_HalChannelOrDomainName)
+                                                                     const stw::scl::C_SclString & orc_DomainSingularName, const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues, const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const QString & orc_HalChannelOrDomainName,
+                                                                     const bool oq_ShowStringElements)
 {
    C_TblTreItem * const pc_ListItem = new C_TblTreItem();
    C_TblTreItem * const pc_OtherItem = new C_TblTreItem();
@@ -1545,7 +1565,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                       oq_ShowArrayElements,
                                                       oq_ShowArrayIndexElements,
                                                       oq_Show64BitValues,
-                                                      opc_AlreasyUsedElements);
+                                                      opc_AlreasyUsedElements, oq_ShowStringElements);
          //Iterate
          ++oru32_Counter;
          //Mark valid
@@ -1564,7 +1584,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                       oq_ShowArrayElements,
                                                       oq_ShowArrayIndexElements,
                                                       oq_Show64BitValues,
-                                                      opc_AlreasyUsedElements);
+                                                      opc_AlreasyUsedElements, oq_ShowStringElements);
          //Iterate
          ++oru32_Counter;
          //Mark valid
@@ -1583,7 +1603,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                       oq_ShowArrayElements,
                                                       oq_ShowArrayIndexElements,
                                                       oq_Show64BitValues,
-                                                      opc_AlreasyUsedElements);
+                                                      opc_AlreasyUsedElements, oq_ShowStringElements);
          //Iterate
          ++oru32_Counter;
          //Mark valid
@@ -1623,7 +1643,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                         oq_ShowArrayElements,
                                                         oq_ShowArrayIndexElements,
                                                         oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                        orc_HalChannelOrDomainName);
+                                                        orc_HalChannelOrDomainName, oq_ShowStringElements);
             }
             else
             {
@@ -1635,7 +1655,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                         oq_ShowArrayElements,
                                                         oq_ShowArrayIndexElements,
                                                         oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                        orc_HalChannelOrDomainName);
+                                                        orc_HalChannelOrDomainName, oq_ShowStringElements);
                //Mark valid
                q_OtherValid = true;
             }
@@ -1654,7 +1674,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                      oq_ShowArrayElements,
                                                      oq_ShowArrayIndexElements,
                                                      oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                     orc_HalChannelOrDomainName);
+                                                     orc_HalChannelOrDomainName, oq_ShowStringElements);
          }
          else
          {
@@ -1665,7 +1685,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
                                                      oq_ShowArrayElements,
                                                      oq_ShowArrayIndexElements,
                                                      oq_Show64BitValues, opc_AlreasyUsedElements,
-                                                     orc_HalChannelOrDomainName);
+                                                     orc_HalChannelOrDomainName, oq_ShowStringElements);
             //Mark valid
             q_OtherValid = true;
          }
@@ -1711,6 +1731,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHalcConfigList(C_TblTreIte
    \param[in]      oq_Show64BitValues           Show64 bit values
    \param[in]      opc_AlreasyUsedElements      Alreasy used elements
    \param[in]      orc_HalChannelOrDomainName   Hal channel or domain name
+   \param[in]      oq_ShowStringElement         Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_AddHalcItem(C_TblTreItem * const opc_BaseItem,
@@ -1720,8 +1741,8 @@ void C_TblTreDataElementModel::mh_AddHalcItem(C_TblTreItem * const opc_BaseItem,
                                               const uint32_t ou32_ChannelArrayIndex,
                                               const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                               const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
-                                              const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
-                                              const QString & orc_HalChannelOrDomainName)
+                                              const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const QString & orc_HalChannelOrDomainName,
+                                              const bool oq_ShowStringElement)
 {
    C_PuiSvDbNodeDataPoolListElementId c_Id(ou32_NodeIndex, ou32_DpIndex, ou32_ListIndex, oru32_Counter,
                                            C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
@@ -1738,7 +1759,7 @@ void C_TblTreDataElementModel::mh_AddHalcItem(C_TblTreItem * const opc_BaseItem,
                                                 oq_ShowArrayElements,
                                                 oq_ShowArrayIndexElements,
                                                 oq_Show64BitValues,
-                                                opc_AlreasyUsedElements);
+                                                opc_AlreasyUsedElements, oq_ShowStringElement);
    //Iterate
    oru32_Counter += C_OscHalcMagicianDatapoolListHandler::h_CountElements(orc_HalcItem, ou32_RelevantChannelNumber);
 }
@@ -1757,6 +1778,7 @@ void C_TblTreDataElementModel::mh_AddHalcItem(C_TblTreItem * const opc_BaseItem,
    \param[in]      oq_Show64BitValues           Show64 bit values
    \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
                                                 will be marked as used an will be disabled
+   \param[in]      oq_ShowStringElements        Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_AddHalcTreeItem(C_TblTreItem * const opc_ListItem, const QString & orc_Name,
@@ -1764,7 +1786,8 @@ void C_TblTreDataElementModel::mh_AddHalcTreeItem(C_TblTreItem * const opc_ListI
                                                   const bool oq_IsArray, const bool oq_IsString,
                                                   const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                                   const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
-                                                  const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                  const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                  const bool oq_ShowStringElements)
 {
    const C_OscNodeDataPoolListElement * const pc_OscElement =
       C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_Id);
@@ -1785,7 +1808,7 @@ void C_TblTreDataElementModel::mh_AddHalcTreeItem(C_TblTreItem * const opc_ListI
                                            oq_ShowArrayElements,
                                            oq_ShowArrayIndexElements,
                                            oq_Show64BitValues,
-                                           opc_AlreasyUsedElements);
+                                           opc_AlreasyUsedElements, oq_ShowStringElements);
       //Append
       opc_ListItem->AddChild(pc_ElementItem);
    }
@@ -1806,6 +1829,7 @@ void C_TblTreDataElementModel::mh_AddHalcTreeItem(C_TblTreItem * const opc_ListI
    \param[in]      oq_Show64BitValues           Show64 bit values
    \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
                                                 will be marked as used an will be disabled
+   \param[in]      oq_ShowStringElement         Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsComm(C_TblTreItem * const opc_DpItem, bool & orq_ComValid,
@@ -1815,7 +1839,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsComm(C_TblTreItem * const 
                                                            const bool oq_ShowArrayElements,
                                                            const bool oq_ShowArrayIndexElements,
                                                            const bool oq_Show64BitValues,
-                                                           const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                           const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                           const bool oq_ShowStringElement)
 {
    if ((opc_DpItem != NULL) && (orc_Dp.e_Type == C_OscNodeDataPool::eCOM))
    {
@@ -1868,7 +1893,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsComm(C_TblTreItem * const 
                                                            C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
                                                            oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                            oq_ShowArrayIndexElements, oq_Show64BitValues,
-                                                           opc_AlreasyUsedElements) == true)
+                                                           opc_AlreasyUsedElements, oq_ShowStringElement) == true)
       {
          orq_ComValid = true;
       }
@@ -1887,6 +1912,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsComm(C_TblTreItem * const 
    \param[in]      oq_Show64BitValues           Show64 bit values
    \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
                                                 will be marked as used an will be disabled
+   \param[in]      oq_ShowStringElements        Optional flag to hide all string elements (if false)
 
    \retval  true     At least one message with at least one signal was added to opc_BaseItem
    \retval  false    Nothing was added.
@@ -1899,13 +1925,14 @@ bool C_TblTreDataElementModel::mh_AddCommMessageItems(C_TblTreItem * const opc_B
                                                       const bool oq_ShowArrayElements,
                                                       const bool oq_ShowArrayIndexElements,
                                                       const bool oq_Show64BitValues,
-                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                      const bool oq_ShowStringElements)
 {
    bool q_Valid = false;
 
    if (opc_BaseItem != NULL)
    {
-      opc_BaseItem->ReserveChildrenSpace(orc_MessageIds.size());
+      opc_BaseItem->ReserveChildrenSpace(static_cast<uint32_t>(orc_MessageIds.size()));
       for (uint32_t u32_ItMessage = 0U; u32_ItMessage < orc_MessageIds.size(); ++u32_ItMessage)
       {
          C_TblTreItem * const pc_MessageItem = new C_TblTreItem();
@@ -1926,7 +1953,7 @@ bool C_TblTreDataElementModel::mh_AddCommMessageItems(C_TblTreItem * const opc_B
             pc_MessageItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_MESSAGE);
             pc_MessageItem->q_Selectable = false;
             //Signals
-            pc_MessageItem->ReserveChildrenSpace(pc_Message->c_Signals.size());
+            pc_MessageItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Message->c_Signals.size()));
             for (uint32_t u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
             {
                const C_OscNodeDataPoolListElement * const pc_Element =
@@ -1947,7 +1974,7 @@ bool C_TblTreDataElementModel::mh_AddCommMessageItems(C_TblTreItem * const opc_B
                   pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_SIGNAL);
                   pc_ElementItem->ConfigureDynamicName(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                        oq_ShowArrayIndexElements, oq_Show64BitValues,
-                                                       opc_AlreasyUsedElements);
+                                                       opc_AlreasyUsedElements, oq_ShowStringElements);
                   //Signal found
                   q_Valid = true;
                   q_MessageValid = true;
@@ -1979,14 +2006,15 @@ bool C_TblTreDataElementModel::mh_AddCommMessageItems(C_TblTreItem * const opc_B
    \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
                                           will be marked as used an will be disabled
    \param[in]  opc_Tree                   Tree
+   \param[in]  oq_ShowStringElement       Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements,
                                                         const bool oq_ShowArrayElements,
                                                         const bool oq_ShowArrayIndexElements,
                                                         const bool oq_Show64BitValues,
-                                                        const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
-                                                        C_TblTreSimpleItem * const opc_Tree)
+                                                        const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, C_TblTreSimpleItem * const opc_Tree,
+                                                        const bool oq_ShowStringElement)
 {
    if (opc_Tree != NULL)
    {
@@ -1994,14 +2022,15 @@ void C_TblTreDataElementModel::mh_UpdateDatapoolElement(const bool oq_ShowOnlyWr
       if (pc_AdaptableItem != NULL)
       {
          pc_AdaptableItem->ConfigureDynamicName(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
-                                                oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements);
+                                                oq_ShowArrayIndexElements, oq_Show64BitValues, opc_AlreasyUsedElements,
+                                                oq_ShowStringElement);
       }
       for (uint32_t u32_It = 0UL; u32_It < opc_Tree->c_Children.size(); ++u32_It)
       {
          C_TblTreDataElementModel::mh_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                             oq_ShowArrayIndexElements, oq_Show64BitValues,
                                                             opc_AlreasyUsedElements,
-                                                            opc_Tree->c_Children[u32_It]);
+                                                            opc_Tree->c_Children[u32_It], oq_ShowStringElement);
       }
    }
 }
@@ -2019,6 +2048,7 @@ void C_TblTreDataElementModel::mh_UpdateDatapoolElement(const bool oq_ShowOnlyWr
    \param[in]  orc_ParentId               Parent id
    \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
                                           will be marked as used an will be disabled
+   \param[in]  oq_ShowStringElement       Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_CreateArrayElementNodes(const bool oq_ShowOnlyWriteElements,
@@ -2029,7 +2059,8 @@ void C_TblTreDataElementModel::mh_CreateArrayElementNodes(const bool oq_ShowOnly
                                                           const bool oq_IsStringElement,
                                                           C_TblTreItem * const opc_ElementItem,
                                                           const C_PuiSvDbNodeDataPoolListElementId & orc_ParentId,
-                                                          const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                          const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                          const bool oq_ShowStringElement)
 {
    if (opc_ElementItem != NULL)
    {
@@ -2059,7 +2090,7 @@ void C_TblTreDataElementModel::mh_CreateArrayElementNodes(const bool oq_ShowOnly
                                                oq_ShowArrayElements,
                                                oq_ShowArrayIndexElements,
                                                oq_Show64BitValues,
-                                               opc_AlreasyUsedElements);
+                                               opc_AlreasyUsedElements, oq_ShowStringElement);
 
             //Add
             opc_ElementItem->AddChild(pc_ArrayItem);
@@ -2147,10 +2178,10 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32_t ou32_ViewIndex)
                pc_NodeItem->c_ToolTipContent = pc_Node->c_Properties.c_Comment.c_str();
                //Data pools
                pc_NodeItem->ReserveChildrenSpace(3UL);
-               pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-               pc_NvmItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-               pc_ComItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
-               pc_HalcItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+               pc_DiagItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+               pc_NvmItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+               pc_ComItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
+               pc_HalcItem->ReserveChildrenSpace(static_cast<uint32_t>(pc_Node->c_DataPools.size()));
                for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
                {
                   const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
@@ -2166,7 +2197,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32_t ou32_ViewIndex)
                   q_DataPoolValid = false;
                   //Data pool
                   //Lists
-                  pc_DataPoolItem->ReserveChildrenSpace(rc_DataPool.c_Lists.size());
+                  pc_DataPoolItem->ReserveChildrenSpace(static_cast<uint32_t>(rc_DataPool.c_Lists.size()));
                   for (uint32_t u32_ItList = 0; u32_ItList < rc_DataPool.c_Lists.size(); ++u32_ItList)
                   {
                      const C_OscNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u32_ItList];

@@ -25,6 +25,7 @@
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_OscNodeDataPoolContentUtil.hpp"
 #include "C_PuiSvHandler.hpp"
+#include "C_SyvDaTrafficEncryptionStatusHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -59,7 +60,7 @@ C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32_t ou32_ViewIndex
    mu32_ViewIndex(ou32_ViewIndex),
    mu32_DataPoolElementConfigIndex(0U),
    mq_Selected(false),
-   mq_Warning(false),
+   me_Warning(eWARNING_INACTIVE),
    mq_Error(false),
    mq_Invalid(false),
    mc_ToolTipErrorTextHeading(""),
@@ -154,11 +155,11 @@ void C_SyvDaChaDataItemWidget::InitWidget(const uint32_t ou32_DataPoolElementCon
    this->UpdateColor(orc_DataPoolElementColor);
 
    this->mc_DataPoolElementId = orc_DataPoolElementId;
-   this->mq_Warning = oq_Warning;
    this->mq_Invalid = oq_Invalid;
 
-   if (this->mq_Warning == true)
+   if (oq_Warning == true)
    {
+      this->me_Warning = eWARNING_ACTIVE_PERMANENT;
       this->mc_ToolTipErrorTextHeading = orc_ToolTipErrorTextHeading;
       this->mc_ToolTipErrorText = orc_ToolTipErrorText;
 
@@ -166,6 +167,10 @@ void C_SyvDaChaDataItemWidget::InitWidget(const uint32_t ou32_DataPoolElementCon
       {
          this->me_PlaceholderDataPoolType = oe_InvalidPlaceholderDataPoolType;
       }
+   }
+   else
+   {
+      this->me_Warning = eWARNING_INACTIVE;
    }
 
    // Save all data
@@ -399,6 +404,51 @@ void C_SyvDaChaDataItemWidget::ResetError(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
+
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaDataItemWidget::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                        bool> & orc_MappingNodeToTrafficEncryptionStatus)
+{
+   if (oq_Active)
+   {
+      if (this->me_Warning == eWARNING_INACTIVE)
+      {
+         const bool q_WarningActive = C_SyvDaTrafficEncryptionStatusHelper::h_GetViewNodeEncrypted(
+            this->mc_DataPoolElementId,
+            oq_Active,
+            this->mu32_ViewIndex,
+            orc_MappingNodeToTrafficEncryptionStatus);
+         if (q_WarningActive)
+         {
+            this->me_Warning = eWARNING_ACTIVE_SECURITY;
+            this->mc_ToolTipErrorText = C_GtGetText::h_GetText("Event driven data element trigger "
+                                                               "and encrypted communication via CAN is not supported");
+            this->mc_ToolTipErrorTextHeading = C_GtGetText::h_GetText("Configuration warning");
+
+            // Adapt the icon
+            this->m_UpdateIcon();
+         }
+      }
+   }
+   else
+   {
+      if (this->me_Warning == eWARNING_ACTIVE_SECURITY)
+      {
+         this->me_Warning = eWARNING_INACTIVE;
+         this->mc_ToolTipErrorText = "";
+         this->mc_ToolTipErrorTextHeading = "";
+
+         // Adapt the icon
+         this->m_UpdateIcon();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the unit of the datapool element
 
    \return
@@ -482,7 +532,7 @@ bool C_SyvDaChaDataItemWidget::event(QEvent * const opc_Event)
       QString c_ToolTipHeading = "";
       stw::opensyde_gui::C_NagToolTip::E_Type e_Type = C_NagToolTip::eDEFAULT;
 
-      if ((this->mq_Warning == true) || (this->mq_Error == true))
+      if ((this->me_Warning != eWARNING_INACTIVE) || (this->mq_Error == true))
       {
          c_ToolTip = this->mc_ToolTipErrorText;
          c_ToolTipHeading = this->mc_ToolTipErrorTextHeading;
@@ -615,7 +665,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconVariableError);
       }
-      else if (this->mq_Warning == true)
+      else if (this->me_Warning != eWARNING_INACTIVE)
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconVariableWarning);
       }
@@ -635,7 +685,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconParameterError);
       }
-      else if (this->mq_Warning == true)
+      else if (this->me_Warning != eWARNING_INACTIVE)
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconParameterWarning);
       }
@@ -655,7 +705,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconSignalError);
       }
-      else if (this->mq_Warning == true)
+      else if (this->me_Warning != eWARNING_INACTIVE)
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconSignalWarning);
       }
@@ -681,7 +731,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalInputError);
          }
-         else if (this->mq_Warning == true)
+         else if (this->me_Warning != eWARNING_INACTIVE)
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherWarning);
          }
@@ -699,7 +749,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOutputError);
          }
-         else if (this->mq_Warning == true)
+         else if (this->me_Warning != eWARNING_INACTIVE)
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherWarning);
          }
@@ -717,7 +767,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherError);
          }
-         else if (this->mq_Warning == true)
+         else if (this->me_Warning != eWARNING_INACTIVE)
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherWarning);
          }

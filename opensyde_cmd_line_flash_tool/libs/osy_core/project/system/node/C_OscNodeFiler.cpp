@@ -22,6 +22,8 @@
 #include "C_OscNodeDataPoolFiler.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscHalcConfigFiler.hpp"
+#include "C_OscDataLoggerJobFiler.hpp"
+#include "C_OscXappPropertiesFiler.hpp"
 #include "C_OscCanOpenManagerFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -182,6 +184,14 @@ int32_t C_OscNodeFiler::h_LoadNode(C_OscNode & orc_Node, C_OscXmlParserBase & or
                      //Return
                      tgl_assert(orc_XmlParser.SelectNodeParent() == "node"); //back up to node
                      s32_Retval = mh_LoadCanOpenManagers(orc_Node.c_CanOpenManagers, orc_XmlParser, orc_BasePath);
+                     if (s32_Retval == C_NO_ERR)
+                     {
+                        s32_Retval = mh_LoadDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath);
+                        if (s32_Retval == C_NO_ERR)
+                        {
+                           s32_Retval = mh_LoadXappProperties(orc_Node.c_XappProperties, orc_XmlParser, orc_BasePath);
+                        }
+                     }
                   }
                }
                else
@@ -290,6 +300,14 @@ int32_t C_OscNodeFiler::h_SaveNode(const C_OscNode & orc_Node, C_OscXmlParserBas
       s32_Retval = mh_SaveCanOpenManagers(orc_Node.c_CanOpenManagers, orc_XmlParser, orc_BasePath, opc_CreatedFiles,
                                           orc_NodeIndicesToNameMap);
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveDataLoggers(orc_Node.c_DataLoggerJobs, orc_XmlParser, orc_BasePath, opc_CreatedFiles);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveXappProperties(orc_Node, orc_XmlParser, orc_BasePath, opc_CreatedFiles);
+   }
    return s32_Retval;
 }
 
@@ -370,8 +388,8 @@ int32_t C_OscNodeFiler::h_LoadNodeComProtocols(std::vector<C_OscCanProtocol> & o
       if (u32_ExpectedSize != orc_NodeComProtocols.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeComProtocols.size());
+         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeComProtocols.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -496,6 +514,8 @@ int32_t C_OscNodeFiler::mh_LoadProperties(C_OscNodeProperties & orc_NodeProperti
 
    if (orc_XmlParser.SelectNodeChild("properties") == "properties")
    {
+      //XAppSupport
+      orc_NodeProperties.q_XappSupport = orc_XmlParser.GetAttributeBool("x-app-support", false);
       //Name
       if (orc_XmlParser.SelectNodeChild("name") == "name")
       {
@@ -549,60 +569,9 @@ int32_t C_OscNodeFiler::mh_LoadProperties(C_OscNodeProperties & orc_NodeProperti
       }
 
       //openSYDE server settings
-      if (orc_XmlParser.SelectNodeChild("open-syde-server-settings") == "open-syde-server-settings")
+      if (s32_Retval == C_NO_ERR)
       {
-         if (orc_XmlParser.AttributeExists("max-clients") == true)
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxClients =
-               static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("max-clients"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxClients = 1;
-         }
-         if (orc_XmlParser.AttributeExists("max-parallel-transmissions") == true)
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions =
-               static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("max-parallel-transmissions"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions = 64;
-         }
-         if (orc_XmlParser.AttributeExists("application-index") == true)
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex =
-               static_cast<int16_t>(orc_XmlParser.GetAttributeSint32("application-index"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex = -1;
-         }
-         if (orc_XmlParser.AttributeExists("max-tx-message-buffer") == true)
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx =
-               static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-tx-message-buffer"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx = 585U;
-         }
-         if (orc_XmlParser.AttributeExists("max-rx-routing-message-buffer") == true)
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx =
-               static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-rx-routing-message-buffer"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx = 585U;
-         }
-
-         //Return
-         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
-      }
-      else
-      {
-         orc_NodeProperties.c_OpenSydeServerSettings.Initialize();
+         s32_Retval = mh_LoadOsyServerSettings(orc_NodeProperties.c_OpenSydeServerSettings, orc_XmlParser);
       }
 
       //Flashloader settings
@@ -661,6 +630,7 @@ void C_OscNodeFiler::mh_SaveProperties(const C_OscNodeProperties & orc_NodePrope
                                        C_OscXmlParserBase & orc_XmlParser)
 {
    orc_XmlParser.CreateAndSelectNodeChild("properties");
+   orc_XmlParser.SetAttributeBool("x-app-support", orc_NodeProperties.q_XappSupport);
    orc_XmlParser.CreateNodeChild("name", orc_NodeProperties.c_Name);
    orc_XmlParser.CreateNodeChild("comment", orc_NodeProperties.c_Comment);
    orc_XmlParser.CreateNodeChild("diagnostic-server",
@@ -671,18 +641,7 @@ void C_OscNodeFiler::mh_SaveProperties(const C_OscNodeProperties & orc_NodePrope
    mh_SaveComInterface(orc_NodeProperties.c_ComInterfaces, orc_XmlParser);
 
    //openSYDE server settings
-   orc_XmlParser.CreateAndSelectNodeChild("open-syde-server-settings");
-   orc_XmlParser.SetAttributeUint32("max-clients", orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxClients);
-   orc_XmlParser.SetAttributeUint32("max-parallel-transmissions",
-                                    orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions);
-   orc_XmlParser.SetAttributeSint32("application-index",
-                                    orc_NodeProperties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex);
-   orc_XmlParser.SetAttributeUint32("max-tx-message-buffer",
-                                    orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx);
-   orc_XmlParser.SetAttributeUint32("max-rx-routing-message-buffer",
-                                    orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx);
-   //Return
-   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+   mh_SaveOsyServerSettings(orc_NodeProperties.c_OpenSydeServerSettings, orc_XmlParser);
 
    //Flashloader options
    mh_SaveStwFlashloaderOptions(orc_NodeProperties.c_StwFlashloaderSettings, orc_XmlParser);
@@ -870,26 +829,18 @@ int32_t C_OscNodeFiler::mh_LoadComInterface(std::vector<C_OscNodeComInterfaceSet
       {
          C_OscNodeComInterfaceSettings c_ComInterface;
 
-         c_ComInterface.u8_InterfaceNumber =
-            static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("interface-number"));
+         if (s32_Retval == C_NO_ERR)
+         {
+            s32_Retval = C_OscXappPropertiesFiler::h_LoadCommInterfaceId(c_ComInterface.e_InterfaceType,
+                                                                         c_ComInterface.u8_InterfaceNumber,
+                                                                         orc_XmlParser, "communication-interface",
+                                                                         "Loading node definition");
+         }
+
          c_ComInterface.u8_NodeId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("node-id"));
          c_ComInterface.q_IsUpdateEnabled = orc_XmlParser.GetAttributeBool("update-available");
          c_ComInterface.q_IsRoutingEnabled = orc_XmlParser.GetAttributeBool("routing-available");
          c_ComInterface.q_IsDiagnosisEnabled = orc_XmlParser.GetAttributeBool("diagnosis-available");
-         //Type
-         if ((orc_XmlParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
-         {
-            s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(
-               orc_XmlParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
-            //Return
-            tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
-         }
-         else
-         {
-            osc_write_log_error("Loading node definition",
-                                "Could not find \"communication-interface\".\"type\" node.");
-            s32_Retval = C_CONFIG;
-         }
 
          //IP address
          if ((orc_XmlParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
@@ -1004,14 +955,12 @@ void C_OscNodeFiler::mh_SaveComInterface(const std::vector<C_OscNodeComInterface
       const C_OscNodeComInterfaceSettings & rc_CurComInterface = orc_ComInterfaces[u32_ItComInterface];
 
       orc_XmlParser.CreateAndSelectNodeChild("communication-interface");
-      orc_XmlParser.SetAttributeUint32("interface-number",
-                                       static_cast<uint32_t>(rc_CurComInterface.u8_InterfaceNumber));
+      C_OscXappPropertiesFiler::h_SaveCommInterfaceId(rc_CurComInterface.e_InterfaceType,
+                                                      rc_CurComInterface.u8_InterfaceNumber, orc_XmlParser);
       orc_XmlParser.SetAttributeUint32("node-id", static_cast<uint32_t>(rc_CurComInterface.u8_NodeId));
       orc_XmlParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
       orc_XmlParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
       orc_XmlParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
-      orc_XmlParser.CreateNodeChild("type",
-                                    C_OscSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
       if (rc_CurComInterface.e_InterfaceType == C_OscSystemBus::eETHERNET)
       {
          orc_XmlParser.CreateAndSelectNodeChild("ip-address");
@@ -1242,8 +1191,9 @@ int32_t C_OscNodeFiler::mh_LoadApplications(std::vector<C_OscNodeApplication> & 
                      if (u32_ExpectedOutputfileNumber != c_CurApplication.c_ResultPaths.size())
                      {
                         C_SclString c_Tmp;
-                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %i, got %i",
-                                             u32_ExpectedOutputfileNumber, c_CurApplication.c_ResultPaths.size());
+                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %u, got %u",
+                                             u32_ExpectedOutputfileNumber,
+                                             static_cast<uint32_t>(c_CurApplication.c_ResultPaths.size()));
                         osc_write_log_warning("Load file", c_Tmp.c_str());
                      }
                   }
@@ -1279,8 +1229,8 @@ int32_t C_OscNodeFiler::mh_LoadApplications(std::vector<C_OscNodeApplication> & 
          if (u32_ExpectedSize != orc_NodeApplications.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected application count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_NodeApplications.size());
+            c_Tmp.PrintFormatted("Unexpected application count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_NodeApplications.size()));
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
@@ -1417,8 +1367,8 @@ int32_t C_OscNodeFiler::mh_LoadDataPools(C_OscNode & orc_Node, C_OscXmlParserBas
             if (u32_ExpectedSize != orc_Node.c_DataPools.size())
             {
                C_SclString c_Tmp;
-               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %i, got %i", u32_ExpectedSize,
-                                    orc_Node.c_DataPools.size());
+               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %u, got %u", u32_ExpectedSize,
+                                    static_cast<uint32_t>(orc_Node.c_DataPools.size()));
                osc_write_log_warning("Load file", c_Tmp.c_str());
             }
          }
@@ -1691,6 +1641,322 @@ int32_t C_OscNodeFiler::mh_SaveCanOpenManagers(const std::map<uint8_t, C_OscCanO
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load data loggers
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_LoadDataLoggers(std::vector<C_OscDataLoggerJob> & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.clear();
+   if (orc_XmlParser.SelectNodeChild("data-loggers-file") == "data-loggers-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OscDataLoggerJobFiler::h_LoadData(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         s32_Retval =
+            C_OscDataLoggerJobFiler::h_LoadFile(orc_Config,
+                                                C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                     orc_XmlParser.
+                                                                                     GetNodeContent()));
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save data loggers
+
+   \param[in]      orc_Config          Config
+   \param[in,out]  orc_XmlParser       XML parser
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Created files
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob> & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BasePath,
+                                           std::vector<C_SclString> * const opc_CreatedFiles)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_Config.size() > 0)
+   {
+      orc_XmlParser.CreateAndSelectNodeChild("data-loggers-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         C_OscDataLoggerJobFiler::h_SaveData(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         // const C_SclString c_FileName = C_OscNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SclString c_FileName = "data_loggers.xml";
+         const C_SclString c_CombinedFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval = C_OscDataLoggerJobFiler::h_SaveFile(orc_Config, c_CombinedFileName);
+         //Set file reference
+         orc_XmlParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load X-App properties
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_LoadXappProperties(C_OscXappProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                              const C_SclString & orc_BasePath)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.Initialize();
+   if (orc_XmlParser.SelectNodeChild("x-app-properties-file") == "x-app-properties-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OscXappPropertiesFiler::h_LoadXappProperties(orc_Config, orc_XmlParser);
+      }
+      else
+      {
+         s32_Retval =
+            C_OscXappPropertiesFiler::h_LoadXappPropertiesFile(orc_Config,
+                                                               C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                                    orc_XmlParser.
+                                                                                                    GetNodeContent()));
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load opensyde server settings
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_LoadOsyServerSettings(C_OscNodeOpenSydeServerSettings & orc_Config,
+                                                 C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_XmlParser.SelectNodeChild("open-syde-server-settings") == "open-syde-server-settings")
+   {
+      if (orc_XmlParser.AttributeExists("max-clients") == true)
+      {
+         orc_Config.u8_MaxClients =
+            static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("max-clients"));
+      }
+      else
+      {
+         orc_Config.u8_MaxClients = 1;
+      }
+      if (orc_XmlParser.AttributeExists("max-parallel-transmissions") == true)
+      {
+         orc_Config.u8_MaxParallelTransmissions =
+            static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("max-parallel-transmissions"));
+      }
+      else
+      {
+         orc_Config.u8_MaxParallelTransmissions = 64;
+      }
+      if (orc_XmlParser.AttributeExists("application-index") == true)
+      {
+         orc_Config.s16_DpdDataBlockIndex =
+            static_cast<int16_t>(orc_XmlParser.GetAttributeSint32("application-index"));
+      }
+      else
+      {
+         orc_Config.s16_DpdDataBlockIndex = -1;
+      }
+      if (orc_XmlParser.AttributeExists("max-tx-message-buffer") == true)
+      {
+         orc_Config.u16_MaxMessageBufferTx =
+            static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-tx-message-buffer"));
+      }
+      else
+      {
+         orc_Config.u16_MaxMessageBufferTx = 585U;
+      }
+      if (orc_XmlParser.AttributeExists("max-rx-routing-message-buffer") == true)
+      {
+         orc_Config.u16_MaxRoutingMessageBufferRx =
+            static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-rx-routing-message-buffer"));
+      }
+      else
+      {
+         orc_Config.u16_MaxRoutingMessageBufferRx = 585U;
+      }
+      if (orc_XmlParser.AttributeExists("max-service-size-byte") == true)
+      {
+         orc_Config.u16_MaxServiceSizeByte =
+            static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-service-size-byte"));
+      }
+      else
+      {
+         orc_Config.u16_MaxServiceSizeByte = 4096U;
+      }
+      if (orc_XmlParser.SelectNodeChild("max-service-size-mode") == "max-service-size-mode")
+      {
+         s32_Retval =
+            mh_StringToMaxServiceSizeModeType(orc_XmlParser.GetNodeContent(), orc_Config.e_MaxServiceSizeMode);
+         //Return
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "open-syde-server-settings");
+      }
+      else
+      {
+         orc_Config.e_MaxServiceSizeMode = C_OscNodeOpenSydeServerSettings::eMSMT_AUTO;
+      }
+
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+   }
+   else
+   {
+      orc_Config.Initialize();
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save opensyde server settings
+
+   \param[in]      orc_Config       Config
+   \param[in,out]  orc_XmlParser    XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNodeFiler::mh_SaveOsyServerSettings(const C_OscNodeOpenSydeServerSettings & orc_Config,
+                                              C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.CreateAndSelectNodeChild("open-syde-server-settings");
+   orc_XmlParser.SetAttributeUint32("max-clients", orc_Config.u8_MaxClients);
+   orc_XmlParser.SetAttributeUint32("max-parallel-transmissions",
+                                    orc_Config.u8_MaxParallelTransmissions);
+   orc_XmlParser.SetAttributeSint32("application-index",
+                                    orc_Config.s16_DpdDataBlockIndex);
+   orc_XmlParser.SetAttributeUint32("max-tx-message-buffer",
+                                    orc_Config.u16_MaxMessageBufferTx);
+   orc_XmlParser.SetAttributeUint32("max-rx-routing-message-buffer",
+                                    orc_Config.u16_MaxRoutingMessageBufferRx);
+   orc_XmlParser.SetAttributeUint32("max-service-size-byte",
+                                    orc_Config.u16_MaxServiceSizeByte);
+   orc_XmlParser.CreateNodeChild("max-service-size-mode",
+                                 mh_MaxServiceSizeModeTypeToString(orc_Config.e_MaxServiceSizeMode));
+   //Return
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save X-App properties
+
+   \param[in]      orc_Config          Config
+   \param[in,out]  orc_XmlParser       XML parser
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Created files
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_SaveXappProperties(const C_OscNode & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                              const C_SclString & orc_BasePath,
+                                              std::vector<C_SclString> * const opc_CreatedFiles)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_Config.c_Properties.q_XappSupport)
+   {
+      orc_XmlParser.CreateAndSelectNodeChild("x-app-properties-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         C_OscXappPropertiesFiler::h_SaveXappProperties(orc_Config.c_XappProperties, orc_XmlParser);
+      }
+      else
+      {
+         // const C_SclString c_FileName = C_OscNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SclString c_FileName = C_OscXappPropertiesFiler::h_GetFileName();
+         const C_SclString c_CombinedFileName = C_OscSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval =
+            C_OscXappPropertiesFiler::h_SaveXappPropertiesFile(orc_Config.c_XappProperties, c_CombinedFileName);
+         //Set file reference
+         orc_XmlParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform diagnostic server type to string
 
    \param[in]  ore_DiagnosticProtocol  Diagnostic protocol type
@@ -1708,9 +1974,6 @@ C_SclString C_OscNodeFiler::mh_DiagnosticServerToString(
    {
    case C_OscNodeProperties::eDS_OPEN_SYDE:
       c_Retval = "open-syde";
-      break;
-   case C_OscNodeProperties::eDS_KEFEX:
-      c_Retval = "kefex";
       break;
    case C_OscNodeProperties::eDS_NONE:
       c_Retval = "none";
@@ -1738,13 +2001,14 @@ int32_t C_OscNodeFiler::mh_StringToDiagnosticServer(const C_SclString & orc_Stri
 {
    int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_String == "kefex")
-   {
-      ore_Type = C_OscNodeProperties::eDS_KEFEX;
-   }
-   else if (orc_String == "open-syde")
+   if (orc_String == "open-syde")
    {
       ore_Type = C_OscNodeProperties::eDS_OPEN_SYDE;
+   }
+   else if (orc_String == "kefex")
+   {
+      // remnants from when KEFEX protocol support was still planned.
+      ore_Type = C_OscNodeProperties::eDS_NONE;
    }
    else if (orc_String == "none")
    {
@@ -1823,6 +2087,70 @@ int32_t C_OscNodeFiler::mh_StringToFlashLoader(const C_SclString & orc_String,
    {
       osc_write_log_error("Loading node definition",
                           "Invalid value for \"properties\".\"flash-loader\": " + orc_String);
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Transform max service size mode type to string
+
+   \param[in]  ore_MaxServiceSizeModeType    Max service size mode type
+
+   \return
+   Stringified max service size mode type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscNodeFiler::mh_MaxServiceSizeModeTypeToString(
+   const C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType & ore_MaxServiceSizeModeType)
+{
+   C_SclString c_Retval;
+
+   switch (ore_MaxServiceSizeModeType)
+   {
+   case C_OscNodeOpenSydeServerSettings::eMSMT_AUTO:
+      c_Retval = "auto";
+      break;
+   case C_OscNodeOpenSydeServerSettings::eMSMT_MANUAL:
+      c_Retval = "manual";
+      break;
+   default:
+      c_Retval = "invalid";
+      break;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Transform string to max service size mode type
+
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Max service size mode type
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscNodeFiler::mh_StringToMaxServiceSizeModeType(const stw::scl::C_SclString & orc_String,
+                                                          C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType & ore_Type)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_String == "manual")
+   {
+      ore_Type = C_OscNodeOpenSydeServerSettings::eMSMT_MANUAL;
+   }
+   else if (orc_String == "auto")
+   {
+      ore_Type = C_OscNodeOpenSydeServerSettings::eMSMT_AUTO;
+   }
+   else
+   {
+      osc_write_log_error("Loading node definition",
+                          "Invalid value for \"properties\".\"open-syde-server-settings\".\"max-service-size-mode\": " +
+                          orc_String);
       s32_Retval = C_RANGE;
    }
 

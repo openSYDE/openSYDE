@@ -31,6 +31,7 @@ public:
 
       std::vector<uint32_t> c_NvmWriteError;
       std::vector<uint32_t> c_PemWriteError;
+      std::vector<uint32_t> c_TrafficEncryptionWriteError;
       std::vector<uint32_t> c_DebuggerEnableError;
       std::vector<uint32_t> c_DebuggerDisableError;
       std::vector<uint32_t> c_EthToEthError;

@@ -165,16 +165,16 @@ bool C_SyvUpPacSecurityCertificatePackageDialog::GetOptionAddPemFiles() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get option add secure authentification
+/*! \brief  Get option add secure authentication
 
    \return
    Flags
 
-   \retval   True    Add secure authentification
-   \retval   False   Dont add secure authentification
+   \retval   True    Add secure authentication
+   \retval   False   Dont add secure authentication
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpPacSecurityCertificatePackageDialog::GetOptionAddSecureAuthentification() const
+bool C_SyvUpPacSecurityCertificatePackageDialog::GetOptionAddSecureAuthentication() const
 {
    return this->mpc_Ui->pc_ChxBoxApplyUpdateConfiguration->isChecked();
 }

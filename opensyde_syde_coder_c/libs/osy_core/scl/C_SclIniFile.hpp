@@ -115,6 +115,10 @@ protected:
    // Note that this returns keys specific to the given section only.
    const C_SclString & m_GetValue(const C_SclString & orc_Key, const C_SclString & orc_Section);
 
+   // Utility to perform Trim on an C_SclString without the need to copy it over
+   // Will save performance when parsing .ini files
+   static void mh_CopyLessTrim(C_SclString & orc_String);
+
    // Sets the value of a given key. Will create the key if it is not found.
    // If oq_ForceAppend==true a new key will be appended to the end of the section
    // without checking if this key already exists. Caution: This could produce a

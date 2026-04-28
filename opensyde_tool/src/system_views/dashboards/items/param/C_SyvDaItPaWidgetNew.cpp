@@ -218,25 +218,25 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const int32_t os32_Resu
             if (s32_Result == C_CHECKSUM)
             {
                //Should be the last read list
-               tgl_assert((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size());
-               if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
+               tgl_assert((this->mu32_ListCounter - 1UL) < static_cast<uint32_t>(this->mc_ListIds.size()));
+               if ((this->mu32_ListCounter - 1UL) < static_cast<uint32_t>(this->mc_ListIds.size()))
                {
                   this->mc_ListsWithCrcError.push_back(
-                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter) - 1U]);
+                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter - 1U)]);
                   //Signal CRC error
                   this->mpc_Ui->pc_TreeView->SetCrcStatus(
-                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter) - 1U], false);
+                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter - 1U)], false);
                }
             }
             else if (s32_Result == C_NO_ERR)
             {
                //Should be the last read list
-               tgl_assert((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size());
-               if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
+               tgl_assert((this->mu32_ListCounter - 1UL) < static_cast<uint32_t>(this->mc_ListIds.size()));
+               if ((this->mu32_ListCounter - 1UL) < static_cast<uint32_t>(this->mc_ListIds.size()))
                {
                   //Signal CRC OK
                   this->mpc_Ui->pc_TreeView->SetCrcStatus(
-                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter) - 1U], true);
+                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter - 1U)], true);
                }
             }
             else
@@ -341,10 +341,10 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const int32_t os32_Resu
             {
                QString c_Details;
                QString c_Node = C_GtGetText::h_GetText("Node");
-               if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
+               if ((this->mu32_ListCounter - 1UL) < static_cast<uint32_t>(this->mc_ListIds.size()))
                {
                   const C_OscNodeDataPoolListElementId & rc_CurEntryId =
-                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter) - 1U];
+                     this->mc_ListIds[static_cast<uint32_t>(this->mu32_ListCounter - 1U)];
                   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                      rc_CurEntryId.u32_NodeIndex);
                   if (pc_Node != NULL)

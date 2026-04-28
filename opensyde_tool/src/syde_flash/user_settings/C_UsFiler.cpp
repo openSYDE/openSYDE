@@ -184,7 +184,7 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    orc_Ini.WriteInteger("Advanced_Properties", "TransferDataTimeout", orc_UserSettings.GetTransferDataTimeout());
 
    // Values from Update widget
-   orc_Ini.WriteInteger("Update", "HexFileCount", c_HexFilePaths.size());
+   orc_Ini.WriteInteger("Update", "HexFileCount", static_cast<int32_t>(c_HexFilePaths.size()));
    for (int32_t s32_SectionCounter = 0; s32_SectionCounter < static_cast<int32_t>(c_HexFilePaths.size());
         ++s32_SectionCounter)
    {

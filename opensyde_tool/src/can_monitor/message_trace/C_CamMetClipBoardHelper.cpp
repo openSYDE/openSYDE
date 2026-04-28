@@ -116,38 +116,38 @@ void C_CamMetClipBoardHelper::mh_AddHeader(QString & orc_Text, const int32_t os3
                                            const int32_t os32_WidthDlc, const int32_t os32_WidthData,
                                            const int32_t os32_WidthCounter)
 {
-   int32_t s32_TextLength;
+   int64_t s64_TextLength;
 
    orc_Text = " ";
    orc_Text = orc_Text.leftJustified(os32_WidthInitial, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("Time");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthTime, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthTime, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("ID");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthId, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthId, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("Name");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthName, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthName, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("Dir");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthDir, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthDir, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("DLC");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthDlc, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthDlc, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("Data");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthData, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthData, ' ');
 
-   s32_TextLength = orc_Text.length();
+   s64_TextLength = orc_Text.length();
    orc_Text += C_GtGetText::h_GetText("Counter");
-   orc_Text = orc_Text.leftJustified(s32_TextLength + os32_WidthCounter, ' ');
+   orc_Text = orc_Text.leftJustified(s64_TextLength + os32_WidthCounter, ' ');
 
    orc_Text += C_GtGetText::h_GetText("Status");
    orc_Text += "\n";
@@ -187,7 +187,7 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
                                             const std::vector<int32_t> & orc_ExpandedIndices)
 {
    QString c_Line;
-   int32_t s32_LineLength;
+   int64_t s64_LineLength;
 
    // Create tree symbolic
    if ((orc_MessageData.c_Signals.size() > 0))
@@ -210,7 +210,7 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
    // Timestamp dependent of the style configuration
    // Save the length of the string before adding the new information to have an easier way to
    // fill it up with spaces
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    if (oq_DisplayTimestampRelative == true)
    {
       c_Line += orc_MessageData.c_TimeStampRelative.c_str();
@@ -223,10 +223,10 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
    {
       c_Line += orc_MessageData.c_TimeStampAbsoluteTimeOfDay.c_str();
    }
-   c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthTime, ' ');
+   c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthTime, ' ');
 
    // CAN ID dependent of the style configuration
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    if (oq_DisplayAsHex == true)
    {
       c_Line += orc_MessageData.c_CanIdHex.c_str();
@@ -235,17 +235,17 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
    {
       c_Line += orc_MessageData.c_CanIdDec.c_str();
    }
-   c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthId, ' ');
+   c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthId, ' ');
 
    // Name
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    c_Line += orc_MessageData.c_Name.c_str();
    // Name could be longer
    c_Line += "   ";
-   c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthName, ' ');
+   c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthName, ' ');
 
    // Direction
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    if (orc_MessageData.q_IsTx == true)
    {
       c_Line += C_GtGetText::h_GetText("Tx");
@@ -258,19 +258,19 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
    {
       c_Line += C_GtGetText::h_GetText(" (RTR)");
    }
-   c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthDir, ' ');
+   c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthDir, ' ');
 
    // DLC
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    c_Line += orc_MessageData.c_CanDlc.c_str();
    if (orc_MessageData.q_CanDlcError)
    {
       c_Line += C_GtGetText::h_GetText(" (!= DB)");
    }
-   c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthDlc, ' ');
+   c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthDlc, ' ');
 
    // Data
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    if (orc_MessageData.c_CanMsg.u8_RTR == 0)
    {
       if (oq_DisplayAsHex == true)
@@ -300,17 +300,17 @@ void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OscComMe
          }
       }
    }
-   c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthData, ' ');
+   c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthData, ' ');
 
    // Counter
-   s32_LineLength = c_Line.length();
+   s64_LineLength = c_Line.length();
    c_Line += orc_MessageData.c_Counter.c_str();
 
    if (orc_MessageData.c_Status != "")
    {
       c_Line += "   "; //Always add at least three spaces for separation
       // only add blanks if there is a status to append in next step
-      c_Line = c_Line.leftJustified(s32_LineLength + os32_WidthCounter, ' ');
+      c_Line = c_Line.leftJustified(s64_LineLength + os32_WidthCounter, ' ');
    }
 
    // Status
@@ -459,24 +459,24 @@ void C_CamMetClipBoardHelper::mh_AddCanSignal(const int32_t os32_LineWidthInitia
    c_LineSignal = c_LineSignal.leftJustified(os32_LineWidthInitial, ' ');
 
    // Name
-   int32_t s32_LineLength = c_LineSignal.length();
+   int64_t s64_LineLength = c_LineSignal.length();
    c_LineSignal += orc_Signal.c_Name.c_str();
-   c_LineSignal = c_LineSignal.leftJustified(s32_LineLength + 30, ' ');
+   c_LineSignal = c_LineSignal.leftJustified(s64_LineLength + 30, ' ');
    // Name could be longer
    c_LineSignal += "   ";
 
    if (orc_Signal.q_DlcError == false)
    {
       // Value
-      s32_LineLength = c_LineSignal.length();
+      s64_LineLength = c_LineSignal.length();
       c_LineSignal += orc_Signal.c_Value.c_str() + static_cast<QString>(" ") + orc_Signal.c_Unit.c_str();
-      c_LineSignal = c_LineSignal.leftJustified(s32_LineLength + 25, ' ');
+      c_LineSignal = c_LineSignal.leftJustified(s64_LineLength + 25, ' ');
       // Name could be longer
       c_LineSignal += "   ";
 
       // RAW Value
       c_LineSignal += "RAW: ";
-      s32_LineLength = c_LineSignal.length();
+      s64_LineLength = c_LineSignal.length();
       if (oq_DisplayAsHex == true)
       {
          c_LineSignal += orc_Signal.c_RawValueHex.c_str();
@@ -488,18 +488,18 @@ void C_CamMetClipBoardHelper::mh_AddCanSignal(const int32_t os32_LineWidthInitia
 
       if (orc_Signal.c_Comment != "")
       {
-         c_LineSignal = c_LineSignal.leftJustified(s32_LineLength + 25, ' ');
+         c_LineSignal = c_LineSignal.leftJustified(s64_LineLength + 25, ' ');
       }
    }
    else
    {
       // DLC error, signal did not fit into CAN message
-      s32_LineLength = c_LineSignal.length();
+      s64_LineLength = c_LineSignal.length();
       c_LineSignal += C_GtGetText::h_GetText("DLC error detected");
 
       if (orc_Signal.c_Comment != "")
       {
-         c_LineSignal = c_LineSignal.rightJustified(s32_LineLength + 47, ' ');
+         c_LineSignal = c_LineSignal.rightJustified(s64_LineLength + 47, ' ');
       }
    }
 

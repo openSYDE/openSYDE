@@ -105,8 +105,8 @@ public:
       C_OscProtocolSerialNumber c_SerialNumber; ///< serial number of device
       stw::scl::C_SclString c_DeviceName;       ///< name of device
 
-      virtual bool operator ==(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
-      virtual bool operator <(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
+      bool operator ==(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
+      bool operator <(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
       virtual void ParseFromArray(const std::vector<uint8_t> & orc_Data, const uint8_t ou8_DataStartIndex);
    };
 
@@ -115,10 +115,10 @@ public:
    {
    public:
       uint8_t u8_SubNodeId;     ///< ID of sub node in case of multi CPU devices. Default is 0
-      bool q_SecurityActivated; ///< flag if node has security feature activated
+      bool q_SecurityActivated; ///< flag if node has a protocol security feature activated
 
-      virtual bool operator ==(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
-      virtual bool operator <(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
+      bool operator ==(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
+      bool operator <(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
       virtual void ParseFromArray(const std::vector<uint8_t> & orc_Data, const uint8_t ou8_DataStartIndex);
    };
 

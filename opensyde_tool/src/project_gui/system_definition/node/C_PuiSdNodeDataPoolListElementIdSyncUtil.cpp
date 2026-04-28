@@ -683,8 +683,7 @@ int32_t C_PuiSdNodeDataPoolListElementIdSyncUtil::h_CheckAndHandleNewElement(
             {
                pc_Element->CalcHashStructure(u32_Hash);
             }
-            stw::scl::C_SclChecksums::CalcCRC32(
-               c_Tmp.c_str(), c_Tmp.length(), u32_Hash);
+            stw::scl::C_SclChecksums::CalcCRC32(c_Tmp.c_str(), static_cast<uint32_t>(c_Tmp.length()), u32_Hash);
             orc_LastKnownHalcCrcs[orc_NewId] = C_PuiSdLastKnownHalElementId(
                u32_Hash, pc_Dp->c_Name.c_str());
          }
@@ -762,6 +761,7 @@ void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_GetNewMapOnSyncHalc(const uint3
                         if (C_PuiSdHandler::h_GetInstance()->GetHalChannelOrDomainName(ou32_Index,
                                                                                        u32_DomainIndex,
                                                                                        u32_ChannelIndex,
+                                                                                       q_UseChannelIndex,
                                                                                        c_Name) == C_NO_ERR)
                         {
                            const std::string c_Tmp = c_Name.toStdString();
@@ -774,8 +774,8 @@ void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_GetNewMapOnSyncHalc(const uint3
                            {
                               rc_El.CalcHashStructure(u32_Hash);
                            }
-                           stw::scl::C_SclChecksums::CalcCRC32(
-                              c_Tmp.c_str(), c_Tmp.length(), u32_Hash);
+                           stw::scl::C_SclChecksums::CalcCRC32(c_Tmp.c_str(),
+                                                               static_cast<uint32_t>(c_Tmp.length()), u32_Hash);
                            c_NewId.SetHalChannelName(c_Tmp);
                            for (std::map<C_OscNodeDataPoolListElementOptArrayId,
                                          C_PuiSdLastKnownHalElementId>::const_iterator c_ItCur =
@@ -787,7 +787,7 @@ void C_PuiSdNodeDataPoolListElementIdSyncUtil::h_GetNewMapOnSyncHalc(const uint3
                                    (c_ItCur->second.c_HalDpName.compare(rc_Dp.c_Name.c_str()) == 0)) &&
                                   ((pc_Node->c_HalcConfig.e_SafetyMode ==
                                     C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
-                                   (c_ItCur->first.GetArrayElementIndexOrZero() == u32_ParameterElementIndex)))
+                                   (c_ItCur->first.GetArrayElementIndexOrZero() == u32_ItAr)))
                               {
                                  c_NewMap[c_NewId] = C_PuiSdLastKnownHalElementId(u32_Hash, rc_Dp.c_Name.c_str());
                                  orc_MapCurToNew[c_ItCur->first] = c_NewId;

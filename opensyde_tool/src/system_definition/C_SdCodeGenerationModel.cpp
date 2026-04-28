@@ -217,7 +217,7 @@ uint32_t C_SdCodeGenerationModel::GetCheckedItemCount(void) const
 
    for (uint32_t u32_ItItems = 0; u32_ItItems < c_AppIndicesPerNode.size(); ++u32_ItItems)
    {
-      u32_CheckedItems += c_AppIndicesPerNode[u32_ItItems].size();
+      u32_CheckedItems += static_cast<uint32_t>(c_AppIndicesPerNode[u32_ItItems].size());
    }
 
    return u32_CheckedItems;

@@ -44,6 +44,11 @@ static const char_t mcn_EqualIndicator = '=';
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
+C_SclIniSection::C_SclIniSection() :
+   ms32_PreviousKeyIndex(0)
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Constructor
 
@@ -56,7 +61,6 @@ static const char_t mcn_EqualIndicator = '=';
 C_SclIniFile::C_SclIniFile(const C_SclString & orc_FileName) :
    mq_Dirty(false),
    ms32_PreviousSectionIndex(0),
-   ms32_PreviousKeyIndex(0),
    FileName(orc_FileName)
 {
    if (orc_FileName == "")
@@ -89,10 +93,27 @@ C_SclIniFile::~C_SclIniFile() SCL_WILL_THROW
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: trim without copying
+
+   C_SclString::Trim does not work on the string as is but creates a copy.
+   This variant works on the string itself.
+   Improves performance, especially when parsing large .ini files.
+
+   \param[in,out]  orc_String   in: string to trim: out: trimmed string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SclIniFile::mh_CopyLessTrim(C_SclString & orc_String)
+{
+   std::string * const pc_String = orc_String.AsStdString();
+   pc_String->erase(pc_String->find_last_not_of(" \t\r\n\v\f") + 1);
+   pc_String->erase(0, pc_String->find_first_not_of(" \t\r\n\v\f"));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: file loader
 
    Attempts to load in the text file. If successful it will populate the
-   Section list with the key/value pairs found in the file. Note that comments
+    section list with the key/value pairs found in the file. Note that comments
     are saved so that they can be rewritten to the file later.
    Saves the file if any values have changed since the last save.
 
@@ -105,15 +126,13 @@ C_SclIniFile::~C_SclIniFile() SCL_WILL_THROW
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SclIniFile::m_Load(const C_SclString & orc_FileName)
 {
-   C_SclDynamicArray<uint16_t> c_Items;
-   C_SclString c_Line;
    C_SclString c_Comment;
-
+   C_SclIniSection * pc_CurrentSection = NULL;
    int32_t s32_Index;
-   uint16_t u16_NumSections;
+   uint16_t u16_NumSections = 0;
    uint16_t u16_NumKeysAdded = 0U;
-
    C_SclStringList c_List;
+
    try
    {
       c_List.LoadFromFile(orc_FileName);
@@ -125,101 +144,65 @@ bool C_SclIniFile::m_Load(const C_SclString & orc_FileName)
       return false;
    }
 
-   //first pass: parse to know how to set the dimensions of our dynamic array:
-   //(performance increase)
+   //Go through file and parse.
+   //A two-pass scan was considered to be able to dimension the vectors once instead
+   // of resizing them when new values are added.
+   //But performance tests showed better performance with this single pass approach.
+   //So all the string checking only needs to be done once.
    for (s32_Index = 0; s32_Index < c_List.Strings.GetLength(); s32_Index++)
    {
-      c_Line = c_List.Strings[s32_Index].Trim(); //Trim to be defensive against whitespaces
+      C_SclIniFile::mh_CopyLessTrim(c_List.Strings[s32_Index]);
+      const C_SclString & rc_Line = c_List.Strings[s32_Index];
 
-      if (c_Line.Pos(mcn_CommentIndicator) == 1U)
+      if (rc_Line.Length() > 0)
       {
-      }
-      else if (c_Line.Pos("[") == 1U) // new section
-      {
-         c_Items.IncLength();
-      }
-      else if (c_Line.Pos("=") != 0U) // we have a key
-      {
-         if (c_Items.GetLength() != 0)
+         //don't use c_Line.Pos to check for characters at specific positions as this would search through the whole
+         // line needlessly
+         if (rc_Line[1] == mcn_CommentIndicator)
          {
-            c_Items[c_Items.GetHigh()] += 1U;
+            c_Comment += (rc_Line + "\n");
          }
-      }
-      else
-      {
-         //nothing to do ...
-      }
-   }
-
-   try
-   {
-      mc_Sections.SetLength(c_Items.GetLength());
-   }
-   catch (...)
-   {
-      return false;
-   }
-
-   for (s32_Index = 0; s32_Index < mc_Sections.GetLength(); s32_Index++)
-   {
-      try
-      {
-         mc_Sections[s32_Index].c_Keys.SetLength(c_Items[s32_Index]);
-      }
-      catch (...)
-      {
-         return false;
-      }
-   }
-
-   u16_NumSections = 0U;
-
-   //2nd pass: enter data
-   for (s32_Index = 0; s32_Index < c_List.Strings.GetLength(); s32_Index++)
-   {
-      c_Line = c_List.Strings[s32_Index].Trim();
-
-      if (c_Line.Pos(mcn_CommentIndicator) == 1U)
-      {
-         c_Comment += (c_Line + "\n");
-      }
-      else if (c_Line.Pos("[") == 1U) // new section
-      {
-         (void)c_Line.Delete(1U, 1U);
-         (void)c_Line.Delete(c_Line.Pos("]"), 1U);
-
-         //we already dimensioned the array -> simply copy data over
-         mc_Sections[u16_NumSections].c_Name    = c_Line;
-         mc_Sections[u16_NumSections].c_Comment = c_Comment;
-
-         u16_NumSections++;
-         c_Comment = "";
-         u16_NumKeysAdded = 0U;
-      }
-      else if (c_Line.Length() > 0U) // we have a key, add this key/value pair
-      {
-         C_SclString c_Key;
-         C_SclString c_Value;
-         mh_GetNextPair(c_Line, c_Key, c_Value);
-
-         if (c_Key.Length() > 0U)
+         else if (rc_Line[1] == '[') // new section
          {
-            if (u16_NumSections > 0U)
+            mc_Sections.IncLength();
+            pc_CurrentSection = &mc_Sections[u16_NumSections];
+            //get everything between the brackets:
+            pc_CurrentSection->c_Name = rc_Line.SubString(2, rc_Line.Length() - 2);
+            pc_CurrentSection->c_Comment = c_Comment;
+
+            u16_NumSections++;
+            c_Comment = "";
+            u16_NumKeysAdded = 0U;
+         }
+         else // in this case this should be a key, add this key/value pair
+         {
+            if (pc_CurrentSection != NULL)
             {
-               //we already dimensioned the array -> simply copy data over
-               mc_Sections[static_cast<int32_t>(u16_NumSections) - 1].c_Keys[u16_NumKeysAdded].c_Key     = c_Key;
-               mc_Sections[static_cast<int32_t>(u16_NumSections) - 1].c_Keys[u16_NumKeysAdded].c_Value   = c_Value;
-               mc_Sections[static_cast<int32_t>(u16_NumSections) - 1].c_Keys[u16_NumKeysAdded].c_Comment = c_Comment;
-               u16_NumKeysAdded++;
-               c_Comment = "";
+               C_SclString c_Key;
+               C_SclString c_Value;
+               mh_GetNextPair(rc_Line, c_Key, c_Value);
+
+               if (c_Key.Length() > 0U)
+               {
+                  C_SclIniKey * pc_NewKey;
+                  pc_CurrentSection->c_Keys.IncLength();
+                  pc_NewKey = &pc_CurrentSection->c_Keys[u16_NumKeysAdded];
+                  pc_NewKey->c_Key     = c_Key;
+                  pc_NewKey->c_Value   = c_Value;
+                  pc_NewKey->c_Comment = c_Comment;
+
+                  u16_NumKeysAdded++;
+                  c_Comment = "";
+               }
             }
          }
       }
       else
       {
-         //probably an empty line
+         //empty line
       }
    }
+
    return true;
 }
 
@@ -293,7 +276,7 @@ bool C_SclIniFile::m_SetValue(const C_SclString & orc_Section, const C_SclString
    {
       if (oq_ForceAppend == false)
       {
-         pc_Key = m_GetKey(orc_Key, pc_Section);
+         pc_Key = pc_Section->GetKey(orc_Key);
       }
    }
    else
@@ -695,7 +678,6 @@ void C_SclIniFile::EraseSection(const C_SclString & orc_Section)
          mc_Sections.Delete(s32_Index);
          mq_Dirty = true;
          ms32_PreviousSectionIndex = 0;
-         ms32_PreviousKeyIndex = 0;
          return;
       }
    }
@@ -735,8 +717,17 @@ void C_SclIniFile::DeleteKey(const C_SclString & orc_Section, const C_SclString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///Given a section name, this function creates the new section and assigns
-///an empty comment.
+/*! \brief   Create a new .ini section
+
+   Given a section name, this function creates the new section and assigns
+    an empty comment.
+
+   \param[in]     orc_Section    section to create
+
+   \return
+   Pointer to new section
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_SclIniSection * C_SclIniFile::m_CreateSection(const C_SclString & orc_Section)
 {
    mc_Sections.IncLength();
@@ -744,7 +735,6 @@ C_SclIniSection * C_SclIniFile::m_CreateSection(const C_SclString & orc_Section)
    mc_Sections[mc_Sections.GetHigh()].c_Comment = "";
    mq_Dirty = true;
    ms32_PreviousSectionIndex = 0;
-   ms32_PreviousKeyIndex = 0;
 
    return &mc_Sections[mc_Sections.GetHigh()];
 }
@@ -800,12 +790,12 @@ C_SclIniKey * C_SclIniFile::m_GetKey(const C_SclString & orc_Key, const C_SclStr
       return NULL;
    }
 
-   return m_GetKey(orc_Key, pt_Section);
+   return pt_Section->GetKey(orc_Key);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-C_SclIniKey * C_SclIniFile::m_GetKey(const C_SclString & orc_Key, C_SclIniSection * const opc_Section)
+C_SclIniKey * C_SclIniSection::GetKey(const C_SclString & orc_Key)
 {
    int32_t s32_Index;
    int32_t s32_LastIndex;
@@ -813,26 +803,40 @@ C_SclIniKey * C_SclIniFile::m_GetKey(const C_SclString & orc_Key, C_SclIniSectio
    s32_LastIndex = ms32_PreviousKeyIndex;
 
    //Search from last successful point to the end
-   for (s32_Index = s32_LastIndex; s32_Index < opc_Section->c_Keys.GetLength(); s32_Index++)
+   for (s32_Index = s32_LastIndex; s32_Index < this->c_Keys.GetLength(); s32_Index++)
    {
-      if (opc_Section->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
+      if (this->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
       {
          ms32_PreviousKeyIndex = s32_Index;
-         return &opc_Section->c_Keys[s32_Index];
+         return &this->c_Keys[s32_Index];
       }
    }
 
    //Not found yet -> Search from beginning to last successful point
    for (s32_Index = 0; s32_Index < s32_LastIndex; s32_Index++)
    {
-      if (opc_Section->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
+      if (this->c_Keys[s32_Index].c_Key.AnsiCompareIc(orc_Key) == 0)
       {
          ms32_PreviousKeyIndex = s32_Index;
-         return &opc_Section->c_Keys[s32_Index];
+         return &this->c_Keys[s32_Index];
       }
    }
 
    return NULL;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+C_SclString C_SclIniSection::GetValue(const C_SclString & orc_Key)
+{
+   C_SclString c_Result;
+   C_SclIniKey * const pc_Key = this->GetKey(orc_Key);
+
+   if (pc_Key != NULL)
+   {
+      c_Result = pc_Key->c_Value;
+   }
+   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -867,10 +871,6 @@ C_SclIniSection * C_SclIniFile::m_GetSection(const C_SclString & orc_Section)
       if (mc_Sections[s32_Index].c_Name.AnsiCompareIc(orc_Section) == 0)
       {
          ms32_PreviousSectionIndex = s32_Index;
-         if (s32_Index != s32_LastIndex) //section changed: restart from 1st key
-         {
-            ms32_PreviousKeyIndex = 0;
-         }
          return &mc_Sections[s32_Index];
       }
    }
@@ -881,7 +881,6 @@ C_SclIniSection * C_SclIniFile::m_GetSection(const C_SclString & orc_Section)
       if (mc_Sections[s32_Index].c_Name.AnsiCompareIc(orc_Section) == 0)
       {
          ms32_PreviousSectionIndex = s32_Index;
-         ms32_PreviousKeyIndex = 0; //section changed: restart from 1st key
          return &mc_Sections[s32_Index];
       }
    }
@@ -1021,17 +1020,25 @@ void C_SclIniFile::ReadSections(C_SclStringList * const opc_Strings, const bool 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function for parsing file
 
-///GetNextPair
-///Given a key +delimiter+ value string, pulls the key name and value from the string.
+   Given a key + delimiter + value string, pulls the key name and value from the string.
+
+   \param[in]   orc_CommandLine    string in "<key>=<value>" format
+   \param[out]  orc_Key            extracted key (empty string if input format is not correct)
+   \param[out]  orc_Value          extracted value (empty string if input format is not correct)
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SclIniFile::mh_GetNextPair(const C_SclString & orc_CommandLine, C_SclString & orc_Key, C_SclString & orc_Value)
 {
    const uint32_t u32_Pos = orc_CommandLine.Pos(mcn_EqualIndicator);
 
    if (u32_Pos > 0U)
    {
-      orc_Key   = orc_CommandLine.SubString(1U, u32_Pos - 1U).Trim();
-      orc_Value = orc_CommandLine.SubString(u32_Pos + 1U, INT_MAX).Trim();
+      orc_Key   = orc_CommandLine.SubString(1U, u32_Pos - 1U);
+      orc_Value = orc_CommandLine.SubString(u32_Pos + 1U, INT_MAX);
+      C_SclIniFile::mh_CopyLessTrim(orc_Key);
+      C_SclIniFile::mh_CopyLessTrim(orc_Value);
    }
    else
    {

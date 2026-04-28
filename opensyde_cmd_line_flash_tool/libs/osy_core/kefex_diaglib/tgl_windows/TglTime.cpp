@@ -93,6 +93,28 @@ void stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sleep for a number of milliseconds
+
+   A more use-case oriented sleep:
+   Intended to be used while polling for more complex operations to be completed.
+   Typical use: poll for completion of an ongoing confirmed communication with an external communication partner without
+    actively blocking the CPU. Depending on the architecture an event mechanism might not be available to wait for.
+
+   The goals of the function:
+   * keep sleep time low in order for the communication procedure to be able to check for responses often
+   * but: do not burden the CPU too much and give other threads CPU time
+
+   The strategy chosen depends on the behavior of the target system. e.g.:
+   * under Windows a "Sleep(0)" will provide a good compromise
+   * under Linux "usleep(0)" can result in high CPU loads; using "usleep(1000)" should be acceptable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void stw::tgl::TglSleepPolling()
+{
+   Sleep(0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get system time in microseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
@@ -136,4 +158,3 @@ uint32_t stw::tgl::TglGetTickCount(void)
 {
    return static_cast<uint32_t>(TglGetTickCountUs() / 1000U);
 }
-

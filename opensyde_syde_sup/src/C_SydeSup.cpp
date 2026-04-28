@@ -936,8 +936,9 @@ void C_SydeSup::m_PrintInformation(const bool oq_Detailed) const
       "-w     --systemview        Name of view in openSYDE project                <none>          -w ViewCAN1\n"
       "-p     --packagefile       Path for resulting Service Update Package file  <none>          -p ." <<
       c_PathDelimiter.c_str() << "MyPackage.syde_sup\n\n"
-      "In createpackage mode the parameters packagefile \"-p\", opensydeproject \"-s\",\n"
-      "systemview \"-w\" and devicedefinition \"-d\" are mandatory.\n\n"
+      "In createpackage mode the parameters packagefile \"-p\", opensydeproject \"-s\", systemview \"-w\" and "
+      "devicedefinition \"-d\" are mandatory.\n"
+      "The Service Update Package gets created in file version 1.\n\n"
       "Update\n"
       "---------------------\n"
       "-n     --necessaryfiles    Only transfer files if necessary.                               -n\n"

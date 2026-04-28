@@ -80,7 +80,6 @@ C_SyvUpPacListWidget::C_SyvUpPacListWidget(QWidget * const opc_Parent) :
    mpc_ShowFileInfoAction(NULL),
    mpc_RemoveAllNodeFilesAction(NULL),
    mpc_HideShowOptionalSectionsAction(NULL),
-   mpc_AddSecurityCertificatePackageAction(NULL),
    mpc_SkipUpdateOfFile(NULL),
    mpc_ShowInExplorerAction(NULL),
    mc_LastPath(""),
@@ -831,9 +830,7 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile, 
             tgl_assert(c_NodeActiveFlags.size() == c_ApplicationsToWrite.size());
             for (u32_NodeCounter = 0; u32_NodeCounter < c_ApplicationsToWrite.size(); ++u32_NodeCounter)
             {
-               if ((c_ApplicationsToWrite[u32_NodeCounter].c_FilesToFlash.size() == 0) &&
-                   (c_ApplicationsToWrite[u32_NodeCounter].c_FilesToWriteToNvm.size() == 0) &&
-                   (c_ApplicationsToWrite[u32_NodeCounter].c_PemFile == ""))
+               if (c_ApplicationsToWrite[u32_NodeCounter].IsAnyActionRequired() == false)
                {
                   c_NodeActiveFlags[u32_NodeCounter] = 0U;
                }
@@ -984,6 +981,38 @@ int32_t C_SyvUpPacListWidget::CheckAllPaths(uint32_t & oru32_CountFiles, QString
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check security settings changed
+
+   \return
+   Flags
+
+   \retval   True    Security settings changed
+   \retval   False   Security settings not changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpPacListWidget::CheckSecuritySettingsChanged() const
+{
+   int32_t s32_Counter;
+   bool q_Retval = false;
+
+   for (s32_Counter = 0; (s32_Counter < this->count()) && (q_Retval == false); ++s32_Counter)
+   {
+      // Check all paths from all nodes
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
+
+      C_SyvUpPacNodeWidget * const pc_WidgetItem =
+         dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
+      if (pc_WidgetItem != NULL)
+      {
+         // Check the security settings
+         q_Retval = pc_WidgetItem->CheckSecuritySettingsChanged();
+      }
+   }
+
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1385,9 +1414,6 @@ void C_SyvUpPacListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos
             this->mpc_RemoveAllNodeFilesAction->setVisible(false);
             this->mpc_ShowInExplorerAction->setEnabled(c_FileInfo.exists());
             this->mpc_ShowInExplorerAction->setVisible(true);
-
-            this->mpc_PemFileSettings->setVisible(
-               this->mpc_SelectedApp->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM);
          }
          else
          {
@@ -1401,16 +1427,6 @@ void C_SyvUpPacListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos
             // New file or new parameter set image file is possible with all openSYDE devices
             this->mpc_AddFileAction->setVisible(!q_IsStwFlashloader);
             this->mpc_ShowInExplorerAction->setVisible(false);
-            this->mpc_PemFileSettings->setVisible(false);
-         }
-
-         if (this->mpc_SelectedNode->IsFileBased() == true)
-         {
-            this->mpc_AddSecurityCertificatePackageAction->setVisible(true);
-         }
-         else
-         {
-            this->mpc_AddSecurityCertificatePackageAction->setVisible(false);
          }
          q_ShowContextMenu = true;
       }
@@ -1446,17 +1462,9 @@ void C_SyvUpPacListWidget::m_SetupContextMenu(void)
       C_GtGetText::h_GetText("Revert to Default"), this, &C_SyvUpPacListWidget::m_RevertFile);
 
    this->mpc_ContextMenu->addSeparator();
-   this->mpc_PemFileSettings = this->mpc_ContextMenu->addAction(
-      C_GtGetText::h_GetText("PEM File Settings"), this, &C_SyvUpPacListWidget::m_OpenPemFileSettings);
-
-   this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ShowFileInfoAction = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("View File Information"), this, &C_SyvUpPacListWidget::m_ViewFileInfo);
-
-   this->mpc_AddSecurityCertificatePackageAction = this->mpc_ContextMenu->addAction(
-      C_GtGetText::h_GetText("Create Security Certificate Package"), this,
-      &C_SyvUpPacListWidget::m_AddSecurityCertificatePackage);
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -1813,19 +1821,6 @@ void C_SyvUpPacListWidget::m_SkipUpdateOfFile(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Toggle skipping update of a specific file
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::m_OpenPemFileSettings(void)
-{
-   if ((this->mpc_SelectedApp != NULL) &&
-       (this->mpc_SelectedSection != NULL))
-   {
-      this->mpc_SelectedSection->OpenPemFileSettings(this->mpc_SelectedApp);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Show file in explorer
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1893,13 +1888,4 @@ QString C_SyvUpPacListWidget::m_GetDialogPath(void)
    }
 
    return c_Folder;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Create Security Certificate package
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::m_AddSecurityCertificatePackage()
-{
-   this->mpc_SelectedNode->AddSecurityCertificatePackage();
 }

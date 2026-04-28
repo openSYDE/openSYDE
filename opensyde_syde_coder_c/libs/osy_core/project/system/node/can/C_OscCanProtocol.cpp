@@ -175,7 +175,7 @@ int32_t C_OscCanProtocol::h_GetListIndex(const C_OscNodeDataPool & orc_DataPool,
 {
    int32_t s32_ResultIndex = -1;
 
-   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2UL;
+   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2U;
 
    if ((u32_ListIndex + 1UL) < static_cast<uint32_t>(orc_DataPool.c_Lists.size()))
    {
@@ -213,7 +213,7 @@ C_OscNodeDataPoolList * C_OscCanProtocol::h_GetComList(C_OscNodeDataPool & orc_D
                                                        const uint32_t ou32_InterfaceIndex, const bool oq_IsTx)
 {
    C_OscNodeDataPoolList * pc_Retval = NULL;
-   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2UL;
+   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2U;
 
    if ((u32_ListIndex + 1UL) < static_cast<uint32_t>(orc_DataPool.c_Lists.size()))
    {
@@ -251,7 +251,7 @@ int32_t C_OscCanProtocol::h_GetComListIndex(const C_OscNodeDataPool & orc_DataPo
                                             const bool oq_IsTx, uint32_t & oru32_ListIndex)
 {
    int32_t s32_Retval = C_RANGE;
-   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2UL;
+   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2U;
 
    if ((u32_ListIndex + 1UL) < static_cast<uint32_t>(orc_DataPool.c_Lists.size()))
    {

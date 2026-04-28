@@ -238,7 +238,7 @@ C_SclString C_OscDeviceGroup::GetGroupName(void) const
    copy of device definitions owned by this class
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<stw::opensyde_core::C_OscDeviceDefinition> C_OscDeviceGroup::GetDevices(void) const
+const std::vector<stw::opensyde_core::C_OscDeviceDefinition> & C_OscDeviceGroup::GetDevices(void) const
 {
    return mc_Devices;
 }

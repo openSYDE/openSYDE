@@ -2200,7 +2200,6 @@ void C_PuiSdHandlerCanOpenLogic::m_HandleOsyNodeIdChangeForCanOpenManager(const 
             u8_InterfaceNumber);
          if (c_ItCanOpenManager != rc_OscNode.c_CanOpenManagers.end())
          {
-            //TODO SSI check
             if (c_ItCanOpenManager->second.q_UseOpenSydeNodeId == true)
             {
                c_ItCanOpenManager->second.u8_NodeIdValue = ou8_NewNodeId;
@@ -2239,7 +2238,6 @@ void C_PuiSdHandlerCanOpenLogic::m_HandleOsyNodeIdChangeForCanOpenDevice(const u
                c_ItCanOpenManager->second.c_CanOpenDevices.find(c_DeviceId);
             if (c_ItCanOpenDevice != c_ItCanOpenManager->second.c_CanOpenDevices.end())
             {
-               //TODO SSI check
                if (c_ItCanOpenDevice->second.q_UseOpenSydeNodeId == true)
                {
                   c_ItCanOpenDevice->second.u8_NodeIdValue = ou8_NewNodeId;

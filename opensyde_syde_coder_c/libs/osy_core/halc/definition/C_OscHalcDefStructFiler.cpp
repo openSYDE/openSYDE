@@ -645,6 +645,19 @@ int32_t C_OscHalcDefStructFiler::h_SetType(C_OscXmlParserBase & orc_XmlParser, C
             }
          }
       }
+      else if (orc_TypeStr == "string")
+      {
+         uint32_t u32_StringLength;
+         s32_Retval = orc_XmlParser.GetAttributeUint32Error("strlen", u32_StringLength);
+         if (s32_Retval == C_NO_ERR)
+         {
+            orc_Content.SetType(C_OscNodeDataPoolContent::eSINT8);
+            orc_Content.SetArray(true);
+            //Inluding \0
+            orc_Content.SetArraySize(u32_StringLength + 1UL);
+            orc_Content.SetComplexType(C_OscHalcDefContent::eCT_STRING);
+         }
+      }
       else
       {
          orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("type", "Unexpected value");
@@ -892,6 +905,15 @@ int32_t C_OscHalcDefStructFiler::h_ParseAttributeIntoContent(C_OscHalcDefContent
       else if (orc_Type == "bitmask")
       {
          s32_Retval = h_ParseSimplestTypeValue(orc_BaseType, orc_Content, orc_XmlParser, orc_AttributeName);
+      }
+      else if (orc_Type == "string")
+      {
+         const C_SclString c_ItemStr = orc_XmlParser.GetAttributeString(orc_AttributeName);
+         if (orc_Content.SetStringValue(c_ItemStr.c_str()) != C_NO_ERR)
+         {
+            orc_XmlParser.ReportErrorForNodeContentAppendXmlContext("Unexpected value \"" + orc_Type + "\" for string");
+            s32_Retval = C_CONFIG;
+         }
       }
       else
       {
@@ -1298,6 +1320,7 @@ int32_t C_OscHalcDefStructFiler::mh_SaveDataElement(const C_OscHalcDefElement & 
                                                     const C_SclString & orc_SingleNodeName)
 {
    int32_t s32_Retval = C_NO_ERR;
+   bool q_SpecialValueHandling = false;
    const C_SclString c_BaseType = h_GetTypeString(orc_Element.GetType());
 
    if (orc_Element.c_Id.IsEmpty() == false)
@@ -1354,6 +1377,16 @@ int32_t C_OscHalcDefStructFiler::mh_SaveDataElement(const C_OscHalcDefElement & 
          }
       }
       break;
+   case C_OscHalcDefContent::eCT_STRING:
+      {
+         std::string c_Tmp;
+         orc_XmlParser.SetAttributeString("type", "string");
+         tgl_assert(orc_Element.c_InitialValue.GetStringValue(c_Tmp) == C_NO_ERR);
+         orc_XmlParser.SetAttributeString("initial-value", c_Tmp);
+         orc_XmlParser.SetAttributeUint32("strlen", orc_Element.c_InitialValue.GetArraySize() - 1UL);
+         q_SpecialValueHandling = true;
+      }
+      break;
    case C_OscHalcDefContent::eCT_PLAIN:
       orc_XmlParser.SetAttributeString("type", c_BaseType);
       break;
@@ -1361,15 +1394,18 @@ int32_t C_OscHalcDefStructFiler::mh_SaveDataElement(const C_OscHalcDefElement & 
       tgl_assert(false);
       break;
    }
-   //Handle values
-   s32_Retval = h_SaveSimpleValueAsAttribute("initial-value", orc_XmlParser, orc_Element.c_InitialValue);
-   if (s32_Retval == C_NO_ERR)
+   if (q_SpecialValueHandling == false)
    {
-      s32_Retval = h_SaveSimpleValueAsAttribute("max-value", orc_XmlParser, orc_Element.c_MaxValue);
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      s32_Retval = h_SaveSimpleValueAsAttribute("min-value", orc_XmlParser, orc_Element.c_MinValue);
+      //Handle values
+      s32_Retval = h_SaveSimpleValueAsAttribute("initial-value", orc_XmlParser, orc_Element.c_InitialValue);
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = h_SaveSimpleValueAsAttribute("max-value", orc_XmlParser, orc_Element.c_MaxValue);
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = h_SaveSimpleValueAsAttribute("min-value", orc_XmlParser, orc_Element.c_MinValue);
+      }
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -1535,6 +1571,13 @@ void C_OscHalcDefStructFiler::mh_SetMaxValForType(const C_SclString & orc_TypeSt
    {
       orc_Content.SetValueU8(1);
    }
+   else if (orc_TypeStr == "string")
+   {
+      for (uint32_t u32_It = 0UL; u32_It < orc_Content.GetArraySize(); ++u32_It)
+      {
+         orc_Content.SetValueArrS8Element(std::numeric_limits<int8_t>::max(), u32_It);
+      }
+   }
    else
    {
       //Unexpected
@@ -1594,6 +1637,13 @@ void C_OscHalcDefStructFiler::mh_SetMinValForType(const C_SclString & orc_TypeSt
    else if (orc_TypeStr == "bool")
    {
       orc_Content.SetValueU8(0);
+   }
+   else if (orc_TypeStr == "string")
+   {
+      for (uint32_t u32_It = 0UL; u32_It < orc_Content.GetArraySize(); ++u32_It)
+      {
+         orc_Content.SetValueArrS8Element(std::numeric_limits<int8_t>::min(), u32_It);
+      }
    }
    else
    {

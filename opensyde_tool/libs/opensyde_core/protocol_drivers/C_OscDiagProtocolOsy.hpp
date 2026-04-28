@@ -59,7 +59,7 @@ protected:
 
 public:
    C_OscDiagProtocolOsy(void);
-   virtual ~C_OscDiagProtocolOsy(void);
+   virtual ~C_OscDiagProtocolOsy();
 
    //implemented functions from C_OscDiagProtocolBase:
    virtual uint8_t GetEndianness(void) const;

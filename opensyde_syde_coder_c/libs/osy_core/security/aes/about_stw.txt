@@ -1,0 +1,12 @@
+AES implementation by SergeyBel
+
+Used version:
+v2.1.0 with STW modification.
+
+Source:
+https://github.com/SergeyBel/AES/tree/v2.1.0
+
+The code has been modified by STW to remove dragging in the "std" namespace in AES.h.
+This prevents pollution of the global namespace.
+Dragging in the namespace was fixed in v5.0.0 of the library.
+But we did not upgrade to a newer version as it would require C++11 and have a changed API.

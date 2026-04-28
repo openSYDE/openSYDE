@@ -125,7 +125,8 @@ private:
                                            const std::vector<uint8_t> & orc_AddSignatureNodes,
                                            const uint32_t ou32_NodeCount,
                                            std::vector<C_OscSupNodeDefinition> & orc_SupDefNodes,
-                                           std::vector<std::set<stw::scl::C_SclString> > & orc_SecFiles);
+                                           std::vector<std::set<stw::scl::C_SclString> > & orc_SecFiles,
+                                           const bool oq_UseMinorVersion1);
    static int32_t mh_HandleSignatureCreation(const std::vector<stw::scl::C_SclString> & orc_NodeFoldersAbs,
                                              const std::vector<uint8_t> & orc_ActiveNodes,
                                              const std::vector<uint8_t> & orc_AddSignatureNodes,
@@ -140,6 +141,8 @@ private:
                                        const std::vector<stw::scl::C_SclString> & orc_NodeSignaturePemFiles,
                                        const uint32_t ou32_NumNodes, std::vector<uint8_t> & orc_PreparedSignatureNodes,
                                        std::vector<std::vector<uint8_t> > & orc_NodeSignatureKeys);
+   static bool mh_CheckMinorVersion1Required(const std::vector<uint8_t> & orc_ActiveNodes,
+                                             const std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

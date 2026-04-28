@@ -55,7 +55,8 @@ C_OscCanDispatcherOsyRouter::C_OscCanDispatcherOsyRouter(C_OscProtocolDriverOsy 
    mrc_OsyProtocol(orc_OsyProtocol),
    mu8_RoutingChannel(0U),
    mu32_FilterId(0U),
-   mu32_FilterMask(0xFFFFFFFFU)
+   mu32_FilterMask(0xFFFFFFFFU),
+   mu8_NrCode(0U)
 {
    orc_OsyProtocol.InitializeTunnelCanMessage(&C_OscCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
 }
@@ -122,7 +123,7 @@ void C_OscCanDispatcherOsyRouter::SetFilterParameters(const uint8_t ou8_RoutingC
 int32_t C_OscCanDispatcherOsyRouter::CAN_Init(void)
 {
    return this->mrc_OsyProtocol.OsySetTunnelCanMessages(this->mu8_RoutingChannel, this->mu32_FilterId,
-                                                        this->mu32_FilterMask);
+                                                        this->mu32_FilterMask, &this->mu8_NrCode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -232,6 +233,20 @@ int32_t C_OscCanDispatcherOsyRouter::CAN_Get_System_Time(uint64_t & oru64_System
    oru64_SystemTimeUs = stw::tgl::TglGetTickCountUs();
 
    return C_NO_ERR;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the NrCode which could be received in CAN_Init
+
+   When the function OsySetTunnelCanMessages called in CAN_Init returns with C_WARN, a NRC is received and stored
+
+   \return
+   NRC of OsySetTunnelCanMessages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8_t C_OscCanDispatcherOsyRouter::GetNrCodeOfCanInit() const
+{
+   return this->mu8_NrCode;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

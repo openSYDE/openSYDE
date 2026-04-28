@@ -158,7 +158,7 @@ void C_SyvUpFileSizeInformation::AppendFiles(const uint32_t ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_SyvUpFileSizeInformation::GetNumParamFiles(void) const
 {
-   return this->mc_ParamFileSizesByte.size();
+   return static_cast<uint32_t>(this->mc_ParamFileSizesByte.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -170,7 +170,7 @@ uint32_t C_SyvUpFileSizeInformation::GetNumParamFiles(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_SyvUpFileSizeInformation::GetNumOtherFiles(void) const
 {
-   return this->mc_FileSizesByte.size();
+   return static_cast<uint32_t>(this->mc_FileSizesByte.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ uint32_t C_SyvUpFileSizeInformation::GetNumParamFilesForDevice(const uint32_t ou
 
    if (ou32_DeviceOrder < this->mc_ParamFileSizesByte.size())
    {
-      u32_Retval = this->mc_ParamFileSizesByte[ou32_DeviceOrder].size();
+      u32_Retval = static_cast<uint32_t>(this->mc_ParamFileSizesByte[ou32_DeviceOrder].size());
    }
    else
    {
@@ -212,7 +212,7 @@ uint32_t C_SyvUpFileSizeInformation::GetNumOtherFilesForDevice(const uint32_t ou
 
    if (ou32_DeviceOrder < this->mc_FileSizesByte.size())
    {
-      u32_Retval = this->mc_FileSizesByte[ou32_DeviceOrder].size();
+      u32_Retval = static_cast<uint32_t>(this->mc_FileSizesByte[ou32_DeviceOrder].size());
    }
    else
    {

@@ -44,12 +44,17 @@ public:
    static void h_SavePc(const opensyde_core::C_OscViewPc & orc_OscPc, C_OscXmlParserBase & orc_XmlParser);
 
    // Utilities
-   static int32_t h_StringToPemFileStateDebugger(const stw::scl::C_SclString & orc_String,
-                                                 C_OscViewNodeUpdate::E_StateDebugger & ore_State);
-   static int32_t h_StringToPemFileStateSecurity(const stw::scl::C_SclString & orc_String,
-                                                 C_OscViewNodeUpdate::E_StateSecurity & ore_State);
-   static stw::scl::C_SclString h_PemFileStateDebuggerToString(const C_OscViewNodeUpdate::E_StateDebugger oe_State);
-   static stw::scl::C_SclString h_PemFileStateSecurityToString(const C_OscViewNodeUpdate::E_StateSecurity oe_State);
+   static int32_t h_StringToSecurityOptionDebugger(const stw::scl::C_SclString & orc_String,
+                                                   C_OscViewNodeUpdate::E_StateDebugger & ore_State);
+   static int32_t h_StringToSecurityOptionAuthentication(const stw::scl::C_SclString & orc_String,
+                                                         C_OscViewNodeUpdate::E_StateSecureAuthentication & ore_State);
+   static int32_t h_StringToSecurityOptionEncryption(const stw::scl::C_SclString & orc_String,
+                                                     C_OscViewNodeUpdate::E_StateTrafficEncryption & ore_State);
+   static stw::scl::C_SclString h_SecurityOptionDebuggerToString(const C_OscViewNodeUpdate::E_StateDebugger oe_State);
+   static stw::scl::C_SclString h_SecurityOptionAuthenticationToString(
+      const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_State);
+   static stw::scl::C_SclString h_SecurityOptionEncryptionToString(
+      const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_State);
 
 private:
    // Load
@@ -68,10 +73,10 @@ private:
                                                  C_OscXmlParserBase & orc_XmlParser);
    static void mh_LoadNodeUpdateInformationSkipUpdateOfFiles(std::vector<bool> & orc_Flags,
                                                              C_OscXmlParserBase & orc_XmlParser);
-   static int32_t mh_LoadNodeUpdateInformationPem(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
-                                                  C_OscXmlParserBase & orc_XmlParser);
-   static int32_t mh_LoadNodeUpdateInformationPemStates(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
-                                                        C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadNodeUpdateInformationSecurity(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
+                                                       C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadNodeUpdateInformationSecurityStates(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
+                                                             C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadViewFileOsc(C_OscViewData & orc_View, const stw::scl::C_SclString & orc_FilePath,
                                      const std::vector<stw::opensyde_core::C_OscNode> & orc_OscNodes);
 
@@ -83,8 +88,8 @@ private:
                                                      C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveNodeUpdateInformationSkipUpdateOfFiles(const std::vector<bool> & orc_Flags,
                                                              C_OscXmlParserBase & orc_XmlParser);
-   static void mh_SaveNodeUpdateInformationPem(const C_OscViewNodeUpdate & orc_NodeUpdateInformation,
-                                               C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveNodeUpdateInformationSecurity(const C_OscViewNodeUpdate & orc_NodeUpdateInformation,
+                                                    C_OscXmlParserBase & orc_XmlParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

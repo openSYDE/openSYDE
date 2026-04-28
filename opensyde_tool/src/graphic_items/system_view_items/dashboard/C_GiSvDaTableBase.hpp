@@ -43,7 +43,9 @@ public:
 
    void UpdateShowValue(void) override;
    void UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value) override;
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
    void EditElementProperties(void);
    void EditModeActiveChanged(const bool oq_Active) override;
    bool EnableEditContent(void) override;
@@ -59,6 +61,8 @@ public:
    bool GetViewActive(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;
    bool GetViewDashboardRouteValid(
       const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;
+   bool GetViewNodeEncrypted(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
+   const;
    uint32_t GetViewIndex(void) const;
    bool CheckItemError(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                        QString & orc_Content, bool & orq_IsTransmissionError) const;

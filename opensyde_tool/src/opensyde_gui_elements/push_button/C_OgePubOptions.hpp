@@ -31,12 +31,14 @@ class C_OgePubOptions :
 public:
    C_OgePubOptions(QWidget * const opc_Parent = NULL);
    void SetCustomIcon(const QString & orc_IconPathEnabled, const QString & orc_IconPathDisabled);
+   void SetTextRightAligned();
 
 protected:
    void paintEvent(QPaintEvent * const opc_Event) override;
 
    QIcon mc_IconEnabled;
    QIcon mc_IconDisabled;
+   int32_t ms32_OffsetHorizontal;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

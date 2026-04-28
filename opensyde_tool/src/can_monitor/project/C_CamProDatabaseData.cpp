@@ -53,7 +53,8 @@ C_CamProDatabaseData::C_CamProDatabaseData(void)
 void C_CamProDatabaseData::CalcHash(uint32_t & oru32_HashValue) const
 {
    // Database properties (name, state)
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.toStdString().c_str(), this->c_Name.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.toStdString().c_str(),
+                                       static_cast<uint32_t>(this->c_Name.length()), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->s32_BusIndex, sizeof(this->s32_BusIndex), oru32_HashValue);
 }

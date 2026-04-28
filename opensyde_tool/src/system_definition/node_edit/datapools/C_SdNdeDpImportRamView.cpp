@@ -63,7 +63,7 @@ int32_t C_SdNdeDpImportRamView::h_ImportDataPoolFromRamViewDefProject(const C_Sc
       orc_GuiDataPool.c_DataPoolLists.resize(orc_DataPool.c_Lists.size());
       for (uint32_t u32_List = 0U; u32_List < orc_DataPool.c_Lists.size(); u32_List++)
       {
-         const uint32_t u32_NumElements = orc_DataPool.c_Lists[u32_List].c_Elements.size();
+         const uint32_t u32_NumElements = static_cast<uint32_t>(orc_DataPool.c_Lists[u32_List].c_Elements.size());
 
          orc_GuiDataPool.c_DataPoolLists[u32_List].c_DataPoolListElements.resize(u32_NumElements);
 

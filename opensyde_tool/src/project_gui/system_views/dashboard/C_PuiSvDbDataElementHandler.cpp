@@ -121,7 +121,7 @@ int32_t C_PuiSvDbDataElementHandler::RegisterDataPoolElement(
          this->mc_MappingDpElementToConfig.insert(orc_WidgetDataPoolElementId, c_ElementConfig);
 
          // Update the counter
-         this->m_SetWidgetDataPoolElementCount(this->mc_MappingDpElementToDataSerie.size());
+         this->m_SetWidgetDataPoolElementCount(static_cast<uint32_t>(this->mc_MappingDpElementToDataSerie.size()));
          this->m_UpdateDataPoolElementTimeoutAndValidFlag(orc_WidgetDataPoolElementId);
          this->m_DataPoolElementsChanged();
 
@@ -184,7 +184,7 @@ void C_PuiSvDbDataElementHandler::RemoveDataPoolElement(
       this->mc_MappingDpElementToDataSerie.erase(c_ItItemDataSerie);
 
       // Update the counter
-      this->m_SetWidgetDataPoolElementCount(this->mc_MappingDpElementToDataSerie.size());
+      this->m_SetWidgetDataPoolElementCount(static_cast<uint32_t>(this->mc_MappingDpElementToDataSerie.size()));
 
       // Update the indexes of the other registered elements
       if (this->mc_MappingDpElementToDataSerie.size() > 0)
@@ -229,7 +229,7 @@ void C_PuiSvDbDataElementHandler::ClearDataPoolElements(void)
    this->mc_CriticalSection.Acquire();
    this->mc_MappingDpElementToDataSerie.clear();
    this->mc_MappingDpElementToConfig.clear();
-   this->m_SetWidgetDataPoolElementCount(this->mc_MappingDpElementToDataSerie.size());
+   this->m_SetWidgetDataPoolElementCount(static_cast<uint32_t>(this->mc_MappingDpElementToDataSerie.size()));
    this->mc_CriticalSection.Release();
 
    this->m_DataPoolElementsChanged();

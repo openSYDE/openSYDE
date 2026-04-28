@@ -309,7 +309,7 @@ QString C_SyvDaItPaTreeView::GetSelectedItemTypeTemplate(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_SyvDaItPaTreeView::GetSelectedItemCount(void) const
 {
-   return this->selectedIndexes().size();
+   return static_cast<uint32_t>(this->selectedIndexes().size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

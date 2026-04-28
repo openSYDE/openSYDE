@@ -43,7 +43,10 @@ public:
    virtual void Save(void) = 0;
 
    virtual void RegisterWidgets(stw::opensyde_gui_logic::C_SyvComDriverDiag & orc_ComDriver) = 0;
-   virtual void ConnectionActiveChanged(const bool oq_Active) = 0;
+   virtual void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                         bool> & orc_MappingNodeToTrafficEncryptionStatus)
+      =
+         0;
    virtual void UpdateShowValues(void) = 0;
    virtual void UpdateTransmissionConfiguration(void) = 0;
    virtual void HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) = 0;

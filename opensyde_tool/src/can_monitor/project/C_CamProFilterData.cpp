@@ -63,9 +63,10 @@ C_CamProFilterData::C_CamProFilterData(void)
 void C_CamProFilterData::CalcHash(uint32_t & oru32_HashValue) const
 {
    // filter properties (name, comment, state)
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.toStdString().c_str(), this->c_Name.length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.toStdString().c_str(), this->c_Comment.length(),
-                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.toStdString().c_str(),
+                                       static_cast<uint32_t>(this->c_Name.length()), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.toStdString().c_str(),
+                                       static_cast<int32_t>(this->c_Comment.length()), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
 
    // filter items properties

@@ -380,9 +380,10 @@ int32_t C_OscViewData::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information states
 
-   \param[in]      ou32_NodeIndex    Node index
-   \param[in]      oe_StateSecurity  Security state of node
-   \param[in]      oe_StateDebugger  Debugger state of node
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  oe_StateAuthentication     Secure authentication state of node
+   \param[in]  oe_StateDebugger           Debugger state of node
+   \param[in]  oe_StateTrafficEncryption  Traffic encryption state of node
 
    \return
    C_NO_ERR Operation success
@@ -390,15 +391,15 @@ int32_t C_OscViewData::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscViewData::SetNodeUpdateInformationStates(const uint32_t ou32_NodeIndex,
-                                                      const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                      const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
+                                                      const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateAuthentication, const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
+                                                      const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateTrafficEncryption)
 {
    int32_t s32_Return = C_RANGE;
 
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
       C_OscViewNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.SetStates(oe_StateSecurity, oe_StateDebugger);
+      rc_UpdateInformation.SetStates(oe_StateAuthentication, oe_StateDebugger, oe_StateTrafficEncryption);
       s32_Return = C_NO_ERR;
    }
 

@@ -70,7 +70,8 @@ public:
    void SetDrawingActive(const bool oq_Active);
 
    bool IsPaused(void) const;
-   void ConnectionActiveChanged(const bool oq_Active);
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus);
 
    int32_t AddNewGraph(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                        const stw::opensyde_gui_logic::C_PuiSvDbDataElementScaling & orc_ElementScaling);

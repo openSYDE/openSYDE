@@ -115,7 +115,7 @@ public:
    {
    public:
       uint8_t u8_SubNodeId;     ///< ID of sub node in case of multi CPU devices. Default is 0
-      bool q_SecurityActivated; ///< flag if node has security feature activated
+      bool q_SecurityActivated; ///< flag if node has a protocol security feature activated
 
       bool operator ==(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
       bool operator <(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;

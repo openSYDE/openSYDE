@@ -59,45 +59,7 @@
       </size>
      </property>
      <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelSecurity">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>13</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>13</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelDebugger">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>13</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>13</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>TextLabel</string>
+      <string>Skip</string>
      </property>
     </widget>
    </item>
@@ -116,17 +78,17 @@
       </size>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>UserHint</string>
      </property>
     </widget>
    </item>
    <item>
     <spacer name="pc_HorizontalSpacerUserHint">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
+      <enum>QSizePolicy::Policy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -139,17 +101,17 @@
    <item>
     <widget class="stw::opensyde_gui_elements::C_OgeLabUpdateAppPath" name="pc_LabelPath">
      <property name="text">
-      <string>TextLabel</string>
+      <string>Path/to/file</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
    </item>
    <item>
     <spacer name="horizontalSpacer">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -162,10 +124,10 @@
    <item>
     <widget class="stw::opensyde_gui_elements::C_OgeLabUpdateAppVersion" name="pc_LabelVersion">
      <property name="text">
-      <string>TextLabel</string>
+      <string>Version</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
    </item>

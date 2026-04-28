@@ -37,6 +37,7 @@
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_OscNodeDataPoolListElement.hpp"
 #include "C_OgeWiCustomMessage.hpp"
+#include "C_SyvDaTrafficEncryptionStatusHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -515,16 +516,20 @@ void C_GiSvDaRectBaseGroup::UpdateTransparency(const uint32_t ou32_DataElementIn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
 
    Base class implementation resets the timeout coloring.
    If the dashboard element wants to know when the
    connections starts the derived class must reimplement this function.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
+void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                     bool> & orc_MappingNodeToTrafficEncryptionStatus)
 {
    this->mq_ConnectionActive = oq_Active;
+   this->mc_MappingNodeToTrafficEncryptionStatus = orc_MappingNodeToTrafficEncryptionStatus;
+   m_HandleWarningIconForTrafficEncryption();
 
    if (oq_Active == true)
    {
@@ -1222,6 +1227,29 @@ void C_GiSvDaRectBaseGroup::m_ForceWidgetResize(const QSizeF & orc_NewSize)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get view node encrypted
+
+   \param[in]  orc_DataPoolElementId   Datapool element ID
+
+   \return
+   Flags
+
+   \retval   True    View node encrypted
+   \retval   False   View node not encrypted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_GetViewNodeEncrypted(
+   const opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
+{
+   const bool q_Retval = C_SyvDaTrafficEncryptionStatusHelper::h_GetViewNodeEncrypted(orc_DataPoolElementId,
+                                                                                      this->mq_ConnectionActive,
+                                                                                      this->mu32_ViewIndex,
+                                                                                      this->mc_MappingNodeToTrafficEncryptionStatus);
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overwritten itemChange event slot
 
    Here: Deactivating the edit content mode when deselecting the element
@@ -1589,6 +1617,15 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
             }
             c_Content += C_GtGetText::h_GetText("- There is a data element of a node with "
                                                 "disabled communication interface flags for Dashboard");
+         }
+         if (m_RequireWarningForTrafficEncryption())
+         {
+            if (c_Content.isEmpty() == false)
+            {
+               c_Content += "\n";
+            }
+            c_Content += C_GtGetText::h_GetText("- Event driven data element trigger "
+                                                "and encrypted communication via CAN is not supported");
          }
       }
       //Check if redisplay necessary
@@ -2161,4 +2198,54 @@ QString C_GiSvDaRectBaseGroup::m_GetItemsForButtonToolTip(void) const
       }
    }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle warning icon for traffic encryption
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::m_HandleWarningIconForTrafficEncryption()
+{
+   if ((this->mpc_WarningIcon != NULL) && (m_AllowWarningIcon() == true))
+   {
+      const bool q_WarningRequired = m_RequireWarningForTrafficEncryption();
+      if (q_WarningRequired)
+      {
+         this->mpc_WarningIcon->setVisible(true);
+      }
+      else
+      {
+         //Update warning icon
+         this->m_DataPoolElementsChanged();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Require warning for traffic encryption
+
+   \return
+   Flags
+
+   \retval   True    Require warning for traffic encryption
+   \retval   False   Do not require warning for traffic encryption
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_RequireWarningForTrafficEncryption() const
+{
+   bool q_WarningRequired = false;
+
+   if (this->mq_ReadItem == true)
+   {
+      for (uint32_t u32_ItItem = 0;
+           (u32_ItItem < this->GetWidgetDataPoolElementCount()) && (q_WarningRequired == false); ++u32_ItItem)
+      {
+         C_PuiSvDbNodeDataPoolListElementId c_Id;
+         if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
+         {
+            q_WarningRequired = this->m_GetViewNodeEncrypted(c_Id);
+         }
+      }
+   }
+   return q_WarningRequired;
 }

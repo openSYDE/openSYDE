@@ -711,7 +711,7 @@ const stw::diag_lib::C_XFLECUInformation * C_GiSvSubNodeData::GetHexFileInfo(con
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_GiSvSubNodeData::GetHexFileInfosCount() const
 {
-   return this->mc_HexFileInfos.size();
+   return static_cast<uint32_t>(this->mc_HexFileInfos.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -723,7 +723,7 @@ uint32_t C_GiSvSubNodeData::GetHexFileInfosCount() const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_GiSvSubNodeData::GetParamFileInfosCount() const
 {
-   return this->mc_ParamFileInfos.size();
+   return static_cast<uint32_t>(this->mc_ParamFileInfos.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -735,7 +735,7 @@ uint32_t C_GiSvSubNodeData::GetParamFileInfosCount() const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_GiSvSubNodeData::GetFileInfosCount() const
 {
-   return this->mc_FileInfos.size();
+   return static_cast<uint32_t>(this->mc_FileInfos.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -759,7 +759,7 @@ bool C_GiSvSubNodeData::IsPemFileInfoSet(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_GiSvSubNodeData::GetHexAppInfoAmbiguousSize() const
 {
-   return this->mc_HexAppInfoAmbiguous.size();
+   return static_cast<uint32_t>(this->mc_HexAppInfoAmbiguous.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

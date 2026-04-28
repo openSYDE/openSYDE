@@ -120,7 +120,7 @@ int32_t C_PuiSvHandlerFilerV1::h_LoadViews(std::vector<C_PuiSvData> & orc_Views,
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFilerV1::h_SaveViews(const std::vector<C_PuiSvData> & orc_Views, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_Views.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Views.size()));
    for (uint32_t u32_ItView = 0; u32_ItView < orc_Views.size(); ++u32_ItView)
    {
       orc_XmlParser.CreateAndSelectNodeChild("opensyde-system-view");

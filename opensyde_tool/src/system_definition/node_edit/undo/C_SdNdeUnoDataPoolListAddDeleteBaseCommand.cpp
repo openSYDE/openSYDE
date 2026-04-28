@@ -93,7 +93,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Add(void)
       {
          pc_Item->setSelected(true);
          //Check last item (It's sorted)
-         if ((u32_Index + 1UL) == this->mc_Indices.size())
+         if ((u32_Index + 1UL) == static_cast<uint32_t>(this->mc_Indices.size()))
          {
             this->mpc_DataPoolListsTreeWidget->setCurrentItem(pc_Item, 0, QItemSelectionModel::SelectCurrent);
          }

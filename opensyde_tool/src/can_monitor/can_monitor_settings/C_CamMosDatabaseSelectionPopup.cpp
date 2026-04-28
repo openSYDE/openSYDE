@@ -261,7 +261,7 @@ void C_CamMosDatabaseSelectionPopup::m_OnSearch(const QString & orc_Text) const
       this->mpc_Ui->pc_TreeView->collapseAll();
       m_HandleHiding();
       this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setVisible(false);
-      m_UpdateSelection(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size());
+      m_UpdateSelection(static_cast<int32_t>(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size()));
    }
    else
    {
@@ -273,7 +273,7 @@ void C_CamMosDatabaseSelectionPopup::m_OnSearch(const QString & orc_Text) const
       }
       else
       {
-         m_UpdateSelection(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size());
+         m_UpdateSelection(static_cast<uint32_t>(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size()));
       }
       this->mpc_Ui->pc_GroupBoxInitialSignalNoElements->setVisible(false);
    }

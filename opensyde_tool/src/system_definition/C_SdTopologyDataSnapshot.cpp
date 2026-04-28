@@ -140,13 +140,13 @@ uint32_t C_SdTopologyDataSnapshot::Count(void) const
          //Node
          ++u32_Retval;
          //Connections
-         u32_Retval += rc_UiNode.c_UiBusConnections.size();
+         u32_Retval += static_cast<uint32_t>(rc_UiNode.c_UiBusConnections.size());
       }
    }
 
-   u32_Retval += this->c_UiBuses.size();
-   u32_Retval += this->c_BusConnections.size();
-   u32_Retval += this->c_BusTextElements.size();
+   u32_Retval += static_cast<uint32_t>(this->c_UiBuses.size());
+   u32_Retval += static_cast<uint32_t>(this->c_BusConnections.size());
+   u32_Retval += static_cast<uint32_t>(this->c_BusTextElements.size());
 
    return u32_Retval;
 }

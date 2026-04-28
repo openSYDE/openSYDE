@@ -37,9 +37,8 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(void) :
-   C_OscNodeDataPoolListElementOptArrayId(),
+   C_OscNodeDataPoolListElementOptArrayOptValidId(),
    me_Type(eDATAPOOL_ELEMENT),
-   mq_IsValid(true),
    me_InvalidTypePlaceholder(C_OscNodeDataPool::eDIAG)
 {
 }
@@ -63,9 +62,9 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const C_O
                                                                        const bool oq_IsValid,
                                                                        const C_OscNodeDataPool::E_Type oe_InvalidTypePlaceholder,
                                                                        const QString & orc_InvalidNamePlaceholder) :
-   C_OscNodeDataPoolListElementOptArrayId(orc_Base, oq_UseArrayElementIndex, ou32_ArrayElementIndex),
+   C_OscNodeDataPoolListElementOptArrayOptValidId(orc_Base, oq_UseArrayElementIndex, ou32_ArrayElementIndex,
+                                                  oq_IsValid),
    me_Type(oe_Type),
-   mq_IsValid(oq_IsValid),
    me_InvalidTypePlaceholder(oe_InvalidTypePlaceholder),
    mc_InvalidNamePlaceholder(orc_InvalidNamePlaceholder)
 {
@@ -84,9 +83,8 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const C_O
 C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(
    const C_OscNodeDataPoolListElementOptArrayId & orc_Base, const E_Type oe_Type, const bool oq_IsValid,
    const C_OscNodeDataPool::E_Type oe_InvalidTypePlaceholder, const QString & orc_InvalidNamePlaceholder) :
-   C_OscNodeDataPoolListElementOptArrayId(orc_Base),
+   C_OscNodeDataPoolListElementOptArrayOptValidId(orc_Base, oq_IsValid),
    me_Type(oe_Type),
-   mq_IsValid(oq_IsValid),
    me_InvalidTypePlaceholder(oe_InvalidTypePlaceholder),
    mc_InvalidNamePlaceholder(orc_InvalidNamePlaceholder)
 {
@@ -117,10 +115,9 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const uin
                                                                        const bool oq_IsValid,
                                                                        const C_OscNodeDataPool::E_Type oe_InvalidTypePlaceholder,
                                                                        const QString & orc_InvalidNamePlaceholder) :
-   C_OscNodeDataPoolListElementOptArrayId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex,
-                                          oq_UseArrayElementIndex, ou32_ArrayElementIndex),
+   C_OscNodeDataPoolListElementOptArrayOptValidId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex,
+                                                  oq_UseArrayElementIndex, ou32_ArrayElementIndex, oq_IsValid),
    me_Type(oe_Type),
-   mq_IsValid(oq_IsValid),
    me_InvalidTypePlaceholder(oe_InvalidTypePlaceholder),
    mc_InvalidNamePlaceholder(orc_InvalidNamePlaceholder)
 {
@@ -145,26 +142,14 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OscNodeDataPoolId & 
    //Not current class, assume base comparison is correct
    if (pc_NonBase != NULL)
    {
-      if ((this->mq_IsValid != pc_NonBase->mq_IsValid) && (this->mq_IsValid == true))
+      //Check type
+      if (this->me_Type > pc_NonBase->GetType())
       {
-         // Instance is 'bigger'. Definition valid elements are bigger
          q_Retval = false;
       }
-      else if (this->mq_IsValid == pc_NonBase->mq_IsValid)
+      else if (this->me_Type == pc_NonBase->GetType())
       {
-         //Check type
-         if (this->me_Type > pc_NonBase->GetType())
-         {
-            q_Retval = false;
-         }
-         else if (this->me_Type == pc_NonBase->GetType())
-         {
-            q_Retval = C_OscNodeDataPoolListElementOptArrayId::operator <(orc_Cmp);
-         }
-         else
-         {
-            q_Retval = true;
-         }
+         q_Retval = C_OscNodeDataPoolListElementOptArrayOptValidId::operator <(orc_Cmp);
       }
       else
       {
@@ -173,7 +158,7 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OscNodeDataPoolId & 
    }
    else
    {
-      q_Retval = C_OscNodeDataPoolListElementOptArrayId::operator <(orc_Cmp);
+      q_Retval = C_OscNodeDataPoolListElementOptArrayOptValidId::operator <(orc_Cmp);
    }
 
    return q_Retval;
@@ -191,7 +176,7 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OscNodeDataPoolId & 
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvDbNodeDataPoolListElementId::operator ==(const C_OscNodeDataPoolId & orc_Cmp) const
 {
-   bool q_Retval = C_OscNodeDataPoolListElementOptArrayId::operator ==(orc_Cmp);
+   bool q_Retval = C_OscNodeDataPoolListElementOptArrayOptValidId::operator ==(orc_Cmp);
 
    if (q_Retval == true)
    {
@@ -201,10 +186,7 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator ==(const C_OscNodeDataPoolId &
       //Not current class, assume base comparison is correct
       if (pc_NonBase != NULL)
       {
-         // In case of a false valid flag, we can not trust the indices
-         if ((this->mq_IsValid == pc_NonBase->mq_IsValid) &&
-             (this->mq_IsValid == true) &&
-             (this->me_Type == pc_NonBase->GetType()))
+         if (this->me_Type == pc_NonBase->GetType())
          {
             q_Retval = true;
          }
@@ -290,9 +272,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbNodeDataPoolListElementId::CalcHash(uint32_t & oru32_HashValue) const
 {
-   C_OscNodeDataPoolListElementOptArrayId::CalcHash(oru32_HashValue);
+   C_OscNodeDataPoolListElementOptArrayOptValidId::CalcHash(oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->me_Type, sizeof(this->me_Type), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->mq_IsValid, sizeof(this->mq_IsValid), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -305,22 +286,9 @@ void C_PuiSvDbNodeDataPoolListElementId::CalcHash(uint32_t & oru32_HashValue) co
 void C_PuiSvDbNodeDataPoolListElementId::MarkInvalid(const C_OscNodeDataPool::E_Type oe_InvalidTypePlaceholder,
                                                      const QString & orc_InvalidName)
 {
-   this->mq_IsValid = false;
+   C_OscNodeDataPoolListElementOptArrayOptValidId::MarkInvalid();
    this->me_InvalidTypePlaceholder = oe_InvalidTypePlaceholder;
    this->mc_InvalidNamePlaceholder = orc_InvalidName;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get valid flag
-
-   \return
-   True  Valid
-   False Invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvDbNodeDataPoolListElementId::GetIsValid(void) const
-{
-   return this->mq_IsValid;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

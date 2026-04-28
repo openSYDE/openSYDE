@@ -867,44 +867,52 @@ void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
 bool C_PuiSdUtil::h_CheckXappNodeReachable(const uint32_t ou32_SdNodeIndex, const uint32_t ou32_TargetNodeIndex)
 {
    bool q_Retval = false;
-   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_SdNodeIndex);
 
-   if (pc_Node != NULL)
+   if (ou32_SdNodeIndex == ou32_TargetNodeIndex)
    {
-      bool q_BusFound = false;
-      uint32_t u32_BusIndex = 0UL;
-      for (uint32_t u32_ItInterface = 0UL; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
-           ++u32_ItInterface)
+      //Internally always reachable
+      q_Retval = true;
+   }
+   else
+   {
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_SdNodeIndex);
+
+      if (pc_Node != NULL)
       {
-         const C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
-         if (((rc_Interface.e_InterfaceType == pc_Node->c_XappProperties.e_ConnectedInterfaceType) &&
-              (rc_Interface.u8_InterfaceNumber == pc_Node->c_XappProperties.u8_ConnectedInterfaceNumber)) &&
-             (rc_Interface.q_IsDiagnosisEnabled))
+         bool q_BusFound = false;
+         uint32_t u32_BusIndex = 0UL;
+         for (uint32_t u32_ItInterface = 0UL; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+              ++u32_ItInterface)
          {
-            //This interface
-            q_BusFound = rc_Interface.GetBusConnected();
-            u32_BusIndex = rc_Interface.u32_BusIndex;
-            break;
+            const C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
+            if (((rc_Interface.e_InterfaceType == pc_Node->c_XappProperties.e_ConnectedInterfaceType) &&
+                 (rc_Interface.u8_InterfaceNumber == pc_Node->c_XappProperties.u8_ConnectedInterfaceNumber)) &&
+                (rc_Interface.q_IsDiagnosisEnabled))
+            {
+               //This interface
+               q_BusFound = rc_Interface.GetBusConnected();
+               u32_BusIndex = rc_Interface.u32_BusIndex;
+               break;
+            }
          }
-      }
-      if (q_BusFound)
-      {
-         const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefintion =
-            C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
-         const C_OscRoutingCalculation c_Calculation(rc_SystemDefintion.c_Nodes,
-                                                     C_PuiSdUtil::mh_GetAllNodesActive(),
-                                                     u32_BusIndex,
-                                                     ou32_TargetNodeIndex, C_OscRoutingCalculation::eDIAGNOSTIC);
-
-         const int32_t s32_Retval = c_Calculation.GetState();
-
-         if (s32_Retval == C_NO_ERR)
+         if (q_BusFound)
          {
-            q_Retval = true;
+            const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefintion =
+               C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
+            const C_OscRoutingCalculation c_Calculation(rc_SystemDefintion.c_Nodes,
+                                                        C_PuiSdUtil::mh_GetAllNodesActive(),
+                                                        u32_BusIndex,
+                                                        ou32_TargetNodeIndex, C_OscRoutingCalculation::eDIAGNOSTIC);
+
+            const int32_t s32_Retval = c_Calculation.GetState();
+
+            if (s32_Retval == C_NO_ERR)
+            {
+               q_Retval = true;
+            }
          }
       }
    }
-
    return q_Retval;
 }
 

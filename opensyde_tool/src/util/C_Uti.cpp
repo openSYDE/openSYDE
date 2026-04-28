@@ -173,9 +173,9 @@ int32_t C_Uti::h_GetNumberOfDecimals(const float64_t of64_Value)
          int32_t s32_ItFromEnd;
          const QString & rc_Str = c_List.at(1);
          //Start from end and iterate over all zeros until first valid number
-         for (s32_ItFromEnd = rc_Str.size(); s32_ItFromEnd > 0; --s32_ItFromEnd)
+         for (s32_ItFromEnd = static_cast<int32_t>(rc_Str.size()); s32_ItFromEnd > 0; --s32_ItFromEnd)
          {
-            if (rc_Str.at(static_cast<int32_t>(s32_ItFromEnd - 1L)) != QChar('0'))
+            if (rc_Str.at(static_cast<int32_t>(s32_ItFromEnd - 1L)) != static_cast<QChar>('0'))
             {
                break;
             }
@@ -236,7 +236,7 @@ QString C_Uti::h_GetStringFromDouble(const float64_t of64_Value)
    {
       int32_t s32_Index;
       // count digits left of decimal point
-      const int32_t s32_DigitsWithoutDecimals = c_SplitString.at(0).length();
+      const int32_t s32_DigitsWithoutDecimals = static_cast<int32_t>(c_SplitString.at(0).length());
 
       // more than one or one that is not zero --> substract from decimal precision
       if ((s32_DigitsWithoutDecimals > 0) && (c_SplitString.at(0) != "0"))
@@ -249,7 +249,7 @@ QString C_Uti::h_GetStringFromDouble(const float64_t of64_Value)
          // example:
          // 0,0000321 --> 0000321 --> 321 --> 3 --> index of 3 in 0000321 is 4 and this is exactly what should be added
          const QString c_HelpString = c_SplitString.at(1);
-         s32_Index = c_HelpString.length() - 1;
+         s32_Index = static_cast<int32_t>(c_HelpString.length()) - 1;
          for (int32_t s32_Pos = 0; s32_Pos < c_HelpString.length(); s32_Pos++)
          {
             if (c_HelpString.at(s32_Pos) != '0')
@@ -275,8 +275,8 @@ QString C_Uti::h_GetStringFromDouble(const float64_t of64_Value)
       c_StringFromValue = QString::number(of64_Value, 'f', s32_Precision);
 
       // remove trailing zeros
-      s32_Index = c_StringFromValue.length() - 1;
-      for (int32_t s32_Pos = c_StringFromValue.length() - 1; s32_Pos > 0; s32_Pos--)
+      s32_Index = static_cast<int32_t>(c_StringFromValue.length()) - 1;
+      for (int32_t s32_Pos = static_cast<int32_t>(c_StringFromValue.length()) - 1; s32_Pos > 0; s32_Pos--)
       {
          if (c_StringFromValue.at(s32_Pos) != '0')
          {
@@ -284,7 +284,7 @@ QString C_Uti::h_GetStringFromDouble(const float64_t of64_Value)
             break;
          }
       }
-      c_StringFromValue.truncate(s32_Index + 1);
+      c_StringFromValue.truncate(static_cast<int64_t>(s32_Index) + 1LL);
 
       // replace cases like "1." with "1.0"
       if (c_StringFromValue.endsWith("."))
@@ -332,7 +332,7 @@ std::vector<uint32_t> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint3
 
    //Reverse order
    c_Retval.reserve(c_Ascending.size());
-   for (uint32_t u32_It = c_Ascending.size(); u32_It > 0UL; --u32_It)
+   for (uint32_t u32_It = static_cast<uint32_t>(c_Ascending.size()); u32_It > 0UL; --u32_It)
    {
       c_Retval.push_back(c_Ascending[static_cast<uint32_t>(u32_It - 1UL)]);
    }
@@ -814,16 +814,17 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
          {
             // yes, try to reduce folders recursively
             c_MinimizedPath = c_Path;
-            int32_t s32_DelimPos = c_MinimizedPath.indexOf("/", 0); // first delimiter
+            int32_t s32_DelimPos = static_cast<int32_t>(c_MinimizedPath.indexOf("/", 0)); // first delimiter
             do
             {
                // get next folder
-               s32_DelimPos = c_MinimizedPath.indexOf("/", s32_DelimPos + 1); // next delimiter
+               s32_DelimPos = static_cast<int32_t>(
+                  c_MinimizedPath.indexOf("/", static_cast<int64_t>(s32_DelimPos) + 1)); // next delimiter
 
                c_MinimizedPath = c_DriveName + c_Placeholder +
                                  c_MinimizedPath.right((c_MinimizedPath.length() - s32_DelimPos) - 1);
 
-               s32_DelimPos = static_cast<QString>(c_DriveName + c_Placeholder).length();
+               s32_DelimPos = static_cast<int32_t>(static_cast<QString>(c_DriveName + c_Placeholder).length());
                s32_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
             }
             // second condition should not occur and is only defensive
@@ -1127,7 +1128,7 @@ QString C_Uti::h_GetHashValueAsQtString(void)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetValueAsHex(const uint64_t ou64_Value, const uint8_t ou8_FieldWidth)
 {
-   return "0x" + static_cast<QString>("%1").arg(ou64_Value, ou8_FieldWidth, 16, QChar('0')).toUpper();
+   return "0x" + static_cast<QString>("%1").arg(ou64_Value, ou8_FieldWidth, 16, static_cast<QChar>('0')).toUpper();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -17,8 +17,6 @@
 #include "constants.hpp"
 #include "C_GtGetText.hpp"
 #include "TglUtils.hpp"
-#include "C_ImpUtil.hpp"
-#include "C_OscLoggingHandler.hpp"
 
 #include "C_SyvUpPacSectionNodeFilesWidget.hpp"
 #include "ui_C_SyvUpPacSectionNodeWidget.h"
@@ -26,7 +24,6 @@
 #include "C_SyvUpPacListNodeItemParamSetWidget.hpp"
 #include "C_SyvUpPacListNodeItemPemFileWidget.hpp"
 #include "C_OscViewNodeUpdateParamInfo.hpp"
-#include "C_SyvUpPacPemFileOptionsPopUp.hpp"
 
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_PuiSdHandler.hpp"
@@ -123,25 +120,16 @@ void C_SyvUpPacSectionNodeFilesWidget::AddFile(const QString & orc_File)
             new C_SyvUpPacListNodeItemPemFileWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
                                                     this->mc_DeviceType,
                                                     this->mq_FileBased, this->mq_StwFlashloader, this);
-         // Set default values
-         const C_OscViewNodeUpdate::E_StateSecurity e_STATE_SECURITY = C_OscViewNodeUpdate::eST_SEC_ACTIVATE;
-         const C_OscViewNodeUpdate::E_StateDebugger e_STATE_DEBUGGER = C_OscViewNodeUpdate::eST_DEB_NO_CHANGE;
 
          pc_PemWidget->SetAppFile(orc_File, false);
          pc_PemWidget->SetAppNumber(0U);
          pc_PemWidget->SetOwnerSectionName(this->mc_SectionName);
-         pc_PemWidget->SetPemStates(e_STATE_SECURITY, e_STATE_DEBUGGER);
 
-         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(this->mu32_PemFileCount,
-                                                           pc_PemWidget);
+         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(this->mu32_PemFileCount, pc_PemWidget);
 
          // Save the new file as application path
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationPemFilePath(
                        this->mu32_ViewIndex, this->mu32_NodeIndex, orc_File) == C_NO_ERR);
-         // Set the new default states as well
-         tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(
-                       this->mu32_ViewIndex, this->mu32_NodeIndex,
-                       e_STATE_SECURITY, e_STATE_DEBUGGER) == C_NO_ERR);
 
          ++this->mu32_PemFileCount;
          ++this->mu32_FileCount;
@@ -343,56 +331,6 @@ void C_SyvUpPacSectionNodeFilesWidget::RemoveFile(C_SyvUpPacListNodeItemWidget *
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Opens the settings for a PEM file
-
-   \param[in]  opc_App  Application widget
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeFilesWidget::OpenPemFileSettings(C_SyvUpPacListNodeItemWidget * const opc_App)
-{
-   C_SyvUpPacListNodeItemPemFileWidget * const pc_PemApp =
-      dynamic_cast<C_SyvUpPacListNodeItemPemFileWidget *>(opc_App);
-
-   if (pc_PemApp != NULL)
-   {
-      C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
-      C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
-      // Get the current PEM states
-      pc_PemApp->GetPemStates(e_StateSecurity, e_StateDebugger);
-
-      // Adapt the states
-      {
-         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-         const C_SyvUpPacPemFileOptionsPopUp * const pc_InfoDialog = new C_SyvUpPacPemFileOptionsPopUp(*c_New,
-                                                                                                       e_StateSecurity,
-                                                                                                       e_StateDebugger);
-
-         //Resize
-         c_New->SetSize(QSize(500, 400));
-
-         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
-         {
-            //No confirmation
-            e_StateSecurity = pc_InfoDialog->GetComboBoxSecState();
-            e_StateDebugger = pc_InfoDialog->GetComboBoxDebState();
-         }
-
-         if (c_New != NULL)
-         {
-            c_New->HideOverlay();
-            c_New->deleteLater();
-         }
-      } //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
-
-      pc_PemApp->SetPemStates(e_StateSecurity, e_StateDebugger);
-      tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(this->mu32_ViewIndex,
-                                                                                 this->mu32_NodeIndex,
-                                                                                 e_StateSecurity,
-                                                                                 e_StateDebugger) == C_NO_ERR);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the update package node configuration
 
    \param[out]  orc_NodeConfig   Node configuration
@@ -425,7 +363,6 @@ void C_SyvUpPacSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpPacConfigNode 
                   if (pc_PemApp != NULL)
                   {
                      orc_NodeConfig.c_PemFilePath = pc_App->GetAppFilePath();
-                     pc_PemApp->GetPemStates(orc_NodeConfig.e_StateSecurity, orc_NodeConfig.e_StateDebugger);
                   }
                }
                else if (pc_App->GetType() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET)
@@ -493,20 +430,6 @@ void C_SyvUpPacSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpPacConfig &
          if (!orc_Config.c_NodeConfigs[u32_ConfigCounter].c_PemFilePath.isEmpty())
          {
             this->AddFile(orc_Config.c_NodeConfigs[u32_ConfigCounter].c_PemFilePath);
-            //Configure PEM states
-            QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(0);
-
-            if (pc_Item != NULL)
-            {
-               C_SyvUpPacListNodeItemPemFileWidget * const pc_PemApp =
-                  dynamic_cast<C_SyvUpPacListNodeItemPemFileWidget *>(pc_Item->widget());
-
-               if (pc_PemApp != NULL)
-               {
-                  pc_PemApp->SetPemStates(orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateSecurity,
-                                          orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateDebugger);
-               }
-            }
          }
 
          break;
@@ -668,16 +591,11 @@ void C_SyvUpPacSectionNodeFilesWidget::m_InitSpecificItem(const stw::opensyde_co
          new C_SyvUpPacListNodeItemPemFileWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
                                                  this->mc_DeviceType,
                                                  this->mq_FileBased, this->mq_StwFlashloader, this);
-      C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
-      C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
 
       pc_PemWidget->SetAppFile(c_ViewPemPath, false);
       pc_PemWidget->SetSkipOfUpdateFile(q_ViewPemSkipFlag);
       pc_PemWidget->SetAppNumber(0U);
       pc_PemWidget->SetOwnerSectionName(this->mc_SectionName);
-
-      orc_UpdateInfo.GetStates(e_StateSecurity, e_StateDebugger);
-      pc_PemWidget->SetPemStates(e_StateSecurity, e_StateDebugger);
 
       ++this->mu32_FileCount;
       this->mu32_PemFileCount = 1U;

@@ -43,7 +43,9 @@ public:
 
    void UpdateShowValue(void) override;
    void UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value) override;
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
    bool CallProperties(void) override;
 
    void UpdateTypePe(const bool oq_ShowUnit, const bool oq_ShowValue);

@@ -33,6 +33,7 @@ public:
    public:
       bool q_NvmWriteError;
       bool q_PemWriteError;
+      bool q_TrafficEncryptionEnableError;
       bool q_DebuggerEnableError;
       bool q_DebuggerDisableError;
       bool q_EthToEthError;

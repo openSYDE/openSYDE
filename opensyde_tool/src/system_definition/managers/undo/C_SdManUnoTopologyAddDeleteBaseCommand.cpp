@@ -358,7 +358,8 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
                {
                   const C_OscSystemBus * const pc_OscBus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_Index);
                   const C_PuiSdBus * const pc_UiBus = C_PuiSdHandler::h_GetInstance()->GetUiBus(u32_Index);
-                  c_MapOldIndexToNewIndex.insert(u32_Index, this->mc_DataBackup.c_OscBuses.size());
+                  c_MapOldIndexToNewIndex.insert(u32_Index,
+                                                 static_cast<uint32_t>(this->mc_DataBackup.c_OscBuses.size()));
                   if (pc_OscBus != NULL)
                   {
                      this->mc_DataBackup.c_OscBuses.push_back(*pc_OscBus);
@@ -369,13 +370,10 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
                   }
                   if (this->mc_DataBackup.c_OscBuses.size() == this->mc_DataBackup.c_UiBuses.size())
                   {
-                     this->mc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement
-                                                                                                     ::
-                                                                                                     E_Type::eBUS),
-                                                                                this->mc_DataBackup.c_UiBuses.size()
-                                                                                -
-                                                                                1UL),
-                                                         u64_CurUniqueId);
+                     this->mc_MapTypeAndIndexToId.insert(
+                        C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::E_Type::eBUS),
+                                               static_cast<uint32_t>(this->mc_DataBackup.c_UiBuses.size()) - 1UL),
+                        u64_CurUniqueId);
                   }
                }
 
@@ -386,15 +384,12 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
                {
                   if (u32_Index < C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size())
                   {
-                     this->mc_DataBackup.c_BusTextElements.push_back(C_PuiSdHandler::h_GetInstance()->c_BusTextElements[
-                                                                        u32_Index]);
-                     this->mc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement
-                                                                                                     ::
-                                                                                                     E_Type::
-                                                                                                     eTEXT_ELEMENT_BUS),
-                                                                                this->mc_DataBackup.c_BusTextElements.
-                                                                                size() - 1UL),
-                                                         u64_CurUniqueId);
+                     this->mc_DataBackup.c_BusTextElements.push_back(
+                        C_PuiSdHandler::h_GetInstance()->c_BusTextElements[u32_Index]);
+                     this->mc_MapTypeAndIndexToId.insert(
+                        C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::E_Type::eTEXT_ELEMENT_BUS),
+                                               static_cast<uint32_t>(this->mc_DataBackup.c_BusTextElements.size()) - 1UL),
+                        u64_CurUniqueId);
                   }
                }
             }
@@ -407,17 +402,15 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
             if (pc_BusConnector != NULL)
             {
                const C_GiLiBus * pc_BusConst;
-               const uint32_t u32_BackupBusConnectionIndex = this->mc_DataBackup.c_BusConnections.size();
+               const uint32_t u32_BackupBusConnectionIndex =
+                  static_cast<uint32_t>(this->mc_DataBackup.c_BusConnections.size());
                this->mc_DataBackup.c_BusConnections.emplace_back(C_PuiSdCompleteBusConnectionData());
                {
                   C_PuiSdCompleteBusConnectionData & rc_CurBusConnectionBackupData =
                      this->mc_DataBackup.c_BusConnections[u32_BackupBusConnectionIndex];
-                  this->mc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(
-                                                                                C_PuiSdDataElement::
-                                                                                E_Type::
-                                                                                eBUS_CONNECTOR),
-                                                                             u32_BackupBusConnectionIndex),
-                                                      u64_CurUniqueId);
+                  this->mc_MapTypeAndIndexToId.insert(
+                     C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::E_Type::eBUS_CONNECTOR),
+                                            u32_BackupBusConnectionIndex), u64_CurUniqueId);
                   //Node data
                   pc_Node = pc_BusConnector->GetNodeItem();
                   if (pc_Node != NULL)
@@ -509,8 +502,8 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToDataNode(const C_GiNode * c
 {
    if (opc_UiNodeItem != NULL)
    {
-      const bool q_IsMulti = C_OscNodeSquad::h_CheckIsMultiDevice(ou32_NodeIndex,
-                                                                  C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_NodeSquads);
+      const bool q_IsMulti = C_OscNodeSquad::h_CheckIsMultiDevice(
+         ou32_NodeIndex, C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_NodeSquads);
       if (q_IsMulti)
       {
          this->m_SaveToDataMultiNode(ou32_NodeIndex);
@@ -532,10 +525,9 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToDataNode(const C_GiNode * c
       }
       if (this->mc_DataBackup.c_OscNodes.size() == this->mc_DataBackup.c_UiNodes.size())
       {
-         this->mc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(
-                                                                       C_PuiSdDataElement::
-                                                                       E_Type::eNODE), oru32_NodeCounter),
-                                             ou64_UniqueId);
+         this->mc_MapTypeAndIndexToId.insert(
+            C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::E_Type::eNODE), oru32_NodeCounter),
+            ou64_UniqueId);
       }
       ++oru32_NodeCounter;
    }
@@ -569,7 +561,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToDataMultiNode(const uint32_
                C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_Indices[u32_ItNode]);
             const C_PuiSdNode * const pc_UiNode =
                C_PuiSdHandler::h_GetInstance()->GetUiNode(c_Indices[u32_ItNode]);
-            c_Group.c_SubNodeIndexes.push_back(this->mc_DataBackup.c_OscNodes.size());
+            c_Group.c_SubNodeIndexes.push_back(static_cast<uint32_t>(this->mc_DataBackup.c_OscNodes.size()));
             if (pc_OscNode != NULL)
             {
                this->mc_DataBackup.c_OscNodes.push_back(*pc_OscNode);
@@ -800,9 +792,8 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenBusBeforeDelete(cons
             {
                bool q_Tmp;
                uint8_t u8_InterfaceNumber;
-               tgl_assert(C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(c_NodeIndexes[u32_ItNode],
-                                                                                          c_InterfaceIndexes[u32_ItNode],
-                                                                                          u8_InterfaceNumber) ==
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(
+                             c_NodeIndexes[u32_ItNode], c_InterfaceIndexes[u32_ItNode], u8_InterfaceNumber) ==
                           C_NO_ERR);
                //Don't check result as this manager might not exist
                C_PuiSdHandler::h_GetInstance()->DeleteCanOpenManager(c_NodeIndexes[u32_ItNode],

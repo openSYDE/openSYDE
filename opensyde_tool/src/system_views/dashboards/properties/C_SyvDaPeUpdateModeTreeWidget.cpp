@@ -294,7 +294,7 @@ void C_SyvDaPeUpdateModeTreeWidget::m_Clear(void)
                         false collapse
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeUpdateModeTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const opc_Item, const bool oq_Expand)
+void C_SyvDaPeUpdateModeTreeWidget::m_OnExpandRequested(const QTreeWidgetItem * const opc_Item, const bool oq_Expand)
 {
    if (oq_Expand == true)
    {

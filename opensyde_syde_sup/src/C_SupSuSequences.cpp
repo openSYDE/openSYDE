@@ -323,7 +323,7 @@ bool C_SupSuSequences::m_CheckErrorCase(const C_OscSuSequences::E_ProgressStep o
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
-   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
@@ -354,10 +354,11 @@ bool C_SupSuSequences::m_CheckErrorCase(const C_OscSuSequences::E_ProgressStep o
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_ENTER_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
@@ -380,7 +381,7 @@ bool C_SupSuSequences::m_CheckErrorCase(const C_OscSuSequences::E_ProgressStep o
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START:
-   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_START:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
    case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_START:
    case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START:
@@ -411,8 +412,10 @@ bool C_SupSuSequences::m_CheckErrorCase(const C_OscSuSequences::E_ProgressStep o
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_FINISHED:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED:
@@ -537,11 +540,11 @@ C_SclString C_SupSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
       c_Text = "Read Device Information - Flashloader information error";
       break;
-   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
-      c_Text = "Read Device Information - Flashloader security activation state start";
+   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_START:
+      c_Text = "Read Device Information - Flashloader debugger activation state start";
       break;
-   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
-      c_Text = "Read Device Information - Flashloader security activation state error";
+   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_ERROR:
+      c_Text = "Read Device Information - Flashloader debugger activation state error";
       break;
    case eREAD_DEVICE_INFO_FINISHED:
       c_Text = "Read Device Information - Finished";
@@ -729,29 +732,38 @@ C_SclString C_SupSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
       c_Text = "Update System: Node write of PEM file finished";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START:
-      c_Text = "Update System: Node write of security activation state start";
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_START:
+      c_Text = "Update System: Node write of secure authentication activation state start";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
-      c_Text = "Update System: Node write of security activation state available feature error";
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = "Update System: Node write of secure authentication activation state available feature error";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
-      c_Text = "Update System: Node write of security activation state session error";
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_ENTER_SESSION_ERROR:
+      c_Text = "Update System: Node write of enter state session error";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
-      c_Text = "Update System: Node write of security activation state send error";
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_SEND_ERROR:
+      c_Text = "Update System: Node write of secure authentication activation state send error";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED:
-      c_Text = "Update System: Node write of security activation state finished";
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_FINISHED:
+      c_Text = "Update System: Node write of secure authentication activation state finished";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_START:
+      c_Text = "Update System: Node write of traffic encryption activation state start";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_SEND_ERROR:
+      c_Text = "Update System: Node write of traffic encryption activation state send error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = "Update System: Node write of traffic encryption activation state available feature error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_FINISHED:
+      c_Text = "Update System: Node write of traffic encryption activation state finished";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START:
       c_Text = "Update System: Node write of debugger activation state start";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
       c_Text = "Update System: Node write of debugger activation state available feature error";
-      break;
-   case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
-      c_Text = "Update System: Node write of debugger activation state session error";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
       c_Text = "Update System: Node write of debugger activation state send error";

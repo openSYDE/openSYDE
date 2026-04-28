@@ -251,7 +251,7 @@ int32_t C_SyvDaPeUpdateModeTableModel::rowCount(const QModelIndex & orc_Parent) 
    if (orc_Parent.isValid() == false)
    {
       //Top level
-      s32_Retval = this->mc_UniqueDataElementIds.size();
+      s32_Retval = static_cast<int32_t>(this->mc_UniqueDataElementIds.size());
    }
 
    return s32_Retval;
@@ -439,15 +439,15 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   c_Tmp.push_back(QString::number(16)); // icon size
                   if (e_DataPoolType == C_OscNodeDataPool::E_Type::eDIAG)
                   {
-                     c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
+                     c_Tmp.append(":/images/system_definition/IconVariable.svg");
                   }
                   else if (e_DataPoolType == C_OscNodeDataPool::E_Type::eCOM)
                   {
-                     c_Tmp.push_back(":/images/system_definition/IconSignal.svg");
+                     c_Tmp.append(":/images/system_definition/IconSignal.svg");
                   }
                   else if (e_DataPoolType == C_OscNodeDataPool::E_Type::eNVM)
                   {
-                     c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
+                     c_Tmp.append(":/images/system_definition/IconParameter.svg");
                   }
                   else
                   {
@@ -481,13 +481,13 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                            switch (pc_Domain->e_Category)
                            {
                            case C_OscHalcDefDomain::eCA_INPUT:
-                              c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
+                              c_Tmp.append(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
                               break;
                            case C_OscHalcDefDomain::eCA_OUTPUT:
-                              c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
+                              c_Tmp.append(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
                               break;
                            case C_OscHalcDefDomain::eCA_OTHER:
-                              c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
+                              c_Tmp.append(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
                               break;
                            default:
                               tgl_assert(false);

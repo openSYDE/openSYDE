@@ -127,11 +127,7 @@ void C_OscComAutoSupport::ClearAutoSupportInfo()
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscComAutoSupport::ResetOnClearData()
 {
-   std::map<int32_t, uint8_t>::iterator c_It = mc_MessageCounterInfoMap.begin();
-   while (c_It != mc_MessageCounterInfoMap.end())
-   {
-      c_It = mc_MessageCounterInfoMap.erase(c_It);
-   }
+   mc_MessageCounterInfoMap.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

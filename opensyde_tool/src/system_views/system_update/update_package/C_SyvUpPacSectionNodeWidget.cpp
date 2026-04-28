@@ -458,21 +458,6 @@ void C_SyvUpPacSectionNodeWidget::UpdateDeviceInformation(const C_SyvUpDeviceInf
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Opens the settings for a PEM file
-
-   Default implementation does nothing.
-
-   \param[in]  opc_App  Application widget
-*/
-//----------------------------------------------------------------------------------------------------------------------
-//lint -e{9175}  //intentionally no functionality in default implementation
-void C_SyvUpPacSectionNodeWidget::OpenPemFileSettings(C_SyvUpPacListNodeItemWidget * const opc_App)
-{
-   Q_UNUSED(opc_App)
-   // Nothing to do here
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks all paths for existence
 
    \param[out]  oru32_CountFiles             Number of files
@@ -854,21 +839,12 @@ int32_t C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlas
                   else
                   {
                      orc_ApplicationsToWrite.c_PemFile = c_Path.toStdString().c_str();
-
-                     mh_FillDoFlashWithPemStates(pc_App, orc_ApplicationsToWrite);
                   }
                }
                else
                {
                   // Update of application is not necessary
                   ++oru32_FilesUpdated;
-
-                  if (q_PemFile == true)
-                  {
-                     // Special case, in case of a skipped PEM file, do not transfer the states
-                     orc_ApplicationsToWrite.q_SendSecurityEnabledState = false;
-                     orc_ApplicationsToWrite.q_SendDebuggerEnabledState = false;
-                  }
                }
 
                if (opc_AllApplications != NULL)
@@ -886,8 +862,6 @@ int32_t C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlas
                   else
                   {
                      opc_AllApplications->c_PemFile = c_Path.toStdString().c_str();
-
-                     mh_FillDoFlashWithPemStates(pc_App, *opc_AllApplications);
                   }
                }
 
@@ -932,9 +906,7 @@ int32_t C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlas
       }
    }
 
-   if ((orc_ApplicationsToWrite.c_FilesToFlash.size() == 0) &&
-       (orc_ApplicationsToWrite.c_FilesToWriteToNvm.size() == 0) &&
-       (orc_ApplicationsToWrite.c_PemFile == ""))
+   if (orc_ApplicationsToWrite.IsAnyActionRequired() == false)
    {
       // No files added
       s32_Return = C_NOACT;
@@ -1745,29 +1717,5 @@ void C_SyvUpPacSectionNodeWidget::m_UpdateLabelNoFiles(void)
       this->mpc_Ui->pc_WidgetAdd->setMinimumHeight(68);
       this->mpc_Ui->pc_LabNoFiles->setVisible(false);
       this->mpc_Ui->pc_LabNoFilesShort->setVisible(true);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Fills the PEM states in the DoFlash class
-
-   \param[in]   opc_App       PEM file app
-   \param[out]  orc_DoFlash   DoFlash data class
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::mh_FillDoFlashWithPemStates(const C_SyvUpPacListNodeItemWidget * const opc_App,
-                                                              C_OscSuSequences::C_DoFlash & orc_DoFlash)
-{
-   const C_SyvUpPacListNodeItemPemFileWidget * const pc_PemApp =
-      dynamic_cast<const C_SyvUpPacListNodeItemPemFileWidget *>(opc_App);
-
-   tgl_assert(pc_PemApp != NULL);
-   if (pc_PemApp != NULL)
-   {
-      C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
-      C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
-
-      pc_PemApp->GetPemStates(e_StateSecurity, e_StateDebugger);
-      C_OscSuSequences::h_FillDoFlashWithPemStates(e_StateSecurity, e_StateDebugger, orc_DoFlash);
    }
 }

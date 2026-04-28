@@ -710,7 +710,7 @@ int32_t C_SdNdeDpUtil::h_GetTableSize(const uint32_t ou32_NodeIndex, const uint3
       const int32_t s32_CONST_CHECKSUM_OFFSET = 33;
       const int32_t s32_ITEM_OFFSET = 30;
       const uint32_t u32_VISIBLE_ITEM_COUNT = 7U;
-      const uint32_t u32_ITEM_COUNT = pc_List->c_Elements.size();
+      const uint32_t u32_ITEM_COUNT = static_cast<uint32_t>(pc_List->c_Elements.size());
       int32_t s32_Height = s32_CONST_OFFSET;
 
       //Add checksum checkbox offset for NVM Datapool lists

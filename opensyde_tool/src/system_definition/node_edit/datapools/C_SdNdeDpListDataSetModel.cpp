@@ -216,7 +216,7 @@ int32_t C_SdNdeDpListDataSetModel::columnCount(const QModelIndex & orc_Parent) c
       if (pc_List != NULL)
       {
          //For table parent should always be invalid
-         s32_Retval = pc_List->c_DataSets.size();
+         s32_Retval = static_cast<int32_t>(pc_List->c_DataSets.size());
       }
    }
    return s32_Retval;
@@ -522,7 +522,7 @@ void C_SdNdeDpListDataSetModel::DoInsertColumns(const std::vector<C_OscNodeDataP
    {
       this->mc_OscNames = orc_OscNames;
       this->mc_OscDataSetValues = orc_OscDataSetValues;
-      this->insertColumns(oru32_Row, orc_OscNames.size());
+      this->insertColumns(oru32_Row, static_cast<int32_t>(orc_OscNames.size()));
    }
 }
 

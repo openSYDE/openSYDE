@@ -176,7 +176,7 @@ int32_t C_TblTreSimpleItem::h_GetIndex(const std::vector<C_TblTreSimpleItem *> &
          );
       if (c_It != orc_Vector.end())
       {
-         s32_Retval = c_It - orc_Vector.begin();
+         s32_Retval = static_cast<int32_t>(c_It - orc_Vector.begin());
       }
    }
    return s32_Retval;

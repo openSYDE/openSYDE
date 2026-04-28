@@ -162,6 +162,15 @@ stw--opensyde_gui_elements--C_OgePubOptions
 padding-left: 40px;
 }
 
+
+stw--opensyde_gui_elements--C_OgePubOptions[Align="right"]
+{
+border-style: none;
+text-align: right;
+padding-left: 25px;
+padding-right: 5px;
+}
+
 /* --------------------------------------------------------------------- */
 stw--opensyde_gui_elements--C_OgePubTextOnlyUnderline
 {
@@ -308,5 +317,28 @@ subcontrol-position: right center;
 subcontrol-origin: padding;
 left: 3px; /*move arrow more to the right*/
 }
-/* --------------------------------------------------------------------- */
 
+/* --------------------------------------------------------------------- */
+stw--opensyde_gui_elements--C_OgePubIconMenu
+{
+border-style: none;
+}
+
+stw--opensyde_gui_elements--C_OgePubIconMenu:menu-indicator
+{
+image: url(:/images/system_views/dashboards/tab_chart/IconArrowBottom.svg);
+}
+
+stw--opensyde_gui_elements--C_OgePubIconMenu:menu-indicator:!enabled
+{
+image: url(:/images/system_views/dashboards/tab_chart/IconArrowBottomDisabled.svg);
+}
+
+stw--opensyde_gui_elements--C_OgePubIconMenu:menu-indicator
+{
+subcontrol-position: right center;
+subcontrol-origin: padding;
+left: 3px; /*move arrow more to the right*/
+}
+
+/* --------------------------------------------------------------------- */

@@ -12,11 +12,13 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <limits>
 #define MINIZ_NO_ZLIB_COMPATIBLE_NAMES //prevent namespace pollution
 #include "miniz.h"
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "C_OscZipData.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -62,7 +64,9 @@ int32_t C_OscZipData::h_Zip(uint8_t * const opu8_Destination, uint32_t & oru32_D
    s32_Return = mz_compress(opu8_Destination, &x_DestinationLength, opu8_Source, ou32_SourceLength);
    if (s32_Return == MZ_OK)
    {
-      oru32_DestinationLength = x_DestinationLength;
+      tgl_assert(x_DestinationLength < std::numeric_limits<uint32_t>::max()); //max 4GiB supported, even on 64bit
+                                                                              // systems
+      oru32_DestinationLength = static_cast<uint32_t>(x_DestinationLength);
       s32_Return = C_NO_ERR;
    }
    else
@@ -102,7 +106,9 @@ int32_t C_OscZipData::h_Unzip(uint8_t * const opu8_Destination, uint32_t & oru32
    s32_Return = mz_uncompress(opu8_Destination, &x_DestinationLength, opu8_Source, ou32_SourceLength);
    if (s32_Return == MZ_OK)
    {
-      oru32_DestinationLength = x_DestinationLength;
+      tgl_assert(x_DestinationLength < std::numeric_limits<uint32_t>::max()); //max 4GiB supported, even on 64bit
+                                                                              // systems
+      oru32_DestinationLength = static_cast<uint32_t>(x_DestinationLength);
       s32_Return = C_NO_ERR;
    }
    else
@@ -126,5 +132,5 @@ int32_t C_OscZipData::h_Unzip(uint8_t * const opu8_Destination, uint32_t & oru32
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_OscZipData::h_GetRequiredBufSizeForZipping(const uint32_t ou32_SourceLength)
 {
-   return mz_compressBound(ou32_SourceLength);
+   return static_cast<uint32_t>(mz_compressBound(ou32_SourceLength));
 }

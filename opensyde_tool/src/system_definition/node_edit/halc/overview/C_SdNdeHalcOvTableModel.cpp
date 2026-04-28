@@ -304,7 +304,7 @@ int32_t C_SdNdeHalcOvTableModel::rowCount(const QModelIndex & orc_Parent) const
 
    if (!orc_Parent.isValid())
    {
-      s32_Retval = this->mc_HalcInfoAll.size();
+      s32_Retval = static_cast<int32_t>(this->mc_HalcInfoAll.size());
    }
    return s32_Retval;
 }

@@ -18,6 +18,7 @@
 #include "stwerrors.hpp"
 #include "TglUtils.hpp"
 #include "C_PuiBsElementsFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
@@ -1049,5 +1050,9 @@ void C_PuiBsElementsFiler::mh_StringToPixmap(const QString & orc_String, QPixmap
    // use PNG as default image type as we had PNG hard-coded in previous implementation
    const QByteArray c_Format = orc_Format.isEmpty() ? "png" : orc_Format;
 
-   orc_Pixmap.loadFromData(QByteArray::fromBase64(orc_String.toUtf8()), c_Format);
+   if (orc_Pixmap.loadFromData(QByteArray::fromBase64(orc_String.toUtf8()), c_Format) == false)
+   {
+      osc_write_log_error("Loading project",
+                          "Could not read image data. This may cause missing images on topology or dashboard.");
+   }
 }

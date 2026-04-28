@@ -310,6 +310,42 @@ void C_OscDataLoggerJobFiler::h_SaveDataElementOptArrayId(const C_OscNodeDataPoo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load data element opt array opt valid id
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    Data loggers file content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscDataLoggerJobFiler::h_LoadDataElementOptArrayOptValidId(
+   C_OscNodeDataPoolListElementOptArrayOptValidId & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   C_OscNodeDataPoolListElementOptArrayId c_TmpConfig;
+   const int32_t s32_Retval = h_LoadDataElementOptArrayId(c_TmpConfig, orc_XmlParser);
+   const bool q_IsValid = orc_XmlParser.GetAttributeBool("is-valid", true);
+
+   orc_Config = C_OscNodeDataPoolListElementOptArrayOptValidId(c_TmpConfig, q_IsValid);
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save data element opt array opt valid id
+
+   \param[in]      orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscDataLoggerJobFiler::h_SaveDataElementOptArrayOptValidId(
+   const C_OscNodeDataPoolListElementOptArrayOptValidId & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.SetAttributeBool("is-valid", orc_Config.GetIsValid());
+   h_SaveDataElementOptArrayId(orc_Config, orc_XmlParser);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -524,7 +560,7 @@ int32_t C_OscDataLoggerJobFiler::mh_LoadJobAdditionalTriggerProperties(
          s32_Retval = orc_XmlParser.SelectNodeChildError("data-pool-element");
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadDataElementOptArrayId(orc_Config.c_ElementId, orc_XmlParser);
+            s32_Retval = h_LoadDataElementOptArrayOptValidId(orc_Config.c_ElementId, orc_XmlParser);
          }
          //Return
          orc_XmlParser.SelectNodeParent();
@@ -562,7 +598,7 @@ void C_OscDataLoggerJobFiler::mh_SaveJobAdditionalTriggerProperties(
    orc_XmlParser.CreateAndSelectNodeChild("additional-trigger-properties");
    orc_XmlParser.SetAttributeBool("enable", orc_Config.q_Enable);
    orc_XmlParser.CreateAndSelectNodeChild("data-pool-element");
-   h_SaveDataElementOptArrayId(orc_Config.c_ElementId, orc_XmlParser);
+   h_SaveDataElementOptArrayOptValidId(orc_Config.c_ElementId, orc_XmlParser);
    //Return
    orc_XmlParser.SelectNodeParent();
    orc_XmlParser.CreateAndSelectNodeChild("threshold");
@@ -599,6 +635,8 @@ int32_t C_OscDataLoggerJobFiler::mh_LoadJobAdditionalTriggerExpertMode(
          {
             orc_Config.c_TriggerConfiguration = orc_XmlParser.GetNodeContent();
             tgl_assert(orc_XmlParser.SelectNodeParent() == "expert-settings");
+            s32_Retval = mh_LoadJobAdditionalTriggerExpertModeTriggerDataElements(orc_Config.c_TriggerDataElementIds,
+                                                                                  orc_XmlParser);
          }
       }
       tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
@@ -619,7 +657,84 @@ void C_OscDataLoggerJobFiler::mh_SaveJobAdditionalTriggerExpertMode(
    orc_XmlParser.CreateAndSelectNodeChild("expert-settings");
    orc_XmlParser.SetAttributeBool("is-enabled", orc_Config.q_Enable);
    orc_XmlParser.CreateNodeChild("trigger-configuration", orc_Config.c_TriggerConfiguration);
+   mh_SaveJobAdditionalTriggerExpertModeTriggerDataElements(orc_Config.c_TriggerDataElementIds, orc_XmlParser);
    tgl_assert(orc_XmlParser.SelectNodeParent() == "additional-trigger-properties");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load job additional trigger expert mode trigger data elements
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    Data loggers file content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscDataLoggerJobFiler::mh_LoadJobAdditionalTriggerExpertModeTriggerDataElements(
+   std::vector<C_OscNodeDataPoolListElementOptArrayId> & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   orc_Config.clear();
+
+   if (orc_XmlParser.SelectNodeChild("trigger-data-element-ids") == "trigger-data-element-ids")
+   {
+      uint32_t u32_ExpectedSize;
+      s32_Retval = orc_XmlParser.GetAttributeUint32Error("length", u32_ExpectedSize);
+      if (s32_Retval == C_NO_ERR)
+      {
+         stw::scl::C_SclString c_NodeName = orc_XmlParser.SelectNodeChild("trigger-data-element-id");
+         if (c_NodeName == "trigger-data-element-id")
+         {
+            do
+            {
+               C_OscNodeDataPoolListElementOptArrayId c_Data;
+               s32_Retval = C_OscDataLoggerJobFiler::h_LoadDataElementOptArrayId(c_Data, orc_XmlParser);
+               if (s32_Retval == C_NO_ERR)
+               {
+                  orc_Config.push_back(c_Data);
+               }
+
+               c_NodeName = orc_XmlParser.SelectNodeNext("trigger-data-element-id");
+            }
+            while ((c_NodeName == "trigger-data-element-id") && (s32_Retval == C_NO_ERR));
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "trigger-data-element-ids");
+         }
+         if (u32_ExpectedSize != orc_Config.size())
+         {
+            stw::scl::C_SclString c_Tmp;
+            c_Tmp.PrintFormatted("Unexpected data logger trigger data element ids count, expected: %u, got %u",
+                                 u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_Config.size()));
+            orc_XmlParser.ReportErrorForAttributeContentAppendXmlContext("length", c_Tmp);
+         }
+      }
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "expert-settings");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save job additional trigger expert mode trigger data elements
+
+   \param[in]      orc_Config       Config
+   \param[in,out]  orc_XmlParser    Xml parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscDataLoggerJobFiler::mh_SaveJobAdditionalTriggerExpertModeTriggerDataElements(
+   const std::vector<C_OscNodeDataPoolListElementOptArrayId> & orc_Config, C_OscXmlParserBase & orc_XmlParser)
+{
+   orc_XmlParser.CreateAndSelectNodeChild("trigger-data-element-ids");
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Config.size()));
+   for (uint32_t u32_It = 0UL; u32_It < orc_Config.size(); ++u32_It)
+   {
+      orc_XmlParser.CreateAndSelectNodeChild("trigger-data-element-id");
+      h_SaveDataElementOptArrayId(orc_Config[u32_It], orc_XmlParser);
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "trigger-data-element-ids");
+   }
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "expert-settings");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -839,6 +954,9 @@ stw::scl::C_SclString C_OscDataLoggerJobFiler::mh_LocalLogTriggerTypeToString(
    case C_OscDataLoggerJobProperties::eLLT_INTERVAL:
       c_Retval = "interval";
       break;
+   case C_OscDataLoggerJobProperties::eLLT_ON_RECEIVE:
+      c_Retval = "on-receive";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -869,6 +987,10 @@ int32_t C_OscDataLoggerJobFiler::mh_StringToLocalLogTriggerType(const stw::scl::
    else if (orc_String == "interval")
    {
       ore_Type = C_OscDataLoggerJobProperties::eLLT_INTERVAL;
+   }
+   else if (orc_String == "on-receive")
+   {
+      ore_Type = C_OscDataLoggerJobProperties::eLLT_ON_RECEIVE;
    }
    else
    {

@@ -451,7 +451,8 @@ void C_UsFiler::mh_SaveColumns(C_SclIniFile & orc_Ini, const C_SclString & orc_S
 {
    const QString c_CountId = static_cast<QString>("%1_count").arg(orc_IdentifierBaseName.c_str());
 
-   orc_Ini.WriteInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(), orc_Columns.size());
+   orc_Ini.WriteInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(),
+                        static_cast<int32_t>(orc_Columns.size()));
    for (uint32_t u32_ItCol = 0UL; u32_ItCol < orc_Columns.size(); ++u32_ItCol)
    {
       const QString c_ItemId = static_cast<QString>("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(u32_ItCol);

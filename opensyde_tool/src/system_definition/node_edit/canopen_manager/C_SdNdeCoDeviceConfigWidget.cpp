@@ -562,19 +562,19 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
    disconnect(this->mpc_Ui->pc_ComboBoxFactorySettings,
               static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   disconnect(this->mpc_Ui->pc_CheckBoxSameAsOpensyde, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxSameAsOpensyde, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_OnSameAsOpensydeNodeIdChanged);
-   disconnect(this->mpc_Ui->pc_CheckBoxConsumerTimeAuto, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxConsumerTimeAuto, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_OnConsumerTimeAutoChanged);
-   disconnect(this->mpc_Ui->pc_CheckBoxOptionalDevice, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxOptionalDevice, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   disconnect(this->mpc_Ui->pc_CheckBoxNoInitialization, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxNoInitialization, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   disconnect(this->mpc_Ui->pc_CheckBoxFactorySettings, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxFactorySettings, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   disconnect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   disconnect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatConsuming, &QCheckBox::stateChanged, this,
+   disconnect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatConsuming, &QCheckBox::checkStateChanged, this,
               &C_SdNdeCoDeviceConfigWidget::m_OnHeartbeatConsumingEnableChanged);
 
    tgl_assert(pc_CanOpenDeviceInfo != NULL);
@@ -757,19 +757,19 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
    connect(this->mpc_Ui->pc_ComboBoxFactorySettings,
            static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   connect(this->mpc_Ui->pc_CheckBoxSameAsOpensyde, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxSameAsOpensyde, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_OnSameAsOpensydeNodeIdChanged);
-   connect(this->mpc_Ui->pc_CheckBoxConsumerTimeAuto, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxConsumerTimeAuto, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_OnConsumerTimeAutoChanged);
-   connect(this->mpc_Ui->pc_CheckBoxOptionalDevice, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxOptionalDevice, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   connect(this->mpc_Ui->pc_CheckBoxNoInitialization, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxNoInitialization, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   connect(this->mpc_Ui->pc_CheckBoxFactorySettings, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxFactorySettings, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   connect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_SaveChanges);
-   connect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatConsuming, &QCheckBox::stateChanged, this,
+   connect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatConsuming, &QCheckBox::checkStateChanged, this,
            &C_SdNdeCoDeviceConfigWidget::m_OnHeartbeatConsumingEnableChanged);
 }
 

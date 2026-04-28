@@ -71,7 +71,7 @@ void C_CamProMessageData::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_IsRtr, sizeof(this->q_IsRtr), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->u32_Id, sizeof(this->u32_Id), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->u16_Dlc, sizeof(this->u16_Dlc), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->c_Bytes[0UL], c_Bytes.size(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->c_Bytes[0UL], static_cast<uint32_t>(c_Bytes.size()), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_DoCyclicTrigger, sizeof(this->q_DoCyclicTrigger), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_SetAutoSupportMode, sizeof(this->q_SetAutoSupportMode),
                                        oru32_HashValue);

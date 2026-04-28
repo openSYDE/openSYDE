@@ -82,11 +82,12 @@ C_OscSuSequencesNodePsiFileStates::C_OscSuSequencesNodePsiFileStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscSuSequencesNodePemFileStates::C_OscSuSequencesNodePemFileStates(void) :
+C_OscSuSequencesNodeSecuritySettingsStates::C_OscSuSequencesNodeSecuritySettingsStates(void) :
    C_OscSuSequencesNodeFileStates(),
    e_PemFileExtracted(eSUSEQ_STATE_NOT_EXECUTED),
-   e_SecurityKeySent(eSUSEQ_STATE_NOT_EXECUTED),
-   e_SecurityFlagSent(eSUSEQ_STATE_NOT_EXECUTED),
+   e_SecureAuthenticationKeySent(eSUSEQ_STATE_NOT_EXECUTED),
+   e_SecureAuthenticationFlagSent(eSUSEQ_STATE_NOT_EXECUTED),
+   e_TrafficEncryptionFlagSent(eSUSEQ_STATE_NOT_EXECUTED),
    e_DebuggerFlagSent(eSUSEQ_STATE_NOT_EXECUTED)
 {
 }
@@ -106,7 +107,7 @@ C_OscSuSequencesNodeStwFlHexFileStates::C_OscSuSequencesNodeStwFlHexFileStates(v
 //----------------------------------------------------------------------------------------------------------------------
 C_OscSuSequencesNodeStates::C_OscSuSequencesNodeStates(void) :
    q_Timeout(false),
-   q_AuthenticationError(false),
+   q_SecurityAccessError(false),
    q_CouldNotReachedDueToRoutingError(false),
    q_RoutingNodeError(false)
 {
@@ -119,8 +120,10 @@ C_OscSuSequencesNodeStates::C_OscSuSequencesNodeStates(void) :
 C_OscSuSequencesNodeConnectStates::C_OscSuSequencesNodeConnectStates(void) :
    C_OscSuSequencesNodeStates(),
    e_InformationRead(eSUSEQ_STATE_NOT_EXECUTED),
-   q_AuthenticationNecessarySet(false),
-   q_AuthenticationNecessary(false)
+   q_SecurityOptionsActiveSet(false),
+   q_AuthenticationNecessary(false),
+   q_TrafficEncryptionNecessary(false),
+   q_DebuggerEnabled(false)
 {
 }
 

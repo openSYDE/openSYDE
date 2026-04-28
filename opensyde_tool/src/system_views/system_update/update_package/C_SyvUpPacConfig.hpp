@@ -51,8 +51,9 @@ public:
 
    QString c_PemFilePath;
 
-   stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecureAuthentication e_StateSecureAuthentication;
    stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateTrafficEncryption e_StateTrafficEncryption;
 };
 
 class C_SyvUpPacConfig

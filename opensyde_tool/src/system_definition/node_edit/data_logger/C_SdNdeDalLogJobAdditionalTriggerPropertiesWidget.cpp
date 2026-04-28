@@ -23,6 +23,8 @@
 #include "ui_C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget.h"
 #include "C_OgeWiUtil.hpp"
 #include "C_SdNdeDalLogJobAdditionalTriggerDialog.hpp"
+#include "C_SyvDaPeDataElementBrowse.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -55,16 +57,23 @@ using namespace stw::opensyde_gui_elements;
 C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget(
    QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mu32_NodeIndex(0UL),
-   mu32_DataLoggerJobIndex(0UL),
    mpc_Ui(new Ui::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget),
-   me_ConnectState(eCS_DISCONNECTED)
+   me_ConnectState(eCS_DISCONNECTED),
+   mu32_NodeIndex(0UL),
+   mu32_DataLoggerJobIndex(0UL)
+
 {
    this->mpc_Ui->setupUi(this);
+
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDataElement, "NoRightBorder", true);
+   this->mpc_Ui->pc_LineEditDataElement->setReadOnly(true);
 
    this->InitStaticNames();
    this->m_InitSupportedOperations();
    this->m_InitSupportedOperationsComboBox();
+
+   connect(this->mpc_Ui->pc_PushButtonDataElement, &QPushButton::clicked, this,
+           &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_BrowseDataElement);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,7 +104,10 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save()
          this->mpc_Ui->pc_ChkBoxAdditionalTrigger->isChecked();
       c_NewValues.c_ElementId = m_GetSelectedDataElement();
       c_NewValues.c_Operation = m_GetOperationForCore().toStdString().c_str();
+
+      // Apply threshold value
       m_ApplyContentValue(c_NewValues.c_Threshold);
+
       C_PuiSdHandler::h_GetInstance()->SetDataLoggerAdditionalTriggerProperties(mu32_NodeIndex,
                                                                                 mu32_DataLoggerJobIndex,
                                                                                 c_NewValues);
@@ -142,6 +154,8 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::InitStaticNames() const
    this->mpc_Ui->pc_LabelExpertView->setText(C_GtGetText::h_GetText("Expert View"));
    this->mpc_Ui->pc_LabelCondition->setText(C_GtGetText::h_GetText("Condition"));
    this->mpc_Ui->pc_PubEdit->setText(C_GtGetText::h_GetText("Edit"));
+   this->mpc_Ui->pc_PushButtonDataElement->setText(C_GtGetText::h_GetText(""));
+   this->mpc_Ui->pc_LineEditDataElement->setText(C_GtGetText::h_GetText(""));
 
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PubEdit, "Edit_Hyperlink", true);
    this->mpc_Ui->pc_PubEdit->setCursor(Qt::PointingHandCursor);
@@ -167,13 +181,13 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::SetNodeDataLoggerJob(con
    {
       this->me_ConnectState = eCS_CONNECTED;
       this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOnMsgTransmission.svg");
-      if (rc_Expert.c_TriggerConfiguration.IsEmpty() || (rc_Expert.c_TriggerConfiguration == " "))
+      if ((rc_Expert.c_TriggerConfiguration.IsEmpty() == true) || (rc_Expert.c_TriggerConfiguration == " "))
       {
          this->mpc_Ui->pc_LabelConditionExp->setText("Empty condition");
       }
       else
       {
-         this->mpc_Ui->pc_LabelConditionExp->setText(rc_Expert.c_TriggerConfiguration.c_str());
+         m_SetExpertTriggerCondition();
       }
       this->mpc_Ui->pc_WidgetCondition->setVisible(true);
       this->mpc_Ui->pc_DataWidget->setVisible(false);
@@ -206,13 +220,12 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Reload()
       //Set content first
       this->mpc_Ui->pc_ChkBoxAdditionalTrigger->setChecked(
          pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.q_Enable);
-      m_InitDataElements(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_ElementId);
+      m_InitDataElement(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_ElementId);
       m_SetOperation(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_Operation.c_str());
       m_InitThreshold(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_ElementId,
                       pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_Threshold);
       m_InitUnit(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_ElementId);
-      //Handle enabled/disabled second
-      m_HandleCheckboxEnabledState();
+
       m_HandleOperationEnabledState(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.q_Enable);
       m_HandleEditFieldsEnabledState(pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.q_Enable);
    }
@@ -221,18 +234,30 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Reload()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Handle checkbox enabled state
+/*! \brief   Overwritten resize event slot
+
+   \param[in,out]   opc_Event   Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_HandleCheckboxEnabledState() const
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   bool q_Enabled = false;
+   const auto & rc_Expert =
+      C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                        mu32_DataLoggerJobIndex)->c_Properties.
+      c_AdditionalTriggerProperties.c_ExpertMode;
 
-   if (m_CheckSelectableDataElementAvailable())
+   if (rc_Expert.q_Enable == true)
    {
-      q_Enabled = true;
+      if ((rc_Expert.c_TriggerConfiguration.IsEmpty() == true) || (rc_Expert.c_TriggerConfiguration == " "))
+      {
+         this->mpc_Ui->pc_LabelConditionExp->setText("Empty condition");
+      }
+      else
+      {
+         m_SetExpertTriggerCondition();
+      }
    }
-   this->mpc_Ui->pc_ChkBoxAdditionalTrigger->setEnabled(q_Enabled);
+   QWidget::resizeEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -251,6 +276,7 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_HandleOperationEnabled
    {
       q_Enabled = true;
    }
+
    this->mpc_Ui->pc_ComboBoxOperation->setEnabled(q_Enabled);
 }
 
@@ -262,9 +288,10 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_HandleOperationEnabled
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_HandleEditFieldsEnabledState(const bool oq_Enabled) const
 {
-   this->mpc_Ui->pc_ComboBoxDataElement->setEnabled(oq_Enabled);
+   this->mpc_Ui->pc_LineEditDataElement->setEnabled(oq_Enabled);
+   this->mpc_Ui->pc_PushButtonDataElement->setEnabled(oq_Enabled);
    this->mpc_Ui->pc_WidgetThreshold->setEnabled(oq_Enabled);
-   this->mpc_Ui->pc_LineEditStringEdit->setEnabled(oq_Enabled);
+   this->mpc_Ui->pc_LineEditThreshold->setEnabled(oq_Enabled);
    this->mpc_Ui->pc_PubEdit->setEnabled(oq_Enabled);
 }
 
@@ -309,68 +336,30 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_InitSupportedOperation
    \param[in]  orc_Id   Id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_InitDataElements(
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_InitDataElement(
    const C_OscNodeDataPoolListElementOptArrayId & orc_Id)
-{
-   m_InitDataElementsMap();
-   m_InitComboBoxFromDataElementsMap(orc_Id);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Init data elements map
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_InitDataElementsMap()
 {
    const C_OscDataLoggerJob * const pc_DataLoggerJob = C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(
       this->mu32_NodeIndex,
       this->mu32_DataLoggerJobIndex);
 
-   this->mc_MapDataElement.clear();
    if (pc_DataLoggerJob != NULL)
    {
-      for (uint32_t u32_ItEl = 0UL; u32_ItEl < pc_DataLoggerJob->c_ConfiguredDataElements.size(); ++u32_ItEl)
+      const C_OscNodeDataPoolListElementOptArrayOptValidId & rc_ElementId =
+         pc_DataLoggerJob->c_Properties.c_AdditionalTriggerProperties.c_ElementId;
+
+      // Ensure the data element is valid / still exists
+      if ((orc_Id == rc_ElementId) && (rc_ElementId.GetIsValid()))
       {
-         const C_OscDataLoggerDataElementReference & rc_CurEl = pc_DataLoggerJob->c_ConfiguredDataElements[u32_ItEl];
-         if (mh_CheckDataElementUseableAsAdditionalTrigger(rc_CurEl.c_ConfiguredElementId))
-         {
-            const QString c_NewEntry = C_PuiSdUtil::h_GetNamespaceDatapoolElement(rc_CurEl.c_ConfiguredElementId);
-            this->mc_MapDataElement.insert(c_NewEntry, rc_CurEl.c_ConfiguredElementId);
-         }
+         const QString c_ElementName = C_PuiSdUtil::h_GetNamespaceDatapoolElement(orc_Id);
+         this->m_SetSelectedDataElement(c_ElementName, orc_Id);
       }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Init combo box from data elements map
-
-   \param[in]  orc_Id   Id
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_InitComboBoxFromDataElementsMap(
-   const C_OscNodeDataPoolListElementOptArrayId & orc_Id)
-{
-   bool q_FoundSelection = false;
-   uint32_t u32_AddedItems = 0UL;
-   uint32_t u32_SelectedIndex = 0UL;
-
-   this->mpc_Ui->pc_ComboBoxDataElement->clear();
-   for (QMap<QString, stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId>::ConstIterator c_It =
-           this->mc_MapDataElement.cbegin();
-        c_It != this->mc_MapDataElement.cend(); ++c_It)
-   {
-      this->mpc_Ui->pc_ComboBoxDataElement->addItem(c_It.key());
-      if (c_It.value() == orc_Id)
+      // data element with invalid Id (e.g. when a new log job is added or the trigger condition is cleared while
+      // switching from expert to simple view)
+      else
       {
-         q_FoundSelection = true;
-         u32_SelectedIndex = u32_AddedItems;
+         this->m_SetSelectedDataElement("", orc_Id);
       }
-      ++u32_AddedItems;
-   }
-
-   if (q_FoundSelection)
-   {
-      this->mpc_Ui->pc_ComboBoxDataElement->setCurrentIndex(u32_SelectedIndex);
    }
 }
 
@@ -392,14 +381,14 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_InitThreshold(
       if (pc_El->q_InterpretAsString)
       {
          this->mpc_Ui->pc_WidgetThreshold->setVisible(false);
-         this->mpc_Ui->pc_LineEditStringEdit->setVisible(true);
-         this->mpc_Ui->pc_LineEditStringEdit->setText(C_SdNdeDpContentUtil::h_ConvertToString(orc_Content));
-         this->mpc_Ui->pc_LineEditStringEdit->setMaxLength(static_cast<int32_t>(orc_Content.GetArraySize()) - 1);
+         this->mpc_Ui->pc_LineEditThreshold->setVisible(true);
+         this->mpc_Ui->pc_LineEditThreshold->setText(C_SdNdeDpContentUtil::h_ConvertToString(orc_Content));
+         this->mpc_Ui->pc_LineEditThreshold->setMaxLength(static_cast<int32_t>(orc_Content.GetArraySize()) - 1);
       }
       else
       {
          this->mpc_Ui->pc_WidgetThreshold->setVisible(true);
-         this->mpc_Ui->pc_LineEditStringEdit->setVisible(false);
+         this->mpc_Ui->pc_LineEditThreshold->setVisible(false);
          m_InitNonStringThreshold(*pc_El, orc_Content, orc_Id.GetArrayElementIndexOrZero());
       }
    }
@@ -452,28 +441,11 @@ const
    Selected data element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscNodeDataPoolListElementOptArrayId C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_GetSelectedDataElement()
+C_OscNodeDataPoolListElementOptArrayOptValidId C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::
+m_GetSelectedDataElement()
 const
 {
-   C_OscNodeDataPoolListElementOptArrayId c_Retval;
-
-   if (this->mpc_Ui->pc_ComboBoxDataElement->currentIndex() >= 0)
-   {
-      const uint32_t u32_Index = this->mpc_Ui->pc_ComboBoxDataElement->currentIndex();
-      uint32_t u32_AddedItems = 0UL;
-      for (QMap<QString, stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId>::ConstIterator c_It =
-              this->mc_MapDataElement.cbegin();
-           c_It != this->mc_MapDataElement.cend(); ++c_It)
-      {
-         if (u32_Index == u32_AddedItems)
-         {
-            c_Retval = c_It.value();
-         }
-         ++u32_AddedItems;
-      }
-   }
-
-   return c_Retval;
+   return this->mc_SelectedOptArrayId;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -485,15 +457,14 @@ const
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ApplyContentValue(C_OscNodeDataPoolContent & orc_Content)
 const
 {
-   if (m_CurrentElementIsString())
+   if (m_CurrentElementIsString() == true)
    {
       orc_Content = m_GetCurrentMinValue();
-      C_SdNdeDpContentUtil::h_SetString(this->mpc_Ui->pc_LineEditStringEdit->text(), orc_Content);
+      C_SdNdeDpContentUtil::h_SetString(this->mpc_Ui->pc_LineEditThreshold->text(), orc_Content);
    }
    else
    {
       const QVariant c_VariantValue = this->mpc_Ui->pc_WidgetThreshold->GetValue();
-
       tgl_assert(C_SdNdeDpContentUtil::h_SimpleConvertFromVariant(c_VariantValue, orc_Content) == C_NO_ERR);
    }
 }
@@ -523,34 +494,38 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_AdditionalTriggerEnabl
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged()
 {
-   const C_OscNodeDataPoolListElementOptArrayId c_NewId = m_GetSelectedDataElement();
-   const C_OscNodeDataPoolListElement * const pc_El =
-      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_NewId);
+   const C_OscNodeDataPoolListElementOptArrayOptValidId c_NewId = m_GetSelectedDataElement();
 
-   if (pc_El != NULL)
+   if (c_NewId.GetIsValid() == true)
    {
-      C_OscNodeDataPoolContent c_Tmp = pc_El->c_MinValue;
-      // set available initial value
-      C_OscNodeDataPoolContentUtil::h_SetValueInContent(0.0, c_Tmp);
-      if (pc_El->q_InterpretAsString == false)
+      const C_OscNodeDataPoolListElement * const pc_El =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_NewId);
+
+      if (pc_El != NULL)
       {
-         C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_ValueChangedTo;
-         // set value in range, leave initial value if in range
-         C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_El->c_MinValue,
-                                                               pc_El->c_MaxValue,
-                                                               c_Tmp,
-                                                               e_ValueChangedTo,
-                                                               C_OscNodeDataPoolContentUtil::eTO_ZERO);
+         C_OscNodeDataPoolContent c_Tmp = pc_El->c_MinValue;
+         // set available initial value
+         C_OscNodeDataPoolContentUtil::h_SetValueInContent(0.0, c_Tmp);
+         if (pc_El->q_InterpretAsString == false)
+         {
+            C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_ValueChangedTo;
+            // set value in range, leave initial value if in range
+            C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_El->c_MinValue,
+                                                                  pc_El->c_MaxValue,
+                                                                  c_Tmp,
+                                                                  e_ValueChangedTo,
+                                                                  C_OscNodeDataPoolContentUtil::eTO_ZERO);
+         }
+         else
+         {
+            m_SetOperation("==");
+         }
+         m_HandleOperationEnabledState(this->mpc_Ui->pc_ChkBoxAdditionalTrigger->isChecked());
+         m_InitThreshold(c_NewId, c_Tmp);
+         m_InitUnit(c_NewId);
       }
-      else
-      {
-         m_SetOperation("==");
-      }
-      m_HandleOperationEnabledState(this->mpc_Ui->pc_ChkBoxAdditionalTrigger->isChecked());
-      m_InitThreshold(c_NewId, c_Tmp);
-      m_InitUnit(c_NewId);
+      Save();
    }
-   Save();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -561,14 +536,24 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetOperation(const QString & orc_NewValue)
 {
+   bool q_Found = false;
+
    for (std::vector<std::pair<QString, QString> >::const_iterator c_It = this->mc_MapCoreOperationToUi.cbegin();
         c_It != this->mc_MapCoreOperationToUi.cend(); ++c_It)
    {
       if (c_It->first.compare(orc_NewValue) == 0)
       {
          this->mpc_Ui->pc_ComboBoxOperation->setCurrentIndex(this->mpc_Ui->pc_ComboBoxOperation->findText(c_It->second));
+
+         q_Found = true;
          break;
       }
+   }
+
+   // No matching operation found. Reset the combobox index.
+   if (!q_Found)
+   {
+      this->mpc_Ui->pc_ComboBoxOperation->setCurrentIndex(-1);
    }
 }
 
@@ -578,18 +563,19 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetOperation(const QSt
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DisconnectChangeTriggers() const
 {
-   disconnect(this->mpc_Ui->pc_ChkBoxAdditionalTrigger, &QCheckBox::stateChanged,
+   disconnect(this->mpc_Ui->pc_ChkBoxAdditionalTrigger, &QCheckBox::checkStateChanged,
               this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_AdditionalTriggerEnabledChanged);
    disconnect(this->mpc_Ui->pc_ComboBoxOperation,
               static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
               this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
-   disconnect(this->mpc_Ui->pc_ComboBoxDataElement,
-              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
-              this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged);
+   disconnect(this->mpc_Ui->pc_LineEditDataElement, &QLineEdit::textChanged, this,
+              &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged);
    disconnect(this->mpc_Ui->pc_WidgetThreshold, &C_OgeWiSpinBoxGroup::SigValueChanged,
               this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
+   disconnect(this->mpc_Ui->pc_LineEditThreshold, &QLineEdit::textChanged,
+              this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
    disconnect(this->mpc_Ui->pc_PbExpertView, &QPushButton::clicked, this,
-              &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetConnectDisconnectExpertView);
+              &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ToggleExpertView);
    disconnect(this->mpc_Ui->pc_PubEdit, &QPushButton::clicked, this,
               &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked);
 }
@@ -600,18 +586,19 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DisconnectChangeTrigge
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ReconnectChangeTriggers() const
 {
-   connect(this->mpc_Ui->pc_ChkBoxAdditionalTrigger, &QCheckBox::stateChanged,
+   connect(this->mpc_Ui->pc_ChkBoxAdditionalTrigger, &QCheckBox::checkStateChanged,
            this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_AdditionalTriggerEnabledChanged);
    connect(this->mpc_Ui->pc_ComboBoxOperation,
            static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
-   connect(this->mpc_Ui->pc_ComboBoxDataElement,
-           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
-           this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged);
+   connect(this->mpc_Ui->pc_LineEditDataElement, &QLineEdit::textChanged, this,
+           &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_DataElementChanged);
    connect(this->mpc_Ui->pc_WidgetThreshold, &C_OgeWiSpinBoxGroup::SigValueChanged,
            this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
+   connect(this->mpc_Ui->pc_LineEditThreshold, &QLineEdit::textChanged,
+           this, &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::Save);
    connect(this->mpc_Ui->pc_PbExpertView, &QPushButton::clicked, this,
-           &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetConnectDisconnectExpertView);
+           &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ToggleExpertView);
    connect(this->mpc_Ui->pc_PubEdit, &QPushButton::clicked, this,
            &C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked);
 }
@@ -665,7 +652,12 @@ bool C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::mh_CheckDataElementUseab
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_CheckSelectableDataElementAvailable() const
 {
-   const bool q_Retval = this->mpc_Ui->pc_ComboBoxDataElement->model()->rowCount() > 0;
+   bool q_Retval = false;
+
+   if (this->mpc_Ui->pc_LineEditDataElement->text().isEmpty() == false)
+   {
+      q_Retval = true;
+   }
 
    return q_Retval;
 }
@@ -683,14 +675,19 @@ bool C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_CheckSelectableDataEle
 bool C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_CurrentElementIsString() const
 {
    bool q_Retval = false;
-   const C_OscNodeDataPoolListElementOptArrayId c_NewId = m_GetSelectedDataElement();
-   const C_OscNodeDataPoolListElement * const pc_El =
-      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_NewId);
+   const C_OscNodeDataPoolListElementOptArrayOptValidId c_NewId = m_GetSelectedDataElement();
 
-   if (pc_El != NULL)
+   if (c_NewId.GetIsValid() == true)
    {
-      q_Retval = pc_El->q_InterpretAsString;
+      const C_OscNodeDataPoolListElement * const pc_El =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_NewId);
+
+      if (pc_El != NULL)
+      {
+         q_Retval = pc_El->q_InterpretAsString;
+      }
    }
+
    return q_Retval;
 }
 
@@ -704,13 +701,17 @@ bool C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_CurrentElementIsString
 C_OscNodeDataPoolContent C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_GetCurrentMinValue() const
 {
    C_OscNodeDataPoolContent c_Retval;
-   const C_OscNodeDataPoolListElementOptArrayId c_NewId = m_GetSelectedDataElement();
-   const C_OscNodeDataPoolListElement * const pc_El =
-      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_NewId);
+   const C_OscNodeDataPoolListElementOptArrayOptValidId c_NewId = m_GetSelectedDataElement();
 
-   if (pc_El != NULL)
+   if (c_NewId.GetIsValid() == true)
    {
-      c_Retval = pc_El->c_MinValue;
+      const C_OscNodeDataPoolListElement * const pc_El =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_NewId);
+
+      if (pc_El != NULL)
+      {
+         c_Retval = pc_El->c_MinValue;
+      }
    }
    return c_Retval;
 }
@@ -745,33 +746,71 @@ QString C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_GetOperationForCore
 /*! Handle push button Expert View press
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetConnectDisconnectExpertView()
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ToggleExpertView()
 {
+   // Switch from Simple view to Expert view
    if (this->me_ConnectState == eCS_DISCONNECTED)
+   {
+      this->me_ConnectState = eCS_CONNECTED;
+      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOnMsgTransmission.svg");
+
+      // copy simple condition to expert condition
+      m_ApplyTriggerConditionToExpertView();
+      m_SetExpertTriggerCondition();
+
+      this->mpc_Ui->pc_WidgetCondition->setVisible(true);
+      this->mpc_Ui->pc_DataWidget->setVisible(false);
+   }
+   // Switch from Expert view to Simple view
+   else
    {
       const auto & rc_Expert =
          C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
                                                            mu32_DataLoggerJobIndex)->c_Properties.
          c_AdditionalTriggerProperties.c_ExpertMode;
-      this->me_ConnectState = eCS_CONNECTED;
-      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOnMsgTransmission.svg");
-      if (rc_Expert.c_TriggerConfiguration.IsEmpty() || (rc_Expert.c_TriggerConfiguration == " "))
+
+      bool q_ToggleView = false;
+
+      // Empty expert condition. Direct switch to simple view
+      if ((rc_Expert.c_TriggerConfiguration.IsEmpty() == true) || (rc_Expert.c_TriggerConfiguration == " "))
       {
-         this->mpc_Ui->pc_LabelConditionExp->setText("Empty condition");
+         q_ToggleView = true;
       }
+      // Ask the user to confirm switching the view. This will delete the previously set simple trigger condition
       else
       {
-         this->mpc_Ui->pc_LabelConditionExp->setText(rc_Expert.c_TriggerConfiguration.c_str());
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+
+         // Show message
+         c_Message.SetHeading(C_GtGetText::h_GetText("Trigger Condition"));
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Are you sure you want to switch to the simple view? Current condition will be deleted."));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+         c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
+         c_Message.SetCustomMinHeight(180, 270);
+         e_ReturnMessageBox = c_Message.Execute();
+
+         // Delete simple condition
+         if (e_ReturnMessageBox == C_OgeWiCustomMessage::eOK)
+         {
+            // Reset GUI texts and combobox index
+            this->mpc_Ui->pc_LineEditDataElement->setText(C_GtGetText::h_GetText(""));
+            this->mpc_Ui->pc_LineEditThreshold->setText(C_GtGetText::h_GetText(""));
+            this->mpc_Ui->pc_ComboBoxOperation->setCurrentIndex(-1);
+            this->mc_SelectedOptArrayId.MarkInvalid();
+
+            q_ToggleView = true;
+         }
       }
-      this->mpc_Ui->pc_WidgetCondition->setVisible(true);
-      this->mpc_Ui->pc_DataWidget->setVisible(false);
-   }
-   else
-   {
-      this->me_ConnectState = eCS_DISCONNECTED;
-      this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOffMsgTransmission.svg");
-      this->mpc_Ui->pc_WidgetCondition->setVisible(false);
-      this->mpc_Ui->pc_DataWidget->setVisible(true);
+
+      if (q_ToggleView == true)
+      {
+         this->me_ConnectState = eCS_DISCONNECTED;
+         this->mpc_Ui->pc_PbExpertView->SetSvg("://images/ToggleOffMsgTransmission.svg");
+         this->mpc_Ui->pc_WidgetCondition->setVisible(false);
+         this->mpc_Ui->pc_DataWidget->setVisible(true);
+      }
    }
    this->mpc_Ui->pc_PbExpertView->update();
    this->Save();
@@ -802,11 +841,7 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked()
       Q_UNUSED(pc_AdditionalTriggerDialog)
       if (c_PopUpCatalog->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
-         const auto & rc_Expert =
-            C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
-                                                              mu32_DataLoggerJobIndex)->c_Properties.
-            c_AdditionalTriggerProperties.c_ExpertMode;
-         this->mpc_Ui->pc_LabelConditionExp->setText(rc_Expert.c_TriggerConfiguration.c_str());
+         m_SetExpertTriggerCondition();
       }
 
       if (c_PopUpCatalog != NULL)
@@ -814,5 +849,165 @@ void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_OnEditClicked()
          c_PopUpCatalog->HideOverlay();
          c_PopUpCatalog->deleteLater();
       }
+   } //lint !e429  //no memory leak because of the parent of pc_AdditionalTriggerDialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of browse button
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_BrowseDataElement(void)
+{
+   // Dialog opens up for data element selection
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+
+   // Single element selection only
+   C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, 0U, false, false, false, true,
+                                                                                 true, true, NULL, false,
+                                                                                 this->mu32_NodeIndex, true);
+
+   //Resize
+   c_New->SetSize(QSize(800, 800));
+
+   // Save the selected data elements to system definition
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      std::vector<C_PuiSvDbNodeDataPoolListElementId> c_DataElements = pc_Dialog->GetSelectedDataElements();
+
+      //Cursor
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+
+      // Data element was selected from the popup dialog
+      // Since it is single selection, only using the first item in the list of data elements i.e c_DataElements[0]
+      if (c_DataElements.size() > 0)
+      {
+         if (c_DataElements[0].GetIsValid() == true)
+         {
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->CheckAndHandleNewElement(
+                          c_DataElements[0]) == C_NO_ERR);
+
+            const C_OscNodeDataPoolListElementOptArrayId & rc_ConfiguredElementOptArrayId = c_DataElements[0];
+
+            const C_OscNodeDataPoolListElement * const pc_Element =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
+                  rc_ConfiguredElementOptArrayId.u32_NodeIndex,
+                  rc_ConfiguredElementOptArrayId.u32_DataPoolIndex,
+                  rc_ConfiguredElementOptArrayId.u32_ListIndex,
+                  rc_ConfiguredElementOptArrayId.u32_ElementIndex);
+
+            // QString c_TriggerCondition = this->mpc_Ui->pc_TextEditTriggerCondition->toPlainText();
+            if (pc_Element != NULL)
+            {
+               const QString c_ElementName =
+                  C_PuiSdUtil::h_GetNamespaceDatapoolElement(rc_ConfiguredElementOptArrayId);
+
+               this->m_SetSelectedDataElement(c_ElementName, rc_ConfiguredElementOptArrayId);
+            }
+         }
+      }
+
+      //Cursor
+      QApplication::restoreOverrideCursor();
    }
-} //lint !e429  //no memory leak because of the parent of pc_AdditionalTriggerDialog and the Qt memory management
+
+   if (c_New != NULL)
+   {
+      pc_Dialog->SaveUserSettings();
+      pc_Dialog->PrepareCleanUp();
+      c_New->HideOverlay();
+      c_New->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set the selected data element
+
+   \param[in]     orc_SelectedDataElement       Selected data element
+   \param[in]     orc_SelectedElementId         Selected element Id
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetSelectedDataElement(
+   const QString & orc_SelectedDataElement, const C_OscNodeDataPoolListElementOptArrayId & orc_SelectedElementId)
+{
+   this->mc_SelectedOptArrayId = orc_SelectedElementId;
+   this->mpc_Ui->pc_LineEditDataElement->setText(orc_SelectedDataElement);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy the simple trigger condition to expert condition
+
+   The context for this is mostly when the user toggles from simple to expert view.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_ApplyTriggerConditionToExpertView() const
+{
+   QString c_TriggerCondition("");
+   QString c_Threshold("");
+
+   // If all 3 elements of the condition are present
+   if ((this->mpc_Ui->pc_LineEditDataElement->text().isEmpty() == false) &&
+       (m_GetOperationForCore().isEmpty() == false))
+   {
+      // Combine all 3 elements of the simple trigger condition: data element, condition & threshold
+      if (m_CurrentElementIsString() == true)
+      {
+         c_Threshold = this->mpc_Ui->pc_LineEditThreshold->text();
+      }
+      else
+      {
+         c_Threshold = this->mpc_Ui->pc_WidgetThreshold->GetValue().toString();
+      }
+
+      c_TriggerCondition = static_cast<QString>(C_GtGetText::h_GetText("%1 %2 %3")).arg(
+         this->mpc_Ui->pc_LineEditDataElement->text(),
+         m_GetOperationForCore(),
+         c_Threshold);
+   }
+
+   // Save the expression
+   C_PuiSdHandler::h_GetInstance()->SetDataLoggerAdditionalTriggerExpertModeString(this->mu32_NodeIndex,
+                                                                                   this->mu32_DataLoggerJobIndex,
+                                                                                   c_TriggerCondition.toStdString());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets the expert trigger condition
+
+   if the condition is too long, it is trimmed and appended with ellipses (...)
+
+   NOTE: Node and data logger job indexes must be valid (mu32_NodeIndex, mu32_DataLoggerJobIndex)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget::m_SetExpertTriggerCondition() const
+{
+   const auto & rc_Expert =
+      C_PuiSdHandler::h_GetInstance()->GetDataLoggerJob(mu32_NodeIndex,
+                                                        mu32_DataLoggerJobIndex)->c_Properties.
+      c_AdditionalTriggerProperties.c_ExpertMode;
+
+   // Empty expert condition
+   if ((rc_Expert.c_TriggerConfiguration.IsEmpty() == true) || (rc_Expert.c_TriggerConfiguration == " "))
+   {
+      this->mpc_Ui->pc_LabelConditionExp->setText("Empty condition");
+   }
+   // Handle long strings (adding  ellipses (...) at the end)
+   else
+   {
+      const QString c_OriginalText = rc_Expert.c_TriggerConfiguration.c_str();
+      const QFontMetrics c_FontMetrics(this->mpc_Ui->pc_LabelConditionExp->font());
+      const QString c_ElidedText = c_FontMetrics.elidedText(c_OriginalText, Qt::ElideRight,
+                                                            this->mpc_Ui->pc_LabelConditionExp->width());
+      this->mpc_Ui->pc_LabelConditionExp->setText(c_ElidedText);
+
+      if (c_ElidedText != c_OriginalText)
+      {
+         this->mpc_Ui->pc_LabelConditionExp->SetToolTipInformation(C_GtGetText::h_GetText(""), c_OriginalText);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelConditionExp->SetToolTipInformation(C_GtGetText::h_GetText(""), C_GtGetText::h_GetText(
+                                                                      ""));
+      }
+   }
+}

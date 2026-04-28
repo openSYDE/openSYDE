@@ -185,7 +185,7 @@ void C_SdNdeDbAddNewProject::SetTspPath(const QString & orc_New)
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_SdNdeDbAddNewProject::GetTspApplicationCount(void) const
 {
-   return this->mc_Package.c_Applications.size();
+   return static_cast<uint32_t>(this->mc_Package.c_Applications.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -341,7 +341,7 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
    this->mu32_ItParamFile = 0UL;
    this->mu32_ItPemFile = 0UL;
    this->mc_FileSizeInformation.Reset();
-   this->mc_FileSizeInformation.ReserveSpace(orc_Order.size());
+   this->mc_FileSizeInformation.ReserveSpace(static_cast<uint32_t>(orc_Order.size()));
    //Search for matching value in order
    for (uint32_t u32_ItOrder = 0; u32_ItOrder < orc_Order.size(); ++u32_ItOrder)
    {
@@ -619,8 +619,9 @@ void C_SyvUpInformationWidget::m_UpdateTime(void) const
    const uint64_t u64_ElapsedMin = (u64_ElapsedMs / 60000ULL) % 60ULL;
    const uint64_t u64_ElapsedHours = u64_ElapsedMs / 3600000ULL;
 
-   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedHours, 2, 10, QChar('0')).
-                          arg(u64_ElapsedMin, 2, 10, QChar('0')).arg(u64_ElapsedSeconds, 2, 10, QChar('0'));
+   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedHours, 2, 10, static_cast<QChar>('0')).
+                          arg(u64_ElapsedMin, 2, 10, static_cast<QChar>('0')).arg(u64_ElapsedSeconds, 2, 10,
+                                                                                  static_cast<QChar>('0'));
 
    this->mpc_Ui->pc_WidgetUpdateSummary->SetElapsedTime(c_Time);
    this->mpc_Ui->pc_WidgetUpdateSummarySmall->SetElapsedTime(c_Time);

@@ -47,7 +47,7 @@ public:
 
    // Extended specific information
    uint8_t u8_SubNodeId;
-   bool q_SecurityActivated;
+   bool q_SecurityActivated; //security protocol feature is active
    bool q_ExtendedInfoValid;
 };
 

@@ -20,6 +20,8 @@
 #include "C_OscNodeApplication.hpp"
 #include "C_OscCanProtocol.hpp"
 #include "C_OscHalcConfig.hpp"
+#include "C_OscDataLoggerJob.hpp"
+#include "C_OscXappProperties.hpp"
 #include "C_OscCanMessageUniqueId.hpp"
 #include "C_OscCanOpenManagerInfo.hpp"
 
@@ -79,6 +81,7 @@ public:
 
    void CalcHash(uint32_t & oru32_HashValue) const;
 
+   std::vector<C_OscNodeApplication> GetHexApplications(void) const;
    int32_t GetDataPoolIndex(const C_OscNodeDataPool::E_Type oe_DataPoolType,
                             const uint32_t ou32_DataPoolTypeIndex) const;
    int32_t GetDataPoolTypeIndex(const uint32_t ou32_DataPoolIndex) const;
@@ -113,11 +116,11 @@ public:
                               bool & orq_InvalidMaxTxSignalCount, bool & orq_InvalidCoRxPdoCount,
                               bool & orq_InvalidCoTxPdoCount, bool & orq_InvalidMinSignalCount) const;
 
-   void CheckErrorDataPoolNumListsAndElements(const uint32_t ou32_DataPoolIndex,
-                                              bool & orq_InvalidNumberOfListsOrElements) const;
+   void CheckErrorDataPoolNumListsAndElements(const uint32_t ou32_DataPoolIndex, bool & orq_TooFewListsOrElements,
+                                              bool & orq_TooManyListsOrElements) const;
    void CheckErrorDataPool(const uint32_t ou32_DataPoolIndex, bool * const opq_NameConflict,
                            bool * const opq_NameInvalid, bool * const opq_IsErrorInListOrMessage,
-                           bool * const opq_InvalidNumberOfListsOrElements,
+                           bool * const opq_TooFewListsOrElements, bool * const opq_TooManyListsOrElements,
                            std::vector<uint32_t> * const opc_InvalidListIndices) const;
    void CheckMessageId(const uint32_t ou32_InterfaceIndex, const C_OscCanMessageUniqueId & orc_MessageId,
                        bool & orq_Valid, const C_OscCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
@@ -135,7 +138,11 @@ public:
    void ReCalcCanProtocolDataPoolIndices(void);
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const;
+   bool IsDiagnosisAvailable(const C_OscSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
+   uint32_t CountAllLocalMessages(void) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    C_OscNodeDataPoolListElement * GetDataPoolListElement(const uint32_t ou32_DataPoolIndex,
                                                          const uint32_t ou32_ListIndex,
@@ -161,6 +168,8 @@ public:
    C_OscHalcConfig c_HalcConfig;                                 ///< Optional HALC configuration for this node
    std::map<uint8_t, C_OscCanOpenManagerInfo> c_CanOpenManagers; ///< CANopen managers grouped by their
    ///< according CAN interface ID
+   std::vector<C_OscDataLoggerJob> c_DataLoggerJobs; ///< Data logger jobs
+   C_OscXappProperties c_XappProperties;             ///< X-App properties
 
    //constraints imposed by openSYDE protocol:
    static const uint32_t hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE = 32U;
@@ -188,6 +197,7 @@ private:
                                                  const C_OscCanProtocol::E_Type oe_ComProtocol,
                                                  bool & orq_InvalidMaxSignalCount, bool & orq_InvalidCoPdoCount,
                                                  bool & orq_InvalidMinSignalCount);
+   bool m_CheckErrorTooFewElements(const uint32_t ou32_DataPoolIndex) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

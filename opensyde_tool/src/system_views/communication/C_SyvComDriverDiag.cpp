@@ -357,6 +357,9 @@ int32_t C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
    orc_FailedNodesElementNumber.clear();
    orc_NodesElementNumber.clear();
 
+   //preset: assume cyclic transmissions supported:
+   (void)std::memset(&this->mc_CyclicTransmissionsSupported[0], 1U, this->mc_CyclicTransmissionsSupported.size());
+
    if ((pc_View == NULL) || (this->mq_Initialized == false))
    {
       s32_Return = C_CONFIG;
@@ -369,39 +372,82 @@ int32_t C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
       {
          // Get the original active node index
          const uint32_t u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNodeCounter];
-         uint16_t u16_RateMs;
-         u16_RateMs = pc_View->GetUpdateRateFast();
-         s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(0, u16_RateMs);
-         if (s32_Return == C_NO_ERR)
+
+         //If encryption is active and connected to the node via CAN then do not set up and request cyclic
+         // transmissions.
+         //In a routing scenario the connection via CAN applies to the "last hop", not the client side interface.
+         const C_OscProtocolSecuritySubLayer * const pc_SslConfig = C_OscProtocolSecuritySubLayer::h_GetConfigByNodeId(
+            this->mc_ServerIds[u32_ActiveNode]);
+         tgl_assert(pc_SslConfig != NULL);
+
+         if ((pc_SslConfig != NULL) && (pc_SslConfig->GetEncryptionIsActive() == true))
          {
-            u16_RateMs = pc_View->GetUpdateRateMedium();
-            s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(1, u16_RateMs);
+            C_OscSystemBus::E_Type e_InterfaceType;
+            //encryption is active; is the last routing hop via CAN?
+            const std::vector<C_OscRoutingRoutePoint> & rc_RoutePoints =
+               this->mc_Routes[u32_ActiveNode].c_VecRoutePoints;
+
+            if (rc_RoutePoints.size() == 0)
+            {
+               tgl_assert(this->mpc_SysDef != NULL);
+               e_InterfaceType = this->mpc_SysDef->c_Buses[this->mu32_ActiveBusIndex].e_Type;
+            }
+            else
+            {
+               // Check the last routing point. The out interface type is connected to the bus which is connected to the
+               // target
+               e_InterfaceType = rc_RoutePoints.back().e_OutInterfaceType;
+            }
+
+            if (e_InterfaceType == C_OscSystemBus::eCAN)
+            {
+               C_SclString c_LogText;
+               mc_CyclicTransmissionsSupported[u32_ActiveNode] = 0U;
+
+               c_LogText.PrintFormatted("Not requesting cyclic transmissions for node \"%s\" (%d.%d). "
+                                        "It is connected via CAN and encryption is active. This is not supported.",
+                                        m_GetActiveNodeName(u32_ActiveNode).c_str(),
+                                        static_cast<int16_t>(mc_ServerIds[u32_ActiveNode].u8_BusIdentifier),
+                                        static_cast<int16_t>(mc_ServerIds[u32_ActiveNode].u8_NodeIdentifier));
+               osc_write_log_info("Asynchronous communication", c_LogText.c_str());
+            }
          }
 
-         if (s32_Return == C_NO_ERR)
+         if (mc_CyclicTransmissionsSupported[u32_ActiveNode] == 1U)
          {
-            u16_RateMs = pc_View->GetUpdateRateSlow();
-            s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(2, u16_RateMs);
-         }
+            uint16_t u16_RateMs = pc_View->GetUpdateRateFast();
+            s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(0, u16_RateMs);
+            if (s32_Return == C_NO_ERR)
+            {
+               u16_RateMs = pc_View->GetUpdateRateMedium();
+               s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(1, u16_RateMs);
+            }
 
-         if (s32_Return != C_NO_ERR)
-         {
-            osc_write_log_warning(
-               "Asynchronous communication",
-               static_cast<QString>("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
-                                    "C_RANGE    parameter out of range (checked by client-side function)\n"
-                                    "C_TIMEOUT  expected response not received within timeout\n"
-                                    "C_NOACT    could not send request (e.g. Tx buffer full)\n"
-                                    "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
-                                    "C_WARN     error response\n"
-                                    "C_RD_WR    malformed protocol response\n").arg(static_cast<QString>(
-                                                                                       m_GetActiveNodeName(
-                                                                                          u32_ActiveNode)
-                                                                                       .c_str())).arg(
-                  C_Uti::h_StwError(s32_Return)).toStdString().c_str());
-            s32_Return = C_COM;
-            orc_ErrorDetails += m_GetActiveNodeName(u32_ActiveNode).c_str();
-            break;
+            if (s32_Return == C_NO_ERR)
+            {
+               u16_RateMs = pc_View->GetUpdateRateSlow();
+               s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(2, u16_RateMs);
+            }
+
+            if (s32_Return != C_NO_ERR)
+            {
+               osc_write_log_warning(
+                  "Asynchronous communication",
+                  static_cast<QString>("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
+                                       "C_RANGE    parameter out of range (checked by client-side function)\n"
+                                       "C_TIMEOUT  expected response not received within timeout\n"
+                                       "C_NOACT    could not send request (e.g. Tx buffer full)\n"
+                                       "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
+                                       "C_WARN     error response\n"
+                                       "C_RD_WR    malformed protocol response\n").arg(static_cast<QString>(
+                                                                                          m_GetActiveNodeName(
+                                                                                             u32_ActiveNode)
+                                                                                          .c_str())).arg(
+                     C_Uti::h_StwError(s32_Return)).toStdString().c_str());
+               s32_Return = C_COM;
+               orc_ErrorDetails += m_GetActiveNodeName(u32_ActiveNode).c_str();
+               break;
+            }
          }
       }
    }
@@ -423,140 +469,153 @@ int32_t C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
          if (q_Found == true)
          {
             const uint32_t u32_ActiveNodeIndex = this->mc_ActiveDiagNodes[u32_ActiveDiagNodeIndex];
-            uint8_t u8_NegResponseCode = 0;
-            //check for valid value ranges (node index is checked in "GetActiveIndex" function)
-            tgl_assert(c_It.key().u32_DataPoolIndex <= 0xFFU);
-            tgl_assert(c_It.key().u32_ListIndex <= 0xFFFFU);
-            tgl_assert(c_It.key().u32_ElementIndex <= 0xFFFFU);
-
-            if ((c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_CYCLIC) ||
-                (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE))
+            //skip CAN nodes with encryption active:
+            if (mc_CyclicTransmissionsSupported[u32_ActiveNodeIndex] == 1U)
             {
-               const std::map<uint32_t, uint32_t>::iterator c_ItNodesElementNumber = orc_NodesElementNumber.find(
-                  c_It.key().u32_NodeIndex);
-               if (c_ItNodesElementNumber == orc_NodesElementNumber.end())
+               uint8_t u8_NegResponseCode = 0;
+               //check for valid value ranges (node index is checked in "GetActiveIndex" function)
+               tgl_assert(c_It.key().u32_DataPoolIndex <= 0xFFU);
+               tgl_assert(c_It.key().u32_ListIndex <= 0xFFFFU);
+               tgl_assert(c_It.key().u32_ElementIndex <= 0xFFFFU);
+
+               if ((c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_CYCLIC) ||
+                   (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE))
                {
-                  orc_NodesElementNumber[c_It.key().u32_NodeIndex] = 1U;
+                  const std::map<uint32_t, uint32_t>::iterator c_ItNodesElementNumber = orc_NodesElementNumber.find(
+                     c_It.key().u32_NodeIndex);
+                  if (c_ItNodesElementNumber == orc_NodesElementNumber.end())
+                  {
+                     orc_NodesElementNumber[c_It.key().u32_NodeIndex] = 1U;
+                  }
+                  else
+                  {
+                     c_ItNodesElementNumber->second = c_ItNodesElementNumber->second + 1;
+                  }
+               }
+
+               if (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_CYCLIC)
+               {
+                  s32_Return = this->mc_DiagProtocols[u32_ActiveNodeIndex]->DataPoolReadCyclic(
+                     static_cast<uint8_t>(c_It.key().u32_DataPoolIndex),
+                     static_cast<uint16_t>(c_It.key().u32_ListIndex),
+                     static_cast<uint16_t>(c_It.key().u32_ElementIndex), c_It.value().u8_RailIndex,
+                     &u8_NegResponseCode);
+               }
+               else if (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
+               {
+                  //convert the type dependent threshold to a uint32_t representation
+                  std::vector<uint8_t> c_Threshold;
+                  uint32_t u32_Threshold;
+                  c_It.value().c_ChangeThreshold.GetValueAsLittleEndianBlob(c_Threshold);
+                  //defensive measure: as element may only be up to 32bit the threshold may also not be > 32bit
+                  tgl_assert(c_Threshold.size() <= 4);
+                  //fill up to 4 bytes with zeroes
+                  c_Threshold.resize(4, 0U);
+                  //finally compose the uint32_t:
+                  u32_Threshold = c_Threshold[0] +
+                                  (static_cast<uint32_t>(c_Threshold[1]) << 8U) +
+                                  (static_cast<uint32_t>(c_Threshold[2]) << 16U) +
+                                  (static_cast<uint32_t>(c_Threshold[3]) << 24U);
+
+                  s32_Return = this->mc_DiagProtocols[u32_ActiveNodeIndex]->DataPoolReadChangeDriven(
+                     static_cast<uint8_t>(c_It.key().u32_DataPoolIndex),
+                     static_cast<uint16_t>(c_It.key().u32_ListIndex),
+                     static_cast<uint16_t>(c_It.key().u32_ElementIndex),
+                     c_It.value().u8_RailIndex, u32_Threshold, &u8_NegResponseCode);
                }
                else
                {
-                  c_ItNodesElementNumber->second = c_ItNodesElementNumber->second + 1;
+                  // No registration necessary
+                  s32_Return = C_NO_ERR;
                }
-            }
-
-            if (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_CYCLIC)
-            {
-               s32_Return = this->mc_DiagProtocols[u32_ActiveNodeIndex]->DataPoolReadCyclic(
-                  static_cast<uint8_t>(c_It.key().u32_DataPoolIndex), static_cast<uint16_t>(c_It.key().u32_ListIndex),
-                  static_cast<uint16_t>(c_It.key().u32_ElementIndex), c_It.value().u8_RailIndex, &u8_NegResponseCode);
-            }
-            else if (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
-            {
-               //convert the type dependent threshold to a uint32_t representation
-               std::vector<uint8_t> c_Threshold;
-               uint32_t u32_Threshold;
-               c_It.value().c_ChangeThreshold.GetValueAsLittleEndianBlob(c_Threshold);
-               //defensive measure: as element may only be up to 32bit the threshold may also not be > 32bit
-               tgl_assert(c_Threshold.size() <= 4);
-               //fill up to 4 bytes with zeroes
-               c_Threshold.resize(4, 0U);
-               //finally compose the uint32_t:
-               u32_Threshold = c_Threshold[0] +
-                               (static_cast<uint32_t>(c_Threshold[1]) << 8U) +
-                               (static_cast<uint32_t>(c_Threshold[2]) << 16U) +
-                               (static_cast<uint32_t>(c_Threshold[3]) << 24U);
-
-               s32_Return = this->mc_DiagProtocols[u32_ActiveNodeIndex]->DataPoolReadChangeDriven(
-                  static_cast<uint8_t>(c_It.key().u32_DataPoolIndex), static_cast<uint16_t>(c_It.key().u32_ListIndex),
-                  static_cast<uint16_t>(c_It.key().u32_ElementIndex),
-                  c_It.value().u8_RailIndex, u32_Threshold, &u8_NegResponseCode);
-            }
-            else
-            {
-               // No registration necessary
-               s32_Return = C_NO_ERR;
-            }
-            //Both services map to the same error
-            if (s32_Return != C_NO_ERR)
-            {
-               QString c_AdditionalInfo;
-               QString c_Details;
-               std::map<uint32_t, uint32_t>::iterator c_ItFailedNodesElementNumber;
-
-               switch (s32_Return)
+               //Both services map to the same error
+               if (s32_Return != C_NO_ERR)
                {
-               case C_RANGE:
-                  c_Details = C_GtGetText::h_GetText("Parameter out of range (checked by client-side function)");
-                  break;
-               case C_NOACT:
-                  c_Details = C_GtGetText::h_GetText("Could not send request (e.g. Tx buffer full)");
-                  break;
-               case C_CONFIG:
-                  c_Details = C_GtGetText::h_GetText("Pre-requisites not correct; e.g. driver not initialized");
-                  break;
-               case C_WARN:
-                  switch (u8_NegResponseCode)
+                  QString c_AdditionalInfo;
+                  QString c_Details;
+                  std::map<uint32_t, uint32_t>::iterator c_ItFailedNodesElementNumber;
+
+                  switch (s32_Return)
                   {
-                  case 0x13:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("Incorrect length of request");
+                  case C_RANGE:
+                     c_Details = C_GtGetText::h_GetText("Parameter out of range (checked by client-side function)");
                      break;
-                  case 0x22:
-                     c_AdditionalInfo = C_GtGetText::h_GetText(
-                        "Datapool element specified by data identifier cannot be transferred event driven (invalid data type)");
+                  case C_NOACT:
+                     c_Details = C_GtGetText::h_GetText("Could not send request (e.g. Tx buffer full)");
                      break;
-                  case 0x70:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("Too many transmissions already registered");
-
-                     c_ItFailedNodesElementNumber = orc_FailedNodesElementNumber.find(c_It.key().u32_NodeIndex);
-
-                     if (c_ItFailedNodesElementNumber == orc_FailedNodesElementNumber.end())
+                  case C_CONFIG:
+                     c_Details = C_GtGetText::h_GetText("Pre-requisites not correct; e.g. driver not initialized");
+                     break;
+                  case C_WARN:
+                     switch (u8_NegResponseCode)
                      {
-                        // Save the information about the number of the first element which failed
-                        orc_FailedNodesElementNumber[c_It.key().u32_NodeIndex] =
-                           orc_NodesElementNumber[c_It.key().u32_NodeIndex];
+                     case 0x13U:
+                        c_AdditionalInfo = C_GtGetText::h_GetText("Incorrect length of request");
+                        break;
+                     case 0x22U:
+                        c_AdditionalInfo = C_GtGetText::h_GetText(
+                           "Datapool element specified by data identifier cannot be transferred event driven (invalid data type)");
+                        break;
+                     case 0x70U:
+                        c_AdditionalInfo = C_GtGetText::h_GetText("Too many transmissions already registered");
+
+                        c_ItFailedNodesElementNumber = orc_FailedNodesElementNumber.find(c_It.key().u32_NodeIndex);
+
+                        if (c_ItFailedNodesElementNumber == orc_FailedNodesElementNumber.end())
+                        {
+                           // Save the information about the number of the first element which failed
+                           orc_FailedNodesElementNumber[c_It.key().u32_NodeIndex] =
+                              orc_NodesElementNumber[c_It.key().u32_NodeIndex];
+                        }
+                        break;
+                     case 0x31U:
+                        c_AdditionalInfo = C_GtGetText::h_GetText("Invalid transmission mode.\n"
+                                                                  "\n"
+                                                                  "When initiating transmission:\n"
+                                                                  "- Datapool element specified by data identifier is not available\n"
+                                                                  "- changeDrivenThreshold is zero\n"
+                                                                  "\n"
+                                                                  "When stopping transmission:\n"
+                                                                  "- Datapool element specified by data identifier is currently not transferred event driven");
+                        break;
+                     case 0x33U:
+                        c_AdditionalInfo = C_GtGetText::h_GetText("Required security level was not unlocked");
+                        break;
+                     case 0x14U:
+                        c_AdditionalInfo = C_GtGetText::h_GetText(
+                           "The total length of the event driven response messages would exceed the available buffer size");
+                        break;
+                     case 0x39U:
+                        //this should only happen if this implementation requests it even if connected via CAN with
+                        // encryption on
+                        c_AdditionalInfo = C_GtGetText::h_GetText("Secured data transmission not allowed");
+                        break;
+                     case 0x7FU:
+                        c_AdditionalInfo = C_GtGetText::h_GetText(
+                           "The requested service is not available in the session currently active");
+                        break;
+                     default:
+                        c_AdditionalInfo =
+                           static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(
+                                                                                                    u8_NegResponseCode,
+                                                                                                    16));
+                        break;
                      }
+                     c_Details = static_cast<QString>(C_GtGetText::h_GetText("Error response (%1)")).arg(
+                        c_AdditionalInfo);
                      break;
-                  case 0x31:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("Invalid transmission mode.\n"
-                                                               "\n"
-                                                               "When initiating transmission:\n"
-                                                               "- Datapool element specified by data identifier is not available\n"
-                                                               "- changeDrivenThreshold is zero\n"
-                                                               "\n"
-                                                               "When stopping transmission:\n"
-                                                               "- Datapool element specified by data identifier is currently not transferred event driven");
-                     break;
-                  case 0x33:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("Required security level was not unlocked");
-                     break;
-                  case 0x14:
-                     c_AdditionalInfo = C_GtGetText::h_GetText(
-                        "The total length of the event driven response messages would exceed the available buffer size");
-                     break;
-                  case 0x7F:
-                     c_AdditionalInfo = C_GtGetText::h_GetText(
-                        "The requested service is not available in the session currently active");
+                  case C_RD_WR:
+                     c_Details = C_GtGetText::h_GetText("Malformed protocol response");
                      break;
                   default:
-                     c_AdditionalInfo =
-                        static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(
-                                                                                                 u8_NegResponseCode,
-                                                                                                 16));
+                     c_Details = C_GtGetText::h_GetText("Unknown error");
                      break;
                   }
-                  c_Details = static_cast<QString>(C_GtGetText::h_GetText("Error response (%1)")).arg(c_AdditionalInfo);
-                  break;
-               case C_RD_WR:
-                  c_Details = C_GtGetText::h_GetText("Malformed protocol response");
-                  break;
-               default:
-                  c_Details = C_GtGetText::h_GetText("Unknown error");
-                  break;
+                  orc_FailedIdErrorDetails.push_back(c_Details);
+                  orc_FailedIdRegisters.push_back(c_It.key());
+                  //Error can be ignored, user feedback is different
+                  s32_Return = C_NO_ERR;
                }
-               orc_FailedIdErrorDetails.push_back(c_Details);
-               orc_FailedIdRegisters.push_back(c_It.key());
-               //Error can be ignored, user feedback is different
-               s32_Return = C_NO_ERR;
             }
          }
       }
@@ -589,20 +648,24 @@ int32_t C_SyvComDriverDiag::StopCyclicTransmissions(void)
    }
    else
    {
-      uint32_t u32_DiagNode;
       //stop all transmissions
-      for (u32_DiagNode = 0U; u32_DiagNode < this->mc_ActiveDiagNodes.size(); u32_DiagNode++)
+      for (uint32_t u32_DiagNode = 0U; u32_DiagNode < this->mc_ActiveDiagNodes.size(); u32_DiagNode++)
       {
          // Get the original active node index
          const uint32_t u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNode];
-         const int32_t s32_Return2 = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolStopEventDriven();
-         if (s32_Return2 != C_NO_ERR)
+
+         // do not try to stop if we already have identified that it's not supported:
+         if (mc_CyclicTransmissionsSupported[u32_ActiveNode] == 1U)
          {
-            osc_write_log_warning("Asynchronous communication",
-                                  static_cast<QString>("Node \"%1\" - DataPoolStopEventDriven - warning: %2\n").
-                                  arg(static_cast<QString>(m_GetActiveNodeName(u32_ActiveNode).c_str())).
-                                  arg(C_Uti::h_StwError(s32_Return2)).toStdString().c_str());
-            s32_Return = C_COM;
+            const int32_t s32_Return2 = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolStopEventDriven();
+            if (s32_Return2 != C_NO_ERR)
+            {
+               osc_write_log_warning("Asynchronous communication",
+                                     static_cast<QString>("Node \"%1\" - DataPoolStopEventDriven - warning: %2\n").
+                                     arg(static_cast<QString>(m_GetActiveNodeName(u32_ActiveNode).c_str())).
+                                     arg(C_Uti::h_StwError(s32_Return2)).toStdString().c_str());
+               s32_Return = C_COM;
+            }
          }
       }
    }
@@ -1434,7 +1497,10 @@ bool C_SyvComDriverDiag::m_IsRoutingSpecificNecessary(const C_OscNode & orc_Node
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Prepares the routing for a KEFEX server
+/*! \brief   Prepares the routing for a specific server.
+
+    Currently no specific server supported. Was originally for KEFEX diagnostic server which we never implemented.
+    But we keep the interface to insert such. Therefore just an empty implementation here.
 
    \param[in]   ou32_ActiveNode                       Active node index of vector mc_ActiveNodes
    \param[in]   opc_Node                              Pointer to current node
@@ -1713,6 +1779,8 @@ int32_t C_SyvComDriverDiag::m_InitDiagProtocol(void)
       //Initialize protocol driver
       this->mc_DiagProtocols.resize(this->m_GetActiveNodeCount(), NULL);
       this->mc_OsyProtocols.resize(this->m_GetActiveNodeCount(), NULL);
+      //preset: assume cyclic transmission supported; otherwise this will be set when setting up cyclic transmissions
+      this->mc_CyclicTransmissionsSupported.resize(this->m_GetActiveNodeCount(), 1U);
 
       for (uint32_t u32_ItActiveNode = 0;
            (u32_ItActiveNode < this->mc_ActiveNodesIndexes.size()) && (s32_Retval == C_NO_ERR);
@@ -2191,13 +2259,13 @@ int32_t C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const uint32_t o
                                sizeof(c_ServerMetadata.au8_Version)) != 0)
                {
                   const QString c_VersionServer = static_cast<QString>("v%1.%2r%3").
-                                                  arg(c_ServerMetadata.au8_Version[0], 2, 10, QChar('0')).
-                                                  arg(c_ServerMetadata.au8_Version[1], 2, 10, QChar('0')).
-                                                  arg(c_ServerMetadata.au8_Version[2], 2, 10, QChar('0'));
+                                                  arg(c_ServerMetadata.au8_Version[0], 2, 10, static_cast<QChar>('0')).
+                                                  arg(c_ServerMetadata.au8_Version[1], 2, 10, static_cast<QChar>('0')).
+                                                  arg(c_ServerMetadata.au8_Version[2], 2, 10, static_cast<QChar>('0'));
                   const QString c_VersionClient = static_cast<QString>("v%1.%2r%3").
-                                                  arg(rc_Datapool.au8_Version[0], 2, 10, QChar('0')).
-                                                  arg(rc_Datapool.au8_Version[1], 2, 10, QChar('0')).
-                                                  arg(rc_Datapool.au8_Version[2], 2, 10, QChar('0'));
+                                                  arg(rc_Datapool.au8_Version[0], 2, 10, static_cast<QChar>('0')).
+                                                  arg(rc_Datapool.au8_Version[1], 2, 10, static_cast<QChar>('0')).
+                                                  arg(rc_Datapool.au8_Version[2], 2, 10, static_cast<QChar>('0'));
 
                   // Version does not match
                   c_ErrorReason = "The version of Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +

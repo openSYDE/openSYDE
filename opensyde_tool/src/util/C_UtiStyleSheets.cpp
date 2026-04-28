@@ -329,7 +329,7 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
 QColor C_UtiStyleSheets::h_GetStyleSheetColor(const QString & orc_Style)
 {
    const QString c_Category = "background-color: ";
-   const int32_t s32_Pos = orc_Style.indexOf(c_Category);
+   const int32_t s32_Pos = static_cast<int32_t>(orc_Style.indexOf(c_Category));
    QColor c_Color;
 
    c_Color.setNamedColor(orc_Style.mid(s32_Pos + c_Category.length(), 9));
@@ -500,17 +500,17 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
 void C_UtiStyleSheets::mh_SetStyleSheetColor(const QString & orc_ColorType, QString & orc_Style,
                                              const QColor & orc_Color)
 {
-   const int32_t s32_Pos = orc_Style.indexOf(orc_ColorType + ":");
+   const int64_t s64_Pos = static_cast<int64_t>(orc_Style.indexOf(orc_ColorType + ":"));
    QString c_StyleColor;
 
    c_StyleColor = orc_ColorType + ": " + orc_Color.name(QColor::HexArgb);
 
-   if (s32_Pos >= 0)
+   if (s64_Pos >= 0)
    {
       // search the semicolon of this part of the stylesheet
-      const int32_t s32_PosSemicolon = orc_Style.indexOf(";", s32_Pos);
-      orc_Style.remove(s32_Pos, s32_PosSemicolon - s32_Pos);
-      orc_Style.insert(s32_Pos, c_StyleColor);
+      const int64_t s64_PosSemicolon = orc_Style.indexOf(";", s64_Pos);
+      orc_Style.remove(s64_Pos, s64_PosSemicolon - s64_Pos);
+      orc_Style.insert(s64_Pos, c_StyleColor);
    }
    else
    {

@@ -65,6 +65,7 @@ protected:
 
    QString m_PrepareSpinBoxValue(const QString & orc_Text) const;
    QString m_ExtractSpinBoxValue(const QString & orc_Text) const;
+   QString m_GetSuffix(void) const;
 
 private:
    bool mq_IsUnsigned;

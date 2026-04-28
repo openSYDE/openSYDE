@@ -320,6 +320,12 @@ int32_t C_OscImportRamView::h_ImportDataPoolFromRamViewDefProject(const C_SclStr
                      }
                   }
                }
+
+               //RAMView projects have a clear logic: arrays of sint8 are generally interpreted as strings
+               rc_Element.q_InterpretAsString =
+                  ((rc_Element.GetType() ==
+                    C_OscNodeDataPoolContent::eSINT8) &&
+                   (rc_Element.GetArray() == true));
             }
             orc_DataPool.c_Lists.push_back(c_List);
          }
@@ -794,11 +800,11 @@ int32_t C_OscImportRamView::mh_LoadRamViewDefProject(const stw::scl::C_SclString
 
    if (s32_Return == C_NO_ERR)
    {
-      C_OscChecksummedIniFile * pc_IniFile;
+      C_OscUtilChecksummedIniFile * pc_IniFile;
       bool q_Return;
 
       //.def file format:
-      pc_IniFile = new C_OscChecksummedIniFile(orc_ProjectPath);
+      pc_IniFile = new C_OscUtilChecksummedIniFile(orc_ProjectPath);
       q_Return = pc_IniFile->CheckCheckSum();
       if (q_Return == false)
       {

@@ -27,7 +27,8 @@ using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw::scl::C_SclString C_OscSupDefinitionFiler::hc_PACKAGE_UPDATE_DEF = "service_update_package.syde_supdef";
-static const uint16_t mu16_FILE_VERSION = 2U;
+static const uint16_t mu16_FILE_VERSION_2 = 2U;
+static const stw::scl::C_SclString mc_FILE_VERSION_2_1 = "0x000102";
 // XML node names of service update package definition
 static const stw::scl::C_SclString mc_FILE_VERSION = "file-version";                // xml node
 static const stw::scl::C_SclString mc_BUS_INDEX = "bus-index-client";               // xml node
@@ -60,6 +61,7 @@ static const stw::scl::C_SclString mc_NODE_FILE_ATTR = "file";                  
    \param[in]  orc_Path             destination path
    \param[in]  orc_SupDefContent    content to write in service update package xml file
    \param[in]  orc_Files            Files
+   \param[in]  oq_UseMinorVersion1  Use minor version 1
 
    \return
    C_NO_ERR    success
@@ -68,7 +70,8 @@ static const stw::scl::C_SclString mc_NODE_FILE_ATTR = "file";                  
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscSupDefinitionFiler::h_CreateUpdatePackageDefFile(const stw::scl::C_SclString & orc_Path,
                                                               const C_OscSupDefinition & orc_SupDefContent,
-                                                              const std::vector<stw::scl::C_SclString> & orc_Files)
+                                                              const std::vector<stw::scl::C_SclString> & orc_Files,
+                                                              const bool oq_UseMinorVersion1)
 {
    const stw::scl::C_SclString c_FileName = TglFileIncludeTrailingDelimiter(orc_Path) + hc_PACKAGE_UPDATE_DEF;
    int32_t s32_Result;
@@ -81,7 +84,14 @@ int32_t C_OscSupDefinitionFiler::h_CreateUpdatePackageDefFile(const stw::scl::C_
 
    //File version
    tgl_assert(c_XmlParser.CreateAndSelectNodeChild(mc_FILE_VERSION) == mc_FILE_VERSION);
-   c_XmlParser.SetNodeContent(stw::scl::C_SclString::IntToStr(mu16_FILE_VERSION));
+   if (oq_UseMinorVersion1)
+   {
+      c_XmlParser.SetNodeContent(mc_FILE_VERSION_2_1);
+   }
+   else
+   {
+      c_XmlParser.SetNodeContent(stw::scl::C_SclString::IntToStr(mu16_FILE_VERSION_2));
+   }
    tgl_assert(c_XmlParser.SelectNodeParent() == mc_ROOT_NAME);
 
    mh_SaveNodes(c_XmlParser, orc_SupDefContent.c_Nodes, orc_Files);
@@ -156,7 +166,7 @@ int32_t C_OscSupDefinitionFiler::h_LoadUpdatePackageDefFile(const stw::scl::C_Sc
       tgl_assert(c_XmlParser.SelectRoot() == mc_ROOT_NAME); // we shall have a valid and
       // compatible update package
 
-      if (oru32_FileVersion == mu16_FILE_VERSION)
+      if ((oru32_FileVersion == mu16_FILE_VERSION_2) || (c_FileVersion == mc_FILE_VERSION_2_1))
       {
          // active bus index
          tgl_assert(c_XmlParser.SelectNodeChild(mc_BUS_INDEX) == mc_BUS_INDEX);
@@ -209,9 +219,7 @@ void C_OscSupDefinitionFiler::mh_SaveNodes(C_OscXmlParserBase & orc_XmlParser,
          if (c_CurrentNode.u8_Active == C_OscSupNodeDefinitionFiler::hu8_ACTIVE_NODE)
          {
             // if there are files to update for active node then list files
-            if ((c_CurrentNode.c_ApplicationFileNames.size() > 0) ||
-                (c_CurrentNode.c_NvmFileNames.size() > 0) ||
-                (c_CurrentNode.c_PemFile != ""))
+            if (c_CurrentNode.CheckUpdateNecessary())
             {
                //Update Position
                orc_XmlParser.SetAttributeUint32(mc_NODE_POSITION_ATTR, c_CurrentNode.u32_Position);

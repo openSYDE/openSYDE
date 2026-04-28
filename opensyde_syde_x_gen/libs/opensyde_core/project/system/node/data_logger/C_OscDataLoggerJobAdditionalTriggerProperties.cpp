@@ -38,6 +38,7 @@ using namespace stw::opensyde_core;
 C_OscDataLoggerJobAdditionalTriggerProperties::C_OscDataLoggerJobAdditionalTriggerProperties() :
    q_Enable(false)
 {
+   this->c_ElementId.MarkInvalid();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

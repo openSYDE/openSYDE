@@ -62,6 +62,7 @@ private:
    {
       eLLT_ON_CHANGE,
       eLLT_INTERVAL,
+      eLLT_ON_RECEIVE,
       eNUM_OF_LOG_TRIGGERS
    };
 

@@ -42,7 +42,7 @@ public:
    QString GetPassword(void) const;
    std::vector<stw::scl::C_SclString> GetPemFiles(void);
    bool GetOptionAddPemFiles(void) const;
-   bool GetOptionAddSecureAuthentification(void) const;
+   bool GetOptionAddSecureAuthentication(void) const;
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;

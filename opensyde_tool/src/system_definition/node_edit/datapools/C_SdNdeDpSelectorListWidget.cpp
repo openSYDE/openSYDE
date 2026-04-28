@@ -373,7 +373,7 @@ void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32_t ou32_DataPo
    //lint -e{429}  no memory leak because of the parent of pc_ItemWidget and the Qt memory management
    C_SdNdeDpSelectorItemWidget * const pc_ItemWidget = new C_SdNdeDpSelectorItemWidget(
       this->mq_UsageViewActive, this);
-   const int32_t s32_Index = this->mc_DpItems.size();
+   const int32_t s32_Index = static_cast<int32_t>(this->mc_DpItems.size());
    const int32_t s32_Number = s32_Index + 1;
 
    pc_ItemWidget->SetNumber(s32_Number);
@@ -752,7 +752,7 @@ void C_SdNdeDpSelectorListWidget::Paste(void)
             else
             {
                //Add at end
-               s32_LastIndex = this->mc_DpItems.size();
+               s32_LastIndex = static_cast<int32_t>(this->mc_DpItems.size());
             }
 
             this->m_AddNewDataPool(c_OscContent, c_UiContent, s32_LastIndex, true, false);
@@ -889,7 +889,7 @@ QSize C_SdNdeDpSelectorListWidget::sizeHint(void) const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SdNdeDpSelectorListWidget::GetItemCount(void) const
 {
-   return this->mc_DpItems.size();
+   return static_cast<int32_t>(this->mc_DpItems.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1438,7 +1438,7 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OscNodeDataPool & orc
                                                                 this->me_ProtocolType, oq_AllowNameAdaptation,
                                                                 oq_AllowDataAdaptation);
       // the new datapool will be at the end
-      s32_Row = this->mc_DpItems.size();
+      s32_Row = static_cast<int32_t>(this->mc_DpItems.size());
 
       if ((s32_Return == C_NO_ERR) &&
           (oq_SharedDatapoolSelected == true) &&
@@ -1482,7 +1482,7 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OscNodeDataPool & orc
                                                                    this->me_ProtocolType, oq_AllowNameAdaptation,
                                                                    oq_AllowDataAdaptation);
          // the new datapool will be at the end
-         s32_Row = this->mc_DpItems.size();
+         s32_Row = static_cast<int32_t>(this->mc_DpItems.size());
       }
    }
    else
@@ -2240,7 +2240,7 @@ void C_SdNdeDpSelectorListWidget::m_UpdateCounters(const bool oq_ForceRearrageIt
    this->ms32_ItemsPerViewPage = s32_RowsPerViewPage * s32_ItemsPerRow;
 
    // Calculate page count
-   s32_CountViewPages = this->mc_DpItems.size() / this->ms32_ItemsPerViewPage;
+   s32_CountViewPages = static_cast<int32_t>(this->mc_DpItems.size()) / this->ms32_ItemsPerViewPage;
 
    // correct rounding error
    if ((this->mc_DpItems.size() % this->ms32_ItemsPerViewPage) > 0)

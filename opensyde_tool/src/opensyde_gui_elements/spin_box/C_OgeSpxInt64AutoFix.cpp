@@ -76,7 +76,7 @@ int32_t C_OgeSpxInt64AutoFix::GetLineEditWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
 {
-   int32_t s32_Pos = orc_Input.length();
+   int32_t s32_Pos = static_cast<int32_t>(orc_Input.length());
 
    if (this->validate(orc_Input, s32_Pos) == QValidator::Intermediate)
    {
@@ -154,7 +154,7 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
 /*! \brief   Validate current input string
 
    \param[in,out]  orc_Input  Input string
-   \param[in,out]  ors32_Pos   Position
+   \param[in,out]  ors32_Pos  Position
 
    \return
    Invalid      Unusable
@@ -179,7 +179,14 @@ QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, int32_t & 
                                         static_cast<float64_t>(this->GetStepWidth());
             if (C_Uti::h_CheckFloatHasNoFractionPart(f64_Steps) == true)
             {
-               e_Retval = QValidator::Acceptable;
+               if ((this->m_GetSuffix().isEmpty() == false) && (orc_Input.endsWith(this->m_GetSuffix()) == false))
+               {
+                  e_Retval = QValidator::Intermediate;
+               }
+               else
+               {
+                  e_Retval = QValidator::Acceptable;
+               }
             }
             else
             {
@@ -202,7 +209,14 @@ QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, int32_t & 
                                         static_cast<float64_t>(this->GetStepWidth());
             if (C_Uti::h_CheckFloatHasNoFractionPart(f64_Steps) == true)
             {
-               e_Retval = QValidator::Acceptable;
+               if ((this->m_GetSuffix().isEmpty() == false) && (orc_Input.endsWith(this->m_GetSuffix()) == false))
+               {
+                  e_Retval = QValidator::Intermediate;
+               }
+               else
+               {
+                  e_Retval = QValidator::Acceptable;
+               }
             }
             else
             {

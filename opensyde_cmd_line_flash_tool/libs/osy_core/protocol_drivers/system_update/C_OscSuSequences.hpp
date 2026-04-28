@@ -73,13 +73,19 @@ public:
       ///optional PEM file (empty string for no PEM file)
       stw::scl::C_SclString c_PemFile;
 
-      /// Node configuration flags for security state
-      bool q_SendSecurityEnabledState;
-      bool q_SecurityEnabled;
+      /// Node configuration flags for secure authentication state
+      bool q_SendSecureAuthenticationEnabledState;
+      bool q_SecureAuthenticationEnabled;
+
+      /// Node configuration flags for secure encryption state
+      bool q_SendTrafficEncryptionEnabledState;
+      bool q_TrafficEncryptionEnabled;
 
       /// Node configuration flags for debugger state
       bool q_SendDebuggerEnabledState;
       bool q_DebuggerEnabled;
+
+      bool IsAnyActionRequired() const;
    };
 
    ///set of information used to identify one application
@@ -130,8 +136,8 @@ public:
       eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR,
       eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START,
       eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR,
-      eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START,
-      eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR,
+      eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_START,
+      eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_ERROR,
       eREAD_DEVICE_INFO_OSY_FINISHED,
       eREAD_DEVICE_INFO_XFL_START,
       eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR,
@@ -199,15 +205,19 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED,
 
-      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START,
-      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR,
-      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR,
-      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of
-                                                                            // flashloader
-      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_ENTER_SESSION_ERROR, //entering programming session was required and failed
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available
+                                                                                         // features of flashloader
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_FINISHED,
 
+      eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features
+                                                                                      // of flashloader
+      eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_FINISHED,
       eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START,
-      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of
                                                                             // flashloader
@@ -253,9 +263,10 @@ public:
    virtual int32_t GetUpdateStates(std::vector<C_OscSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes)
    const;
 
-   static void h_FillDoFlashWithPemStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                          const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
-                                          C_OscSuSequences::C_DoFlash & orc_DoFlash);
+   static void h_FillDoFlashWithSecurityOptions(
+      const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateAuthentication,
+      const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateEncryption,
+      const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger, C_OscSuSequences::C_DoFlash & orc_DoFlash);
    static void h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceInformation & orc_Info,
                                                       stw::scl::C_SclStringList & orc_Text);
    static void h_StwFlashloaderInformationToText(const C_XflDeviceInformation & orc_Info,
@@ -316,11 +327,12 @@ private:
                               std::vector<C_OscSuSequencesNodePsiFileStates> & orc_StatePsiFiles);
    int32_t m_WritePemOpenSydeFile(const stw::scl::C_SclString & orc_FileToWrite,
                                   const C_OscProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
-                                  bool & orq_SetProgrammingMode, C_OscSuSequencesNodePemFileStates & orc_StatePemFile);
+                                  bool & orq_SetProgrammingMode,
+                                  C_OscSuSequencesNodeSecuritySettingsStates & orc_StateSecuritySettings);
    int32_t m_WriteOpenSydeNodeStates(const C_OscSuSequences::C_DoFlash & orc_ApplicationsToWrite,
                                      const C_OscProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
                                      bool & orq_SetProgrammingMode,
-                                     C_OscSuSequencesNodePemFileStates & orc_StatePemFile);
+                                     C_OscSuSequencesNodeSecuritySettingsStates & orc_StateSecuritySettings);
 
    int32_t m_WriteFingerPrintOsy(void);
 

@@ -1528,7 +1528,7 @@ QString C_SdNdeDpContentUtil::h_CombineString(const std::vector<QString> & orc_I
    for (uint32_t u32_It = 0; u32_It < orc_Input.size(); ++u32_It)
    {
       c_Retval += orc_Input[u32_It];
-      if ((u32_It + 1) < orc_Input.size())
+      if ((u32_It + 1) < static_cast<uint32_t>(orc_Input.size()))
       {
          c_Retval += ";";
       }

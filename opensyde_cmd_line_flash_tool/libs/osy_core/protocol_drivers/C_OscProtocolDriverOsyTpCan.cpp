@@ -477,8 +477,9 @@ int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_ST
          C_SclString c_Tmp;
          //incorrect sequence: abort
          mc_RxService.e_Status = C_ServiceState::eIDLE;
-         c_Tmp.PrintFormatted("Consecutive frame with incorrect sequence number received. Expected: %i, Received: %i",
-                              mc_RxService.u8_SequenceNumber, orc_CanMessage.au8_Data[0] & 0x0FU);
+         c_Tmp.PrintFormatted("Consecutive frame with incorrect sequence number received. Expected: %u, Received: %u",
+                              static_cast<uint32_t>(mc_RxService.u8_SequenceNumber),
+                              orc_CanMessage.au8_Data[0] & 0x0FU);
          m_LogWarningWithHeader(c_Tmp.c_str(), TGL_UTIL_FUNC_ID);
          s32_Return = C_RANGE;
       }
@@ -738,10 +739,10 @@ int32_t C_OscProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberRes
          {
             //negative response detected
             q_NegativeResponseReceived = true;
-            //Node id was not set, node has security activated.
+            //Node id was not set, node has security feature activated.
             if (c_Response.au8_Data[3] == 0x22U)
             {
-               m_LogWarningWithHeader("Broadcast: Negative response received. Node has security activated.",
+               m_LogWarningWithHeader("Broadcast: Negative response received. Node has security feature activated.",
                                       TGL_UTIL_FUNC_ID);
             }
             else

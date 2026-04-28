@@ -16,7 +16,6 @@
 #include "stwerrors.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_CamProHandlerFiler.hpp"
-#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
@@ -120,7 +119,7 @@ int32_t C_CamProHandlerFiler::h_Load(C_CamProHandler & orc_Handler, C_OscXmlPars
 void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData> & orc_Messages,
                                           C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_Messages.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Messages.size()));
    for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
    {
       orc_XmlParser.CreateAndSelectNodeChild("message");
@@ -546,7 +545,7 @@ int32_t C_CamProHandlerFiler::h_LoadSettings(C_CamProHandler & orc_Handler, C_Os
 void C_CamProHandlerFiler::h_SaveFilters(const std::vector<C_CamProFilterData> & orc_Filters,
                                          C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_Filters.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Filters.size()));
    for (uint32_t u32_ItFilter = 0UL; u32_ItFilter < orc_Filters.size(); ++u32_ItFilter)
    {
       orc_XmlParser.CreateAndSelectNodeChild("filter");
@@ -569,7 +568,7 @@ void C_CamProHandlerFiler::h_SaveFilter(const C_CamProFilterData & orc_Filter, C
    orc_XmlParser.CreateNodeChild("name", orc_Filter.c_Name.toStdString().c_str());
    orc_XmlParser.CreateNodeChild("comment", orc_Filter.c_Comment.toStdString().c_str());
    orc_XmlParser.CreateAndSelectNodeChild("filter-items");
-   orc_XmlParser.SetAttributeUint32("length", orc_Filter.c_FilterItems.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Filter.c_FilterItems.size()));
 
    // filter items
    for (int32_t s32_ItFilterItem = 0UL; s32_ItFilterItem < orc_Filter.c_FilterItems.size(); ++s32_ItFilterItem)
@@ -749,7 +748,7 @@ int32_t C_CamProHandlerFiler::h_LoadFilter(C_CamProFilterData & orc_Filter, C_Os
       {
          C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected filter items count, expected: %u, got %i", u32_ExpectedSize,
-                              orc_Filter.c_FilterItems.size());
+                              static_cast<int32_t>(orc_Filter.c_FilterItems.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -841,7 +840,7 @@ int32_t C_CamProHandlerFiler::h_LoadFilterItem(C_CamProFilterItemData & orc_Filt
 void C_CamProHandlerFiler::h_SaveDatabases(const std::vector<C_CamProDatabaseData> & orc_Databases,
                                            C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_Databases.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Databases.size()));
    for (uint32_t u32_ItDatabase = 0UL; u32_ItDatabase < orc_Databases.size(); ++u32_ItDatabase)
    {
       orc_XmlParser.CreateAndSelectNodeChild("database");

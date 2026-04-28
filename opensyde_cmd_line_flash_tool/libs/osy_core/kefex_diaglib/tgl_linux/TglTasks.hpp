@@ -28,7 +28,7 @@ namespace tgl
 class C_TglCriticalSection
 {
 protected:
-   pthread_mutex_t mt_mutex; ///< synchronization object
+   pthread_mutex_t mu_Mutex; ///< synchronization object
 
 private:
    //this class can not be copied:
@@ -43,7 +43,6 @@ public:
    bool TryAcquire(void);
    void Release(void);
 };
-
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }

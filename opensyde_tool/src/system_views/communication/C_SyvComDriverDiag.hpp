@@ -148,12 +148,9 @@ private:
    C_SyvComPollingThreadDiag mc_PollingThread;
 
    std::vector<stw::opensyde_core::C_OscDiagProtocolBase *> mc_DiagProtocols; ///< Holds created
-                                                                              // instances
-   ///< of either openSYDE or
-   ///< KEFEX protocols.
-   std::vector<C_SyvComDataDealer *> mc_DataDealers; ///< Array of elements with
-                                                     // as many entries as we
-                                                     // have nodes.
+                                                                              // instances of openSYDE protocol
+
+   std::vector<C_SyvComDataDealer *> mc_DataDealers; ///< Array of elements with as many entries as we have active nodes
 
    std::vector<uint32_t> mc_ActiveDiagNodes; ///< Nodes which has diagnostic active. The other active
    // nodes are active for routing but not for diagnostic.
@@ -162,6 +159,9 @@ private:
    // part of at least one route
    std::set<uint32_t> mc_DiagNodesWithElements; ///< Nodes which has used datapool elements
    std::set<uint32_t> mc_DefectNodeIndices;     ///< Nodes which could not be reached on start
+
+   std::vector<uint8_t> mc_CyclicTransmissionsSupported; ///< 0/1 for each active node; set in SetUpCyclicTransmissions
+
    // Read metadata of all active nodes and its Datapools. First layer are the active
    // nodes, second layer are the Datapools
    std::vector<std::list<stw::opensyde_core::C_OscProtocolDriverOsy::C_DataPoolMetaData> > mc_ReadDatapoolMetadata;

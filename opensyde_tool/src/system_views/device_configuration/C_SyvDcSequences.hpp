@@ -183,7 +183,8 @@ private:
       std::vector<stw::opensyde_core::C_OscProtocolDriverOsyNode> & orc_UsedServerIds);
 
    int32_t m_ConfigureNodes(const bool oq_ViaCan,
-                            std::vector<stw::opensyde_core::C_OscProtocolDriverOsyNode> & orc_UsedServerIds);
+                            std::vector<stw::opensyde_core::C_OscProtocolDriverOsyNode> & orc_UsedServerIds,
+                            const bool oq_EnterPreProgrammingRequired = true);
 
    int32_t m_CheckConfOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfiguration)
    const;
@@ -228,7 +229,7 @@ private:
    std::vector<stw::opensyde_core::C_OscDcDeviceInformation> mc_DeviceInfoResult;
    // Result of ScanCanGetInfoFromOpenSydeDevices and ScanEthGetInfoFromOpenSydeDevices
    // Input of ConfCanOpenSydeDevices and ConfEthOpenSydeDevices
-   bool mq_SecurityFeatureUsed;
+   bool mq_SecurityFeatureUsed; //security protocol feature active?
    // Service execution result
    int32_t ms32_Result;
 

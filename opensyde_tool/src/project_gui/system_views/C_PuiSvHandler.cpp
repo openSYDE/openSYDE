@@ -219,7 +219,7 @@ const C_PuiSvData * C_PuiSvHandler::GetView(const uint32_t ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_PuiSvHandler::GetViewCount(void) const
 {
-   return this->mc_Views.size();
+   return static_cast<uint32_t>(this->mc_Views.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1420,10 +1420,11 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information states
 
-   \param[in]  ou32_ViewIndex    View index
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  oe_StateSecurity  Security state of node
-   \param[in]  oe_StateDebugger  Debugger state of node
+   \param[in]  ou32_ViewIndex                 View index
+   \param[in]  ou32_NodeIndex                 Node index
+   \param[in]  oe_StateSecureAuthentication   Secure updatestate of node
+   \param[in]  oe_StateDebugger               Debugger state of node
+   \param[in]  oe_StateTrafficEncryption      Traffic encryption state of node
 
    \return
    C_NO_ERR Operation success
@@ -1431,15 +1432,17 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::SetNodeUpdateInformationStates(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                                       const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                       const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
+                                                       const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateSecureAuthentication, const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
+                                                       const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateTrafficEncryption)
 {
    int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      s32_Retval = rc_View.SetNodeUpdateInformationStates(ou32_NodeIndex, oe_StateSecurity, oe_StateDebugger);
+      s32_Retval = rc_View.SetNodeUpdateInformationStates(ou32_NodeIndex, oe_StateSecureAuthentication,
+                                                          oe_StateDebugger,
+                                                          oe_StateTrafficEncryption);
    }
    else
    {
@@ -2967,11 +2970,13 @@ int32_t C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32_t ou32_ViewIndex, c
                   if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetOscPcData().GetBusIndex(),
                                                                          c_Name) == C_NO_ERR)
                   {
-                     stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                     stw::scl::C_SclChecksums::CalcCRC32(
+                        c_Name.toStdString().c_str(), static_cast<uint32_t>(c_Name.length()), oru32_Crc);
                      if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(pc_Route->u32_TargetNodeIndex,
                                                                              c_Name) == C_NO_ERR)
                      {
-                        stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                        stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(), static_cast<uint32_t>(
+                                                               c_Name.length()), oru32_Crc);
 
                         for (uint32_t u32_ItRoute = 0UL;
                              (u32_ItRoute < pc_Route->c_VecRoutePoints.size()) && (s32_Retval == C_NO_ERR);
@@ -2998,7 +3003,7 @@ int32_t C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32_t ou32_ViewIndex, c
                                                                                   c_Name) == C_NO_ERR)
                            {
                               stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                  c_Name.length(), oru32_Crc);
+                                                                  static_cast<uint32_t>(c_Name.length()), oru32_Crc);
                            }
                            else
                            {
@@ -3010,12 +3015,13 @@ int32_t C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32_t ou32_ViewIndex, c
                                                                                      c_Name) == C_NO_ERR)
                               {
                                  stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                     c_Name.length(), oru32_Crc);
+                                                                     static_cast<uint32_t>(c_Name.length()), oru32_Crc);
                                  if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(rc_Route.u32_NodeIndex,
                                                                                          c_Name) == C_NO_ERR)
                                  {
                                     stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                        c_Name.length(), oru32_Crc);
+                                                                        static_cast<uint32_t>(c_Name.length()),
+                                                                        oru32_Crc);
                                  }
                                  else
                                  {
@@ -3079,25 +3085,6 @@ QString C_PuiSvHandler::h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId 
    {
       if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
       {
-         // TODO: commented lines to be removed ultimately
-         //         C_OscNodeDataPool::E_Type e_Type;
-         //         if ((C_PuiSdHandler::h_GetInstance()->GetDataPoolType(orc_Id.u32_NodeIndex,
-         // orc_Id.u32_DataPoolIndex,
-         //                                                               e_Type) == C_NO_ERR) &&
-         //             ((e_Type == C_OscNodeDataPool::eHALC) || (e_Type == C_OscNodeDataPool::eHALC_NVM)))
-         //         {
-         //            c_Retval = C_PuiSdUtil::h_GetHalcNamespace(orc_Id);
-         //         }
-         //         else
-         //         {
-         //            c_Retval = C_PuiSdUtil::h_GetNamespace(orc_Id);
-         //            if (orc_Id.GetUseArrayElementIndex())
-         //            {
-         //               //Append array element index
-         //               c_Retval +=
-         // static_cast<QString>(C_GtGetText::h_GetText("[%1]")).arg(orc_Id.GetArrayElementIndex());
-         //            }
-         //         }
          c_Retval = C_PuiSdUtil::h_GetNamespaceDatapoolElement(orc_Id);
       }
       else

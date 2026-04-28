@@ -44,7 +44,9 @@ public:
 
    void UpdateShowValue(void) override;
    void UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value) override;
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
    bool CallProperties(void) override;
 
    void UpdateTypePe(const stw::opensyde_gui_logic::C_PuiSvDbLabel::E_Type oe_Type, const bool oq_ShowCaption,

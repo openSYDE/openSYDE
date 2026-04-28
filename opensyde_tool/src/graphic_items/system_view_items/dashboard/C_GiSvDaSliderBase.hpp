@@ -43,7 +43,9 @@ public:
    void DeleteData(void) override;
 
    void UpdateShowValue(void) override;
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
    void SendCurrentValue(void) override;
    bool CallProperties(void) override;
 

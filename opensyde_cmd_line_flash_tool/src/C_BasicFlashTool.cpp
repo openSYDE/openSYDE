@@ -21,7 +21,8 @@
 #include "TglFile.hpp"
 #include "TglTime.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "C_OscBinaryHash.hpp"
+#include "C_OscUtilBinaryHash.hpp"
+#include "C_OscUtils.hpp"
 #include "C_BasicUpdateSequence.hpp"
 #include "C_BasicFlashTool.hpp"
 
@@ -67,24 +68,48 @@ C_BasicFlashTool::C_BasicFlashTool(void) :
 //----------------------------------------------------------------------------------------------------------------------
 C_BasicFlashTool::~C_BasicFlashTool()
 {
-   mpc_CanDispatcher = NULL;
-   delete mpc_CanDispatcher;
+   if (this->mpc_CanDispatcher != NULL)
+   {
+      if (this->mpc_CanDispatcher->DLL_Close() == C_NO_ERR)
+      {
+         osc_write_log_info("Teardown", "CAN DLL closed.");
+      }
+      else
+      {
+         osc_write_log_info("Teardown", "Failed to close CAN DLL.");
+      }
+
+      delete this->mpc_CanDispatcher;
+      this->mpc_CanDispatcher = NULL;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialization on tool startup
 
    Show some information on command line and setup logging
+
+   \param[in]  os32_Argc   Number of command line arguments
+   \param[in]  oppcn_Argv  Command line arguments
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_BasicFlashTool::Init(void)
+void C_BasicFlashTool::Init(const int32_t os32_Argc, char_t * const * const oppcn_Argv)
 {
+   char_t acn_ApplicationName[MAX_PATH + 1];
    C_SclString c_LogFile;
    C_TglDateTime c_DateTime;
+   C_SclString c_ExeName;
+   const C_SclString c_ExeVersion = mh_GetApplicationVersion(TglGetExePath());
+   const C_SclString c_BinaryHash = C_OscUtilBinaryHash::h_CreateBinaryHash();
+   const uint32_t u32_Return = GetModuleFileNameA(NULL, &acn_ApplicationName[0], MAX_PATH + 1);
+
+   tgl_assert(u32_Return != 0);
+
+   c_ExeName = acn_ApplicationName;
 
    std::cout << "This is a very simple openSYDE tool for updating one device with one hex file." << std::endl;
-   std::cout << "Version: " << mh_GetApplicationVersion(TglGetExePath()).c_str() << std::endl;
-   std::cout << "MD5-Checksum: " << C_OscBinaryHash::h_CreateBinaryHash().c_str() << std::endl;
+   std::cout << "Version: " << c_ExeVersion.c_str() << std::endl;
+   std::cout << "MD5-Checksum: " << c_BinaryHash.c_str() << std::endl;
 
    // setup logging
    TglGetDateTimeNow(c_DateTime);
@@ -106,7 +131,10 @@ void C_BasicFlashTool::Init(void)
 
    std::cout << "Logging to file: " << c_LogFile.c_str() << "\n" << std::endl;
 
-   osc_write_log_info("Start", "Simple openSYDE command line tool for updating one device with one hex file started.");
+   osc_write_log_info("Starting tool",
+                      c_ExeName + " Version: " + c_ExeVersion + ", MD5-Checksum: " + c_BinaryHash);
+   osc_write_log_info("Call",
+                      "Command line: \"" + C_OscUtils::h_GetCommandLineAsString(os32_Argc, oppcn_Argv) + "\"");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -302,12 +330,50 @@ C_BasicFlashTool::E_Result C_BasicFlashTool::Flash(void)
 {
    E_Result e_Result = eRESULT_OK;
    C_BasicUpdateSequence c_TheSequence;
-   int32_t s32_Return;
+   int32_t s32_Return = C_NO_ERR;
 
-   s32_Return = c_TheSequence.Init(mc_CanDriver, ms32_CanBitrate, mu8_NodeId);
+   if (this->mpc_CanDispatcher == NULL)
+   {
+      const std::string c_DllPath = mc_CanDriver.c_str();
+      this->mpc_CanDispatcher = new stw::can::C_Can();
+
+      osc_write_log_info("Initialization", "CAN DLL path used: " + c_DllPath);
+
+      this->mpc_CanDispatcher->SetDLLName(c_DllPath);
+      s32_Return = this->mpc_CanDispatcher->DLL_Open();
+      if (s32_Return == C_NO_ERR)
+      {
+         osc_write_log_info("Initialization", "CAN DLL loaded.");
+         s32_Return = this->mpc_CanDispatcher->CAN_Init(ms32_CanBitrate);
+         if (s32_Return == C_NO_ERR)
+         {
+            osc_write_log_info("Initialization", "CAN interface initialized.");
+         }
+         else
+         {
+            osc_write_log_error("Initialization", "Could not initialize the CAN interface!");
+         }
+      }
+      else
+      {
+         const C_SclString c_Bitness = static_cast<C_SclString>(8 * sizeof(size_t));
+         osc_write_log_error("Initialization", "Could not load the CAN DLL! "
+                             "Make sure to use a " + c_Bitness + "-bit DLL.");
+      }
+   }
+
    if (s32_Return != C_NO_ERR)
    {
       e_Result = eERR_INITIALIZATION_FAILED;
+   }
+
+   if (e_Result == eRESULT_OK)
+   {
+      s32_Return = c_TheSequence.Init(this->mpc_CanDispatcher, ms32_CanBitrate, mu8_NodeId);
+      if (s32_Return != C_NO_ERR)
+      {
+         e_Result = eERR_INITIALIZATION_FAILED;
+      }
    }
 
    if (e_Result == eRESULT_OK)
@@ -402,7 +468,7 @@ C_SclString C_BasicFlashTool::mh_GetApplicationVersion(const stw::scl::C_SclStri
                             reinterpret_cast<PVOID *>(&pc_Info), //lint !e9176
                             &u32_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+            c_Version.PrintFormatted("V%lu.%02lur%lu", (pc_Info->dwFileVersionMS >> 16U),
                                      pc_Info->dwFileVersionMS & 0x0000FFFFUL,
                                      (pc_Info->dwFileVersionLS >> 16U));
          }

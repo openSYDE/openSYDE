@@ -82,18 +82,19 @@ public:
    E_OscSuSequencesNodeState e_PsiFileWrote;
 };
 
-class C_OscSuSequencesNodePemFileStates :
+class C_OscSuSequencesNodeSecuritySettingsStates :
    public C_OscSuSequencesNodeFileStates
 {
 public:
-   C_OscSuSequencesNodePemFileStates(void);
+   C_OscSuSequencesNodeSecuritySettingsStates(void);
 
    // PEM file
    E_OscSuSequencesNodeState e_PemFileExtracted;
-   E_OscSuSequencesNodeState e_SecurityKeySent;
+   E_OscSuSequencesNodeState e_SecureAuthenticationKeySent;
 
    // Related node states
-   E_OscSuSequencesNodeState e_SecurityFlagSent;
+   E_OscSuSequencesNodeState e_SecureAuthenticationFlagSent;
+   E_OscSuSequencesNodeState e_TrafficEncryptionFlagSent;
    E_OscSuSequencesNodeState e_DebuggerFlagSent;
 };
 
@@ -115,8 +116,8 @@ public:
    // Node caused a timeout
    bool q_Timeout;
 
-   // Node caused an authentication error
-   bool q_AuthenticationError;
+   // Security Access failed (e.g. authentication, encryption, protocol error)
+   bool q_SecurityAccessError;
 
    // Node has at least one node as router on its node which caused a problem
    bool q_CouldNotReachedDueToRoutingError;
@@ -133,8 +134,11 @@ public:
    C_OscSuSequencesNodeConnectStates(void);
 
    E_OscSuSequencesNodeState e_InformationRead;
-   bool q_AuthenticationNecessarySet; // Flag if the check for the need of security was made
-   bool q_AuthenticationNecessary;    // Flag if security is necessary for this node
+   bool q_SecurityOptionsActiveSet; // Flag if the information about active security options was set
+
+   bool q_AuthenticationNecessary;    // Flag if secure authentication is necessary/activated for this node
+   bool q_TrafficEncryptionNecessary; // Flag if traffic enctyption is necessary/activated for this node
+   bool q_DebuggerEnabled;            // Flag if debugger is enabled for this node
 
    // Feature compatibility flags
    C_OscProtocolDriverOsy::C_ListOfFeatures c_AvailableFeatures;
@@ -151,7 +155,7 @@ public:
    std::vector<C_OscSuSequencesNodeHexFileStates> c_StateHexFiles;
    std::vector<C_OscSuSequencesNodeOtherFileStates> c_StateOtherFiles;
    std::vector<C_OscSuSequencesNodePsiFileStates> c_StatePsiFiles;
-   C_OscSuSequencesNodePemFileStates c_StatePemFile;
+   C_OscSuSequencesNodeSecuritySettingsStates c_StateSecuritySettings;
 
    // STW flashloader specific
    std::vector<C_OscSuSequencesNodeStwFlHexFileStates> c_StateStwFlHexFiles;

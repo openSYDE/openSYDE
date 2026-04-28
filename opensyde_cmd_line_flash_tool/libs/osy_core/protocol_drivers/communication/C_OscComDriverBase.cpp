@@ -284,6 +284,18 @@ void C_OscComDriverBase::UpdateBitrate(const int32_t os32_Bitrate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clear rx messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscComDriverBase::ClearRxMessages()
+{
+   if (this->mpc_CanDispatcher != NULL)
+   {
+      this->mpc_CanDispatcher->ClearQueue(this->mu16_DispatcherClientHandle);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Distributes the CAN message to all registered C_OscMessageLogger instances.
 
    Gets all received CAN messages and informs all logger about the received messages.

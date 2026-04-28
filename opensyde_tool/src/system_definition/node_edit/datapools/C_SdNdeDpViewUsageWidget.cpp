@@ -211,7 +211,8 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32_t ou32_NodeIndex, const uin
                   // Check if the next one is an overlap and the next after next is the same Datapool to have the
                   // same color if the current Datapool will be separated in multiple areas by overlapped Datapools
                   // in between
-                  for (u32_NextAreaCounter = u32_AreaCounter + 1U; u32_NextAreaCounter < orc_Areas.size();
+                  for (u32_NextAreaCounter = u32_AreaCounter + 1U;
+                       u32_NextAreaCounter < static_cast<uint32_t>(orc_Areas.size());
                        ++u32_NextAreaCounter)
                   {
                      const C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea & rc_NextArea =

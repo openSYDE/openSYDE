@@ -67,16 +67,102 @@
           </widget>
          </item>
          <item>
-          <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PbAddSecurityPackage">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Policy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelAuth">
            <property name="minimumSize">
             <size>
-             <width>20</width>
+             <width>0</width>
+             <height>13</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>13</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Auth</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelTrafficEncryption">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>13</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>13</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>TrafficEncr</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelDebugger">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>13</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>13</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Debugger</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>5</width>
+             <height>5</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="stw::opensyde_gui_elements::C_OgePubIconMenu" name="pc_PbAddSecurityPackage">
+           <property name="minimumSize">
+            <size>
+             <width>30</width>
              <height>20</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>20</width>
+             <width>30</width>
              <height>20</height>
             </size>
            </property>
@@ -147,10 +233,10 @@
          </size>
         </property>
         <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
+         <enum>QFrame::Shape::StyledPanel</enum>
         </property>
         <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
+         <enum>QFrame::Shadow::Raised</enum>
         </property>
        </widget>
       </item>
@@ -162,7 +248,7 @@
         <item>
          <widget class="stw::opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
           <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
@@ -228,11 +314,6 @@
    <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeWiProgressBar</class>
    <extends>QWidget</extends>
    <header>C_OgeWiProgressBar.hpp</header>
@@ -248,6 +329,16 @@
    <extends>QWidget</extends>
    <header>C_OgeWiBorder.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgePubIconMenu</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubIconMenu.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericBubble</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericBubble.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

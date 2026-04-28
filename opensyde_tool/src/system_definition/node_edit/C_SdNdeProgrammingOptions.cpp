@@ -16,6 +16,7 @@
 #include "TglUtils.hpp"
 #include "C_GtGetText.hpp"
 #include "C_PuiSdHandler.hpp"
+#include "C_OscProtocolDriverOsyTpBase.hpp"
 
 #include "C_SdNdeProgrammingOptions.hpp"
 #include "ui_C_SdNdeProgrammingOptions.h"
@@ -44,8 +45,8 @@ using namespace stw::opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent     Reference to parent
-   \param[in]     ou32_NodeIndex Node index
+   \param[in,out]  orc_Parent       Reference to parent
+   \param[in]      ou32_NodeIndex   Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -75,6 +76,12 @@ C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw::opensyde_gui_elements:
    this->mpc_Ui->pc_ComboBoxScaling->insertItem(2, C_GtGetText::h_GetText("Disabled"),
                                                 static_cast<int32_t>(C_OscNodeCodeExportSettings::eNONE));
 
+   this->mpc_Ui->pc_CbxMode->insertItem(
+      static_cast<int32_t>(C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType::eMSMT_AUTO), "Auto");
+   this->mpc_Ui->pc_CbxMode->insertItem(
+      static_cast<int32_t>(C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType::eMSMT_MANUAL),
+      "Manual");
+
    //Load AFTER ranges are valid
    m_Load();
 
@@ -88,6 +95,8 @@ C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw::opensyde_gui_elements:
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SdNdeProgrammingOptions::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked, this, &C_SdNdeProgrammingOptions::m_CancelClicked);
+   connect(this->mpc_Ui->pc_CbxMode, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
+           this, &C_SdNdeProgrammingOptions::m_OnServiceModeChangedSlot);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,6 +128,9 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelNBR->setText(C_GtGetText::h_GetText("Number of buffered CAN Rx routing messages"));
    this->mpc_Ui->pc_LabelMNO->setText(C_GtGetText::h_GetText("Maximum number of cyclic/event driven transmissions "
                                                              "in parallel"));
+   this->mpc_Ui->pc_LabelMode->setText(C_GtGetText::h_GetText("Definition of the maximum service size value"));
+   this->mpc_Ui->pc_LabelServerSize->setText(C_GtGetText::h_GetText("Maximum service size"));
+   this->mpc_Ui->pc_SpxServerSize->setSuffix(C_GtGetText::h_GetText(" Bytes"));
 
    //Tool tips
    this->mpc_Ui->pc_LabelScaling->SetToolTipInformation(
@@ -139,17 +151,37 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
       C_GtGetText::h_GetText("Number of buffered CAN Tx messages"),
       C_GtGetText::h_GetText("Maximum number of CAN Tx messages the server can buffer "
                              "(used for all transferred CAN messages).\n"
-                             "\nDefault value: 585"));
+                             "\nDefault value: 585"
+                             "\nAffected server variable: OSY_INIT_DPD_CAN_FIFO_SIZE_TX"));
    this->mpc_Ui->pc_LabelNBR->SetToolTipInformation(
       C_GtGetText::h_GetText("Number of buffered CAN Rx routing messages"),
       C_GtGetText::h_GetText("Maximum number of CAN Rx routing messages the server can buffer before the client has "
                              "to wait for an acknowledge.\n"
-                             "\nDefault value: 585"));
+                             "\nDefault value: 585"
+                             "\nAffected server variable: OSY_INIT_DPD_CAN_ROUTING_FIFO_SIZE_RX"));
    this->mpc_Ui->pc_LabelMNO->SetToolTipInformation(
       C_GtGetText::h_GetText("Max number of cyclic/event driven transmissions in parallel"),
       C_GtGetText::h_GetText("This refers to the maximum number of parallel cyclic and event driven diagnostic "
                              "transmissions you are allowed to configure for this server.\n"
                              "\nDefault value: 64"));
+   this->mpc_Ui->pc_LabelMode->SetToolTipInformation(
+      C_GtGetText::h_GetText("Definition of the maximum service size value"),
+      C_GtGetText::h_GetText("Select the mode for defining the maximum service size value. "
+                             "\n\nAuto: The service size value is set automatically based on the largest openSYDE "
+                             "data element of this node. This ensures that the buffer size is large enough to transfer "
+                             "the biggest data element (e.g. when visualizing the value in the openSYDE dashboard)."
+                             "\n\nManual: The service size value is defined by the user. This option can be useful for "
+                             "scenarios such as Ethernet-to-CAN routing. In this case, the buffer size must be large "
+                             "enough to route the required data elements of other nodes. The buffer size may therefore "
+                             "be larger than the value calculated in Auto mode. To ensure that every data element of "
+                             "other nodes can be routed, configure the routing node’s manual value to at least the "
+                             "largest Auto value of those nodes."
+                             "\n\nDefault value: Auto"));
+   this->mpc_Ui->pc_LabelServerSize->SetToolTipInformation(
+      C_GtGetText::h_GetText("Maximum service size"),
+      C_GtGetText::h_GetText(
+         "Maximum service size in bytes. Check description of the propertie above for more information."
+         "\n\nAffected server variable: OSY_INIT_DPD_BUF_SIZE_INSTANCE"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,7 +230,10 @@ void C_SdNdeProgrammingOptions::Save(void) const
       c_DpdSettings.s16_DpdDataBlockIndex = -1;
    }
 
+   c_DpdSettings.e_MaxServiceSizeMode =
+      static_cast<C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType>(this->mpc_Ui->pc_CbxMode->currentIndex());
    //Spin boxes
+   c_DpdSettings.u16_MaxServiceSizeByte = static_cast<uint16_t>(this->mpc_Ui->pc_SpxServerSize->value());
    c_DpdSettings.u16_MaxMessageBufferTx = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxNBT->value());
    c_DpdSettings.u16_MaxRoutingMessageBufferRx = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxNBR->value());
    c_DpdSettings.u8_MaxParallelTransmissions =
@@ -244,7 +279,7 @@ void C_SdNdeProgrammingOptions::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 /*! \brief   Load dynamic content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeProgrammingOptions::m_Load(void) const
+void C_SdNdeProgrammingOptions::m_Load(void)
 {
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
@@ -293,6 +328,9 @@ void C_SdNdeProgrammingOptions::m_Load(void) const
       this->mpc_Ui->pc_SpinBoxNBT->setValue(pc_Node->c_Properties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx);
       this->mpc_Ui->pc_SpinBoxParallelTransmissions->setValue(
          pc_Node->c_Properties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions);
+      this->mpc_Ui->pc_CbxMode->setCurrentIndex(static_cast<int32_t>(pc_Node->c_Properties.c_OpenSydeServerSettings.
+                                                                     e_MaxServiceSizeMode));
+      this->m_OnServiceModeChanged(this->mpc_Ui->pc_CbxMode->currentIndex(), true);
    }
 }
 
@@ -312,4 +350,58 @@ void C_SdNdeProgrammingOptions::m_OkClicked(void)
 void C_SdNdeProgrammingOptions::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for service mode combo box index change.
+
+   \param[in]  os32_NewIndex  New combo box index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeProgrammingOptions::m_OnServiceModeChangedSlot(const int32_t os32_NewIndex) const
+{
+   this->m_OnServiceModeChanged(os32_NewIndex, false);
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for service mode combo box index change.
+
+   \param[in]  os32_NewIndex           New combo box index
+   \param[in]  oq_IsFromInitialLoad    Is the index from initial load
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeProgrammingOptions::m_OnServiceModeChanged(const int32_t os32_NewIndex,
+                                                       const bool oq_IsFromInitialLoad) const
+{
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   if (os32_NewIndex == static_cast<int32_t>(C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType::eMSMT_MANUAL))
+   {
+      this->mpc_Ui->pc_SpxServerSize->SetMinimumCustom(static_cast<int32_t>(C_OscNodeOpenSydeServerSettings::
+                                                                            hu8_MIN_SIZE_DPD_BUF_INSTANCE));
+      this->mpc_Ui->pc_SpxServerSize->SetMaximumCustom(4096);
+      if (oq_IsFromInitialLoad == true)
+      {
+         this->mpc_Ui->pc_SpxServerSize->setValue(static_cast<int32_t>(pc_Node->c_Properties.c_OpenSydeServerSettings.
+                                                                       u16_MaxServiceSizeByte));
+      }
+      else
+      {
+         this->mpc_Ui->pc_SpxServerSize->setValue(static_cast<int32_t>(C_OscNodeOpenSydeServerSettings::
+                                                                       h_GetTransportBufferSizeInByteWithAutoCalculation(
+                                                                          pc_Node->c_DataPools,
+                                                                          C_OscProtocolDriverOsyTpBase::
+                                                                          hu16_OSY_MAXIMUM_SERVICE_SIZE)));
+      }
+      this->mpc_Ui->pc_SpxServerSize->setEnabled(true);
+   }
+   else
+   {
+      this->mpc_Ui->pc_SpxServerSize->SetMinimumCustom(0);
+      this->mpc_Ui->pc_SpxServerSize->SetMaximumCustom(static_cast<int32_t>(std::numeric_limits<uint16_t>::max()));
+      this->mpc_Ui->pc_SpxServerSize->setValue(static_cast<int32_t>(C_OscNodeOpenSydeServerSettings::
+                                                                    h_GetTransportBufferSizeInByteWithAutoCalculation(
+                                                                       pc_Node->c_DataPools,
+                                                                       C_OscProtocolDriverOsyTpBase::
+                                                                       hu16_OSY_MAXIMUM_SERVICE_SIZE)));
+      this->mpc_Ui->pc_SpxServerSize->setEnabled(false);
+   }
 }

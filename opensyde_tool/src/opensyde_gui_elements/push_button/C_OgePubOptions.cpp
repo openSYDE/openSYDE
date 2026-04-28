@@ -40,7 +40,8 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubOptions::C_OgePubOptions(QWidget * const opc_Parent) :
-   C_OgePubToolTipBase(opc_Parent)
+   C_OgePubToolTipBase(opc_Parent),
+   ms32_OffsetHorizontal(26)
 {
 }
 
@@ -55,6 +56,18 @@ void C_OgePubOptions::SetCustomIcon(const QString & orc_IconPathEnabled, const Q
 {
    mc_IconEnabled.addPixmap(static_cast<QPixmap>(orc_IconPathEnabled));
    mc_IconDisabled.addPixmap(static_cast<QPixmap>(orc_IconPathDisabled));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets the offset to set the text right aligned
+ *
+ *  Note: The text alignment is meant in combination with an icon to the left of the text
+ *
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubOptions::SetTextRightAligned()
+{
+   this->ms32_OffsetHorizontal = 11;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,15 +88,19 @@ void C_OgePubOptions::paintEvent(QPaintEvent * const opc_Event)
       QPainter c_Painter(this);
       QPixmap c_PixmapEnabled;
       c_PixmapEnabled = this->mc_IconEnabled.pixmap(this->iconSize());
+
       //Calculate icon top left based on fixed center
-      c_Painter.drawPixmap(26 - (this->iconSize().width() / 2), 15 - (this->iconSize().height() / 2), c_PixmapEnabled);
+      c_Painter.drawPixmap(this->ms32_OffsetHorizontal - (this->iconSize().width() / 2),
+                           15 - (this->iconSize().height() / 2), c_PixmapEnabled);
    }
    else
    {
       QPainter c_Painter(this);
       QPixmap c_PixmapDisabled;
       c_PixmapDisabled = this->mc_IconDisabled.pixmap(this->iconSize());
+
       //Calculate icon top left based on fixed center
-      c_Painter.drawPixmap(26 - (this->iconSize().width() / 2), 15 - (this->iconSize().height() / 2), c_PixmapDisabled);
+      c_Painter.drawPixmap(this->ms32_OffsetHorizontal - (this->iconSize().width() / 2),
+                           15 - (this->iconSize().height() / 2), c_PixmapDisabled);
    }
 }

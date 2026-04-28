@@ -610,12 +610,11 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    c_Selection = this->m_GetSelectedRows();
    if (c_Selection.size() == 1UL)
    {
-      const uint32_t u32_Size = c_Selection.size();
-      Q_EMIT (this->SigSelected(u32_Size, c_Selection[0UL]));
+      Q_EMIT (this->SigSelected(static_cast<uint32_t>(c_Selection.size()), c_Selection[0UL]));
    }
    else
    {
-      Q_EMIT (this->SigSelected(c_Selection.size(), 0UL));
+      Q_EMIT (this->SigSelected(static_cast<uint32_t>(c_Selection.size()), 0UL));
    }
 
    this->mc_Delegate.SetSelectedRows(this->selectedIndexes());

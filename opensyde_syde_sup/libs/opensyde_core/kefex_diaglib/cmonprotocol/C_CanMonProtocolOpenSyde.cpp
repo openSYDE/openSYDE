@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-
 #include "precomp_headers.hpp" //pre-compiled headers
 
 #include <cctype>
@@ -69,6 +68,7 @@ using namespace stw::can;
 #define OSY_UDS_SI_REQUEST_FILE_TRANSFER               (0x38U)
 #define OSY_UDS_SI_WRITE_MEMORY_BY_ADDRESS             (0x3DU)
 #define OSY_UDS_SI_TESTER_PRESENT                      (0x3EU)
+#define OSY_UDS_SI_SECURED_DATA_TRANSMISSION           (0x84U)
 #define OSY_DPD_SI_OS_READ_DATAPOOLDATA_EVENT_DRIVEN   (0xBAU) ///< system supplier specific
 #define OSY_DPD_SI_OS_READ_DATAPOOLDATA_BY_IDENTIFIER  (0xBBU) ///< system supplier specific
 #define OSY_DPD_SI_OS_WRITE_DATAPOOLDATA_BY_IDENTIFIER (0xBCU) ///< system supplier specific
@@ -94,6 +94,8 @@ using namespace stw::can;
 #define OSY_UDS_NRC_INVALID_KEY                                 (0x35U) ///< invalidKey
 #define OSY_UDS_NRC_EXCEEDED_NUMBER_OF_ATTEMPTS                 (0x36U) ///< exceededNumberOfAttempts
 #define OSY_UDS_NRC_REQUIRED_TIME_DELAY_NOT_EXPIRED             (0x37U) ///< requiredTimeDelayNotExpired
+#define OSY_UDS_NRC_SECURE_DATA_TRANSMISSION_NOT_ALLOWED        (0x39U) ///< secureDataTransmissionNotAllowed
+#define OSY_UDS_NRC_SECURE_DATA_VERIFICATION_FAILED             (0x3AU) ///< secureDataVerificationFailed
 #define OSY_UDS_NRC_UPLOAD_DOWNLOAD_NOT_ACCEPTED                (0x70U) ///< uploadDownloadNotAccepted
 #define OSY_UDS_NRC_TRANSFER_DATA_SUSPENDED                     (0x71U) ///< transferDataSuspended
 #define OSY_UDS_NRC_GENERAL_PROGRAMMING_FAILURE                 (0x72U) ///< generalProgrammingFailure
@@ -126,6 +128,7 @@ using namespace stw::can;
 #define UDC_H_DATAID_DEBUGGER_ACTIVATION                    (0xA822U)
 #define UDC_H_DATAID_SECURITY_KEY                           (0xA823U)
 #define UDC_H_DATAID_CERTIFICATE_SERIAL_NUMBER_L7           (0xA824U)
+#define UDC_H_DATAID_TRAFFIC_ENCRYPTION_ACTIVATION          (0xA825U)
 #define UDC_H_DATAID_BOOTSOFTWARE_IDENTIFICATION            (0xF180U)
 #define FL_H_DATAID_SOFTWARE_FINGERPRINT                    (0xF184U)
 #define UDC_H_DATAID_ACTIVE_DIAGNOSTIC_SESSION              (0xF186U)
@@ -425,6 +428,9 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceIdToText(const uint8_t ou8_Servic
    case OSY_UDS_SI_TESTER_PRESENT:
       c_Text += "TesterPresent";
       break;
+   case OSY_UDS_SI_SECURED_DATA_TRANSMISSION:
+      c_Text += "SecuredDataTransmission";
+      break;
    case OSY_DPD_SI_OS_READ_DATAPOOLDATA_EVENT_DRIVEN:
       c_Text += "ReadDataPoolDataEventDriven";
       break;
@@ -693,6 +699,34 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
       }
       u8_FirstRawByte = 2U;
       break;
+   case OSY_UDS_SI_SECURED_DATA_TRANSMISSION:
+      if (ou8_ServiceSize < 3U)
+      {
+         c_Text = " error: DLC too short (no APar)";
+      }
+      else
+      {
+         c_Text += (" APAR:" + m_GetValueDecHex(mh_BytesToWordHighLow(&opu8_ServiceData[1])));
+
+         if (ou8_ServiceSize < 4U)
+         {
+            c_Text += " error: DLC too short (no algorithm)";
+         }
+         else
+         {
+            switch (opu8_ServiceData[3])
+            {
+            case 0x00U:
+               c_Text += " ALGO:AES_CBC_128_WITH_PKCS7_PADDING";
+               break;
+            default:
+               c_Text += (" ALGO:" + m_GetByteAsStringFormat(opu8_ServiceData[3]));
+               break;
+            }
+         }
+         u8_FirstRawByte = 4U;
+      }
+      break;
    case OSY_UDC_B_SI_READ_SERIAL_NUMBER:
       if (q_IsResponse == false)
       {
@@ -740,6 +774,7 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
             if (u8_BlockNumber == 0)
             {
                // First byte reserved
+               c_Text += "  Options: " + C_SclString::IntToStr(opu8_ServiceData[5]);
                c_Text += "  Manufacturer Format: " + C_SclString::IntToStr(opu8_ServiceData[6]);
             }
             else if (u8_BlockNumber == 1)
@@ -869,57 +904,74 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
       }
       else
       {
-         if (ou8_ServiceSize > 2U)
-         {
-            c_Text = "  MODE:";
-            if (oq_IsSingleFrame == false)
-            {
-               c_Text += "secure";
-            }
-            else
-            {
-               c_Text += "non-secure";
-            }
-         }
-         else
-         {
-            c_Text = "";
-         }
+         bool q_EncryptionActive = false;
+         bool q_AuthenticationActive = false;
+         bool q_IsRequestSeed;
+
          if (opu8_ServiceData[1] == 0U)
          {
             c_Text += "  TYPE:INVALID";
+            q_IsRequestSeed = false;
          }
          else
          {
             c_Text += "  TYPE:";
             if ((opu8_ServiceData[1] & 0x01U) == 0x01U)
             {
-               c_Text += "  REQUEST_SEED  LEVEL:" + m_GetByteAsStringFormat(opu8_ServiceData[1]);
+               c_Text += "REQUEST_SEED  LEVEL:" + m_GetByteAsStringFormat(opu8_ServiceData[1]);
+               q_IsRequestSeed = true;
             }
             else
             {
-               c_Text += "  SEND_KEY  LEVEL:" + m_GetByteAsStringFormat(opu8_ServiceData[1] - 1U);
+               c_Text += "SEND_KEY  LEVEL:" + m_GetByteAsStringFormat(opu8_ServiceData[1] - 1U);
+               q_IsRequestSeed = false;
             }
+         }
 
-            if (ou8_ServiceSize > 2U)
+         //responses to RequestSeed have some interesting information:
+         if ((q_IsRequestSeed == true) && (q_IsResponse == true))
+         {
+            if (oq_IsSingleFrame == false)
             {
-               //we expect a 4 byte seed or key
-               if (ou8_ServiceSize < 6U)
+               if (ou8_ServiceSize > 2U)
                {
-                  c_Text += " error: DLC too short (no full seed or key)";
+                  u8_FirstRawByte = 3U;
+                  q_AuthenticationActive = ((opu8_ServiceData[2] & 0x01U) == 0x01U) ? false : true;
+                  q_EncryptionActive =  ((opu8_ServiceData[2] & 0x10U) == 0x10U) ? true : false;
+                  if (q_AuthenticationActive == true)
+                  {
+                     c_Text += "  AUTH:RSA_1024";
+                  }
+                  else
+                  {
+                     c_Text += "  AUTH:none";
+                  }
+                  if (q_EncryptionActive == true)
+                  {
+                     c_Text += "  ENC:AES_CBC_128";
+                  }
+                  else
+                  {
+                     c_Text += "  ENC:none";
+                  }
                }
                else
                {
-                  const uint32_t u32_Value = (static_cast<uint32_t>(opu8_ServiceData[2]) << 24U) +
-                                             (static_cast<uint32_t>(opu8_ServiceData[3]) << 16U) +
-                                             (static_cast<uint32_t>(opu8_ServiceData[4]) << 8U) +
-                                             opu8_ServiceData[5];
-                  c_Text += "  VALUE:" + m_GetValueDecHex(u32_Value);
+                  //this should not really happen with a non single-frame; but be defensive ...
+                  c_Text += "  AUTH/ENC:<DLC error>";
                }
             }
+            else
+            {
+               c_Text += "  AUTH/ENC:none";
+               u8_FirstRawByte = 2U;
+            }
+         }
+         else
+         {
+            u8_FirstRawByte = 2U;
          }
       }
-      u8_FirstRawByte = ou8_ServiceSize;
       break;
    case OSY_UDS_SI_REQUEST_DOWNLOAD:
       //no specifics reported for now
@@ -1013,6 +1065,12 @@ C_SclString C_CanMonProtocolOpenSyde::m_NegativeResponseCodeToText(const uint8_t
       break;
    case OSY_UDS_NRC_REQUIRED_TIME_DELAY_NOT_EXPIRED:
       c_Text = "requiredTimeDelayNotExpired";
+      break;
+   case OSY_UDS_NRC_SECURE_DATA_TRANSMISSION_NOT_ALLOWED:
+      c_Text = "secureDataTransmissionNotAllowed";
+      break;
+   case OSY_UDS_NRC_SECURE_DATA_VERIFICATION_FAILED:
+      c_Text = "secureDataVerificationFailed";
       break;
    case OSY_UDS_NRC_UPLOAD_DOWNLOAD_NOT_ACCEPTED:
       c_Text = "uploadDownloadNotAccepted";
@@ -1317,7 +1375,7 @@ C_SclString C_CanMonProtocolOpenSyde::m_DataIdentifierAndDataToText(const bool o
       }
       break;
    case UDC_H_DATAID_SECURITY_ACTIVATION:
-      c_Text = "SecurityActivation";
+      c_Text = "SecureAuthenticationActivation";
       if (((oq_IsResponse == true) && (oq_IsWrite == false)) ||
           ((oq_IsResponse == false) && (oq_IsWrite == true)))
       {
@@ -1376,7 +1434,7 @@ C_SclString C_CanMonProtocolOpenSyde::m_DataIdentifierAndDataToText(const bool o
       }
       break;
    case UDC_H_DATAID_SECURITY_KEY:
-      c_Text = "SecurityKey";
+      c_Text = "SecureAuthenticationKey";
       if (oq_IsResponse == false)
       {
          if (ou8_PayloadSize != 3U)
@@ -1390,6 +1448,38 @@ C_SclString C_CanMonProtocolOpenSyde::m_DataIdentifierAndDataToText(const bool o
 
             c_Text += c_Text2;
             u8_FirstRawByte = 3U; //finished here ...
+         }
+      }
+      break;
+   case UDC_H_DATAID_TRAFFIC_ENCRYPTION_ACTIVATION:
+      c_Text = "TrafficEncryptionActivation";
+      if (((oq_IsResponse == true) && (oq_IsWrite == false)) ||
+          ((oq_IsResponse == false) && (oq_IsWrite == true)))
+      {
+         if (ou8_PayloadSize != 2U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            if ((opu8_Payload[0] & 0x01) == 0x01)
+            {
+               c_Text += "  ACTIVATION:on";
+            }
+            else
+            {
+               c_Text += "  ACTIVATION:off";
+            }
+
+            if (opu8_Payload[1] == 0)
+            {
+               c_Text += "  ALGO:AES_CBC_128_WITH_PKCS7_PADDING";
+            }
+            else
+            {
+               c_Text += "  ALGO:" + m_GetByteAsStringFormat(opu8_Payload[1]);
+            }
+            u8_FirstRawByte = 2U; //finished here ...
          }
       }
       break;

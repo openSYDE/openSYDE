@@ -160,6 +160,7 @@ public:
    void GetValueAsScaledString(const float64_t of64_Factor, const float64_t of64_Offset, std::string & orc_Output,
                                const uint32_t ou32_Index, const bool oq_AllowRangeAdaptation = true,
                                const bool oq_AllowSpecialHandling = false) const;
+   void GetAnyValueAsFloat32(float32_t & orf32_Output, const uint32_t ou32_Index) const;
    void GetAnyValueAsFloat64(float64_t & orf64_Output, const uint32_t ou32_Index) const;
 
    const std::vector<uint8_t> * GetDataAccessConst(stw::tgl::C_TglCriticalSection ** const oppc_CriticalSection) const;
@@ -172,6 +173,7 @@ private:
 
    template <typename T> void m_SetValue(const T & orc_Value, const E_Type oe_Type);
    template <typename T> void m_GetValue(const E_Type oe_Type, T & orc_Value) const;
+   template <typename T> void m_GetAnyValueAsTemplate(T & orc_Output, const uint32_t ou32_Index) const;
 
    template <typename T> void m_SetValueArray(const T & orc_Value, const E_Type oe_Type);
    //lint -e{8058,8080} //template parameter names are not properly handled by naming convention check

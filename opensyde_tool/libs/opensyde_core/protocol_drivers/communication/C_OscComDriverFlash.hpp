@@ -158,7 +158,9 @@ public:
    int32_t SendOsySetPreProgrammingMode(C_OscProtocolDriverOsy & orc_Protocol, const bool oq_SessionOnly,
                                         uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsySetPreProgrammingMode(const C_OscProtocolDriverOsyNode & orc_ServerId, const bool oq_SessionOnly,
-                                        uint8_t * const opu8_NrCode = NULL);
+                                        uint8_t * const opu8_NrCode = NULL,
+                                        bool * const opq_SecureAuthenticationActive = NULL,
+                                        bool * const opq_TrafficEncryptionActive = NULL);
    int32_t SendOsySetProgrammingMode(const C_OscProtocolDriverOsyNode & orc_ServerId,
                                      const uint8_t * const opu8_SecurityLevel = NULL,
                                      uint8_t * const opu8_NrCode = NULL) const;
@@ -187,22 +189,30 @@ public:
                                      C_OscProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
                                      uint8_t * const opu8_NrCode = NULL) const;
 
-   int32_t SendOsyReadCertificateSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                              std::vector<uint8_t> & orc_SerialNumber,
-                                              uint8_t * const opu8_NrCode = NULL) const;
-   int32_t SendOsyReadCertificateSerialNumberL7(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                std::vector<uint8_t> & orc_SerialNumber,
-                                                uint8_t * const opu8_NrCode = NULL) const;
-   int32_t SendOsyWriteSecurityKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                   const std::vector<uint8_t> & orc_PublicKeyModulus,
-                                   const std::vector<uint8_t> & orc_PublicKeyExponent,
-                                   const std::vector<uint8_t> & orc_CertificateSerialNumber,
-                                   uint8_t * const opu8_NrCode = NULL) const;
-   int32_t SendOsyReadSecurityActivation(const C_OscProtocolDriverOsyNode & orc_ServerId, bool & orq_SecurityOn,
-                                         uint8_t & oru8_SecurityAlgorithm, uint8_t * const opu8_NrCode = NULL) const;
-   int32_t SendOsyWriteSecurityActivation(const C_OscProtocolDriverOsyNode & orc_ServerId, const bool oq_SecurityOn,
-                                          const uint8_t ou8_SecurityAlgorithm,
-                                          uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyReadAuthenticationCertificateSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                            std::vector<uint8_t> & orc_SerialNumber,
+                                                            uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyReadAuthenticationCertificateSerialNumberL7(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                              std::vector<uint8_t> & orc_SerialNumber,
+                                                              uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyWriteSecurityAuthenticationKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                 const std::vector<uint8_t> & orc_PublicKeyModulus,
+                                                 const std::vector<uint8_t> & orc_PublicKeyExponent,
+                                                 const std::vector<uint8_t> & orc_CertificateSerialNumber,
+                                                 uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyReadSecurityAuthenticationActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                       bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+                                                       uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyWriteSecurityAuthenticationActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                        const bool oq_SecurityOn, const uint8_t ou8_SecurityAlgorithm,
+                                                        uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyReadSecurityTrafficEncryptionActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                          bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+                                                          uint8_t * const opu8_NrCode = NULL) const;
+   int32_t SendOsyWriteSecurityTrafficEncryptionActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                           const bool oq_SecurityOn,
+                                                           const uint8_t ou8_SecurityAlgorithm,
+                                                           uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyReadDebuggerEnabled(const C_OscProtocolDriverOsyNode & orc_ServerId, bool & orq_DebuggerEnabled,
                                       uint8_t * const opu8_NrCode = NULL) const;
    int32_t SendOsyWriteDebuggerEnabled(const C_OscProtocolDriverOsyNode & orc_ServerId, const bool oq_DebuggerEnabled,

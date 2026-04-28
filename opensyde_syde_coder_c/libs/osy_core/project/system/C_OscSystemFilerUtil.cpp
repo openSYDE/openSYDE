@@ -281,7 +281,6 @@ int32_t C_OscSystemFilerUtil::h_SaveStringToFile(const C_SclString & orc_Complet
    {
       //Write (erase if file exists)
       std::ofstream c_File;
-
       c_File.open(orc_CompleteFilePath.c_str(), std::ofstream::trunc);
       if (c_File.is_open() == true)
       {

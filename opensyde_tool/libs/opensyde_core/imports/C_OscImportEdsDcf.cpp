@@ -1180,7 +1180,7 @@ void C_OscImportEdsDcf::mh_LoadSrdoCyclicSection(const uint32_t ou32_StartingId,
              (u32_CycleTime > 0U))
          {
             orc_Message.u32_CycleTimeMs = u32_CycleTime;
-            orc_Message.u32_TimeoutMs = (u32_CycleTime * 3UL) + 10UL;
+            orc_Message.u32_TimeoutMs = (u32_CycleTime * 3U) + 10U;
          }
          else
          {
@@ -1267,7 +1267,7 @@ void C_OscImportEdsDcf::mh_LoadEventTimerSectionCanOpen(const uint32_t ou32_Star
          }
          else
          {
-            orc_Message.u32_TimeoutMs = (u32_EventTimer * 3UL) + 10UL;
+            orc_Message.u32_TimeoutMs = (u32_EventTimer * 3U) + 10U;
          }
       }
       else
@@ -1699,7 +1699,7 @@ int32_t C_OscImportEdsDcf::mh_GetIntegerValueSimple(const C_SclString & orc_CoVa
    {
       char_t * pcn_Ptr = NULL;
 
-      oru32_Value = strtoul(orc_CoValue.c_str(), &pcn_Ptr, 0);
+      oru32_Value = static_cast<uint32_t>(strtoul(orc_CoValue.c_str(), &pcn_Ptr, 0));
       if (pcn_Ptr != NULL)
       {
          if (*pcn_Ptr == '\0')

@@ -557,7 +557,7 @@ const
                   s32_Retval = C_CONFIG;
                }
             }
-            u32_SignalSum += rc_OscCurMessage.c_Signals.size();
+            u32_SignalSum += static_cast<uint32_t>(rc_OscCurMessage.c_Signals.size());
          }
          if (rc_CurData.c_ImportData.c_Core.c_OscRxSignalData.size() != u32_SignalSum)
          {
@@ -592,7 +592,7 @@ const
                   s32_Retval = C_CONFIG;
                }
             }
-            u32_SignalSum += rc_OscCurMessage.c_Signals.size();
+            u32_SignalSum += static_cast<uint32_t>(rc_OscCurMessage.c_Signals.size());
          }
          if (rc_CurData.c_ImportData.c_Core.c_OscTxSignalData.size() != u32_SignalSum)
          {

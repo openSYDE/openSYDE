@@ -36,6 +36,7 @@ C_KFXVariableListBase::~C_KFXVariableListBase(void)
 
 C_KFXVariableListBase::C_KFXVariableListBase(const C_KFXVariableListBase & orc_Source)
 {
+   mu16_NumDefaults = 0U; //have a clearly defined start value for assignment operator
    this->operator =(orc_Source);
 }
 

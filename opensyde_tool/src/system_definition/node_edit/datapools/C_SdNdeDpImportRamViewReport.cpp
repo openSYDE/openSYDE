@@ -171,7 +171,7 @@ void C_SdNdeDpImportRamViewReport::m_FillReport(const QString & orc_ProjectPath,
    for (std::vector<C_OscNodeDataPoolList>::const_iterator c_ItLists = orc_DataPool.c_Lists.begin();
         c_ItLists < orc_DataPool.c_Lists.end(); ++c_ItLists)
    {
-      u32_ElementCount += c_ItLists->c_Elements.size();
+      u32_ElementCount += static_cast<uint32_t>(c_ItLists->c_Elements.size());
    }
 
    // Source File Information

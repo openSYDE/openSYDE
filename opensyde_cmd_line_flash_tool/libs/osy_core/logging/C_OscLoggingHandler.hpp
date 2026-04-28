@@ -49,7 +49,9 @@ class C_OscLoggingHandler
 {
 public:
    //Configuration
-   static void h_SetWriteToFileActive(const bool oq_Active);
+   static void h_SetWriteToFileActive(const bool oq_Active, const bool oq_AutoFlushAll = false,
+                                      const bool oq_LogInitErrorsToConsole = false,
+                                      const bool oq_AutoFlushWarningsAndErrors = false);
    static void h_SetWriteToConsoleActive(const bool oq_Active);
    static void h_SetMeasurePerformanceActive(const bool oq_Active);
    static void h_SetCompleteLogFileLocation(const stw::scl::C_SclString & orc_CompleteLogFileLocation);
@@ -74,8 +76,11 @@ public:
 
 private:
    static bool mhq_WriteToFile;
+   static bool mhq_AutoFlushAllFile;
+   static bool mhq_AutoFlushWarningsAndErrorsFile;
    static bool mhq_WriteToConsole;
    static bool mhq_MeasureTime;
+   static bool mhq_LogInitErrorsToConsole;
    static std::map<uint16_t, uint32_t> mhc_StartTimes; ///< first: Timer ID, second: start time
    static stw::scl::C_SclString mhc_FileName;
    static stw::tgl::C_TglCriticalSection mhc_ConsoleCriticalSection;

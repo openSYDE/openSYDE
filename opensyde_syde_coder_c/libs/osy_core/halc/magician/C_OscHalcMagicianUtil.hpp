@@ -32,7 +32,7 @@ public:
    static int32_t h_GetVariableName(const std::vector<C_OscHalcDefStruct> & orc_DefinitionArray,
                                     const uint32_t ou32_ParameterIndexStruct, const uint32_t ou32_ParameterIndexElement,
                                     const stw::scl::C_SclString & orc_DomainSingularName,
-                                    stw::scl::C_SclString & orc_Name);
+                                    stw::scl::C_SclString & orc_Name, const uint32_t ou32_CurChannel = 0UL);
    static stw::scl::C_SclString h_CombineVariableName(const stw::scl::C_SclString & orc_Domain,
                                                       const stw::scl::C_SclString & orc_ParameterName);
    static C_OscNodeDataPoolListElement h_GetChanNumVariable(const stw::scl::C_SclString & orc_DomainSingularName,
@@ -51,7 +51,8 @@ public:
 
 private:
    static stw::scl::C_SclString mh_GetElementName(const C_OscHalcDefElement & orc_Param,
-                                                  const stw::scl::C_SclString & orc_Domain);
+                                                  const stw::scl::C_SclString & orc_Domain,
+                                                  const uint32_t ou32_CurChannel);
    static void mh_HandleGenericType(C_OscNodeDataPoolListElement & orc_Element, const uint32_t ou32_NumChannels,
                                     const bool oq_AddDataset, const bool oq_UseU16);
 };

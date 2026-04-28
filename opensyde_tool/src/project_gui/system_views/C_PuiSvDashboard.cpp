@@ -125,9 +125,9 @@ C_PuiSvDashboard & C_PuiSvDashboard::operator =(const C_PuiSvDashboard & orc_Sou
 void C_PuiSvDashboard::CalcHash(uint32_t & oru32_HashValue) const
 {
    stw::scl::C_SclChecksums::CalcCRC32(this->mc_Name.toStdString().c_str(),
-                                       this->mc_Name.length(), oru32_HashValue);
+                                       static_cast<uint32_t>(this->mc_Name.length()), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(this->mc_Comment.toStdString().c_str(),
-                                       this->mc_Comment.length(), oru32_HashValue);
+                                       static_cast<uint32_t>(this->mc_Comment.length()), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->mq_Active, sizeof(this->mq_Active), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->ms32_TabIndex, sizeof(this->ms32_TabIndex), oru32_HashValue);
    for (uint32_t u32_ItWidget = 0; u32_ItWidget < this->mc_Charts.size(); ++u32_ItWidget)
@@ -805,9 +805,10 @@ const C_PuiSvDbWidgetBase * C_PuiSvDashboard::GetWidgetBase(const C_PuiSvDbDataE
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *> & orc_Output) const
 {
-   const uint32_t u32_Size = this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
-                             this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
-                             this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size() + 1U;
+   const uint32_t u32_Size =
+      static_cast<uint32_t>(this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
+                            this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
+                            this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size() + 1U);
 
    //Improve performance
    orc_Output.reserve(u32_Size);
@@ -2330,28 +2331,28 @@ int32_t C_PuiSvDashboard::AddWidget(const C_PuiSvDbWidgetBase * const opc_Box,
    switch (oe_Type)
    {
    case C_PuiSvDbDataElement::eLABEL:
-      s32_Retval = this->InsertWidget(this->mc_Labels.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_Labels.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::ePARAM:
-      s32_Retval = this->InsertWidget(this->mc_ParamWidgets.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_ParamWidgets.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::ePIE_CHART:
-      s32_Retval = this->InsertWidget(this->mc_PieCharts.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_PieCharts.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::ePROGRESS_BAR:
-      s32_Retval = this->InsertWidget(this->mc_ProgressBars.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_ProgressBars.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::eSLIDER:
-      s32_Retval = this->InsertWidget(this->mc_Sliders.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_Sliders.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::eSPIN_BOX:
-      s32_Retval = this->InsertWidget(this->mc_SpinBoxes.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_SpinBoxes.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::eTABLE:
-      s32_Retval = this->InsertWidget(this->mc_Tables.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_Tables.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::eTOGGLE:
-      s32_Retval = this->InsertWidget(this->mc_Toggles.size(), opc_Box, oe_Type);
+      s32_Retval = this->InsertWidget(static_cast<uint32_t>(this->mc_Toggles.size()), opc_Box, oe_Type);
       break;
    case C_PuiSvDbDataElement::eTAB_CHART:
       s32_Retval = this->InsertWidget(0UL, opc_Box, oe_Type);
@@ -3048,7 +3049,7 @@ void C_PuiSvDashboard::HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & 
       //Iterate
       ++u32_Counter;
    }
-   for (uint32_t u32_It = this->GetCharts().size(); u32_It > 0UL; --u32_It)
+   for (uint32_t u32_It = static_cast<uint32_t>(this->GetCharts().size()); u32_It > 0UL; --u32_It)
    {
       Q_UNUSED(u32_It)
       tgl_assert(this->DeleteWidget(0UL, C_PuiSvDbDataElement::eCHART) == C_NO_ERR);
@@ -3175,15 +3176,15 @@ uint32_t C_PuiSvDashboard::Count(void) const
 {
    uint32_t u32_Retval = C_PuiBsElements::Count();
 
-   u32_Retval += this->mc_Charts.size();
-   u32_Retval += this->mc_Labels.size();
-   u32_Retval += this->mc_ParamWidgets.size();
-   u32_Retval += this->mc_PieCharts.size();
-   u32_Retval += this->mc_ProgressBars.size();
-   u32_Retval += this->mc_SpinBoxes.size();
-   u32_Retval += this->mc_Sliders.size();
-   u32_Retval += this->mc_Tables.size();
-   u32_Retval += this->mc_Toggles.size();
+   u32_Retval += static_cast<uint32_t>(this->mc_Charts.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_Labels.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_ParamWidgets.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_PieCharts.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_ProgressBars.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_SpinBoxes.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_Sliders.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_Tables.size());
+   u32_Retval += static_cast<uint32_t>(this->mc_Toggles.size());
    return u32_Retval;
 }
 
@@ -3197,9 +3198,10 @@ uint32_t C_PuiSvDashboard::Count(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & orc_Output)
 {
-   const uint32_t u32_Size = this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
-                             this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
-                             this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size() + 1U;
+   const uint32_t u32_Size =
+      static_cast<uint32_t>(this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
+                            this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
+                            this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size() + 1U);
 
    //Improve performance
    orc_Output.reserve(u32_Size);

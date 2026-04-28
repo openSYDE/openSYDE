@@ -184,6 +184,7 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
          if (s32_Return == C_NO_ERR)
          {
             //Fix inconsistency problems with existing projects (notify user about changes, so do this after CRC update)
+            m_FixDataLoggerTriggerIssues();
             m_FixCommInconsistencyErrors();
             m_FixAddressIssues();
             m_FixNameIssues();

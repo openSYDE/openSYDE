@@ -36,7 +36,7 @@ public:
 
    //File
    int32_t CreateCleanFileWithoutCrc(const stw::scl::C_SclString & orc_FilePath,
-                                     const bool oq_InterpretedDataOnly = false);
+                                     const bool oq_InterpretedDataOnly = false) const;
    int32_t ReadFile(const stw::scl::C_SclString & orc_FilePath, const bool oq_IgnoreCrc,
                     const bool oq_InterpretedDataOnly = false, uint16_t * const opu16_FileCrc = NULL,
                     bool * const opq_MissingOptionalContent = NULL);

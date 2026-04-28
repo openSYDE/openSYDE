@@ -278,18 +278,17 @@ int32_t C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
                   if ((C_CamProHandler::h_GetInstance()->GetMessageConst(this->mu32_MessageIndex)->
                        q_SetAutoSupportMode == true) && (e_ProtocolType == C_OscCanProtocol::eECES))
                   {
-                     s32_Retval = static_cast<int32_t>(pc_OsyMessage->c_Signals.size()) - 2; //Not showing Message
-                                                                                             // counter and Checksum
-                     // signals if is an ECES protocol
+                     //Not showing Message counter and Checksum signals if it is an ECES protocol
+                     s32_Retval = static_cast<int32_t>(pc_OsyMessage->c_Signals.size()) - 2;
                   }
                   else
                   {
-                     s32_Retval = pc_OsyMessage->c_Signals.size();
+                     s32_Retval = static_cast<int32_t>(pc_OsyMessage->c_Signals.size());
                   }
                }
                else if (pc_DbcMessage != NULL)
                {
-                  s32_Retval = pc_DbcMessage->c_Signals.size();
+                  s32_Retval = static_cast<int32_t>(pc_DbcMessage->c_Signals.size());
                }
                else
                {
@@ -1600,7 +1599,7 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32_t ou
             {
                if (os32_Role == ms32_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST)
                {
-                  c_Strings.push_back(c_It->second.c_str());
+                  c_Strings.emplace_back(c_It->second.c_str());
                }
                else
                {

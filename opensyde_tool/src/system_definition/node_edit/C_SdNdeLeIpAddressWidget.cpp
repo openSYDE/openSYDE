@@ -396,7 +396,8 @@ void C_SdNdeLeIpAddressWidget::m_MovePrevLineEdit(const uint32_t ou32_Pos)
       // pointer out of bounds is secured by if-clause
       //lint -save -e661
       this->mapc_LineEdit[ou32_Pos - 1]->setFocus();
-      this->mapc_LineEdit[ou32_Pos - 1]->setCursorPosition(this->mapc_LineEdit[ou32_Pos - 1]->text().size());
+      this->mapc_LineEdit[ou32_Pos - 1]->
+      setCursorPosition(static_cast<int32_t>(this->mapc_LineEdit[ou32_Pos - 1]->text().size()));
       //lint -restore
    }
 }
@@ -413,7 +414,8 @@ void C_SdNdeLeIpAddressWidget::SetIpAddress(const uint8_t * const opu8_IpAddress
 {
    for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
    {
-      this->mapc_LineEdit[u32_Pos]->setText(static_cast<QString>("%1").arg(opu8_IpAddress[u32_Pos], 0, 10, QChar(' ')));
+      this->mapc_LineEdit[u32_Pos]->setText(static_cast<QString>("%1").arg(opu8_IpAddress[u32_Pos], 0, 10,
+                                                                           static_cast<QChar>(' ')));
    }
 }
 

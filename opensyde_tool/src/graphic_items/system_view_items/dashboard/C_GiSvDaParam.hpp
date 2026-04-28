@@ -45,7 +45,9 @@ public:
    void UpdateData(void) override;
    void DeleteData(void) override;
 
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
    void EditModeActiveChanged(const bool oq_Active) override;
    bool EnableEditContent(void) override;
    void DisableEditContent(void) override;

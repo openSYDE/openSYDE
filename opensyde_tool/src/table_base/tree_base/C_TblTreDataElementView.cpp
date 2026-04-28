@@ -113,13 +113,14 @@ void C_TblTreDataElementView::InitSd(const uint32_t ou32_NodeIndex, const int32_
    \param[in]  oq_UseInSysViews                    If the view is used within system views/commissioning  or not.
                                                    Default value is true, false otherwise
    \param[in]  ou32_SdDataLoggerUseCaseNodeIndex   System definition data logger use case: node index
+   \param[in]  oq_ShowStringElements               Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSv(const uint32_t ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                      const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
                                      const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
-                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews,
-                                     const uint32_t ou32_SdDataLoggerUseCaseNodeIndex)
+                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews, const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
+                                     const bool oq_ShowStringElements)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    // if the view is used in a context other than system views
@@ -130,7 +131,7 @@ void C_TblTreDataElementView::InitSv(const uint32_t ou32_ViewIndex, const bool o
                                             oq_ShowOnlyWriteElements,
                                             oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                             oq_Show64BitValues,
-                                            opc_AlreasyUsedElements);
+                                            opc_AlreasyUsedElements, oq_ShowStringElements);
    }
    else
    {
@@ -328,7 +329,7 @@ void C_TblTreDataElementView::selectionChanged(const QItemSelection & orc_Select
                                                const QItemSelection & orc_Deselected)
 {
    QTreeView::selectionChanged(orc_Selected, orc_Deselected);
-   Q_EMIT this->SigSelectionChanged(this->selectedIndexes().size());
+   Q_EMIT (this->SigSelectionChanged(static_cast<int32_t>(this->selectedIndexes().size())));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

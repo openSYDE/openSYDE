@@ -748,7 +748,7 @@ int32_t C_OscDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_O
                      this->mpc_Node->c_DataPools[rc_DataPoolListId.u32_DataPoolIndex];
                   if (rc_DataPoolListId.u32_ListIndex < rc_DataPool.c_Lists.size())
                   {
-                     C_OscNodeDataPoolList & rc_List = rc_DataPool.c_Lists[rc_DataPoolListId.u32_ListIndex];
+                     const C_OscNodeDataPoolList & rc_List = rc_DataPool.c_Lists[rc_DataPoolListId.u32_ListIndex];
                      if (rc_List.q_NvmCrcActive == true)
                      {
                         C_OscParamSetRawEntry c_RawEntry;
@@ -1264,7 +1264,7 @@ int32_t C_OscDataDealerNvmSafe::NvmSafeReadFileWithCrc(const C_SclString & orc_P
       {
          C_SclString c_Error;
          c_Error.PrintFormatted(
-            "File \"%s\"  Expected: contains parameters for one device  Found: contains parameters for %d devices\n",
+            "File \"%s\"  Expected: contains parameters for one device  Found: contains parameters for %u devices\n",
             orc_Path.c_str(), this->mc_ImageFileHandler.GetNumberOfNodes());
          this->mc_ImageFileHandler.ClearContent();
          s32_Retval = C_CONFIG;

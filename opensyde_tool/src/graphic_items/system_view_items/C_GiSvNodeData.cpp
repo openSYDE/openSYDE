@@ -46,6 +46,7 @@ void C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors::Clear(void)
 {
    this->c_NvmWriteError.clear();
    this->c_PemWriteError.clear();
+   this->c_TrafficEncryptionWriteError.clear();
    this->c_DebuggerEnableError.clear();
    this->c_DebuggerDisableError.clear();
    this->c_EthToEthError.clear();
@@ -248,6 +249,9 @@ void C_GiSvNodeData::SetNodeConnectStates(const std::vector<C_OscSuSequencesNode
                                                                           u32_NodeIndex);
          c_PreconditionErrors.q_PemWriteError = mh_IsPreconditionErrorSet(orc_NodePreconditionErrors.c_PemWriteError,
                                                                           u32_NodeIndex);
+         c_PreconditionErrors.q_TrafficEncryptionEnableError = mh_IsPreconditionErrorSet(
+            orc_NodePreconditionErrors.c_TrafficEncryptionWriteError, u32_NodeIndex);
+
          c_PreconditionErrors.q_DebuggerEnableError = mh_IsPreconditionErrorSet(
             orc_NodePreconditionErrors.c_DebuggerEnableError,
             u32_NodeIndex);
@@ -749,7 +753,7 @@ C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetOverallInitialState(void
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_GiSvNodeData::GetSubNodeCount() const
 {
-   return this->mc_SubNodes.size();
+   return static_cast<uint32_t>(this->mc_SubNodes.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

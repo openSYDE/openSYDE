@@ -43,40 +43,29 @@ public:
    void SetNodeDataLoggerJob(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataLoggerJobIndex);
    void Reload(void);
 
+protected:
+   void resizeEvent(QResizeEvent * const opc_Event) override;
+
 private:
-   uint32_t mu32_NodeIndex;
-   uint32_t mu32_DataLoggerJobIndex;
-   std::vector<std::pair<QString, QString> > mc_MapCoreOperationToUi;
-   QMap<QString, stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId> mc_MapDataElement;
-   Ui::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget * mpc_Ui;
+   // State indicating if Expert View is On/Off
    enum E_ConnectState
    {
       eCS_DISCONNECTED,
       eCS_CONNECTED
    };
 
-   E_ConnectState me_ConnectState;
-
-   //Avoid call
-   C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget(const C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget &);
-   C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget & operator =(
-      const C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget &) &;
-
-   void m_HandleCheckboxEnabledState(void) const;
    void m_HandleOperationEnabledState(const bool oq_AdditionalTriggerEnabled) const;
    void m_HandleEditFieldsEnabledState(const bool oq_Enabled) const;
    void m_InitSupportedOperations();
    void m_InitSupportedOperationsComboBox() const;
-   void m_InitDataElements(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id);
-   void m_InitDataElementsMap(void);
-   void m_InitComboBoxFromDataElementsMap(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id);
+   void m_InitDataElement(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id);
    void m_InitThreshold(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id,
                         const stw::opensyde_core::C_OscNodeDataPoolContent & orc_Content);
    void m_InitNonStringThreshold(const stw::opensyde_core::C_OscNodeDataPoolListElement & orc_Element,
                                  const stw::opensyde_core::C_OscNodeDataPoolContent & orc_Content,
                                  const uint32_t ou32_Index);
    void m_InitUnit(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id) const;
-   stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId m_GetSelectedDataElement(void) const;
+   stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayOptValidId m_GetSelectedDataElement(void) const;
    void m_ApplyContentValue(stw::opensyde_core::C_OscNodeDataPoolContent & orc_Content) const;
    void m_AdditionalTriggerEnabledChanged(void);
    void m_DataElementChanged(void);
@@ -89,8 +78,26 @@ private:
    bool m_CurrentElementIsString(void) const;
    stw::opensyde_core::C_OscNodeDataPoolContent m_GetCurrentMinValue(void) const;
    QString m_GetOperationForCore(void) const;
-   void m_SetConnectDisconnectExpertView(void);
+   void m_ToggleExpertView(void);
    void m_OnEditClicked(void);
+   void m_BrowseDataElement(void);
+   void m_SetSelectedDataElement(const QString & orc_SelectedDataElement,
+                                 const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_SelectedElementId);
+   void m_ApplyTriggerConditionToExpertView(void) const;
+   void m_SetExpertTriggerCondition(void) const;
+
+   Ui::C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget * mpc_Ui;
+   E_ConnectState me_ConnectState;
+   uint32_t mu32_NodeIndex;
+   uint32_t mu32_DataLoggerJobIndex;
+   std::vector<std::pair<QString, QString> > mc_MapCoreOperationToUi;
+   QMap<QString, stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId> mc_MapDataElement;
+   stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayOptValidId mc_SelectedOptArrayId;
+
+   //Avoid call
+   C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget(const C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget &);
+   C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget & operator =(
+      const C_SdNdeDalLogJobAdditionalTriggerPropertiesWidget &) &;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -13,8 +13,9 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
+
 #include "C_OscNodeDataPool.hpp"
-#include "C_OscNodeDataPoolListElementOptArrayId.hpp"
+#include "C_OscNodeDataPoolListElementOptArrayOptValidId.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -26,7 +27,7 @@ namespace opensyde_gui_logic
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvDbNodeDataPoolListElementId :
-   public stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId
+   public stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayOptValidId
 {
 public:
    enum E_Type
@@ -62,7 +63,6 @@ public:
    void MarkInvalid(const stw::opensyde_core::C_OscNodeDataPool::E_Type oe_InvalidTypePlaceholder,
                     const QString & orc_InvalidName);
 
-   bool GetIsValid(void) const;
    QString GetInvalidNamePlaceholder(void) const;
    QString GetInvalidItemPlaceholderTooltip(void) const;
    stw::opensyde_core::C_OscNodeDataPool::E_Type GetInvalidTypePlaceholder(void) const;
@@ -73,9 +73,6 @@ public:
 
 private:
    E_Type me_Type;
-   bool mq_IsValid; ///< Invalid flag,
-   ///< should only be set by system definition
-   ///< to system view synchronisation engine
    stw::opensyde_core::C_OscNodeDataPool::E_Type me_InvalidTypePlaceholder; ///< Type used in case of invalid
    QString mc_InvalidNamePlaceholder;                                       ///< Name used in case of invalid
 };

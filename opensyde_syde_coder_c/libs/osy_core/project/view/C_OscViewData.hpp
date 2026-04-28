@@ -61,8 +61,9 @@ public:
                                                          const bool oq_SkipFile);
    int32_t SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_t ou32_NodeIndex, const bool oq_SkipFile);
    int32_t SetNodeUpdateInformationStates(const uint32_t ou32_NodeIndex,
-                                          const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                          const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger);
+                                          const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateAuthentication,
+                                          const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
+                                          const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateTrafficEncryption);
    int32_t SetNodeUpdateInformationParamInfoContent(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
                                                     const stw::scl::C_SclString & orc_FilePath,
                                                     const uint32_t ou32_LastKnownCrc);

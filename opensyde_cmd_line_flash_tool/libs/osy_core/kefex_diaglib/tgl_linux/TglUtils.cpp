@@ -11,8 +11,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <stdlib.h>
-#include <string.h>
+#include <cstring>
 #include <unistd.h>
 #include <err.h>
 #include <pwd.h>
@@ -51,6 +50,7 @@ void stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t
                                   const int32_t os32_Line)
 {
    C_SclString c_Text;
+
    c_Text = static_cast<C_SclString>("Extremely nasty error\n (assertion in module ") + opcn_Module + ", function " +
             opcn_Func + ", line " + C_SclString::IntToStr(os32_Line) + ") !";
    warnx("%s", c_Text.c_str());
@@ -67,16 +67,16 @@ void stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t
    \param[in]     os32_Line              Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo, const char_t * const opcn_Module, 
+void stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo, const char_t * const opcn_Module,
                                         const char_t * const opcn_Func, const int32_t os32_Line)
 {
    C_SclString c_Text;
 
-   c_Text = static_cast<C_SclString>(opcn_DetailInfo)
-                                     + "\nfunction  " + opcn_Func
-                                     + "\nassertion in module  " + opcn_Module
-                                     + ", line  " + C_SclString::IntToStr(os32_Line)
-                                     + "!";
+   c_Text = static_cast<C_SclString>(opcn_DetailInfo) +
+            "\nfunction  " + opcn_Func +
+            "\nassertion in module  " + opcn_Module +
+            ", line  " + C_SclString::IntToStr(os32_Line) +
+            "!";
    warnx("%s", c_Text.c_str());
 }
 
@@ -84,7 +84,7 @@ void stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo, co
 /*! \brief  Get system user name
 
    Reports the name of the currently logged in system user (i.e. the user running the active process)
-   
+
    Known issue: in the following scenario this function will return false:
       - compiling this with a 32-bit compiler on a 64-bit machine
       - that machine doesn't have the 32-bit (i386) verion of libnss-sss installed
@@ -99,18 +99,18 @@ void stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo, co
 //----------------------------------------------------------------------------------------------------------------------
 bool stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 {
-   struct passwd *pt_passwd;
+   struct passwd * pc_PassWord;
    bool q_Return = false;
 
-   pt_passwd = getpwuid(geteuid());
-   if (pt_passwd != NULL)
+   pc_PassWord = getpwuid(geteuid());
+   if (pc_PassWord != NULL)
    {
-      orc_UserName = pt_passwd->pw_name;
+      orc_UserName = pc_PassWord->pw_name;
       q_Return    = true;
    }
    else
    {
-      orc_UserName = "?????";
+      orc_UserName = "\?\?\?\?\?";
    }
    return q_Return;
 }
@@ -130,7 +130,8 @@ bool stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 bool stw::tgl::TglGetSystemMachineName(C_SclString & orc_MachineName)
 {
    char_t acn_HostName[HOST_NAME_MAX + 1];
-   const int x_Result = gethostname(&acn_HostName[0], sizeof(acn_HostName));
+   const int x_Result = //lint !e8080 !e970  type defined by API we use
+                        gethostname(&acn_HostName[0], sizeof(acn_HostName));
 
    if (x_Result == 0)
    {
@@ -152,22 +153,30 @@ bool stw::tgl::TglGetSystemMachineName(C_SclString & orc_MachineName)
 //----------------------------------------------------------------------------------------------------------------------
 void stw::tgl::TglHandleSystemMessages(void)
 {
-/*
-   MSG t_Msg;
-   bool q_Return;
-   q_Return = PeekMessage(&t_Msg, 0, 0, 0, PM_REMOVE) == 0 ? false : true;
-   if (q_Return == true)
-   {
-      TranslateMessage(&t_Msg);
-      DispatchMessage(&t_Msg);
-   }
-*/
+   /*
+      MSG t_Msg;
+      bool q_Return;
+      q_Return = PeekMessage(&t_Msg, 0, 0, 0, PM_REMOVE) == 0 ? false : true;
+      if (q_Return == true)
+      {
+         TranslateMessage(&t_Msg);
+         DispatchMessage(&t_Msg);
+      }
+   */
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set environment variable for calling process
 
    Sets an environment variable to a fixed value.
+   This function was modified to fail in any case after reviewing the code.
+   The implementation uses "putenv" which will usually not do what the author expected.
+   "putenv" will store a pointer to the passed memory, which is on the stack in this implementation.
+   So after the function is left the environment will point to undefined memory.
+   See e.g.: https://wiki.sei.cmu.edu/confluence/display/c/POS34-C.+Do+not+call+putenv%28%29+with+a+pointer+to+an+automatic+variable+as+the+argument
+
+   Fixing this is not straightforward. Better for the function to fail than to do random things.
+   Maybe Team Linux has a ready-made implementation at hand.
 
    \param[in]    orc_Name    name of environment variable
    \param[in]    orc_Value   value of environment variable
@@ -179,14 +188,21 @@ void stw::tgl::TglHandleSystemMessages(void)
 //----------------------------------------------------------------------------------------------------------------------
 int32_t stw::tgl::TglSetEnvironmentVariable(const C_SclString & orc_Name, const C_SclString & orc_Value)
 {
+   (void)orc_Name;
+   (void)orc_Value;
+   tgl_assert(false);
+
+#if 0
    int32_t s32_Return = -1;
-   char acn_String[1024];
-   C_SclString c_String = orc_Name + "=" + orc_Value;
+   char_t acn_String[1024];
+   const C_SclString c_String = orc_Name + "=" + orc_Value;
 
    if (c_String.Length() < sizeof(acn_String))
    {
-      strcpy(acn_String, c_String.c_str());
+      std::strcpy(acn_String, c_String.c_str());
       s32_Return = putenv(acn_String);
    }
    return (s32_Return == 0) ? 0 : -1;
+#endif
+   return -1;
 }

@@ -27,13 +27,14 @@ public:
    enum E_LogFileFormat ///< log file types
    {
       eLFF_CSV,    ///< log file type CSV
-      eLFF_PARQUET ///< log file type CSV
+      eLFF_PARQUET ///< log file type parquet
    };
 
    enum E_LocalLogTrigger ///< local log triggers
    {
       eLLT_ON_CHANGE, ///< local log trigger on change
-      eLLT_INTERVAL   ///< local log trigger on change
+      eLLT_INTERVAL,  ///< local log trigger interval
+      eLLT_ON_RECEIVE ///< local log trigger on receive
    };
 
    enum E_UseCase ///< Use cases

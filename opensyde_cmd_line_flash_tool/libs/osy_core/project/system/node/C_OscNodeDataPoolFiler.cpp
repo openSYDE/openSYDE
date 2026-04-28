@@ -422,6 +422,7 @@ int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolElement(C_OscNodeDataPoolListEleme
 
    orc_NodeDataPoolListElement.f64_Factor = orc_XmlParser.GetAttributeFloat64("factor");
    orc_NodeDataPoolListElement.f64_Offset = orc_XmlParser.GetAttributeFloat64("offset");
+   orc_NodeDataPoolListElement.q_InterpretAsString = orc_XmlParser.GetAttributeBool("interpret_as_string");
    orc_NodeDataPoolListElement.q_DiagEventCall = orc_XmlParser.GetAttributeBool("diag-event-call");
    orc_NodeDataPoolListElement.u32_NvmStartAddress = orc_XmlParser.GetAttributeUint32("nvm-start-address");
    if (orc_XmlParser.SelectNodeChild("name") == "name")
@@ -562,6 +563,7 @@ void C_OscNodeDataPoolFiler::h_SaveDataPoolElement(const C_OscNodeDataPoolListEl
 {
    orc_XmlParser.SetAttributeFloat64("factor", orc_NodeDataPoolListElement.f64_Factor);
    orc_XmlParser.SetAttributeFloat64("offset", orc_NodeDataPoolListElement.f64_Offset);
+   orc_XmlParser.SetAttributeBool("interpret_as_string", orc_NodeDataPoolListElement.q_InterpretAsString);
    if (oe_DatapoolType == C_OscNodeDataPool::eDIAG)
    {
       orc_XmlParser.SetAttributeBool("diag-event-call", orc_NodeDataPoolListElement.q_DiagEventCall);
@@ -650,8 +652,8 @@ int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OscNodeDataPoo
       if (u32_ExpectedSize != orc_NodeDataPoolLists.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected list count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeDataPoolLists.size());
+         c_Tmp.PrintFormatted("Unexpected list count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeDataPoolLists.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
@@ -745,8 +747,8 @@ int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolListElements(
       if (u32_ExpectedSize != orc_NodeDataPoolListElements.size())
       {
          C_SclString c_Tmp;
-         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
-                              orc_NodeDataPoolListElements.size());
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %u, got %u", u32_ExpectedSize,
+                              static_cast<uint32_t>(orc_NodeDataPoolListElements.size()));
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }

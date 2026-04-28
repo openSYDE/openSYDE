@@ -278,7 +278,7 @@ bool C_SdNdeDpListTableWidget::IsSelected(void) const
 void C_SdNdeDpListTableWidget::Reset(void)
 {
    this->mpc_Ui->pc_TableView->Reset();
-   this->m_AdjustToItems();
+   this->m_OnSizeChangePossible();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

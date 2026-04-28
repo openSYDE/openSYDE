@@ -76,16 +76,19 @@ C_TblTreDataElementItem::C_TblTreDataElementItem(const bool oq_IsArrayItem, cons
    \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
    \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
                                           will be marked as used an will be disabled
+   \param[in]  oq_ShowStringElements      Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                                    const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
-                                                   const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+                                                   const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
+                                                   const bool oq_ShowStringElements)
 {
    // Set the name always here, in case of an earlier update, the name was adapted with the explanation
    this->c_Name = this->mc_OriginalName;
-   if (((this->mq_IsArrayItem) && (oq_ShowArrayIndexElements == true)) ||
-       ((this->mq_IsArrayItem == false) && ((this->mq_IsArray == false) || (oq_ShowArrayElements == true))))
+   if ((((this->mq_IsArrayItem) && (oq_ShowArrayIndexElements == true)) ||
+        ((this->mq_IsArrayItem == false) && ((this->mq_IsArray == false) || (oq_ShowArrayElements == true)))) ||
+       ((this->mq_IsArray) && (this->mq_IsString) && oq_ShowStringElements))
    {
       if ((((this->me_Type != C_OscNodeDataPoolContent::eFLOAT64) &&
             (this->me_Type != C_OscNodeDataPoolContent::eUINT64)) &&

@@ -61,6 +61,8 @@ public:
    void UpdateError(const uint32_t ou32_DataElementIndex, const QString & orc_ErrorText,
                     const bool oq_IsTransmissionError, const bool oq_ErrorActive) const;
    void ResetError(void) const;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus);
    void UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value);
    QString GetDataElementName(const uint32_t ou32_DataPoolElementConfigIndex) const;
    QString GetDataElementUnit(const uint32_t ou32_DataPoolElementConfigIndex) const;

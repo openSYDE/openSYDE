@@ -54,8 +54,8 @@ void C_Can::m_InitClass(const uint8_t ou8_CommChannel)
 {
    ms32_Socket = -1;
    ms32_RxTimeout = 0;
-   mu32_RXID = CAN_RX_ID_INVALID;
-   mc_CanIfName.PrintFormatted("can%u", (unsigned int)ou8_CommChannel);
+   mu32_RxId = CAN_RX_ID_INVALID;
+   mc_CanIfName.PrintFormatted("can%d", ou8_CommChannel);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ C_Can::~C_Can(void)
 {
    if (ms32_Socket >= 0)
    {
-      (void)this->CAN_Exit();
+      (void)this->C_Can::CAN_Exit();
    }
 }
 
@@ -88,7 +88,7 @@ C_Can::~C_Can(void)
 
 int32_t C_Can::CAN_Exit(void)
 {
-   int32_t s32_return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    // check if the socket is correct bind
    if (ms32_Socket >= 0)
@@ -98,9 +98,9 @@ int32_t C_Can::CAN_Exit(void)
    }
    else
    {
-      s32_return = C_CONFIG;
+      s32_Return = C_CONFIG;
    }
-   return s32_return;
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,11 +115,11 @@ int32_t C_Can::CAN_Reset(void)
 
 int32_t C_Can::CAN_Init(const C_SclString & orc_InterfaceName, const int32_t os32_RxTimeout)
 {
-   int32_t s32_retval = C_NO_ERR;
-   struct sockaddr_can t_addr;
-   struct ifreq t_ifr;
+   int32_t s32_RetVal = C_NO_ERR;
+   struct sockaddr_can c_Addr;
+   struct ifreq c_IfRequest;
 
-   (void)memcpy(t_ifr.ifr_name, orc_InterfaceName.c_str(), sizeof (t_ifr.ifr_name));
+   (void)memcpy(c_IfRequest.ifr_name, orc_InterfaceName.c_str(), sizeof (c_IfRequest.ifr_name));
 
    // ************************* RxTx Socket configuration*************************
    // open socket
@@ -128,8 +128,8 @@ int32_t C_Can::CAN_Init(const C_SclString & orc_InterfaceName, const int32_t os3
    ms32_Socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
    if (ms32_Socket >= 0)
    {
-      // SIOCGIFINDEX is an macro, which retrieve the interface index of the interface into t_ifr.ifr_index
-      if (ioctl(ms32_Socket, SIOCGIFINDEX, &t_ifr) >= 0)
+      // SIOCGIFINDEX is an macro, which retrieve the interface index of the interface into c_IfRequest.ifr_index
+      if (ioctl(ms32_Socket, SIOCGIFINDEX, &c_IfRequest) >= 0)
       {
          /*
          Disable default receive filter on this raw socket.
@@ -137,7 +137,7 @@ int32_t C_Can::CAN_Init(const C_SclString & orc_InterfaceName, const int32_t os3
          CAN filter definition
          A CAN raw filter list with elements of struct can_filter can be installed with setsockopt. This
          list is used upon reception of CAN frames to decide whether the bound socket will receive a
-         freame. An empty filter list can also be defined using optlen = 0, which is recommended for write-only
+         frame. An empty filter list can also be defined using optlen = 0, which is recommended for write-only
          sockets. If the socket was already bound with BIND, the old filter list gets replaced with the new one.
          Be aware that already received, but not read out CAN frames may stay in the socket buffer.
 
@@ -174,42 +174,43 @@ int32_t C_Can::CAN_Init(const C_SclString & orc_InterfaceName, const int32_t os3
 
          setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
          */
-         struct can_filter at_canFilter[1];
+         struct can_filter ac_CanFilter[1];
 
-         if (mu32_RXID == CAN_RX_ID_INVALID)
+         if (mu32_RxId == CAN_RX_ID_INVALID)
          {
-            at_canFilter[0].can_id = 0;   // don't care
-            at_canFilter[0].can_mask = 0; // ALL frames will pass this filter
+            ac_CanFilter[0].can_id = 0;   // don't care
+            ac_CanFilter[0].can_mask = 0; // ALL frames will pass this filter
          }
          else
          {
-            at_canFilter[0].can_id = mu32_RXID;
-            at_canFilter[0].can_mask = (mu32_RXID & 0x1fffffff) ? CAN_EFF_MASK : CAN_SFF_MASK;
+            ac_CanFilter[0].can_id = mu32_RxId;
+            ac_CanFilter[0].can_mask = ((mu32_RxId & 0x1fffffffU) != 0U) ? CAN_EFF_MASK : CAN_SFF_MASK;
          }
-         if (setsockopt(ms32_Socket, SOL_CAN_RAW, CAN_RAW_FILTER, &at_canFilter, sizeof (at_canFilter)) == 0)
+         if (setsockopt(ms32_Socket, SOL_CAN_RAW, CAN_RAW_FILTER, &ac_CanFilter, sizeof (ac_CanFilter)) == 0)
          {
-            t_addr.can_family = AF_CAN;
+            c_Addr.can_family = AF_CAN;
             // set the received index from the ioctl!!!
-            t_addr.can_ifindex = t_ifr.ifr_ifindex;
+            c_Addr.can_ifindex = c_IfRequest.ifr_ifindex;
             // bind socket
             // The function shall assign a local socket address address to a socket identified by descriptor socket
-            if (bind(ms32_Socket, (struct sockaddr *)&t_addr, sizeof(t_addr)) < 0)
+            //lint -e{9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+            if (bind(ms32_Socket, reinterpret_cast<struct sockaddr *>(&c_Addr), sizeof(c_Addr)) < 0)
             {
                // close socket
                (void)CAN_Exit();
                // set return value
-               s32_retval = C_CONFIG;
+               s32_RetVal = C_CONFIG;
             }
             ms32_RxTimeout = os32_RxTimeout;
             mc_CanIfName = orc_InterfaceName;
-            // TODO: Use SetCommChannel to set cahnnel nmber in CanBase class
+            // TODO: Use SetCommChannel to set channel number in CanBase class
          }
          else
          {
             // close socket
             (void)CAN_Exit();
             // set return value
-            s32_retval = C_CONFIG;
+            s32_RetVal = C_CONFIG;
          }
       }
       else
@@ -217,31 +218,28 @@ int32_t C_Can::CAN_Init(const C_SclString & orc_InterfaceName, const int32_t os3
          // close socket
          (void)CAN_Exit();
          // set return value
-         s32_retval = C_CONFIG;
+         s32_RetVal = C_CONFIG;
       }
    }
    else
    {
-      // error occured while creating new Socket
-      s32_retval = C_CONFIG;
+      // error occurred while creating new Socket
+      s32_RetVal = C_CONFIG;
    }
-   return s32_retval;
+   return s32_RetVal;
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 
 int32_t C_Can::CAN_Init(void)
 {
-   int32_t s32_Error = C_NO_ERR;
-
-   s32_Error = this->CAN_Init(mc_CanIfName, 0);
-
-   return s32_Error;
+   return this->CAN_Init(mc_CanIfName, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-int32_t C_Can::CAN_Init(const int32_t os32_Bitrate)
+int32_t C_Can::CAN_Init(const int32_t os32_BitrateKBitS)
 {
-   (void)os32_Bitrate;
+   (void)os32_BitrateKBitS;
    return CAN_Init();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -249,39 +247,39 @@ int32_t C_Can::CAN_Init(const int32_t os32_Bitrate)
 int32_t C_Can::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
 {
    int32_t s32_Error;
-   int32_t s32_Ret;
 
    if (this->ms32_Socket >= 0)
    {
-      struct pollfd t_PollFd;
-      struct can_frame t_Frame;
+      struct pollfd c_PollFd;
+      struct can_frame c_Frame;
+      int32_t s32_Ret;
 
       // prepare CAN frame
-      t_Frame.can_id =  CAN_ERR_MASK & orc_Message.u32_ID;
+      c_Frame.can_id =  CAN_ERR_MASK & orc_Message.u32_ID;
       if (orc_Message.u8_XTD != 0)
       {
-         t_Frame.can_id |= CAN_EFF_FLAG;
+         c_Frame.can_id |= CAN_EFF_FLAG;
       }
       if (orc_Message.u8_RTR != 0)
       {
-         t_Frame.can_id |= CAN_RTR_FLAG;
+         c_Frame.can_id |= CAN_RTR_FLAG;
       }
-      t_Frame.can_dlc = orc_Message.u8_DLC;
-      for (int i = 0; i < 8; ++i)
+      c_Frame.can_dlc = orc_Message.u8_DLC;
+      for (uint8_t u8_Byte = 0; u8_Byte < 8; ++u8_Byte)
       {
-         t_Frame.data[i] = orc_Message.au8_Data[i];
+         c_Frame.data[u8_Byte] = orc_Message.au8_Data[u8_Byte];
       }
 
       // check if socket is ready (sleep max. 50ms)
-      t_PollFd.fd = this->ms32_Socket;
-      t_PollFd.events = POLLOUT;
-      s32_Ret = poll(&t_PollFd, 1, 50);
+      c_PollFd.fd = this->ms32_Socket;
+      c_PollFd.events = POLLOUT;
+      s32_Ret = poll(&c_PollFd, 1, 50);
       if (s32_Ret > 0)
       {
-         if ((t_PollFd.revents & POLLOUT) != 0)
+         if ((c_PollFd.revents & POLLOUT) != 0)
          {
-            s32_Ret = write(this->ms32_Socket, &t_Frame, sizeof(t_Frame));
-            s32_Error = (s32_Ret ==  sizeof(t_Frame)) ? C_NO_ERR : C_COM;
+            s32_Ret = write(this->ms32_Socket, &c_Frame, sizeof(c_Frame));
+            s32_Error = (s32_Ret ==  sizeof(c_Frame)) ? C_NO_ERR : C_COM;
          }
          else
          {
@@ -310,45 +308,44 @@ int32_t C_Can::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
 
 int32_t C_Can::m_CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
 {
-   return CAN_Read_Msg_Timeout((uint32_t)ms32_RxTimeout, orc_Message);
+   return m_CanReadMsgTimeout(static_cast<uint32_t>(ms32_RxTimeout), orc_Message);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-int32_t C_Can::CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMS, T_STWCAN_Msg_RX & orc_Message)
+int32_t C_Can::m_CanReadMsgTimeout(const uint32_t ou32_MaxWaitTimeMs, T_STWCAN_Msg_RX & orc_Message) const
 {
    int32_t s32_Error;
    int32_t s32_Ret;
 
    if (this->ms32_Socket >= 0)
    {
-      struct pollfd t_PollFd;
+      struct pollfd c_PollFd;
 
-      t_PollFd.fd = this->ms32_Socket;
-      t_PollFd.events = POLLIN;
-      s32_Ret = poll(&t_PollFd, 1, ou32_MaxWaitTimeMS);
+      c_PollFd.fd = this->ms32_Socket;
+      c_PollFd.events = POLLIN;
+      s32_Ret = poll(&c_PollFd, 1, ou32_MaxWaitTimeMs);
       if (s32_Ret > 0)
       {
          s32_Error = C_COM; // indicates that an unexpected error occurred, should never happen
-         if ((t_PollFd.revents & POLLIN) != 0)
+         if ((c_PollFd.revents & POLLIN) != 0)
          {
-            struct can_frame t_Frame;
-
-            s32_Ret = read(this->ms32_Socket, &t_Frame, sizeof(t_Frame));
-            if (s32_Ret == sizeof(t_Frame))
+            struct can_frame c_Frame;
+            const ssize_t x_Ret = //lint !e8080 //using type to match library interface
+                                  read(this->ms32_Socket, &c_Frame, sizeof(c_Frame));
+            if (x_Ret == static_cast<ssize_t>(sizeof(c_Frame)))
             {
                // new message received
-               orc_Message.u64_TimeStamp = TglGetTickCountUs();                    // better than ioctl(SIOCGSTAMP)
-                                                                                    // since
-                                                                                    // this is synchronous to system
-                                                                                    // time
-               orc_Message.u32_ID = t_Frame.can_id & CAN_ERR_MASK;                  // get received ID
-               orc_Message.u8_XTD = ((t_Frame.can_id & CAN_EFF_FLAG) == 0) ? 0 : 1; // get extended flag
-               orc_Message.u8_RTR = ((t_Frame.can_id & CAN_RTR_FLAG) == 0) ? 0 : 1; // get RTR flag
-               orc_Message.u8_DLC = t_Frame.can_dlc;                                // get data length code
-               for (int i = 0; i < 8; ++i)
+               orc_Message.u64_TimeStamp = TglGetTickCountUs(); // better than ioctl(SIOCGSTAMP)
+                                                                // since this is synchronous to system time
+
+               orc_Message.u32_ID = c_Frame.can_id & CAN_ERR_MASK;                     // get received ID
+               orc_Message.u8_XTD = ((c_Frame.can_id & CAN_EFF_FLAG) == 0U) ? 0U : 1U; // get extended flag
+               orc_Message.u8_RTR = ((c_Frame.can_id & CAN_RTR_FLAG) == 0U) ? 0U : 1U; // get RTR flag
+               orc_Message.u8_DLC = c_Frame.can_dlc;                                   // get data length code
+               for (uint8_t u8_Byte = 0; u8_Byte < 8; ++u8_Byte)
                {
-                  orc_Message.au8_Data[i] = t_Frame.data[i];
+                  orc_Message.au8_Data[u8_Byte] = c_Frame.data[u8_Byte];
                }
                s32_Error = C_NO_ERR;
             }
@@ -373,22 +370,24 @@ int32_t C_Can::CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMS, T_STWCAN_
 
 //----------------------------------------------------------------------------------------------------------------------
 
-int32_t C_Can::CAN_Get_System_Time(uint64_t & oru64_SystemTime) const
+int32_t C_Can::CAN_Get_System_Time(uint64_t & oru64_SystemTimeUs) const
 {
-   oru64_SystemTime = TglGetTickCountUs();
+   oru64_SystemTimeUs = TglGetTickCountUs();
    return C_NO_ERR;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_Can::SetLimitRXID(const uint32_t ou32_LimitRXID)
+//lint -e{8001} //keep name so this class can serve as a stand-in replacement for pre-existing Windows applications
+void C_Can::SetLimitRXID(const uint32_t ou32_LimitRxId)
 {
-   mu32_RXID = ou32_LimitRXID;
+   mu32_RxId = ou32_LimitRxId;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
+//lint -e{8001} //keep name so this class can serve as a stand-in replacement for pre-existing Windows applications
 uint32_t C_Can::GetLimitRXID(void) const
 {
-   return mu32_RXID;
+   return mu32_RxId;
 }

@@ -21,8 +21,8 @@
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef STWTYPES_HPP
-#define STWTYPES_HPP
+#ifndef STWTYPESHPP
+#define STWTYPESHPP
 
 #ifndef __cplusplus
 //use stwtypes.h for C sources
@@ -32,6 +32,8 @@ extern T_stwtypes_hpp_undefined_type gt_stwtypes_hpp_FailBuild;
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #if __cplusplus >= 201103L //>= C++11 ?
 #include <cstdint>
+#elif __BORLANDC__ >= 0x630
+#include <stdint.h>
 #else
 #include <climits>
 #endif
@@ -57,6 +59,7 @@ using std::int64_t;
 using std::uint64_t;
 #else //before C++11: typedef types ourselves
 
+#ifndef __BORLANDC__
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
 
@@ -80,15 +83,25 @@ extern T_stwtypes_hpp_undefined_type gt_stwtypes_hpp_FailBuild;
 #endif
 
 //long long is only available from C++11 so we are in compiler specific terrain for 64bit values
-#if defined _MSC_VER || defined __BORLANDC__
+#if defined _MSC_VER
 typedef signed __int64 int64_t;
 typedef unsigned __int64 uint64_t;
 #elif defined __GNUC__
+
+//with GNU GCC the definition of 64 bit types depends of the 32 bit or 64 bit compiler configuration
+//using limits.h mechanisms with stable defines to check for the current configuration
+#if ((ULONG_MAX) == (UINT_MAX))
 typedef signed long long int64_t;
 typedef unsigned long long uint64_t;
 #else
+typedef signed long int64_t;
+typedef unsigned long uint64_t;
+#endif
+
+#else
 //stwtypes.hpp type for 64bit integer not known
 extern T_stwtypes_hpp_undefined_type gt_stwtypes_hpp_FailBuild;
+#endif
 #endif
 #endif
 

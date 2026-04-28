@@ -907,17 +907,17 @@ int32_t C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculati
          }
          if (c_BusSegments.size() == (c_Busses.size() * 2UL))
          {
-            for (uint32_t u32_ItBus = 0; u32_ItBus < c_Busses.size(); ++u32_ItBus)
+            for (uint64_t u64_ItBus = 0; u64_ItBus < c_Busses.size(); ++u64_ItBus)
             {
-               const C_PuiSdBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetUiBus(c_Busses[u32_ItBus]);
+               const C_PuiSdBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetUiBus(c_Busses[u64_ItBus]);
                if (pc_Bus != NULL)
                {
                   QPolygonF c_AnimatedPoints;
                   bool q_Inverse;
                   const QPointF & rc_StartPoint = c_BusSegments[static_cast<std::vector< QPointF>::size_type >
-                                                                (u32_ItBus * 2UL)];
+                                                                (u64_ItBus * 2UL)];
                   const QPointF & rc_EndPoint = c_BusSegments[static_cast<std::vector< QPointF>::size_type >
-                                                              ((u32_ItBus * 2UL) + 1UL)];
+                                                              ((u64_ItBus * 2UL) + 1UL)];
 
                   if (mh_GetAnimationPath(rc_StartPoint, rc_EndPoint, pc_Bus->c_UiInteractionPoints, c_AnimatedPoints,
                                           q_Inverse) == C_NO_ERR)
@@ -936,7 +936,7 @@ int32_t C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculati
 
                            C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
                            if ((pc_CurBus != NULL) &&
-                               (static_cast<uint32_t>(pc_CurBus->GetIndex()) == c_Busses[u32_ItBus]))
+                               (static_cast<uint32_t>(pc_CurBus->GetIndex()) == c_Busses[u64_ItBus]))
                            {
                               bool q_SpeedUp = false;
                               if (pc_CurBus->GetType() == C_OscSystemBus::eETHERNET)
@@ -1003,13 +1003,13 @@ int32_t C_SyvUpScene::mh_GetAnimationPath(const QPointF & orc_PointStart, const 
    bool q_Finished = false;
 
    //Path calculation
-   for (uint32_t u32_ItBusConnection = 0;
-        (u32_ItBusConnection < (static_cast<uint32_t>(orc_UiInteractionPoints.size()) - 1UL)) && (q_Finished == false);
-        ++u32_ItBusConnection)
+   for (uint64_t u64_ItBusConnection = 0;
+        (u64_ItBusConnection < (orc_UiInteractionPoints.size() - 1ULL)) && (q_Finished == false);
+        ++u64_ItBusConnection)
    {
-      const QPointF & rc_LineStart = orc_UiInteractionPoints[u32_ItBusConnection];
+      const QPointF & rc_LineStart = orc_UiInteractionPoints[u64_ItBusConnection];
       const QPointF & rc_LineEnd =
-         orc_UiInteractionPoints[static_cast<std::vector< QPointF>::size_type > (u32_ItBusConnection + 1UL)];
+         orc_UiInteractionPoints[static_cast<std::vector< QPointF>::size_type > (u64_ItBusConnection + 1UL)];
       float64_t f64_Dist1;
       float64_t f64_Dist2;
       C_GiBiConnectableItem::h_DistToLine(rc_LineStart, rc_LineEnd, orc_PointStart, &f64_Dist1);

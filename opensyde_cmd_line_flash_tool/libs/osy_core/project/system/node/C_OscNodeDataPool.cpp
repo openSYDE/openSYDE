@@ -548,6 +548,30 @@ void C_OscNodeDataPool::CheckErrorList(const uint32_t & oru32_ListIndex, bool * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle name max char limit
+
+   \param[in]      ou32_NameMaxCharLimit  Name max char limit
+   \param[in,out]  opc_ChangedItems       Changed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscNodeDataPool::HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems)
+{
+   if ((this->e_Type != C_OscNodeDataPool::eHALC) && (this->e_Type != C_OscNodeDataPool::eHALC_NVM))
+   {
+      C_OscSystemNameMaxCharLimitChangeReportItem::h_HandleNameMaxCharLimitItem(ou32_NameMaxCharLimit,
+                                                                                "node-datapool-name",
+                                                                                this->c_Name,
+                                                                                opc_ChangedItems);
+      for (uint32_t u32_ItList = 0UL; u32_ItList < this->c_Lists.size(); ++u32_ItList)
+      {
+         C_OscNodeDataPoolList & rc_List = this->c_Lists[u32_ItList];
+         rc_List.HandleNameMaxCharLimit(ou32_NameMaxCharLimit, opc_ChangedItems);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get hash for element
 
    \param[in]  ou32_ListIndex       List index

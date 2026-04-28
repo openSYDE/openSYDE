@@ -133,7 +133,8 @@ public:
 
    //Misc
    int32_t GetHalChannelOrDomainName(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
-                                     const uint32_t ou32_Channel, QString & orc_Name) const;
+                                     const uint32_t ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                     QString & orc_Name) const;
    int32_t TranslateToHalcIndex(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id,
                                 const uint32_t ou32_ArrayIndex, uint32_t & oru32_DomainIndex,
                                 bool & orq_UseChannelIndex, uint32_t & oru32_ChannelIndex,

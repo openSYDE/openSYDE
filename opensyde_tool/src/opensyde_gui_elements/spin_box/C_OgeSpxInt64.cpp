@@ -186,6 +186,8 @@ void C_OgeSpxInt64::SetMaximum(const QVariant & orc_Maximum)
 void C_OgeSpxInt64::SetSuffix(const QString & orc_Value)
 {
    this->mc_Suffix = orc_Value;
+   //Apply
+   this->SetValue(this->GetValue(), false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -532,6 +534,18 @@ QString C_OgeSpxInt64::m_ExtractSpinBoxValue(const QString & orc_Text) const
    const QString c_Retval = C_OgeSpxInt64::h_ExtractSpinBoxValue(orc_Text, this->mc_Suffix);
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get suffix
+
+   \return
+   Suffix
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxInt64::m_GetSuffix() const
+{
+   return this->mc_Suffix;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

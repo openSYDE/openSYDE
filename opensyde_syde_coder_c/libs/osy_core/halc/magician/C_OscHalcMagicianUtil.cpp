@@ -126,6 +126,7 @@ stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetListName(const C_OscHalcDefDom
    \param[in]      ou32_ParameterIndexElement   Parameter index element
    \param[in,out]  orc_DomainSingularName       Domain singular name
    \param[in,out]  orc_Name                     Name
+   \param[in]      ou32_CurChannel              Current channel
 
    \return
    C_NO_ERR Variable name
@@ -136,7 +137,7 @@ int32_t C_OscHalcMagicianUtil::h_GetVariableName(const std::vector<C_OscHalcDefS
                                                  const uint32_t ou32_ParameterIndexStruct,
                                                  const uint32_t ou32_ParameterIndexElement,
                                                  const stw::scl::C_SclString & orc_DomainSingularName,
-                                                 stw::scl::C_SclString & orc_Name)
+                                                 stw::scl::C_SclString & orc_Name, const uint32_t ou32_CurChannel)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -148,7 +149,7 @@ int32_t C_OscHalcMagicianUtil::h_GetVariableName(const std::vector<C_OscHalcDefS
          if (ou32_ParameterIndexElement < rc_StructDef.c_StructElements.size())
          {
             const C_OscHalcDefElement & rc_DefElem = rc_StructDef.c_StructElements[ou32_ParameterIndexElement];
-            orc_Name = C_OscHalcMagicianUtil::mh_GetElementName(rc_DefElem, orc_DomainSingularName);
+            orc_Name = C_OscHalcMagicianUtil::mh_GetElementName(rc_DefElem, orc_DomainSingularName, ou32_CurChannel);
          }
          else
          {
@@ -157,7 +158,7 @@ int32_t C_OscHalcMagicianUtil::h_GetVariableName(const std::vector<C_OscHalcDefS
       }
       else
       {
-         orc_Name = C_OscHalcMagicianUtil::mh_GetElementName(rc_StructDef, orc_DomainSingularName);
+         orc_Name = C_OscHalcMagicianUtil::mh_GetElementName(rc_StructDef, orc_DomainSingularName, ou32_CurChannel);
       }
    }
    else
@@ -366,17 +367,29 @@ void C_OscHalcMagicianUtil::h_SetCommonDpElementDefaults(C_OscNodeDataPoolListEl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get element name
 
-   \param[in]  orc_Param   Param
-   \param[in]  orc_Domain  Domain
+   \param[in]  orc_Param         Param
+   \param[in]  orc_Domain        Domain
+   \param[in]  ou32_CurChannel   Current channel
 
    \return
    Complete element name
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw::scl::C_SclString C_OscHalcMagicianUtil::mh_GetElementName(const C_OscHalcDefElement & orc_Param,
-                                                               const stw::scl::C_SclString & orc_Domain)
+                                                               const stw::scl::C_SclString & orc_Domain,
+                                                               const uint32_t ou32_CurChannel)
 {
-   const stw::scl::C_SclString c_Retval = C_OscHalcMagicianUtil::h_CombineVariableName(orc_Domain, orc_Param.c_Display);
+   stw::scl::C_SclString c_Retval = C_OscHalcMagicianUtil::h_CombineVariableName(orc_Domain, orc_Param.c_Display);
+
+   if (orc_Param.GetComplexType() == C_OscHalcDefContent::eCT_STRING)
+   {
+      //First channel = Ch1
+      const uint32_t u32_ChannelDisplayValue = ou32_CurChannel + 1UL;
+      std::stringstream c_Stream;
+      c_Stream << u32_ChannelDisplayValue;
+      c_Retval += "_Ch";
+      c_Retval += c_Stream.str();
+   }
 
    return c_Retval;
 }

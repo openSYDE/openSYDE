@@ -38,7 +38,8 @@ stw--opensyde_gui_elements--C_CamOgePubAbout,
 stw--opensyde_gui_elements--C_CamOgeCbxDark QListView::item,
 stw--opensyde_gui_elements--C_CamOgeCbxTable QListView::item:!selected:hover,
 stw--opensyde_gui_elements--C_CamOgeCbxWhite QListView::item:!selected:hover,
-stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView::item:!selected:hover
+stw--opensyde_gui_elements--C_CamOgeCbxTableSmall QListView::item:!selected:hover,
+stw--opensyde_gui--C_CamMosDatabaseSelectionView
 {
 background-color:transparent;
 }

@@ -254,9 +254,7 @@ void C_FlaSenSearchNodePopup::m_CleanupDcSequence(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_FlaSenSearchNodePopup::m_ApplyClicked(void)
 {
-   const int32_t s32_CurrentItem = this->mpc_Ui->pc_ListWidgetConnectedNodes->selectedItems().count();
-
-   if (s32_CurrentItem > 0)
+   if (this->mpc_Ui->pc_ListWidgetConnectedNodes->selectedItems().count() > 0)
    {
       this->mpc_DcSequences->StartResetSystem();
       this->mc_Timer.start();

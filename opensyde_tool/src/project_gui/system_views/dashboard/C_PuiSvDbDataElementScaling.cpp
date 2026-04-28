@@ -67,5 +67,6 @@ void C_PuiSvDbDataElementScaling::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_Unit.toStdString().c_str(), this->c_Unit.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Unit.toStdString().c_str(),
+                                       static_cast<uint32_t>(this->c_Unit.length()), oru32_HashValue);
 }

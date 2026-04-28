@@ -106,6 +106,7 @@ protected:
    C_OscProtocolDriverOsyTpIp * mpc_IpTransportProtocolBroadcast;
 
    const C_OscSystemDefinition * mpc_SysDef;
+   uint32_t mu32_ActiveBusIndex; //index of bus within mpc_SysDef that we are connecting from
 
    uint32_t m_GetActiveNodeCount(void) const;
    uint32_t m_GetActiveIndex(const uint32_t ou32_NodeIndex, bool * const opq_Found = NULL) const;
@@ -128,9 +129,11 @@ protected:
    int32_t m_SetNodeSessionIdWithExpectation(const uint32_t ou32_ActiveNode,
                                              const uint8_t ou8_ExpectedNeededSession) const;
    int32_t m_SetNodeSecurityAccess(const uint32_t ou32_ActiveNode, const uint8_t ou8_SecurityLevel,
-                                   uint8_t * const opu8_NrCode) const;
+                                   uint8_t * const opu8_NrCode, bool * const opq_SecureAuthenticationActive = NULL,
+                                   bool * const opq_TrafficEncryptionActive = NULL) const;
    int32_t m_SetNodeSecurityAccess(C_OscProtocolDriverOsy * const opc_ExistingProtocol, const uint8_t ou8_SecurityLevel,
-                                   uint8_t * const opu8_NrCode) const;
+                                   uint8_t * const opu8_NrCode, bool * const opq_SecureAuthenticationActive = NULL,
+                                   bool * const opq_TrafficEncryptionActive = NULL) const;
    int32_t m_SetNodesSecurityAccess(const uint8_t ou8_SecurityLevel, std::set<uint32_t> & orc_ErrorActiveNodes) const;
    int32_t m_SetNodesSecurityAccess(const std::vector<uint32_t> & orc_ActiveNodes, const uint8_t ou8_SecurityLevel,
                                     std::set<uint32_t> & orc_ErrorActiveNodes) const;
@@ -191,26 +194,19 @@ private:
    uint32_t mu32_ActiveNodeCount;          ///< Active node count in mc_ActiveNodesIndexes, not in mc_ActiveNodesSystem
    C_OscIpDispatcher * mpc_IpDispatcher;   ///< Holds created instance of IP dispatcher
 
-   std::map<uint32_t, uint32_t> mc_ActiveNodeIp2IpDispatcher; ///< Mapping from active node index to
-   // node
-   // TCP dispatcher handle for IP to IP
-   // routing
-   std::vector<uint32_t> mc_ActiveNodeIp2IpDispatcherNodeCount; ///< Count of nodes which use the TCP
-   // dispatcher handle for IP to IP
-   // routing
+   std::map<uint32_t, uint32_t> mc_ActiveNodeIp2IpDispatcher; ///< Mapping from active node index to node
+   // TCP dispatcher handle for IP to IP routing
+   std::vector<uint32_t> mc_ActiveNodeIp2IpDispatcherNodeCount; ///< Count of nodes which use the TCP/ dispatcher handle
+   // for IP to IP routing
 
-   std::map<uint32_t, uint32_t> mc_ActiveNodeIp2CanDispatcher; ///< Mapping from active node index to
-   // node
-   // TCP dispatcher handle for IP to CAN
-   // routing
+   std::map<uint32_t, uint32_t> mc_ActiveNodeIp2CanDispatcher; ///< Mapping from active node index to node
+   // TCP dispatcher handle for IP to CAN routing
    std::vector<uint32_t> mc_ActiveNodeIp2CanDispatcherNodeCount; ///< Count of nodes which use the TCP
-   // dispatcher handle for IP to CAN
-   // routing
+   // dispatcher handle for IP to CAN routing
 
    std::vector<uint8_t> mc_ActiveNodesSystem; ///< List of flags for all nodes which are active in the system
    // definition set by Init call
 
-   uint32_t mu32_ActiveBusIndex;
    C_OscSecurityPemDatabase * mpc_SecurityPemDb;
 
    int32_t m_InitRoutesAndActiveNodes(void);

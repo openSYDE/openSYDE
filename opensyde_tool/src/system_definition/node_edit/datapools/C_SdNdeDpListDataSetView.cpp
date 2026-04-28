@@ -572,7 +572,7 @@ void C_SdNdeDpListDataSetView::selectionChanged(const QItemSelection & orc_Selec
 
    c_SelectedIndices = C_SdNdeDpUtil::h_ConvertVector(this->selectedIndexes(), false);
    C_Uti::h_Uniqueify(c_SelectedIndices);
-   Q_EMIT this->SigSelectionChanged(c_SelectedIndices.size());
+   Q_EMIT (this->SigSelectionChanged(static_cast<uint32_t>(c_SelectedIndices.size())));
    m_CheckActions(c_SelectedIndices);
 }
 

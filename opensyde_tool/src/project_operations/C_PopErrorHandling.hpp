@@ -16,6 +16,7 @@
 #include <QWidget>
 #include <QString>
 #include "stwtypes.hpp"
+#include "C_SclString.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw

@@ -782,7 +782,8 @@ void C_CamMainWindow::m_SaveUserSettings(void)
    C_UsHandler::h_GetInstance()->SetScreenPos(this->normalGeometry().topLeft());
    C_UsHandler::h_GetInstance()->SetAppSize(this->normalGeometry().size());
    C_UsHandler::h_GetInstance()->SetAppMaximized(this->isMaximized());
-   C_UsHandler::h_GetInstance()->SetAppScreenIndex(QGuiApplication::screens().indexOf(this->screen()));
+   C_UsHandler::h_GetInstance()->SetAppScreenIndex(
+      static_cast<uint32_t>(QGuiApplication::screens().indexOf(this->screen())));
 
    // splitter
    // update to actual value if settings are not collapsed

@@ -55,10 +55,10 @@ C_CamProLoggingData::C_CamProLoggingData(void) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProLoggingData::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_FileName.toStdString().c_str(), this->c_FileName.length(),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_Directory.toStdString().c_str(), this->c_Directory.length(),
-                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_FileName.toStdString().c_str(),
+                                       static_cast<uint32_t>(this->c_FileName.length()), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Directory.toStdString().c_str(),
+                                       static_cast<uint32_t>(this->c_Directory.length()), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_OverwriteMode, sizeof(this->e_OverwriteMode), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->e_FileFormat, sizeof(this->e_FileFormat), oru32_HashValue);

@@ -21,6 +21,7 @@
 #include "TglUtils.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_OscSupServiceUpdatePackageV1.hpp"
+// TODO GS #include "C_OscSupServiceUpdatePackageCreate.hpp"
 #include "C_OscViewData.hpp"
 #include "C_OscSystemDefinitionFiler.hpp"
 #include "C_OscSystemFilerUtil.hpp"
@@ -187,6 +188,15 @@ C_SydeSup::E_Result C_SupCreatePackage::Create()
                                                                    c_NodeActiveFlags, c_NodesUpdateOrder,
                                                                    c_ApplicationsToWrite,
                                                                    c_Warnings, c_Error, false, true, mc_TempDir);
+      // We use V1 because the create package functionality was only made for very special customer purposes
+      // that had no need for security features. If it gets ordered somewhen, take the money and use:
+      // (okay, maybe some interface for password and Co. is needed too)
+      /*s32_Return = C_OscSupServiceUpdatePackageCreate::h_CreatePackage(mc_SupFilePath, c_SystemDefinition,
+                                                                       c_View.GetOscPcData().GetBusIndex(),
+                                                                       c_NodeActiveFlags, c_NodesUpdateOrder,
+                                                                       c_ApplicationsToWrite, c_Warnings,
+                                                                       c_Error, mc_TempDir, {}, {}
+                                                                       );*/
 
       // File writing issues
       if ((s32_Return == C_RD_WR) || (s32_Return == C_RANGE) || (s32_Return == C_BUSY))
@@ -295,21 +305,26 @@ void C_SupCreatePackage::m_GetUpdatePackage(const C_OscViewData & orc_View,
          {
             if (rc_NodeUpdateInfo.GetSkipUpdateOfPemFile() == false)
             {
-               C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
-               C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
-
                const C_SclString c_AbsolutePath =
                   TglIsRelativePath(rc_NodeUpdateInfo.GetPemFilePath()) ?
                   TglExpandFileName(rc_NodeUpdateInfo.GetPemFilePath(), TglExtractFilePath(mc_OsyProjectPath)) :
                   rc_NodeUpdateInfo.GetPemFilePath();
                rc_AppsToWrite.c_PemFile = c_AbsolutePath;
-               // Fill PEM states
-               rc_NodeUpdateInfo.GetStates(e_StateSecurity, e_StateDebugger);
-               C_OscSuSequences::h_FillDoFlashWithPemStates(e_StateSecurity, e_StateDebugger, rc_AppsToWrite);
                C_SydeSup::h_WriteLog(mc_LoggingCategory,
                                      "For node \"" + rc_Node.c_Properties.c_Name + "\" use PEM file: " +
                                      c_AbsolutePath, false, mq_Quiet);
             }
+         }
+
+         // Security options
+         // In fact not used, because we currently generate package in version V1. See call of h_CreatePackage for info.
+         {
+            C_OscViewNodeUpdate::E_StateSecureAuthentication e_StateAuth;
+            C_OscViewNodeUpdate::E_StateTrafficEncryption e_StateTrafficEncryption;
+            C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
+            rc_NodeUpdateInfo.GetStates(e_StateAuth, e_StateDebugger, e_StateTrafficEncryption);
+            C_OscSuSequences::h_FillDoFlashWithSecurityOptions(e_StateAuth, e_StateTrafficEncryption,
+                                                               e_StateDebugger, rc_AppsToWrite);
          }
       }
    }

@@ -385,7 +385,7 @@ int32_t C_PuiSdHandlerFiler::h_SaveDataPools(const std::vector<C_PuiSdNodeDataPo
       if (orc_UiDataPools.size() == opc_OscDataPools->size())
       {
          orc_XmlParser.CreateAndSelectNodeChild("data-pools");
-         orc_XmlParser.SetAttributeUint32("length", orc_UiDataPools.size());
+         orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_UiDataPools.size()));
          for (uint32_t u32_ItDataPool = 0; (u32_ItDataPool < orc_UiDataPools.size()) && (s32_Retval == C_NO_ERR);
               ++u32_ItDataPool)
          {
@@ -411,7 +411,7 @@ int32_t C_PuiSdHandlerFiler::h_SaveDataPools(const std::vector<C_PuiSdNodeDataPo
    else
    {
       orc_XmlParser.CreateAndSelectNodeChild("data-pools");
-      orc_XmlParser.SetAttributeUint32("length", orc_UiDataPools.size());
+      orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_UiDataPools.size()));
       for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < orc_UiDataPools.size(); ++u32_ItDataPool)
       {
          orc_XmlParser.CreateAndSelectNodeChild("data-pool");
@@ -493,7 +493,7 @@ void C_PuiSdHandlerFiler::h_SaveDataPool(const C_PuiSdNodeDataPool & orc_DataPoo
 void C_PuiSdHandlerFiler::h_SaveDataPoolLists(const std::vector<C_PuiSdNodeDataPoolList> & orc_DataPoolLists,
                                               C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_DataPoolLists.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_DataPoolLists.size()));
    for (uint32_t u32_ItDataPoolList = 0; u32_ItDataPoolList < orc_DataPoolLists.size();
         ++u32_ItDataPoolList)
    {
@@ -530,7 +530,7 @@ void C_PuiSdHandlerFiler::h_SaveDataPoolList(const C_PuiSdNodeDataPoolList & orc
 void C_PuiSdHandlerFiler::h_SaveDataPoolListElements(
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_DataPoolListElements.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_DataPoolListElements.size()));
    for (uint32_t u32_ItDataPoolListElement = 0;
         u32_ItDataPoolListElement < orc_DataPoolListElements.size();
         ++u32_ItDataPoolListElement)
@@ -807,7 +807,7 @@ void C_PuiSdHandlerFiler::h_SaveSharedDatapoolsGroups(const C_PuiSdSharedDatapoo
    uint32_t u32_GroupCounter;
    uint32_t u32_DatapoolIdCounter;
 
-   orc_XmlParser.SetAttributeUint32("length", orc_SharedDatapools.c_SharedDatapools.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_SharedDatapools.c_SharedDatapools.size()));
 
    // Iterate over all different groups
    for (u32_GroupCounter = 0U; u32_GroupCounter < orc_SharedDatapools.c_SharedDatapools.size(); ++u32_GroupCounter)
@@ -816,7 +816,7 @@ void C_PuiSdHandlerFiler::h_SaveSharedDatapoolsGroups(const C_PuiSdSharedDatapoo
          orc_SharedDatapools.c_SharedDatapools[u32_GroupCounter];
 
       orc_XmlParser.CreateAndSelectNodeChild("group");
-      orc_XmlParser.SetAttributeUint32("length", rc_Group.size());
+      orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(rc_Group.size()));
 
       // All Datapool Ids of the group
       for (u32_DatapoolIdCounter = 0U; u32_DatapoolIdCounter < rc_Group.size(); ++u32_DatapoolIdCounter)
@@ -1268,7 +1268,7 @@ int32_t C_PuiSdHandlerFiler::h_SaveCanProtocols(const std::vector<C_PuiSdNodeCan
       if (orc_UiCanProtocols.size() == opc_OscCanProtocols->size())
       {
          orc_XmlParser.CreateAndSelectNodeChild("com-protocols");
-         orc_XmlParser.SetAttributeUint32("length", orc_UiCanProtocols.size());
+         orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_UiCanProtocols.size()));
          for (uint32_t u32_ItCanProtocol = 0;
               (u32_ItCanProtocol < orc_UiCanProtocols.size()) && (s32_Retval == C_NO_ERR);
               ++u32_ItCanProtocol)
@@ -1305,7 +1305,7 @@ int32_t C_PuiSdHandlerFiler::h_SaveCanProtocols(const std::vector<C_PuiSdNodeCan
    else
    {
       orc_XmlParser.CreateAndSelectNodeChild("com-protocols");
-      orc_XmlParser.SetAttributeUint32("length", orc_UiCanProtocols.size());
+      orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_UiCanProtocols.size()));
       for (uint32_t u32_ItCanProtocol = 0; u32_ItCanProtocol < orc_UiCanProtocols.size(); ++u32_ItCanProtocol)
       {
          orc_XmlParser.CreateAndSelectNodeChild("com-protocol");
@@ -1390,7 +1390,7 @@ void C_PuiSdHandlerFiler::h_SaveCanProtocol(const C_PuiSdNodeCanProtocol & orc_C
 void C_PuiSdHandlerFiler::h_SaveCanMessageContainers(
    const std::vector<C_PuiSdNodeCanMessageContainer> & orc_CanMessageContainers, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_CanMessageContainers.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_CanMessageContainers.size()));
    for (uint32_t u32_ItCanMessageContainer = 0; u32_ItCanMessageContainer < orc_CanMessageContainers.size();
         ++u32_ItCanMessageContainer)
    {
@@ -1431,7 +1431,7 @@ void C_PuiSdHandlerFiler::h_SaveCanMessageContainer(const C_PuiSdNodeCanMessageC
 void C_PuiSdHandlerFiler::h_SaveCanMessages(const std::vector<C_PuiSdNodeCanMessage> & orc_CanMessages,
                                             C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_CanMessages.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_CanMessages.size()));
    for (uint32_t u32_ItMessage = 0; u32_ItMessage < orc_CanMessages.size();
         ++u32_ItMessage)
    {
@@ -1491,7 +1491,7 @@ void C_PuiSdHandlerFiler::h_SaveCanMessage(const C_PuiSdNodeCanMessage & orc_Can
 void C_PuiSdHandlerFiler::h_SaveCanSignals(const std::vector<C_PuiSdNodeCanSignal> & orc_CanSignals,
                                            C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_CanSignals.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_CanSignals.size()));
    for (uint32_t u32_ItDataPoolListElement = 0;
         u32_ItDataPoolListElement < orc_CanSignals.size();
         ++u32_ItDataPoolListElement)
@@ -1691,7 +1691,7 @@ void C_PuiSdHandlerFiler::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nodes
 {
    if (orc_Nodes.size() > 0)
    {
-      orc_XmlParser.SetAttributeUint32("length", orc_Nodes.size());
+      orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Nodes.size()));
       for (uint32_t u32_Index = 0U; u32_Index < orc_Nodes.size(); u32_Index++)
       {
          orc_XmlParser.CreateAndSelectNodeChild("node");
@@ -1780,7 +1780,7 @@ int32_t C_PuiSdHandlerFiler::h_LoadBuses(std::vector<C_PuiSdBus> & orc_Buses, C_
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveBuses(const std::vector<C_PuiSdBus> & orc_Buses, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_Buses.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Buses.size()));
    if (orc_Buses.size() > 0)
    {
       for (uint32_t u32_Index = 0U; u32_Index < orc_Buses.size(); u32_Index++)
@@ -1864,7 +1864,7 @@ int32_t C_PuiSdHandlerFiler::h_LoadBusTextElements(std::vector<C_PuiSdTextElemen
 void C_PuiSdHandlerFiler::h_SaveBusTextElements(const std::vector<C_PuiSdTextElementBus> & orc_BusTextElements,
                                                 C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeUint32("length", orc_BusTextElements.size());
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_BusTextElements.size()));
    for (uint32_t u32_Index = 0U; u32_Index < orc_BusTextElements.size(); ++u32_Index)
    {
       orc_XmlParser.CreateAndSelectNodeChild("bus-text-element");
@@ -2007,7 +2007,7 @@ int32_t C_PuiSdHandlerFiler::h_SaveSystemDefinitionUiFile(const QString & orc_Fi
       //Version
       c_XmlParser.CreateNodeChild("file-version", "1");
       tgl_assert(c_XmlParser.CreateAndSelectNodeChild("nodes") == "nodes");
-      c_XmlParser.SetAttributeUint32("length", orc_OscSystemDefinition.c_Nodes.size());
+      c_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_OscSystemDefinition.c_Nodes.size()));
       if (orc_OscSystemDefinition.c_Nodes.size() == orc_UiNodes.size())
       {
          for (uint32_t u32_ItNode = 0UL;

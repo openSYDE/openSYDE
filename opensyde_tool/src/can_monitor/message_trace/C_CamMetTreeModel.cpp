@@ -465,9 +465,9 @@ void C_CamMetTreeModel::SetTraceBufferSize(const uint32_t ou32_Value)
 std::vector<C_CamMetTreeLoggerData *> C_CamMetTreeModel::GetAllMessagesForProtocolChange(void)
 {
    std::vector<C_CamMetTreeLoggerData *> c_Retval;
-   const int32_t s32_CompleteSize = static_cast<int32_t>(this->mc_DataBase.size()) + this->mc_UniqueMessages.size();
+   const int64_t s64_CompleteSize = static_cast<int32_t>(this->mc_DataBase.size()) + this->mc_UniqueMessages.size();
    //Reserve
-   c_Retval.reserve(s32_CompleteSize);
+   c_Retval.reserve(s64_CompleteSize);
    //Append vector
    for (uint32_t u32_ItVec = 0; u32_ItVec < this->mc_DataBase.size(); ++u32_ItVec)
    {
@@ -734,11 +734,11 @@ int32_t C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
       //Top level
       if (this->mq_UniqueMessageMode == true)
       {
-         s32_Retval = this->mc_UniqueMessages.size();
+         s32_Retval = static_cast<int32_t>(this->mc_UniqueMessages.size());
       }
       else
       {
-         s32_Retval = this->mc_DataBase.size();
+         s32_Retval = static_cast<int32_t>(this->mc_DataBase.size());
       }
    }
    else
@@ -2149,8 +2149,8 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
    for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
    {
       const C_OscComMessageLoggerDataSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
-      c_W1.push_back(rc_Signal.c_Name.c_str());
-      c_W2.push_back(rc_Signal.c_Unit.c_str());
+      c_W1.emplace(*rc_Signal.c_Name.c_str());
+      c_W2.emplace(*rc_Signal.c_Unit.c_str());
    }
    c_Retval.push_back(c_W1);
    c_Retval.push_back(c_W2);
@@ -2195,7 +2195,8 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
                                   static_cast<int32_t>(opc_Item->c_Children.size() + orc_Message.c_Signals.size()));
          }
          //Add
-         for (uint32_t u32_ItSig = opc_Item->c_Children.size(); u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+         for (uint32_t u32_ItSig = static_cast<uint32_t>(opc_Item->c_Children.size());
+              u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
          {
             opc_Item->AddChild(new C_TblTreSimpleItem());
          }
@@ -2263,7 +2264,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          const C_TblTreSimpleItem * const pc_Child = opc_Item->c_Children[u32_ItChild];
          if (pc_Child != NULL)
          {
-            c_Current.push_back(pc_Child->c_Children.size());
+            c_Current.push_back(static_cast<uint32_t>(pc_Child->c_Children.size()));
          }
       }
       //Compare
@@ -2864,7 +2865,7 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
       else
       {
          //If all valid, use last item
-         oru32_InsertAt = orc_CurrentVec.size();
+         oru32_InsertAt = static_cast<uint32_t>(orc_CurrentVec.size());
          oru32_InsertNum = orc_ExpectedVec[static_cast<std::vector<uint32_t>::size_type>(orc_ExpectedVec.size() - 1UL)];
       }
       for (uint32_t u32_ItCurrent = 0; (u32_ItCurrent < orc_CurrentVec.size()) && q_FixByInsertingNewChild;
@@ -3067,7 +3068,7 @@ uint32_t C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
    else
    {
       //Skip multiplexer in counting
-      u32_Counter += c_Order.size();
+      u32_Counter += static_cast<uint32_t>(c_Order.size());
       //Others
       for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
       {
@@ -3153,7 +3154,8 @@ void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OscComMessageLog
          if (s32_MultiplexerValue >= 0)
          {
             // Compare the multiplexer value of this multiplexer signal with all multiplexed signals
-            for (u32_SignalCounter = u32_MultiplexerCounter + 1U; u32_SignalCounter < orc_Signals.size();
+            for (u32_SignalCounter = u32_MultiplexerCounter + 1U;
+                 u32_SignalCounter < static_cast<uint32_t>(orc_Signals.size());
                  ++u32_SignalCounter)
             {
                if ((orc_Signals[u32_SignalCounter].c_OscSignal.e_MultiplexerType ==

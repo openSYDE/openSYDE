@@ -293,7 +293,7 @@ uint32_t C_CamGenSigUtil::h_CalcMessageHash(const C_OscCanMessage & orc_Message,
                                             const std::vector<C_OscNodeDataPoolListElement> & orc_DatapoolPart)
 {
    uint32_t u32_Retval = 0UL;
-   const uint32_t u32_Size = orc_DatapoolPart.size();
+   const uint32_t u32_Size = static_cast<uint32_t>(orc_DatapoolPart.size());
 
    orc_Message.CalcHash(u32_Retval, true);
    stw::scl::C_SclChecksums::CalcCRC32(&u32_Size, sizeof(u32_Size), u32_Retval);

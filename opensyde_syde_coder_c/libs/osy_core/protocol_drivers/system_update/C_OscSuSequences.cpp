@@ -54,11 +54,31 @@ using namespace stw::diag_lib;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OscSuSequences::C_DoFlash::C_DoFlash(void) :
-   q_SendSecurityEnabledState(false),
-   q_SecurityEnabled(false),
+   q_SendSecureAuthenticationEnabledState(false),
+   q_SecureAuthenticationEnabled(false),
+   q_SendTrafficEncryptionEnabledState(false),
+   q_TrafficEncryptionEnabled(false),
    q_SendDebuggerEnabledState(false),
    q_DebuggerEnabled(false)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check whether the instance contains any data to be written
+
+   \return  true: configuration contains data that needs writing
+            false: empty config
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscSuSequences::C_DoFlash::IsAnyActionRequired() const
+{
+   return ((this->c_FilesToFlash.size() > 0) ||
+           (this->c_FilesToWriteToNvm.size() > 0) ||
+           (this->c_PemFile != "") ||
+           (this->q_SendDebuggerEnabledState) ||
+           (this->q_SendSecureAuthenticationEnabledState) ||
+           (this->q_SendTrafficEncryptionEnabledState));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -448,7 +468,7 @@ int32_t C_OscSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SclString> 
                              "Checking memory availability ...");
       if (orq_SetProgrammingMode == true)
       {
-         // In the hole update sequence, setting the programming mode only one time
+         // In the whole update sequence, setting the programming mode only one time
          s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
          orq_SetProgrammingMode = false;
       }
@@ -846,7 +866,7 @@ int32_t C_OscSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SclString>
                           "Checking memory availability ...");
    if (orq_SetProgrammingMode == true)
    {
-      // In the hole update sequence, setting the programming mode only one time
+      // In the whole update sequence, setting the programming mode only one time
       s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
       orq_SetProgrammingMode = false;
    }
@@ -951,7 +971,7 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeFile(const C_SclString & orc_Fil
       }
       else
       {
-         s32_FileApiReturn = std::ftell(pc_File);
+         s32_FileApiReturn = static_cast<int32_t>(std::ftell(pc_File));
          if (s32_FileApiReturn < 0)
          {
             s32_Return = C_RD_WR;
@@ -1299,7 +1319,7 @@ int32_t C_OscSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SclString> & or
       {
          if (oq_SetProgrammingMode == true)
          {
-            // In the hole update sequence, setting the programming mode only one time
+            // In the whole update sequence, setting the programming mode only one time
             s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
             // Last step with this security level in this sequence
          }
@@ -1441,7 +1461,7 @@ int32_t C_OscSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SclString> & or
    \param[in]      orc_ProtocolFeatures          Information about available protocol features
    \param[in,out]  orq_SetProgrammingMode        In: Flag if programming mode must be set.
                                                  Out: Flag if programming mode was set.
-   \param[out]     orc_StatePemFile              State of PEM file
+   \param[out]     orc_StateSecuritySettings     State of security settings (info will be merged in)
 
    \return
    C_NO_ERR    file was written or nothing to do
@@ -1455,7 +1475,7 @@ int32_t C_OscSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SclString> & or
 int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & orc_FileToWrite,
                                                  const C_OscProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
                                                  bool & orq_SetProgrammingMode,
-                                                 C_OscSuSequencesNodePemFileStates & orc_StatePemFile)
+                                                 C_OscSuSequencesNodeSecuritySettingsStates & orc_StateSecuritySettings)
 {
    int32_t s32_Return;
 
@@ -1464,13 +1484,14 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
                              "Writing PEM file ...");
 
-      if (orc_ProtocolFeatures.q_SupportsSecurity == false)
+      if (orc_ProtocolFeatures.q_SupportsSecurityAuthentication == false)
       {
          s32_Return = C_RANGE;
          // Security feature is necessary to write PEM file to flashloader
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
                                 mc_CurrentNode,
-                                "The node has not the Flashloader features to support security and to write PEM files.");
+                                "The node has not the Flashloader features to support security authentication"
+                                " and to write PEM files.");
       }
       else
       {
@@ -1485,7 +1506,7 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
             std::vector<uint8_t> c_PubKeyModulus;
             std::vector<uint8_t> c_PubKeyExponent;
 
-            orc_StatePemFile.e_FileLoaded = eSUSEQ_STATE_NO_ERR;
+            orc_StateSecuritySettings.e_FileLoaded = eSUSEQ_STATE_NO_ERR;
 
             s32_Return = C_OscSecurityPem::h_ExtractModulusAndExponent(c_PubKeyDecoded, c_PubKeyModulus,
                                                                        c_PubKeyExponent,
@@ -1493,11 +1514,11 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
 
             if (s32_Return == C_NO_ERR)
             {
-               orc_StatePemFile.e_PemFileExtracted = eSUSEQ_STATE_NO_ERR;
+               orc_StateSecuritySettings.e_PemFileExtracted = eSUSEQ_STATE_NO_ERR;
 
                if (orq_SetProgrammingMode == true)
                {
-                  // In the hole update sequence, setting the programming mode only one time
+                  // In the whole update sequence, setting the programming mode only one time
                   const uint8_t u8_SECURITY_LEVEL = 1U;
                   s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
                   orq_SetProgrammingMode = false;
@@ -1515,7 +1536,7 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
             }
             else
             {
-               orc_StatePemFile.e_PemFileExtracted = eSUSEQ_STATE_ERROR;
+               orc_StateSecuritySettings.e_PemFileExtracted = eSUSEQ_STATE_ERROR;
             }
 
             if (s32_Return == C_NO_ERR)
@@ -1523,24 +1544,25 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
                const std::vector<uint8_t> c_KeySerialNumber = c_PemFile.GetKeyInfo().GetCertificateSerialNumber();
                uint8_t u8_NrCode;
 
-               s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityKey(this->mc_CurrentNode, c_PubKeyModulus,
-                                                                         c_PubKeyExponent,
-                                                                         c_KeySerialNumber,
-                                                                         &u8_NrCode);
+               s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityAuthenticationKey(this->mc_CurrentNode,
+                                                                                       c_PubKeyModulus,
+                                                                                       c_PubKeyExponent,
+                                                                                       c_KeySerialNumber,
+                                                                                       &u8_NrCode);
 
                if (s32_Return != C_NO_ERR)
                {
                   (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR, s32_Return,
                                          75U, mc_CurrentNode,
-                                         "Could not write security key. Details: " +
+                                         "Could not write security authentication key. Details: " +
                                          C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
                                                                                                   u8_NrCode));
-                  orc_StatePemFile.e_SecurityKeySent = eSUSEQ_STATE_ERROR;
+                  orc_StateSecuritySettings.e_SecureAuthenticationKeySent = eSUSEQ_STATE_ERROR;
                   s32_Return = C_COM;
                }
                else
                {
-                  orc_StatePemFile.e_SecurityKeySent = eSUSEQ_STATE_NO_ERR;
+                  orc_StateSecuritySettings.e_SecureAuthenticationKeySent = eSUSEQ_STATE_NO_ERR;
                }
             }
             else
@@ -1555,9 +1577,9 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
          {
             (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR, s32_Return,
                                    25U, mc_CurrentNode,
-                                   "Could not extract security key from decoded public key. Details: " +
+                                   "Could not extract security authentication key from decoded public key. Details: " +
                                    c_ErrorMessage);
-            orc_StatePemFile.e_FileLoaded = eSUSEQ_STATE_ERROR;
+            orc_StateSecuritySettings.e_FileLoaded = eSUSEQ_STATE_ERROR;
             s32_Return = C_RD_WR;
          }
       }
@@ -1571,8 +1593,8 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
    else
    {
       // Nothing to do, no error
-      orc_StatePemFile.e_FileLoaded = eSUSEQ_STATE_NOT_NEEDED;
-      orc_StatePemFile.e_SecurityKeySent = eSUSEQ_STATE_NOT_NEEDED;
+      orc_StateSecuritySettings.e_FileLoaded = eSUSEQ_STATE_NOT_NEEDED;
+      orc_StateSecuritySettings.e_SecureAuthenticationKeySent = eSUSEQ_STATE_NOT_NEEDED;
       s32_Return = C_NO_ERR;
    }
 
@@ -1580,7 +1602,12 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Write device states to openSYDE node
+/*! \brief   Write security related settings to openSYDE node
+
+   Contains:
+   * secure authentication on/off
+   * traffic encryption on/off
+   * debugger interface on/off
 
    Assumptions/prerequisites (not explicitly checked by this function):
    * mc_CurrentNode contains ID of node to work with
@@ -1590,93 +1617,152 @@ int32_t C_OscSuSequences::m_WritePemOpenSydeFile(const stw::scl::C_SclString & o
    \param[in]      orc_ApplicationsToWrite       Update configuration with all states for sending or not sending
    \param[in]      orc_ProtocolFeatures          Information about available protocol features
    \param[in,out]  orq_SetProgrammingMode        In: Flag if programming mode must be set.
-                                                 Out: Flag if programming mode was set.
-   \param[out]     orc_StatePemFile              State of PEM file and its associated handled states
+                                                 Out: Flag if programming mode was already set.
+   \param[out]     orc_StateSecuritySettings     State of security settings (info will be merged in)
 
    \return
-   C_NO_ERR    all states were written or no write process was necessary
-   C_COM       communication driver reported problem (details will be written to log file)
-   C_RANGE     At least one feature of the openSYDE Flashloader is not available for state writing
-   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+   C_NO_ERR     all settings were written or no write process was required
+   C_COM        communication driver reported problem (details will be written to log file)
+   C_RANGE      At least one feature of the openSYDE Flashloader is not available for writing
+   C_CHECKSUM   Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscSuSequences::m_WriteOpenSydeNodeStates(const C_OscSuSequences::C_DoFlash & orc_ApplicationsToWrite,
                                                     const C_OscProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures, bool & orq_SetProgrammingMode,
-                                                    C_OscSuSequencesNodePemFileStates & orc_StatePemFile)
+                                                    C_OscSuSequencesNodeSecuritySettingsStates & orc_StateSecuritySettings)
 {
    int32_t s32_Return = C_NO_ERR;
    const uint8_t u8_SECURITY_LEVEL = 1U;
 
-   // Security state
-   if (orc_ApplicationsToWrite.q_SendSecurityEnabledState == true)
+   //We need to make sure we are in programming mode if we want to write at least one of the flags:
+   if ((orc_ApplicationsToWrite.q_SendDebuggerEnabledState == true) ||
+       (orc_ApplicationsToWrite.q_SendSecureAuthenticationEnabledState == true) ||
+       (orc_ApplicationsToWrite.q_SendTrafficEncryptionEnabledState == true))
    {
-      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
-                             "Writing security activation ...");
-
-      if (orc_ProtocolFeatures.q_SupportsSecurity == true)
+      if (orq_SetProgrammingMode == true)
       {
-         if (orq_SetProgrammingMode == true)
+         // In the whole update sequence, setting the programming mode only one time
+         s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
+         orq_SetProgrammingMode = false;
+      }
+      if (s32_Return != C_NO_ERR)
+      {
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_ENTER_SESSION_ERROR, s32_Return,
+                                10U, mc_CurrentNode,
+                                "Could not activate programming session.");
+         if (s32_Return != C_CHECKSUM)
          {
-            // In the hole update sequence, setting the programming mode only one time
-            s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
-            orq_SetProgrammingMode = false;
+            s32_Return = C_COM;
          }
-         if (s32_Return != C_NO_ERR)
-         {
-            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR, s32_Return, 10U,
-                                   mc_CurrentNode,
-                                   "Could not activate programming session.");
-            if (s32_Return != C_CHECKSUM)
-            {
-               s32_Return = C_COM;
-            }
-         }
+      }
+   }
 
-         if (s32_Return == C_NO_ERR)
+   if (s32_Return == C_NO_ERR)
+   {
+      // secure authentication state
+      if (orc_ApplicationsToWrite.q_SendSecureAuthenticationEnabledState == true)
+      {
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_START, C_NO_ERR, 0U,
+                                mc_CurrentNode,
+                                "Writing security authentication activation ...");
+
+         if (orc_ProtocolFeatures.q_SupportsSecurityAuthentication == true)
          {
             uint8_t u8_NrCode;
-            // Only RSA 1024 supported at the moment, so 0 for security algorithm
-            s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityActivation(this->mc_CurrentNode,
-                                                                             orc_ApplicationsToWrite.q_SecurityEnabled,
-                                                                             0U, &u8_NrCode);
+            // Only RSA 1024 supported at the moment, so 0 for security authentication algorithm
+            s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityAuthenticationActivation(
+               this->mc_CurrentNode,
+               orc_ApplicationsToWrite.q_SecureAuthenticationEnabled,
+               0U, &u8_NrCode);
 
             if (s32_Return == C_NO_ERR)
             {
-               orc_StatePemFile.e_SecurityFlagSent = eSUSEQ_STATE_NO_ERR;
-               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED, s32_Return, 100U,
-                                      mc_CurrentNode, "Writing security activation to device finished.");
+               orc_StateSecuritySettings.e_SecureAuthenticationFlagSent = eSUSEQ_STATE_NO_ERR;
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_FINISHED, s32_Return,
+                                      100U,
+                                      mc_CurrentNode,
+                                      "Writing security authentication activation to device finished.");
             }
             else
             {
-               orc_StatePemFile.e_SecurityFlagSent = eSUSEQ_STATE_ERROR;
-               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR, s32_Return,
+               orc_StateSecuritySettings.e_SecureAuthenticationFlagSent = eSUSEQ_STATE_ERROR;
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_SEND_ERROR,
+                                      s32_Return,
                                       50U, mc_CurrentNode,
-                                      "Could not write security activation. Details: " +
+                                      "Could not write security authentication activation. Details: " +
                                       C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
                                                                                                u8_NrCode));
                s32_Return = C_COM;
             }
          }
+         else
+         {
+            // Security feature is necessary to write security activation state to flashloader
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_AVAILABLE_FEATURE_ERROR,
+                                   s32_Return, 5U,
+                                   mc_CurrentNode,
+                                   "The node has not the Flashloader features to support security authentication.");
+
+            s32_Return = C_RANGE;
+         }
       }
       else
       {
-         // Security feature is necessary to write security activation state to flashloader
-         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
-                                mc_CurrentNode,
-                                "The node has not the Flashloader features to support security.");
-
-         s32_Return = C_RANGE;
+         orc_StateSecuritySettings.e_SecureAuthenticationFlagSent = eSUSEQ_STATE_NOT_NEEDED;
       }
-   }
-   else
-   {
-      orc_StatePemFile.e_SecurityFlagSent = eSUSEQ_STATE_NOT_NEEDED;
-   }
 
-   // Debugger state
-   if (orc_ApplicationsToWrite.q_SendDebuggerEnabledState == true)
-   {
-      if (s32_Return == C_NO_ERR)
+      // traffic encryption state
+      if ((s32_Return == C_NO_ERR) && (orc_ApplicationsToWrite.q_SendTrafficEncryptionEnabledState == true))
+      {
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_START, C_NO_ERR, 0U,
+                                mc_CurrentNode,
+                                "Writing traffic encryption activation ...");
+
+         if (orc_ProtocolFeatures.q_SupportsSecurityTrafficEncryption == true)
+         {
+            uint8_t u8_NrCode;
+            // Only ECDH/AES supported, so 0 for traffic encryption algorithm
+            s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityTrafficEncryptionActivation(
+               this->mc_CurrentNode,
+               orc_ApplicationsToWrite.q_TrafficEncryptionEnabled,
+               0U, &u8_NrCode);
+
+            if (s32_Return == C_NO_ERR)
+            {
+               orc_StateSecuritySettings.e_TrafficEncryptionFlagSent = eSUSEQ_STATE_NO_ERR;
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_FINISHED, s32_Return,
+                                      100U,
+                                      mc_CurrentNode, "Writing traffic encryption activation to device finished.");
+            }
+            else
+            {
+               orc_StateSecuritySettings.e_TrafficEncryptionFlagSent = eSUSEQ_STATE_ERROR;
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_SEND_ERROR, s32_Return,
+                                      50U, mc_CurrentNode,
+                                      "Could not write traffic encryption activation. Details: " +
+                                      C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                               u8_NrCode));
+               s32_Return = C_COM;
+            }
+         }
+         else
+         {
+            // Feature is necessary to write traffic encryption state to flashloader
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_AVAILABLE_FEATURE_ERROR,
+                                   s32_Return, 5U,
+                                   mc_CurrentNode,
+                                   "The node has not the Flashloader features to support traffic encryption.");
+
+            s32_Return = C_RANGE;
+         }
+      }
+      else
+      {
+         orc_StateSecuritySettings.e_TrafficEncryptionFlagSent = eSUSEQ_STATE_NOT_NEEDED;
+      }
+
+      // Debugger state
+      if ((s32_Return == C_NO_ERR) && (orc_ApplicationsToWrite.q_SendDebuggerEnabledState == true))
       {
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
                                 "Writing debugger state ...");
@@ -1686,46 +1772,26 @@ int32_t C_OscSuSequences::m_WriteOpenSydeNodeStates(const C_OscSuSequences::C_Do
              ((orc_ProtocolFeatures.q_SupportsDebuggerOff == true) &&
               (orc_ApplicationsToWrite.q_DebuggerEnabled == false)))
          {
-            if (orq_SetProgrammingMode == true)
-            {
-               // In the hole update sequence, setting the programming mode only one time
-               s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
-               // Last time setting of ProgrammingMode in this sequence
-            }
-            if (s32_Return != C_NO_ERR)
-            {
-               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR, s32_Return, 10U,
-                                      mc_CurrentNode,
-                                      "Could not activate programming session.");
-               if (s32_Return != C_CHECKSUM)
-               {
-                  s32_Return = C_COM;
-               }
-            }
+            uint8_t u8_NrCode;
+            s32_Return = this->mpc_ComDriver->SendOsyWriteDebuggerEnabled(this->mc_CurrentNode,
+                                                                          orc_ApplicationsToWrite.q_DebuggerEnabled,
+                                                                          &u8_NrCode);
 
             if (s32_Return == C_NO_ERR)
             {
-               uint8_t u8_NrCode;
-               s32_Return = this->mpc_ComDriver->SendOsyWriteDebuggerEnabled(this->mc_CurrentNode,
-                                                                             orc_ApplicationsToWrite.q_DebuggerEnabled,
-                                                                             &u8_NrCode);
-
-               if (s32_Return == C_NO_ERR)
-               {
-                  orc_StatePemFile.e_DebuggerFlagSent = eSUSEQ_STATE_NO_ERR;
-                  (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED, s32_Return, 100U,
-                                         mc_CurrentNode, "Writing debugger state to device finished.");
-               }
-               else
-               {
-                  orc_StatePemFile.e_DebuggerFlagSent = eSUSEQ_STATE_ERROR;
-                  (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR, s32_Return,
-                                         50U, mc_CurrentNode,
-                                         "Could not write debugger state. Details: " +
-                                         C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
-                                                                                                  u8_NrCode));
-                  s32_Return = C_COM;
-               }
+               orc_StateSecuritySettings.e_DebuggerFlagSent = eSUSEQ_STATE_NO_ERR;
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED, s32_Return, 100U,
+                                      mc_CurrentNode, "Writing debugger state to device finished.");
+            }
+            else
+            {
+               orc_StateSecuritySettings.e_DebuggerFlagSent = eSUSEQ_STATE_ERROR;
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR, s32_Return,
+                                      50U, mc_CurrentNode,
+                                      "Could not write debugger state. Details: " +
+                                      C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                               u8_NrCode));
+               s32_Return = C_COM;
             }
          }
          else
@@ -1733,14 +1799,16 @@ int32_t C_OscSuSequences::m_WriteOpenSydeNodeStates(const C_OscSuSequences::C_Do
             // Debugger state change feature is necessary to write debugger state to flashloader
             if (orc_ApplicationsToWrite.q_DebuggerEnabled == true)
             {
-               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return,
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR,
+                                      s32_Return,
                                       5U,
                                       mc_CurrentNode,
                                       "The node has not the Flashloader feature to enable the debugger.");
             }
             else
             {
-               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return,
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR,
+                                      s32_Return,
                                       5U,
                                       mc_CurrentNode,
                                       "The node has not the Flashloader feature to disable the debugger.");
@@ -1748,10 +1816,10 @@ int32_t C_OscSuSequences::m_WriteOpenSydeNodeStates(const C_OscSuSequences::C_Do
             s32_Return = C_RANGE;
          }
       }
-   }
-   else
-   {
-      orc_StatePemFile.e_DebuggerFlagSent = eSUSEQ_STATE_NOT_NEEDED;
+      else
+      {
+         orc_StateSecuritySettings.e_DebuggerFlagSent = eSUSEQ_STATE_NOT_NEEDED;
+      }
    }
 
    return s32_Return;
@@ -1925,7 +1993,9 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationOpenSyde(const uint8_t ou8_Prog
       // level 1
       (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_SET_SESSION_START, C_NO_ERR, ou8_ProgressToReport, mc_CurrentNode,
                              "Activating PreProgramming session ...");
-      s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(mc_CurrentNode, false, &u8_NrCode);
+      s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(mc_CurrentNode, false, &u8_NrCode,
+                                                                     &orc_NodeState.q_AuthenticationNecessary,
+                                                                     &orc_NodeState.q_TrafficEncryptionNecessary);
       if (s32_Return != C_NO_ERR)
       {
          (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR, s32_Return, ou8_ProgressToReport,
@@ -1939,10 +2009,9 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationOpenSyde(const uint8_t ou8_Prog
          }
          else
          {
-            // By this error we know security is necessary and failed
-            orc_NodeState.q_AuthenticationNecessarySet = true;
-            orc_NodeState.q_AuthenticationNecessary = true;
-            orc_NodeState.q_AuthenticationError = true;
+            // set flag to report that security access failed
+            orc_NodeState.q_SecurityAccessError = true;
+            orc_NodeState.q_SecurityOptionsActiveSet = true;
          }
       }
    }
@@ -1988,9 +2057,7 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationOpenSyde(const uint8_t ou8_Prog
          //this information is only available for address based devices
          tgl_assert(rc_CurNode.u32_SubDeviceIndex < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size());
          if (rc_CurNode.pc_DeviceDefinition->c_SubDevices[rc_CurNode.u32_SubDeviceIndex].
-             q_FlashloaderOpenSydeIsFileBased
-             ==
-             false)
+             q_FlashloaderOpenSydeIsFileBased == false)
          {
             s32_Return = this->mpc_ComDriver->SendOsyReadAllFlashBlockData(mc_CurrentNode, c_Info.c_Applications,
                                                                            &u8_NrCode);
@@ -2030,37 +2097,32 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationOpenSyde(const uint8_t ou8_Prog
       }
    }
 
+   // check whether debugger is active
    if ((s32_Return == C_NO_ERR) &&
-       (c_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurity == true))
+       ((c_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOn == true) ||
+        (c_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOff == true)))
    {
-      // Check for activated security
-      // By calling SendOsySetPreProgrammingMode on the beginning we know it is successful, but not if security is
-      // activated
-      uint8_t u8_Algorithm;
-      (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START, C_NO_ERR,
+      (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_START, C_NO_ERR,
                              ou8_ProgressToReport,
-                             mc_CurrentNode, "Reading security activation state ...");
-      s32_Return = this->mpc_ComDriver->SendOsyReadSecurityActivation(mc_CurrentNode,
-                                                                      orc_NodeState.q_AuthenticationNecessary,
-                                                                      u8_Algorithm,
-                                                                      &u8_NrCode);
+                             mc_CurrentNode, "Reading debugger activation state ...");
+      s32_Return = this->mpc_ComDriver->SendOsyReadDebuggerEnabled(mc_CurrentNode,
+                                                                   orc_NodeState.q_DebuggerEnabled,
+                                                                   &u8_NrCode);
 
       if (s32_Return != C_NO_ERR)
       {
-         (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR, s32_Return,
+         (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_ERROR, s32_Return,
                                 ou8_ProgressToReport,
-                                mc_CurrentNode, "Error reading security activation state. Details:" +
+                                mc_CurrentNode, "Error reading debugger activation state. Details:" +
                                 C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode));
          s32_Return = C_COM;
       }
-      else
-      {
-         orc_NodeState.q_AuthenticationNecessarySet = true;
-      }
    }
-   else
+
+   if (s32_Return == C_NO_ERR)
    {
-      orc_NodeState.q_AuthenticationNecessarySet = true;
+      // information was read and flags were set
+      orc_NodeState.q_SecurityOptionsActiveSet = true;
    }
 
    (void)this->m_DisconnectFromTargetServer();
@@ -2095,8 +2157,8 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationOpenSyde(const uint8_t ou8_Prog
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscSuSequences::m_ReadDeviceInformationStwFlashloader(const uint8_t ou8_ProgressToReport,
-                                                                const uint32_t ou32_NodeIndex,
-                                                                C_OscSuSequencesNodeConnectStates & orc_NodeState)
+                                                                const uint32_t ou32_NodeIndex, C_OscSuSequencesNodeConnectStates &
+                                                                orc_NodeState)
 {
    int32_t s32_Return;
    C_XflDeviceInformation c_Information;
@@ -2114,8 +2176,9 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationStwFlashloader(const uint8_t ou
       //read everything we can get ...
       (void)m_ReportProgress(eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START, C_NO_ERR, ou8_ProgressToReport,
                              mc_CurrentNode, "Reading information from node ...");
-      s32_Return = this->mpc_ComDriver->SendStwReadDeviceInformation(mc_CurrentNode, c_Information.c_BasicInformation,
-                                                                     c_Information.c_ChecksumInformation);
+      s32_Return =
+         this->mpc_ComDriver->SendStwReadDeviceInformation(mc_CurrentNode, c_Information.c_BasicInformation,
+                                                           c_Information.c_ChecksumInformation);
       if (s32_Return != C_NO_ERR)
       {
          (void)m_ReportProgress(eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR, s32_Return, ou8_ProgressToReport,
@@ -2130,7 +2193,10 @@ int32_t C_OscSuSequences::m_ReadDeviceInformationStwFlashloader(const uint8_t ou
       }
    }
 
-   orc_NodeState.q_AuthenticationNecessarySet = true;
+   //no security options available for this protocol
+   orc_NodeState.q_AuthenticationNecessary = false;
+   orc_NodeState.q_TrafficEncryptionNecessary = false;
+   orc_NodeState.q_SecurityOptionsActiveSet = true;
    orc_NodeState.e_InformationRead = (s32_Return == C_NO_ERR) ? eSUSEQ_STATE_NO_ERR : eSUSEQ_STATE_ERROR;
 
    return s32_Return;
@@ -2302,7 +2368,8 @@ int32_t C_OscSuSequences::h_CreateTemporaryFolder(const std::vector<C_OscNode> &
          {
             // Special case: File based nodes shall have unique file names
             tgl_assert(
-               orc_Nodes[u16_Node].u32_SubDeviceIndex < orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices.size());
+               orc_Nodes[u16_Node].u32_SubDeviceIndex <
+               orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices.size());
             if (orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices[orc_Nodes[u16_Node].u32_SubDeviceIndex].
                 q_FlashloaderOpenSydeIsFileBased == true)
             {
@@ -2398,7 +2465,8 @@ int32_t C_OscSuSequences::h_CreateTemporaryFolder(const std::vector<C_OscNode> &
          if (orc_ActiveNodes[u16_Node] == 1U)
          {
             //flash files
-            for (uint16_t u16_File = 0U; u16_File < orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size(); u16_File++)
+            for (uint16_t u16_File = 0U; u16_File < orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size();
+                 u16_File++)
             {
                //get source file name
                const C_SclString c_SourceFileName = orc_ApplicationsToWrite[u16_Node].c_FilesToFlash[u16_File];
@@ -2418,7 +2486,7 @@ int32_t C_OscSuSequences::h_CreateTemporaryFolder(const std::vector<C_OscNode> &
                else
                {
                   // The original source file name is not relevant and does not need to be unique
-                  // Add an counter to the target file name
+                  // Add a counter to the target file name
                   c_TargetFileName = c_NodeTargetPaths[u16_Node] +
                                      C_SclString::IntToStr(static_cast<uint32_t>(u16_File) + 1U) + "_" +
                                      TglExtractFileName(orc_ApplicationsToWrite[u16_Node].c_FilesToFlash[u16_File]);
@@ -2443,7 +2511,7 @@ int32_t C_OscSuSequences::h_CreateTemporaryFolder(const std::vector<C_OscNode> &
                const C_SclString c_SourceFileName = orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u16_File];
                //compose target file name
                // The original file name is not relevant does not need to be unique
-               // Add an counter to the target file name
+               // Add a counter to the target file name
                const C_SclString c_TargetFileName =
                   c_NodeTargetPaths[u16_Node] +
                   C_SclString::IntToStr(static_cast<uint32_t>(u16_File) + 1U) + "_" +
@@ -2684,7 +2752,8 @@ int32_t C_OscSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
          for (uint16_t u16_Node = 0U; u16_Node < this->mpc_SystemDefinition->c_Nodes.size(); u16_Node++)
          {
             C_OscNodeProperties::E_FlashLoaderProtocol e_ProtocolType;
-            const bool q_IsActive = m_IsNodeActive(u16_Node, this->mu32_ActiveBusIndex, e_ProtocolType, mc_CurrentNode);
+            const bool q_IsActive =
+               m_IsNodeActive(u16_Node, this->mu32_ActiveBusIndex, e_ProtocolType, mc_CurrentNode);
 
             if (q_IsActive == true)
             {
@@ -2795,7 +2864,8 @@ int32_t C_OscSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                   s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastEnterPreProgrammingSession();
                   if (s32_Return != C_NO_ERR)
                   {
-                     (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR, s32_Return, 20U,
+                     (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR, s32_Return,
+                                            20U,
                                             "EnterPreProgramming broadcast failed.");
                      s32_Return = C_COM;
                   }
@@ -2900,7 +2970,7 @@ int32_t C_OscSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                            }
                            else
                            {
-                              this->mc_ConnectStatesNodes[u16_Node].q_AuthenticationError = true;
+                              this->mc_ConnectStatesNodes[u16_Node].q_SecurityAccessError = true;
                            }
                         }
                         else
@@ -3113,7 +3183,7 @@ int32_t C_OscSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                                  }
                                  else
                                  {
-                                    this->mc_ConnectStatesNodes[u16_Node].q_AuthenticationError = true;
+                                    this->mc_ConnectStatesNodes[u16_Node].q_SecurityAccessError = true;
                                  }
                               }
 
@@ -3215,7 +3285,7 @@ int32_t C_OscSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                         if (s32_Return == C_CHECKSUM)
                         {
-                           this->mc_ConnectStatesNodes[u32_ErrorIndex].q_AuthenticationError = true;
+                           this->mc_ConnectStatesNodes[u32_ErrorIndex].q_SecurityAccessError = true;
                         }
                      }
 
@@ -3256,7 +3326,8 @@ int32_t C_OscSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
    }
    if (s32_Return == C_NO_ERR)
    {
-      (void)m_ReportProgress(eACTIVATE_FLASHLOADER_FINISHED, C_NO_ERR, 100U, "Flashloader activated on all devices.");
+      (void)m_ReportProgress(eACTIVATE_FLASHLOADER_FINISHED, C_NO_ERR, 100U,
+                             "Flashloader activated on all devices.");
    }
 
    if (q_AtLeastOneError == true)
@@ -3323,7 +3394,7 @@ int32_t C_OscSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
 {
    int32_t s32_Return = C_NO_ERR;
    bool q_AtLeastOneError = false;
-   bool q_AtLeastOneAuthentificationError = false;
+   bool q_AtLeastOneAuthenticationError = false;
 
    if (this->mpc_SystemDefinition == NULL)
    {
@@ -3402,7 +3473,8 @@ int32_t C_OscSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
                         (void)m_ReportProgress(eREAD_DEVICE_INFO_XFL_START, C_NO_ERR, u8_Progress, mc_CurrentNode,
                                                "Reading STW Flashloader device information ...");
                         s32_Return = this->m_ReadDeviceInformationStwFlashloader(u8_Progress, u16_Node,
-                                                                                 this->mc_ConnectStatesNodes[u16_Node]);
+                                                                                 this->mc_ConnectStatesNodes[u16_Node
+                                                                                 ]);
 
                         if (s32_Return == C_NO_ERR)
                         {
@@ -3434,7 +3506,7 @@ int32_t C_OscSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
          {
             if (s32_Return == C_CHECKSUM)
             {
-               q_AtLeastOneAuthentificationError = true;
+               q_AtLeastOneAuthenticationError = true;
             }
 
             q_AtLeastOneError = true;
@@ -3455,7 +3527,7 @@ int32_t C_OscSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
 
    if (q_AtLeastOneError == true)
    {
-      if (q_AtLeastOneAuthentificationError == true)
+      if (q_AtLeastOneAuthenticationError == true)
       {
          s32_Return = C_CHECKSUM;
       }
@@ -3586,14 +3658,12 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
             // Nothing to do
          }
 
-         if ((orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size() != 0) ||
-             (orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size() != 0) ||
-             (orc_ApplicationsToWrite[u16_Node].c_PemFile != ""))
+         if (orc_ApplicationsToWrite[u16_Node].IsAnyActionRequired() == true)
          {
             if (this->mc_ActiveNodes[u16_Node] == false)
             {
                osc_write_log_error("System Update",
-                                   "File(s) to flash or write to NVM configured for node " + C_SclString::IntToStr(
+                                   "Update packages contains file(s) or setting(s) for node " + C_SclString::IntToStr(
                                       u16_Node) + " which is not marked as active !");
                s32_Return = C_NOACT;
             }
@@ -3667,7 +3737,8 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                      }
                   }
                   //files for Nvm:
-                  for (uint32_t u32_File = 0U; u32_File < orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size();
+                  for (uint32_t u32_File = 0U;
+                       u32_File < orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size();
                        u32_File++)
                   {
                      // Save the file name
@@ -3677,7 +3748,8 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                      if (TglFileExists(orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u32_File]) == false)
                      {
                         osc_write_log_error("System Update", "Could not find file \"" +
-                                            orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u32_File] + "\" !");
+                                            orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u32_File] +
+                                            "\" !");
                         rc_State.c_StatePsiFiles[u32_File].e_FileExists = eSUSEQ_STATE_ERROR;
                         s32_Return = C_RD_WR;
                         break;
@@ -3690,30 +3762,28 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                   // PEM file
                   if (orc_ApplicationsToWrite[u16_Node].c_PemFile != "")
                   {
-                     rc_State.c_StatePemFile.c_FileName = TglExtractFileName(
+                     rc_State.c_StateSecuritySettings.c_FileName = TglExtractFileName(
                         orc_ApplicationsToWrite[u16_Node].c_PemFile);
                      if (TglFileExists(orc_ApplicationsToWrite[u16_Node].c_PemFile) == false)
                      {
                         osc_write_log_error("System Update", "Could not find file \"" +
                                             orc_ApplicationsToWrite[u16_Node].c_PemFile + "\" !");
-                        rc_State.c_StatePemFile.e_FileExists = eSUSEQ_STATE_ERROR;
+                        rc_State.c_StateSecuritySettings.e_FileExists = eSUSEQ_STATE_ERROR;
                         s32_Return = C_RD_WR;
                      }
                      else
                      {
-                        rc_State.c_StatePemFile.e_FileExists = eSUSEQ_STATE_NO_ERR;
+                        rc_State.c_StateSecuritySettings.e_FileExists = eSUSEQ_STATE_NO_ERR;
                      }
                   }
                   else
                   {
-                     // No PEM file exists
-                     rc_State.c_StatePemFile.c_FileName = "";
-                     rc_State.c_StatePemFile.e_FileExists = eSUSEQ_STATE_NOT_NEEDED;
-                     rc_State.c_StatePemFile.e_FileLoaded = eSUSEQ_STATE_NOT_NEEDED;
-                     rc_State.c_StatePemFile.e_PemFileExtracted = eSUSEQ_STATE_NOT_NEEDED;
-                     rc_State.c_StatePemFile.e_SecurityKeySent = eSUSEQ_STATE_NOT_NEEDED;
-                     rc_State.c_StatePemFile.e_SecurityFlagSent = eSUSEQ_STATE_NOT_NEEDED;
-                     rc_State.c_StatePemFile.e_DebuggerFlagSent = eSUSEQ_STATE_NOT_NEEDED;
+                     // No PEM file exists; writing not needed; we still do try to write activation flags if set in
+                     //  update package
+                     rc_State.c_StateSecuritySettings.c_FileName = "";
+                     rc_State.c_StateSecuritySettings.e_FileExists = eSUSEQ_STATE_NOT_NEEDED;
+                     rc_State.c_StateSecuritySettings.e_FileLoaded = eSUSEQ_STATE_NOT_NEEDED;
+                     rc_State.c_StateSecuritySettings.e_PemFileExtracted = eSUSEQ_STATE_NOT_NEEDED;
                   }
                }
             }
@@ -3771,10 +3841,9 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
          // Save node index
          this->mu32_CurrentNode = u32_NodeIndex;
 
-         //flash openSYDE nodes
-         if ((orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash.size() > 0) ||
-             (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm.size() > 0) ||
-             (orc_ApplicationsToWrite[u32_NodeIndex].c_PemFile != ""))
+         //Flash openSYDE nodes.
+         //Do we have anything for that node at all?
+         if (orc_ApplicationsToWrite[u32_NodeIndex].IsAnyActionRequired() == true)
          {
             uint32_t u32_BusIndex;
             bool q_RoutingActivated = false;
@@ -3805,7 +3874,7 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
 
                   if (s32_Return == C_CHECKSUM)
                   {
-                     this->mc_ConnectStatesNodes[u32_ErrorIndex].q_AuthenticationError = true;
+                     this->mc_ConnectStatesNodes[u32_ErrorIndex].q_SecurityAccessError = true;
                   }
                }
 
@@ -3841,7 +3910,8 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                         s32_Return = this->m_ReconnectToTargetServer();
                         if (s32_Return != C_NO_ERR)
                         {
-                           (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_RECONNECT_ERROR, s32_Return, 10U, mc_CurrentNode,
+                           (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_RECONNECT_ERROR, s32_Return, 10U,
+                                                  mc_CurrentNode,
                                                   "Could not reconnect to node");
                            if (s32_Return != C_CHECKSUM)
                            {
@@ -3869,14 +3939,17 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                         {
                            tgl_assert(u32_SubDeviceIndex < pc_DeviceDefinition->c_SubDevices.size());
                            //address based or file based ?
-                           if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased ==
+                           if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased
+                               ==
                                false)
                            {
                               s32_Return = m_FlashNodeOpenSydeHex(
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_OtherAcceptedDeviceNames,
-                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].
+                                 u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].
+                                 u32_FlashloaderOpenSydeTransferDataTimeout,
                                  q_SetProgrammingMode,
                                  rc_NodeUpdateStates.c_StateHexFiles);
                            }
@@ -3884,8 +3957,10 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                            {
                               s32_Return = m_FlashNodeOpenSydeFile(
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
-                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].
+                                 u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].
+                                 u32_FlashloaderOpenSydeTransferDataTimeout,
                                  c_AvailableFeatures,
                                  q_SetProgrammingMode,
                                  rc_NodeUpdateStates.c_StateOtherFiles);
@@ -3903,17 +3978,17 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                                                  rc_NodeUpdateStates.c_StatePsiFiles);
                         }
 
-                        // Special case: An other security level is necessary for the next steps.
-                        // The next step must set the programming mode with the other security level again
                         q_SetProgrammingMode = true;
 
                         // PEM file to write?
                         if (s32_Return == C_NO_ERR)
                         {
+                           // Special case: Another security level is necessary for the next steps.
+                           // The next step must set the programming mode with the other security level again
                            s32_Return = m_WritePemOpenSydeFile(orc_ApplicationsToWrite[u32_NodeIndex].c_PemFile,
                                                                c_AvailableFeatures,
                                                                q_SetProgrammingMode,
-                                                               rc_NodeUpdateStates.c_StatePemFile);
+                                                               rc_NodeUpdateStates.c_StateSecuritySettings);
                         }
 
                         // States to write?
@@ -3922,11 +3997,11 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                            s32_Return = m_WriteOpenSydeNodeStates(orc_ApplicationsToWrite[u32_NodeIndex],
                                                                   c_AvailableFeatures,
                                                                   q_SetProgrammingMode,
-                                                                  rc_NodeUpdateStates.c_StatePemFile);
+                                                                  rc_NodeUpdateStates.c_StateSecuritySettings);
                         }
 
                         (void)this->m_DisconnectFromTargetServer();
-                     }
+                     } //lint !e438 //false positive; valued of q_SetProgrammingMode passed through following calls
                      if (s32_Return == C_NO_ERR)
                      {
                         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FINISHED, C_NO_ERR, 100U, mc_CurrentNode,
@@ -3964,7 +4039,7 @@ int32_t C_OscSuSequences::UpdateSystem(const std::vector<C_OscSuSequences::C_DoF
                rc_NodeUpdateStates.q_Timeout = true;
                break;
             case C_CHECKSUM:
-               rc_NodeUpdateStates.q_AuthenticationError = true;
+               rc_NodeUpdateStates.q_SecurityAccessError = true;
                break;
             default:
                // Nothing to do
@@ -4101,7 +4176,8 @@ int32_t C_OscSuSequences::ResetSystem(void)
                         }
                         else
                         {
-                           (void)m_ReportProgress(eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR, s32_Return, 0U, mc_CurrentNode,
+                           (void)m_ReportProgress(eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR, s32_Return, 0U,
+                                                  mc_CurrentNode,
                                                   "Could not reset routed node.");
                         }
                         s32_Return = C_COM;
@@ -4163,36 +4239,56 @@ const
    \retval   C_NO_ERR   States returned
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscSuSequences::GetUpdateStates(std::vector<C_OscSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes) const
+int32_t C_OscSuSequences::GetUpdateStates(std::vector<C_OscSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes)
+const
 {
    orc_UpdateStatesNodes = this->mc_UpdateStatesNodes;
    return C_NO_ERR;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Fill flash data structure with PEM states
+/*! \brief  Fill flash data structure with security settings
 
-   \param[in]   oe_StateSecurity    Security state
-   \param[in]   oe_StateDebugger    Debugger state
-   \param[out]  orc_DoFlash         Flash data structure
+   \param[in]   oe_StateAuthentication   Setting for secure authentication
+   \param[in]   oe_StateEncryption       Setting for traffic enctyption
+   \param[in]   oe_StateDebugger         Setting for debugger activation
+   \param[out]  orc_DoFlash              Flash data structure to fill information into
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscSuSequences::h_FillDoFlashWithPemStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                  const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
-                                                  C_OscSuSequences::C_DoFlash & orc_DoFlash)
+void C_OscSuSequences::h_FillDoFlashWithSecurityOptions(
+   const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateAuthentication,
+   const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateEncryption,
+   const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger, C_OscSuSequences::C_DoFlash & orc_DoFlash)
 {
-   switch (oe_StateSecurity)
+   switch (oe_StateAuthentication)
    {
    case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
-      orc_DoFlash.q_SendSecurityEnabledState = false;
+      orc_DoFlash.q_SendSecureAuthenticationEnabledState = false;
       break;
    case C_OscViewNodeUpdate::eST_SEC_ACTIVATE:
-      orc_DoFlash.q_SendSecurityEnabledState = true;
-      orc_DoFlash.q_SecurityEnabled = true;
+      orc_DoFlash.q_SendSecureAuthenticationEnabledState = true;
+      orc_DoFlash.q_SecureAuthenticationEnabled = true;
       break;
    case C_OscViewNodeUpdate::eST_SEC_DEACTIVATE:
-      orc_DoFlash.q_SendSecurityEnabledState = true;
-      orc_DoFlash.q_SecurityEnabled = false;
+      orc_DoFlash.q_SendSecureAuthenticationEnabledState = true;
+      orc_DoFlash.q_SecureAuthenticationEnabled = false;
+      break;
+   default:
+      break;
+   }
+
+   switch (oe_StateEncryption)
+   {
+   case C_OscViewNodeUpdate::eST_TEN_NO_CHANGE:
+      orc_DoFlash.q_SendTrafficEncryptionEnabledState = false;
+      break;
+   case C_OscViewNodeUpdate::eST_TEN_ACTIVATE:
+      orc_DoFlash.q_SendTrafficEncryptionEnabledState = true;
+      orc_DoFlash.q_TrafficEncryptionEnabled = true;
+      break;
+   case C_OscViewNodeUpdate::eST_TEN_DEACTIVATE:
+      orc_DoFlash.q_SendTrafficEncryptionEnabledState = true;
+      orc_DoFlash.q_TrafficEncryptionEnabled = false;
       break;
    default:
       break;
@@ -4291,7 +4387,8 @@ void C_OscSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
 
       orc_Text.Add("Number of applications: " +
                    C_SclString::IntToStr(orc_Info.c_BasicInformation.c_DeviceInfoAddresses.GetLength()));
-      for (uint8_t u8_Application = 0U; u8_Application < orc_Info.c_BasicInformation.c_DeviceInfoAddresses.GetLength();
+      for (uint8_t u8_Application = 0U;
+           u8_Application < orc_Info.c_BasicInformation.c_DeviceInfoAddresses.GetLength();
            u8_Application++)
       {
          orc_Text.Add("Application " + C_SclString::IntToStr(u8_Application));
@@ -4504,8 +4601,9 @@ void C_OscSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
             }
          }
 
-         u32_SectorSize = (c_SectorTable[s32_Index].u32_HighestAddress - c_SectorTable[s32_Index].u32_LowestAddress) +
-                          1;
+         u32_SectorSize =
+            (c_SectorTable[s32_Index].u32_HighestAddress - c_SectorTable[s32_Index].u32_LowestAddress) +
+            1;
          u32_TotalSize += u32_SectorSize;
          if (c_SectorTable[s32_Index].q_IsProtected == false)
          {

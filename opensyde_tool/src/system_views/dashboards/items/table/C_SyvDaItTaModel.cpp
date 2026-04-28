@@ -179,7 +179,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
       const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
       if (pc_Item != NULL)
       {
-         const uint32_t u32_Count = pc_Item->c_DataPoolElementsConfig.size();
+         const uint32_t u32_Count = static_cast<uint32_t>(pc_Item->c_DataPoolElementsConfig.size());
 
          //Resize
          this->mc_ScaledDisplayDataValues.resize(u32_Count);
@@ -248,7 +248,7 @@ void C_SyvDaItTaModel::UpdateValue(void)
                         }
                         else
                         {
-                           this->mc_UnscaledLastDataValues.resize(static_cast<uint32_t>(u32_ItConfig) + 1U);
+                           this->mc_UnscaledLastDataValues.resize(static_cast<uint32_t>(u32_ItConfig + 1U));
                            this->mc_UnscaledLastDataValues[u32_ItConfig] = c_UnscaledValues;
                         }
                         if (u32_ItConfig < this->mc_ScaledDisplayDataValues.size())
@@ -257,7 +257,7 @@ void C_SyvDaItTaModel::UpdateValue(void)
                         }
                         else
                         {
-                           this->mc_ScaledDisplayDataValues.resize(static_cast<uint32_t>(u32_ItConfig) + 1U);
+                           this->mc_ScaledDisplayDataValues.resize(static_cast<uint32_t>(u32_ItConfig + 1U));
                            this->mc_ScaledDisplayDataValues[u32_ItConfig] = c_ScaledDisplayValues;
                         }
                      }
@@ -440,7 +440,7 @@ int32_t C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
             }
             else
             {
-               s32_Retval = pc_Item->c_DataPoolElementsConfig.size();
+               s32_Retval = static_cast<int32_t>(pc_Item->c_DataPoolElementsConfig.size());
             }
          }
       }
@@ -584,7 +584,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const int32_t os3
                            QStringList c_Icons;
                            c_Icons.push_back(QString::number(16));
                            if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
-                               (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
+                               (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false) ||
+                               (pc_TableWidget->GetViewNodeEncrypted(*pc_DataElementId) == true))
                            {
                               switch (pc_DataPool->e_Type)
                               {
@@ -747,7 +748,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const int32_t os3
                      case C_SyvDaItTaModel::eICON:
                         bool q_IsTransmissionError;
                         if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
-                            (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
+                            (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false) ||
+                            (pc_TableWidget->GetViewNodeEncrypted(*pc_DataElementId) == true))
                         {
                            c_Retval = C_GtGetText::h_GetText("Configuration warning");
                         }
@@ -806,6 +808,11 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const int32_t os3
                            c_Retval = C_GtGetText::h_GetText("There is a data element of a node with "
                                                              "disabled communication interface flags for Dashboard");
                         }
+                        else if (pc_TableWidget->GetViewNodeEncrypted(*pc_DataElementId) == true)
+                        {
+                           c_Retval = C_GtGetText::h_GetText("Event driven data element trigger "
+                                                             "and encrypted communication via CAN is not supported");
+                        }
                         else if (pc_TableWidget->CheckItemError(*pc_DataElementId, c_Error,
                                                                 q_IsTransmissionError) == true)
                         {
@@ -848,7 +855,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const int32_t os3
                      case C_SyvDaItTaModel::eICON:
                         bool q_IsTransmissionError;
                         if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
-                            (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
+                            (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false) ||
+                            (pc_TableWidget->GetViewNodeEncrypted(*pc_DataElementId) == true))
                         {
                            c_Retval = static_cast<int32_t>(C_NagToolTip::eWARNING);
                         }
@@ -1315,7 +1323,7 @@ uint32_t C_SyvDaItTaModel::m_GetSizeItems(void) const
       const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
       if (pc_Item != NULL)
       {
-         u32_Retval = pc_Item->c_DataPoolElementsConfig.size();
+         u32_Retval = static_cast<uint32_t>(pc_Item->c_DataPoolElementsConfig.size());
       }
    }
 

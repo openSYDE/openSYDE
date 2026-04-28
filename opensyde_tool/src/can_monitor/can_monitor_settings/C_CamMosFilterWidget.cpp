@@ -156,10 +156,12 @@ void C_CamMosFilterWidget::SetAddFilter(const QList<int32_t> oc_CanMsgId, const 
    {
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                          "Do you want to add the filter item to an existing filter \"%1\" ?")).arg(
-                                     c_Filters.at(static_cast<std::vector<int32_t>::size_type>(
-                                                     s32_MessageFilterItemDroppedOnIndex) - 1).c_Name));
+      const uint32_t u32_Index = (s32_MessageFilterItemDroppedOnIndex > 1) ?
+                                 static_cast<uint32_t>(s32_MessageFilterItemDroppedOnIndex - 1) : 0UL;
+      c_MessageBox.SetDescription(
+         static_cast<QString>(
+            C_GtGetText::h_GetText("Do you want to add the filter item to an existing filter \"%1\" ?")).
+         arg(c_Filters.at(u32_Index).c_Name));
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Filter"));
       c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Add to existing Filter"));
       c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Create new Filter"));
@@ -194,12 +196,6 @@ void C_CamMosFilterWidget::SetAddFilter(const QList<int32_t> oc_CanMsgId, const 
    \param[in]       oc_CanMsgId                  List of selected message CanId's
    \param[in]       oc_CanMsgXtd                 List of selected CanMessage has extended format
    \param[in]       ou32_ExistingFilterIndex     Index on which the filter message got dropped
-
-   \return
-   Type of return values, e.g. STW error codes
-
-   \retval   Return value 1   Detailed description of 1st return value
-   \retval   Return value 2   Detailed description of 2nd return value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_SetAddFilterToExistingFilter(const QList<int32_t> oc_CanMsgId,
@@ -207,10 +203,11 @@ void C_CamMosFilterWidget::m_SetAddFilterToExistingFilter(const QList<int32_t> o
                                                           const uint32_t ou32_ExistingFilterIndex)
 {
    connect(this, &C_CamMosFilterWidget::SigAddFilterToExistingFilter,
-           this->mc_Entries[ou32_ExistingFilterIndex - 1],
+           this->mc_Entries[static_cast<std::vector<uint32_t>::size_type>(ou32_ExistingFilterIndex) - 1],
            &C_CamMosFilterItemWidget::SetAddFilterToExistingFilter);
    Q_EMIT C_CamMosFilterWidget::SigAddFilterToExistingFilter(oc_CanMsgId, oc_CanMsgXtd);
-   disconnect(this, &C_CamMosFilterWidget::SigAddFilterToExistingFilter, this->mc_Entries[ou32_ExistingFilterIndex - 1],
+   disconnect(this, &C_CamMosFilterWidget::SigAddFilterToExistingFilter,
+              this->mc_Entries[static_cast<std::vector<uint32_t>::size_type>(ou32_ExistingFilterIndex) - 1],
               &C_CamMosFilterItemWidget::SetAddFilterToExistingFilter);
 }
 

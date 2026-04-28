@@ -26,7 +26,7 @@
 #endif
 
 //PC-Lint suppressions: function-like macro is the only way to get file,func,line information into the text
-//lint -save -e1960
+//lint -save -e9026
 #ifndef tgl_assert
 #define tgl_assert(p) ((p) ? (void)0 : stw::tgl::TglReportAssertion(__FILE__, TGL_UTIL_FUNC_ID, __LINE__))
 #define tgl_assertdetail(a, b) ((a) ? (void)0 : stw::tgl::TglReportAssertionDetail((b), __FILE__, TGL_UTIL_FUNC_ID, \

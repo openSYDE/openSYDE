@@ -81,9 +81,7 @@ int32_t C_PuiSdNodeCanUtil::h_SetCanSignalPosition(const C_OscCanMessageIdentifi
             const E_SignalType e_SignalType = C_PuiSdNodeCanUtil::h_GetSignalType(c_NewElement.GetType());
             const C_OscNodeDataPoolContent::E_Type e_NewType = C_PuiSdNodeCanUtil::h_GetRequiredType(
                orc_OscSignal.u16_ComBitLength, e_SignalType);
-            c_NewElement.c_MinValue.SetType(e_NewType);
-            c_NewElement.c_MaxValue.SetType(e_NewType);
-            c_NewElement.c_DataSetValues[0].SetType(e_NewType);
+            c_NewElement.SetType(e_NewType);
             //Value
             C_SdNdeDpContentUtil::h_InitMinForSignal(c_NewElement.c_MinValue, orc_OscSignal.u16_ComBitLength);
             C_SdNdeDpContentUtil::h_InitMaxForSignal(c_NewElement.c_MaxValue, orc_OscSignal.u16_ComBitLength);

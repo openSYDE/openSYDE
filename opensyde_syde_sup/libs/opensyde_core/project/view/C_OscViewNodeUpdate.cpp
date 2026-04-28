@@ -41,8 +41,9 @@ using namespace stw::opensyde_core;
 C_OscViewNodeUpdate::C_OscViewNodeUpdate(void) :
    u32_NodeUpdatePosition(0U),
    mq_SkipUpdateOfPemFile(false),
-   me_StateSecurity(eST_SEC_NO_CHANGE),
-   me_StateDebugger(eST_DEB_NO_CHANGE)
+   me_StateSecureAuthentication(eST_SEC_NO_CHANGE),
+   me_StateDebugger(eST_DEB_NO_CHANGE),
+   me_StateTrafficEncryption(eST_TEN_NO_CHANGE)
 {
    // For each type of file
    this->mc_SkipUpdateOfFiles.resize(3);
@@ -62,7 +63,10 @@ void C_OscViewNodeUpdate::CalcHash(uint32_t & oru32_HashValue) const
    const stw::scl::C_SclString c_PemFile = this->mc_PemFilePath;
 
    stw::scl::C_SclChecksums::CalcCRC32(&this->me_StateDebugger, sizeof(this->me_StateDebugger), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->me_StateSecurity, sizeof(this->me_StateSecurity), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_StateSecureAuthentication, sizeof(this->me_StateSecureAuthentication),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_StateTrafficEncryption, sizeof(this->me_StateTrafficEncryption),
+                                       oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&u32_Size, sizeof(u32_Size), oru32_HashValue);
    for (uint32_t u32_It = 0; u32_It < this->mc_DataBlockPaths.size(); ++u32_It)
    {
@@ -549,15 +553,16 @@ void C_OscViewNodeUpdate::RemovePemFilePath(void)
 {
    this->mc_PemFilePath = "";
    this->mq_SkipUpdateOfPemFile = false;
-   this->me_StateSecurity = eST_SEC_NO_CHANGE;
+   this->me_StateSecureAuthentication = eST_SEC_NO_CHANGE;
    this->me_StateDebugger = eST_DEB_NO_CHANGE;
+   this->me_StateTrafficEncryption = eST_TEN_NO_CHANGE;
    this->mq_SkipUpdateOfPemFile = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information PEM file path skip flag
 
-   \param[in]  oq_Skip   New flag
+   \param[in]  oq_Skip  New flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscViewNodeUpdate::SetSkipUpdateOfPemFile(const bool oq_Skip)
@@ -580,29 +585,35 @@ bool C_OscViewNodeUpdate::GetSkipUpdateOfPemFile(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set node update information states
 
-   \param[in]      oe_StateSecurity   Security state of node
-   \param[in]      oe_StateDebugger   Debugger state of node
+   \param[in]  oe_StateSecureAuthentication     Secure authentication state of node
+   \param[in]  oe_StateDebugger                 Debugger state of node
+   \param[in]  oe_StateTrafficEncryption        Traffic encryption state of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscViewNodeUpdate::SetStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                    const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
+void C_OscViewNodeUpdate::SetStates(const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateSecureAuthentication,
+                                    const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
+                                    const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateTrafficEncryption)
 {
    this->me_StateDebugger = oe_StateDebugger;
-   this->me_StateSecurity = oe_StateSecurity;
+   this->me_StateSecureAuthentication = oe_StateSecureAuthentication;
+   this->me_StateTrafficEncryption = oe_StateTrafficEncryption;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the update information states of the node
 
-   \param[out]      ore_StateSecurity   Security state of node
-   \param[out]      ore_StateDebugger   Debugger state of node
+   \param[out]  ore_StateSecureAuthentication   Secure authentication state of node
+   \param[out]  ore_StateDebugger               Debugger state of node
+   \param[in]   ore_StateTrafficEncryption      Traffic encryption state of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscViewNodeUpdate::GetStates(C_OscViewNodeUpdate::E_StateSecurity & ore_StateSecurity,
-                                    C_OscViewNodeUpdate::E_StateDebugger & ore_StateDebugger) const
+void C_OscViewNodeUpdate::GetStates(C_OscViewNodeUpdate::E_StateSecureAuthentication & ore_StateSecureAuthentication,
+                                    C_OscViewNodeUpdate::E_StateDebugger & ore_StateDebugger,
+                                    C_OscViewNodeUpdate::E_StateTrafficEncryption & ore_StateTrafficEncryption) const
 {
    ore_StateDebugger = this->me_StateDebugger;
-   ore_StateSecurity = this->me_StateSecurity;
+   ore_StateSecureAuthentication = this->me_StateSecureAuthentication;
+   ore_StateTrafficEncryption = this->me_StateTrafficEncryption;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

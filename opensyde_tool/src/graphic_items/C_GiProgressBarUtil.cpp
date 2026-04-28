@@ -1370,15 +1370,20 @@ void C_GiProgressBarUtil::mh_GetMarginType1TopBottom(float32_t * const opf32_Mar
                                                      const C_PuiSvDbProgressBar::E_Alignment & ore_Alignment,
                                                      const QFontMetrics & orc_TextFontMetric)
 {
+   // magic number needed after Qt6 upgrade to make the progress bar height look like before;
+   // independently from the alignment top-bottom/left-right only the top and bottom margin is affected, so
+   // just adapting the font size calculation did not do it.
+   const float32_t f32_MODIFIER = 0.9F;
+
    //Define top and bottom margin
    if (ore_Alignment == C_PuiSvDbProgressBar::eTOP)
    {
-      *opf32_MarginTop = static_cast<float32_t>(orc_TextFontMetric.height()) + orf32_ArrowOffset;
+      *opf32_MarginTop = (static_cast<float32_t>(orc_TextFontMetric.height()) * f32_MODIFIER) + orf32_ArrowOffset;
       *opf32_MarginBottom = mhf32_DEFAULT_MARGIN;
    }
    else
    {
-      *opf32_MarginBottom = static_cast<float32_t>(orc_TextFontMetric.height()) + orf32_ArrowOffset;
+      *opf32_MarginBottom = (static_cast<float32_t>(orc_TextFontMetric.height()) * f32_MODIFIER) + orf32_ArrowOffset;
       *opf32_MarginTop = mhf32_DEFAULT_MARGIN;
    }
 }
@@ -1465,17 +1470,22 @@ void C_GiProgressBarUtil::mh_GetMarginTyp23TopBottom(float32_t * const opf32_Mar
                                                      float32_t * const opf32_MarginBottom, const bool & orq_ShowMinMax,
                                                      const QFontMetrics & orc_TextFontMetric)
 {
+   // magic number needed after Qt6 upgrade to make the progress bar height look like before;
+   // independently from the alignment top-bottom/left-right only the top and bottom margin is affected, so
+   // just adapting the font size calculation did not do it.
+   const float32_t f32_MODIFIER = 0.92F;
+
    // Define top and bottom margin
    if (orq_ShowMinMax)
    {
-      *opf32_MarginBottom = static_cast<float32_t>(orc_TextFontMetric.height());
-      *opf32_MarginTop = static_cast<float32_t>(orc_TextFontMetric.height());
+      *opf32_MarginBottom = static_cast<float32_t>(orc_TextFontMetric.height()) * f32_MODIFIER;
+      *opf32_MarginTop = static_cast<float32_t>(orc_TextFontMetric.height()) * f32_MODIFIER;
    }
    // If no minimum and maximum value should be visible
    else
    {
-      *opf32_MarginBottom = static_cast<float32_t>(orc_TextFontMetric.height()) / mhf32_HALF_MODIFIER;
-      *opf32_MarginTop = static_cast<float32_t>(orc_TextFontMetric.height()) / mhf32_HALF_MODIFIER;
+      *opf32_MarginBottom = (static_cast<float32_t>(orc_TextFontMetric.height()) * f32_MODIFIER) / mhf32_HALF_MODIFIER;
+      *opf32_MarginTop = (static_cast<float32_t>(orc_TextFontMetric.height()) * f32_MODIFIER) / mhf32_HALF_MODIFIER;
    }
 }
 

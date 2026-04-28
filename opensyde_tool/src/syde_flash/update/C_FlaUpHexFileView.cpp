@@ -147,8 +147,8 @@ void C_FlaUpHexFileView::m_LoadInfo(const C_FlaUpHexFileInfo * const opc_HexFile
       for (int32_t s32_ItAppl = 0UL; s32_ItAppl < opc_HexFileInfo->c_HexFileInfo.s32_NumberOfBlocks; ++s32_ItAppl)
       {
          c_Text += "<h3>" +
-                   static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1, 2, 10, QChar('0')) +
-                   "</h3>";
+                   static_cast<QString>(C_GtGetText::h_GetText("Block %1")).
+                   arg(s32_ItAppl + 1, 2, 10, static_cast<QChar>('0')) + "</h3>";
          c_Text += "<table>";
          c_Text += "<tr>";
          c_Text += C_FlaUpHexFileView::mhc_START_TD;

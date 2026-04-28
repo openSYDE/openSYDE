@@ -360,7 +360,7 @@ int32_t C_SyvDcExistingNodeList::m_Init(void)
                }
 
                // Count all communicating sub nodes and normal nodes
-               this->mu32_CommunicatingNodeCount += c_RelevantNodeIndexes.size();
+               this->mu32_CommunicatingNodeCount += static_cast<uint32_t>(c_RelevantNodeIndexes.size());
             }
 
             // Skip the other sub nodes in case of a squad. Only the first node index of a squad will be used

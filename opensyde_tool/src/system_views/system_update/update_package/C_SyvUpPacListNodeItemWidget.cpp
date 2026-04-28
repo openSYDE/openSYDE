@@ -110,10 +110,6 @@ C_SyvUpPacListNodeItemWidget::C_SyvUpPacListNodeItemWidget(const uint32_t ou32_V
    this->mpc_Ui->pc_LabelSkip->SetBackgroundColor(24);
    this->mpc_Ui->pc_LabelSkip->setVisible(false);
 
-   // Will be handled in specific derived items
-   this->mpc_Ui->pc_LabelSecurity->setVisible(false);
-   this->mpc_Ui->pc_LabelDebugger->setVisible(false);
-
    this->mpc_Ui->pc_LabelPath->setText(C_GtGetText::h_GetText("<Add File>"));
 }
 
@@ -702,27 +698,13 @@ void C_SyvUpPacListNodeItemWidget::m_UpateFilePathLabel(void) const
          s32_Width -= (this->mpc_Ui->pc_LabelSkip->width() + s32_SPACING);
       }
 
-      if (this->mpc_Ui->pc_LabelSecurity->isVisible() == true)
-      {
-         // In this case the label for the path does not have so much space to use
-         s32_Width -= (this->mpc_Ui->pc_LabelSecurity->width() + s32_SPACING);
-      }
-
-      if (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)
-      {
-         // In this case the label for the path does not have so much space to use
-         s32_Width -= (this->mpc_Ui->pc_LabelDebugger->width() + s32_SPACING);
-      }
-
       if (this->mpc_Ui->pc_LabelVersion->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
          s32_Width -= (this->mpc_Ui->pc_LabelVersion->width() + s32_SPACING);
       }
 
-      if (((this->mpc_Ui->pc_LabelUserHint->isVisible() == true) ||
-           (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)) ||
-          (this->mpc_Ui->pc_LabelSecurity->isVisible() == true) ||
+      if ((this->mpc_Ui->pc_LabelUserHint->isVisible() == true) ||
           (this->mpc_Ui->pc_LabelSkip->isVisible() == true))
       {
          // In this case the label for the path does not have so much space to use

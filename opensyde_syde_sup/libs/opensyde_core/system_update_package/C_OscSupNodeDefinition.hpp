@@ -39,13 +39,19 @@ public:
    uint8_t u8_SignaturePresent;
    stw::scl::C_SclString c_SignatureFile;
 
-   /// Node configuration flags for security state
-   bool q_SendSecurityEnabledState;
-   bool q_SecurityEnabled;
+   /// Node configuration flags for secure authentication state
+   bool q_SendSecureAuthenticationEnabledState;
+   bool q_SecureAuthenticationEnabled;
+
+   /// Node configuration flags for secure encryption state
+   bool q_SendTrafficEncryptionEnabledState;
+   bool q_TrafficEncryptionEnabled;
 
    /// Node configuration flags for debugger state
    bool q_SendDebuggerEnabledState;
    bool q_DebuggerEnabled;
+
+   bool CheckUpdateNecessary(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

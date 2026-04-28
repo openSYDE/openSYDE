@@ -51,13 +51,13 @@ private:
    static stw::scl::C_SclString mh_GenOutFilePathPart(const stw::scl::C_SclString & orc_InPath,
                                                       const stw::scl::C_SclString & orc_TargetFolder);
    static int32_t mh_CopyFile(const stw::scl::C_SclString & orc_InPath, const stw::scl::C_SclString & orc_OutBasePath,
-                              const stw::scl::C_SclString & orc_OutFolder, std::map<scl::C_SclString,
+                              const stw::scl::C_SclString & orc_OutFolder, std::map<stw::scl::C_SclString,
                                                                                     bool> & orc_ExistingFiles,
                               std::set<stw::scl::C_SclString> & orc_XcertFiles,
                               stw::scl::C_SclString * const opc_OutFilePath = NULL);
    static stw::scl::C_SclString mh_GetUniqueFileName(const stw::scl::C_SclString & orc_InPath,
                                                      const stw::scl::C_SclString & orc_OutFolder,
-                                                     std::map<scl::C_SclString,
+                                                     std::map<stw::scl::C_SclString,
                                                               bool> & orc_ExistingFiles);
 };
 

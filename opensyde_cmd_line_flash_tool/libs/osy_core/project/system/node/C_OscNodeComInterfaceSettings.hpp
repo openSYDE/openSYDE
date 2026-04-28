@@ -45,7 +45,7 @@ public:
    };
 
    C_OscNodeComInterfaceSettings(void);
-   ~C_OscNodeComInterfaceSettings(void);
+   virtual ~C_OscNodeComInterfaceSettings(void);
 
    void CalcHash(uint32_t & oru32_HashValue) const;
 

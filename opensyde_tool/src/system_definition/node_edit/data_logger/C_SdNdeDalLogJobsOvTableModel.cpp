@@ -213,7 +213,7 @@ int32_t C_SdNdeDalLogJobsOvTableModel::rowCount(const QModelIndex & orc_Parent) 
 
    if (!orc_Parent.isValid())
    {
-      s32_Retval = this->mc_LogJobsInfoAll.size();
+      s32_Retval = static_cast<int32_t>(this->mc_LogJobsInfoAll.size());
    }
    return s32_Retval;
 }
@@ -482,14 +482,19 @@ void C_SdNdeDalLogJobsOvTableModel::m_FillLogJobsInfo(const std::vector<std::tup
             break;
          }
          //Log job Trigger
-         if (pc_Node->c_DataLoggerJobs[u32_It].c_Properties.e_LocalLogTrigger ==
-             C_OscDataLoggerJobProperties::E_LocalLogTrigger::eLLT_ON_CHANGE)
+         switch (pc_Node->c_DataLoggerJobs[u32_It].c_Properties.e_LocalLogTrigger)
          {
+         case  C_OscDataLoggerJobProperties::E_LocalLogTrigger::eLLT_ON_CHANGE:
             c_LogJobInfo.c_LogJobTriggerMode = "On Change";
-         }
-         else
-         {
+            break;
+         case  C_OscDataLoggerJobProperties::E_LocalLogTrigger::eLLT_ON_RECEIVE:
+            c_LogJobInfo.c_LogJobTriggerMode = "On Receive";
+            break;
+         case  C_OscDataLoggerJobProperties::E_LocalLogTrigger::eLLT_INTERVAL:
             c_LogJobInfo.c_LogJobTriggerMode = "Interval";
+            break;
+         default:
+            break;
          }
          //Log job LoggingData
          if ((u32_It < orc_AllLoggerJobElementsLocationCount.size()) &&

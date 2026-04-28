@@ -233,7 +233,7 @@ void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) 
          {
             const C_OscParamSetInterpretedList & rc_List = rc_Dp.c_Lists[u32_ItList];
             ++u32_ListCount;
-            u32_ParameterCount += rc_List.c_Elements.size();
+            u32_ParameterCount += static_cast<uint32_t>(rc_List.c_Elements.size());
          }
       }
    }

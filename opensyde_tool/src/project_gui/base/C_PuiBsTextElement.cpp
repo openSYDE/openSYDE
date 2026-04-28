@@ -71,7 +71,8 @@ void C_PuiBsTextElement::CalcHash(uint32_t & oru32_HashValue) const
    int32_t s32_Value;
    const QString c_Font = this->c_UiFontStyle.toString();
 
-   stw::scl::C_SclChecksums::CalcCRC32(c_Font.toStdString().c_str(), c_Font.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(c_Font.toStdString().c_str(),
+                                       static_cast<uint32_t>(c_Font.length()), oru32_HashValue);
 
    s32_Value = this->c_UiFontColorBright.red();
    stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
@@ -91,7 +92,8 @@ void C_PuiBsTextElement::CalcHash(uint32_t & oru32_HashValue) const
    s32_Value = this->c_UiFontColorDark.alpha();
    stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_UiText.toStdString().c_str(), this->c_UiText.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(
+      this->c_UiText.toStdString().c_str(), static_cast<uint32_t>(this->c_UiText.length()), oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);
 }

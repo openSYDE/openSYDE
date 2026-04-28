@@ -1051,9 +1051,13 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
                QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
                                                     q_FlashloaderCanWriteToNvm))));
          this->m_UpdateReportText(
-            static_cast<QString>(C_GtGetText::h_GetText(" Security supported: %1")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText(" Security authentication supported: %1")).arg(
                QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
-                                                    q_SupportsSecurity))));
+                                                    q_SupportsSecurityAuthentication))));
+         this->m_UpdateReportText(
+            static_cast<QString>(C_GtGetText::h_GetText(" Security traffic encryption supported: %1")).arg(
+               QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                    q_SupportsSecurityTrafficEncryption))));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(" Disabling debugger supported: %1")).arg(
                QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
@@ -1199,48 +1203,60 @@ void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vecto
                }
             }
 
-            if (this->mc_NodesToFlash[u32_NodesPackageCounter].c_PemFile != "")
+            // Node must have features for PEM writing in Flashloader
+            if (((this->mc_NodesToFlash[u32_NodesPackageCounter].q_SendSecureAuthenticationEnabledState == true) ||
+                 (this->mc_NodesToFlash[u32_NodesPackageCounter].c_PemFile != "")) &&
+                (rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurityAuthentication == false))
             {
-               // Node must have features for PEM writing in Flashloader
-               if (rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurity == false)
+               // Node does not have the ability
+               this->mq_NodesPreconditionError = true;
+               this->mc_NodePreconditionErrors.c_PemWriteError.push_back(u32_NodesPackageCounter);
+
+               osc_write_log_error(
+                  "Update Node",
+                  "Node " + c_NodeName +
+                  " has not the Flashloader features to support security authentication and to write PEM files.");
+            }
+
+            if ((this->mc_NodesToFlash[u32_NodesPackageCounter].q_SendTrafficEncryptionEnabledState == true) &&
+                (rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurityTrafficEncryption == false))
+            {
+               // Node does not have the ability
+               this->mq_NodesPreconditionError = true;
+               this->mc_NodePreconditionErrors.c_TrafficEncryptionWriteError.push_back(u32_NodesPackageCounter);
+
+               osc_write_log_error(
+                  "Update Node",
+                  "Node " + c_NodeName +
+                  " has not the Flashloader features to support security traffic encryption.");
+            }
+
+            if (this->mc_NodesToFlash[u32_NodesPackageCounter].q_SendDebuggerEnabledState == true)
+            {
+               if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOn == false) &&
+                   (this->mc_NodesToFlash[u32_NodesPackageCounter].q_DebuggerEnabled == true))
                {
                   // Node does not have the ability
                   this->mq_NodesPreconditionError = true;
-                  this->mc_NodePreconditionErrors.c_PemWriteError.push_back(u32_NodesPackageCounter);
+                  this->mc_NodePreconditionErrors.c_DebuggerEnableError.push_back(u32_NodesPackageCounter);
 
                   osc_write_log_error(
                      "Update Node",
                      "Node " + c_NodeName +
-                     " has not the Flashloader features to support security and to write PEM files.");
+                     " has not the Flashloader features to support enabling the debugger.");
                }
 
-               if (this->mc_NodesToFlash[u32_NodesPackageCounter].q_SendDebuggerEnabledState == true)
+               if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOff == false) &&
+                   (this->mc_NodesToFlash[u32_NodesPackageCounter].q_DebuggerEnabled == false))
                {
-                  if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOn == false) &&
-                      (this->mc_NodesToFlash[u32_NodesPackageCounter].q_DebuggerEnabled == true))
-                  {
-                     // Node does not have the ability
-                     this->mq_NodesPreconditionError = true;
-                     this->mc_NodePreconditionErrors.c_DebuggerEnableError.push_back(u32_NodesPackageCounter);
+                  // Node does not have the ability
+                  this->mq_NodesPreconditionError = true;
+                  this->mc_NodePreconditionErrors.c_DebuggerDisableError.push_back(u32_NodesPackageCounter);
 
-                     osc_write_log_error(
-                        "Update Node",
-                        "Node " + c_NodeName +
-                        " has not the Flashloader features to support enabling the debugger.");
-                  }
-
-                  if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOff == false) &&
-                      (this->mc_NodesToFlash[u32_NodesPackageCounter].q_DebuggerEnabled == false))
-                  {
-                     // Node does not have the ability
-                     this->mq_NodesPreconditionError = true;
-                     this->mc_NodePreconditionErrors.c_DebuggerDisableError.push_back(u32_NodesPackageCounter);
-
-                     osc_write_log_error(
-                        "Update Node",
-                        "Node " + c_NodeName +
-                        " has not the Flashloader features to support disabling the debugger.");
-                  }
+                  osc_write_log_error(
+                     "Update Node",
+                     "Node " + c_NodeName +
+                     " has not the Flashloader features to support disabling the debugger.");
                }
             }
 
@@ -1345,11 +1361,11 @@ void C_SyvUpUpdateWidget::m_Connect(void)
          {
             C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
             C_OgeWiCustomMessage::E_Outputs e_Output;
-            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Transferring PEM file"));
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Transferring Secure Authentication"));
             c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                           "The Update Package includes PEM file(s). After transferring the public certificate and activating the security flag on the target,\n"
-                                           "access is only possible with a valid private key.\n"
-                                           "\n"
+                                           "The Update Package contains PEM file(s) or activates authentication for at "
+                                           "least one node. After transfer, access will only be possible with a valid "
+                                           "private key.\n\n"
                                            "Are you sure you want to continue?\n"));
             c_MessageBox.SetCustomMinHeight(240, 240);
             c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
@@ -1941,10 +1957,22 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                      this->mc_NodePreconditionErrors.c_PemWriteError,
                      C_GtGetText::h_GetText(
                         "Enter update mode failed.\n"
-                        "There are nodes, which do not support security"
+                        "There are nodes, which do not support authentication"
                         " and writing PEM files."),
                      C_GtGetText::h_GetText(
-                        "Following node(s) do not support security and writing PEM files:\n"));
+                        "Following node(s) do not support authentication and writing PEM files:\n"));
+               }
+
+               // Error for traffic encryption
+               if (this->mc_NodePreconditionErrors.c_TrafficEncryptionWriteError.size() > 0)
+               {
+                  this->m_HandlePreconditionErrorType(
+                     this->mc_NodePreconditionErrors.c_TrafficEncryptionWriteError,
+                     C_GtGetText::h_GetText(
+                        "Enter update mode failed.\n"
+                        "There are nodes, which do not support traffic encryption."),
+                     C_GtGetText::h_GetText(
+                        "Following node(s) do not support traffic encryption:\n"));
                }
 
                // Error for debugger enabling
@@ -2731,7 +2759,7 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OscSuSequences::E_Progr
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
-   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_DEBUGGER_ACTIVATION_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
       q_Retval = true;
@@ -2931,12 +2959,13 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OscSuSequences::E_ProgressS
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_ENTER_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURE_AUTHENTICATION_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_TRAFFIC_ENCRYPTION_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
    case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
       q_Retval = true;
       break;
@@ -2992,7 +3021,8 @@ bool C_SyvUpUpdateWidget::mh_IsSecurityWarningNecessary(
    for (uint32_t u32_It = 0UL; u32_It < orc_NodesToFlash.size(); ++u32_It)
    {
       const C_OscSuSequences::C_DoFlash & rc_Flash = orc_NodesToFlash[u32_It];
-      if (!rc_Flash.c_PemFile.IsEmpty())
+      if ((!rc_Flash.c_PemFile.IsEmpty()) ||
+          (rc_Flash.q_SendSecureAuthenticationEnabledState && rc_Flash.q_SecureAuthenticationEnabled))
       {
          q_Retval = true;
       }

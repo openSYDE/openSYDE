@@ -15,6 +15,7 @@
 
 #include "TglUtils.hpp"
 #include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
 #include "C_SyvUtil.hpp"
 #include "C_OgeWiUtil.hpp"
 #include "C_GtGetText.hpp"

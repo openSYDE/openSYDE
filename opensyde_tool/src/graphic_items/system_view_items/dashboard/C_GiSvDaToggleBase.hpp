@@ -45,7 +45,9 @@ public:
 
    void SendCurrentValue(void) override;
    bool CallProperties(void) override;
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
 
    void UpdateType(const stw::opensyde_gui_logic::C_PuiSvDbToggle::E_Type oe_Type);
 

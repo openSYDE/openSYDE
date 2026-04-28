@@ -32,15 +32,17 @@ class C_OscRoutingCalculation
 public:
    enum E_Mode ///< mode of routing
    {
-      eUPDATE,       ///< routing for update communication
-      eDIAGNOSTIC,   ///< routing for diagnostic communication
-      eROUTING_CHECK ///< routing calculation only for validation of an existing route independent of the use case
+      eUPDATE,            ///< routing for update communication
+      eDIAGNOSTIC,        ///< routing for diagnostic communication
+      eROUTING_CHECK,     ///< routing calculation only for validation of an existing route independent of the use case
+      eROUTING_CHECK_DIAG ///< routing calculation only for validation of an existing route but with filtering of nodes
+                          //   which are principle not capable of openSYDE diagnostic
    };
 
    C_OscRoutingCalculation(const std::vector<C_OscNode> & orc_AllNodes, const std::vector<uint8_t> & orc_ActiveNodes,
                            const uint32_t ou32_StartBusIndex, const uint32_t ou32_TargetNodeIndex,
                            const E_Mode oe_Mode);
-   ~C_OscRoutingCalculation();
+   virtual ~C_OscRoutingCalculation();
 
    const std::vector<C_OscRoutingRoute> * GetRoutes(void) const;
    const C_OscRoutingRoute * GetBestRoute(void) const;

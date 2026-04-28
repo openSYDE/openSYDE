@@ -373,16 +373,19 @@ void C_SyvDaTearOffWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active         Flag if connection is active or not active now
-   \param[in]  oq_WidgetTabOnly  Optional flag if tab widget should be adapted to the connection change
-                                 (use if scene was already changed)
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
+   \param[in]  oq_WidgetTabOnly                          Optional flag if tab widget should be adapted to the connection change
+                                                         (use if scene was already changed)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaTearOffWidget::ConnectionActiveChanged(const bool oq_Active, const bool oq_WidgetTabOnly) const
+void C_SyvDaTearOffWidget::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                    bool> & orc_MappingNodeToTrafficEncryptionStatus,
+                                                   const bool oq_WidgetTabOnly) const
 {
    if ((this->mpc_Dashboard != NULL) && (oq_WidgetTabOnly == false))
    {
-      this->mpc_Dashboard->ConnectionActiveChanged(oq_Active);
+      this->mpc_Dashboard->ConnectionActiveChanged(oq_Active, orc_MappingNodeToTrafficEncryptionStatus);
    }
    this->mpc_Ui->pc_WidgetTab->SetInteractive(!oq_Active);
 }

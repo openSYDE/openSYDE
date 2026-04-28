@@ -47,7 +47,7 @@ int32_t main(const int32_t os32_Argc, char_t * const oppcn_Argv[])
 
    C_BasicFlashTool::E_Result e_ResultCode;
 
-   c_TheFlasher.Init();
+   c_TheFlasher.Init(os32_Argc, oppcn_Argv);
    e_ResultCode = c_TheFlasher.ParseCommandLine(os32_Argc, oppcn_Argv);
 
    if (e_ResultCode == C_BasicFlashTool::eRESULT_OK)

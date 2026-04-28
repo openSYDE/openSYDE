@@ -16,7 +16,6 @@
 
 #include "stwtypes.hpp"
 
-#include "C_OgeLabToolTipBase.hpp"
 #include "C_SyvUpDeviceInfo.hpp"
 #include "C_SyvUpPacConfig.hpp"
 #include "C_OscSuSequences.hpp"
@@ -25,6 +24,7 @@
 #include "C_SyvUpPacSectionNodeFilesWidget.hpp"
 #include "C_SyvUpPacListNodeItemWidget.hpp"
 #include "C_OgeFraSeparator.hpp"
+#include "C_OgeMuSections.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -71,11 +71,12 @@ public:
    void RemoveAllFiles(void) const;
 
    void PrepareExportConfig(stw::opensyde_gui_logic::C_SyvUpPacConfigNode & orc_NodeConfig) const;
-   void LoadImportConfig(const stw::opensyde_gui_logic::C_SyvUpPacConfig & orc_Config) const;
+   void LoadImportConfig(const stw::opensyde_gui_logic::C_SyvUpPacConfig & orc_Config);
 
    int32_t CheckAllFiles(uint32_t & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps = NULL,
                          QStringList * const opc_MissingApps = NULL, QStringList * const opc_MissingParamFiles = NULL,
                          QStringList * const opc_MissingFiles = NULL) const;
+   bool CheckSecuritySettingsChanged(void) const;
 
    C_SyvUpPacSectionNodeWidget * GetSectionList(const QPoint & orc_Pos) const;
    C_SyvUpPacListNodeItemWidget * GetAndSelectApplication(const QPoint & orc_Pos) const;
@@ -95,7 +96,6 @@ public:
    void CollapseAll(void) const;
    void SetEmptyOptionalSectionsVisible(const bool oq_Visible);
    void UpdateSectionsVisibility(void) const;
-   void AddSecurityCertificatePackage(void);
 
 protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;
@@ -107,6 +107,8 @@ protected:
 private:
    Ui::C_SyvUpPacNodeWidget * mpc_Ui;
 
+   static const int32_t mhs32_LAYOUT_THRESHOLD;
+
    uint32_t mu32_ViewIndex;
    uint32_t mu32_NodeIndex;
    QString mc_NodeName;
@@ -117,14 +119,19 @@ private:
    bool mq_StwFlashloader;
    bool mq_Connected;
    bool mq_EmptyOptionalSectionsVisible;
-   bool mq_ShowAddSecurityPack;
+   bool mq_ShowAddSecurityButton;
 
    uint32_t mu32_PositionNumber;
    uint32_t mu32_FilesUpdated;
 
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecureAuthentication me_StateSecureAuthentication;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger me_StateDebugger;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateTrafficEncryption me_StateTrafficEncryption;
+
    QVector<C_SyvUpPacSectionNodeDatablockWidget *> mc_DatablockWidgets;
    C_SyvUpPacSectionNodeFilesWidget * mpc_FilesWidget;
    stw::opensyde_gui_elements::C_OgeFraSeparator * mpc_FilesWidgetSeparator;
+   stw::opensyde_gui_elements::C_OgeMuSections * mpc_SecurityMenu;
 
    //Avoid call
    C_SyvUpPacNodeWidget(const C_SyvUpPacNodeWidget &);
@@ -140,18 +147,19 @@ private:
    C_SyvUpPacSectionNodeWidget * m_GetAppParentList(C_SyvUpPacListNodeItemWidget * const opc_App) const;
    bool m_CheckFileAlreadyContained(const QString & orc_File);
    void m_CheckForMultipleSecurityCertificatePackages(const QString & orc_File);
+   void m_AskForAuthFlagAdaption(void);
    bool m_CheckMime(const QMimeData * const opc_Mime, const QPoint & orc_Pos,
                     QStringList * const opc_FilePathsDatablocks = NULL,
                     QStringList * const opc_FilePathsParamsets = NULL,
                     QStringList * const opc_FilePathsFileBased = NULL,
                     QStringList * const opc_RelevantPemFilePaths = NULL,
                     C_SyvUpPacListNodeItemWidget ** const oppc_App = NULL) const;
-
-   static const int32_t mhs32_LAYOUT_THRESHOLD;
-
+   void m_AddSecurityCertificatePackage(void);
    void m_OnCreatePackage(const QString & orc_PublicKeyPath, const QString & orc_Password,
                           const std::vector<stw::scl::C_SclString> & orc_CertificatesPath,
-                          const bool oq_OptionAddPemFiles, const bool oq_OptionAddSecureAuthentification);
+                          const bool oq_OptionAddPemFiles, const bool oq_OptionAddSecureAuthentication);
+   void m_OpenSecuritySettings(void);
+   void m_ShowSecurityStates(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

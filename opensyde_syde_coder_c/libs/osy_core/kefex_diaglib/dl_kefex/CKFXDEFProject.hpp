@@ -15,7 +15,7 @@
 #include "stwtypes.hpp"
 #include "CKFXVariableLists.hpp"
 #include "C_SclString.hpp"
-#include "C_OscChecksummedIniFile.hpp"
+#include "C_OscUtilChecksummedIniFile.hpp"
 #include "DiagLib_config.hpp"
 
 namespace stw
@@ -65,7 +65,7 @@ public:
    static int32_t LoadComments(const stw::scl::C_SclString & orc_FileName, const stw::scl::C_SclString & orc_DeviceName,
                                C_KFXVariableLists & orc_VariableLists,
                                stw::scl::C_SclString * const opc_CommentDescriptions);
-   static void LoadDefaultNames(stw::opensyde_core::C_OscChecksummedIniFile * const opc_IniFile,
+   static void LoadDefaultNames(stw::opensyde_core::C_OscUtilChecksummedIniFile * const opc_IniFile,
                                 C_KFXVariableLists & orc_VariableLists);
 };
 }

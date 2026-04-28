@@ -54,7 +54,8 @@ C_OscProtocolDriverOsy::C_ListOfFeatures::C_ListOfFeatures(void)
    q_EthernetToEthernetRoutingSupported = false;
    q_FileBasedTransferExitResultAvailable = false;
    q_ExtendedSerialNumberModeImplemented = false;
-   q_SupportsSecurity = false;
+   q_SupportsSecurityAuthentication = false;
+   q_SupportsSecurityTrafficEncryption = false;
    q_SupportsDebuggerOff = false;
    q_SupportsDebuggerOn = false;
 }
@@ -72,7 +73,8 @@ C_OscProtocolDriverOsy::C_OscProtocolDriverOsy(void) :
    mpv_OnOsyWaitTimeInstance(NULL),
    mpc_TransportProtocol(NULL),
    mu32_TimeoutPollingMs(hu32_DEFAULT_TIMEOUT),
-   mu16_MaxServiceSize(C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE)
+   mu16_MaxServiceSize(C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE),
+   pc_SecuritySubLayer(NULL)
 {
 }
 
@@ -87,6 +89,7 @@ C_OscProtocolDriverOsy::~C_OscProtocolDriverOsy(void)
    mpv_OnAsyncTunnelCanMessageInstance = NULL;
    mpr_OnOsyWaitTime = NULL;
    mpv_OnOsyWaitTimeInstance = NULL;
+   pc_SecuritySubLayer = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -304,7 +307,7 @@ int32_t C_OscProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId,
          s32_Return = C_NO_ERR;
          while (s32_Return == C_NO_ERR)
          {
-            s32_Return = mpc_TransportProtocol->ReadResponse(c_Service);
+            s32_Return = m_ReadResponse(c_Service);
 
             if (s32_Return == C_NO_ERR)
             {
@@ -352,10 +355,19 @@ int32_t C_OscProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId,
                   break; //finished here
                }
             }
-         }
-         if ((oq_CheckForSpecificServiceId == true) && (q_ExpectedServiceReceived == false))
-         {
-            s32_Return = C_WARN;
+            else if (s32_Return == C_WARN)
+            {
+               //security sub layer got an error response; no need to try to continue here
+               s32_Return = C_COM;
+            }
+            else
+            {
+               //retry ...
+            }
+            if ((oq_CheckForSpecificServiceId == true) && (q_ExpectedServiceReceived == false))
+            {
+               s32_Return = C_WARN;
+            }
          }
       }
    }
@@ -474,10 +486,13 @@ int32_t C_OscProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8_t o
 
                if (q_Match == true)
                {
+                  osc_write_log_info("", "q_Match==true");
+
                   // Matching error response found!
                   // special handling for "responsePending": rewind Rx timeout expectation
                   if (orc_Service.c_Data[2] == hu8_NR_CODE_RESPONSE_PENDING)
                   {
+                     osc_write_log_info("", "ResponsePending detected, rewinding timeout ...");
                      u32_StartTime = stw::tgl::TglGetTickCount();
                      // The response of the server resets the session timeouts
                      u32_LastWaitTimeHandled = u32_StartTime;
@@ -608,7 +623,7 @@ int32_t C_OscProtocolDriverOsy::OsyDiagnosticSessionControl(const uint8_t ou8_Se
       c_Service.c_Data[0] = mhu8_OSY_SI_DIAGNOSTIC_SESSION_CONTROL;
       c_Service.c_Data[1] = ou8_SessionId;
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Service);
+      s32_Return = m_SendRequest(c_Service);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -680,7 +695,7 @@ int32_t C_OscProtocolDriverOsy::m_ReadDataByIdentifier(const uint16_t ou16_Ident
       c_Request.c_Data[1] = static_cast<uint8_t>(ou16_Identifier >> 8U);
       c_Request.c_Data[2] = static_cast<uint8_t>(ou16_Identifier & 0xFFU);
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -805,7 +820,7 @@ int32_t C_OscProtocolDriverOsy::m_WriteDataByIdentifier(const uint16_t ou16_Iden
       c_Request.c_Data[2] = static_cast<uint8_t>(ou16_Identifier & 0xFFU);
       (void)std::memcpy(&c_Request.c_Data[3], &orc_WriteData[0], orc_WriteData.size());
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -998,9 +1013,10 @@ int32_t C_OscProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_Lis
       orc_ListOfFeatures.q_EthernetToEthernetRoutingSupported = ((c_Data[7] & 0x04U) == 0x04U) ? true : false;
       orc_ListOfFeatures.q_FileBasedTransferExitResultAvailable = ((c_Data[7] & 0x08U) == 0x08U) ? true : false;
       orc_ListOfFeatures.q_ExtendedSerialNumberModeImplemented = ((c_Data[7] & 0x10U) == 0x10U) ? true : false;
-      orc_ListOfFeatures.q_SupportsSecurity = ((c_Data[7] & 0x20U) == 0x20U) ? true : false;
+      orc_ListOfFeatures.q_SupportsSecurityAuthentication = ((c_Data[7] & 0x20U) == 0x20U) ? true : false;
       orc_ListOfFeatures.q_SupportsDebuggerOff = ((c_Data[7] & 0x40U) == 0x40U) ? true : false;
       orc_ListOfFeatures.q_SupportsDebuggerOn = ((c_Data[7] & 0x80U) == 0x80U) ? true : false;
+      orc_ListOfFeatures.q_SupportsSecurityTrafficEncryption = ((c_Data[6] & 0x01U) == 0x01U) ? true : false;
       //we don't know anything about the meaning of the rest of the bits as we have no crystal ball
    }
    if (opu8_NrCode != NULL)
@@ -1020,6 +1036,8 @@ int32_t C_OscProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_Lis
    See class description for general handling of "polled" services.
 
    Whether this service is available on the target can be checked with OsyReadListOfFeatures().
+   If traffic encryption is active the returned value will consider the overhead needed for encryption
+    (done on client side).
 
    \param[out] oru16_MaxNumberOfBlockLength     read MaxNumberOfBlockLength
    \param[out] opu8_NrCode                      if != NULL: negative response code in case of an error response
@@ -1047,6 +1065,22 @@ int32_t C_OscProtocolDriverOsy::OsyReadMaxNumberOfBlockLength(uint16_t & oru16_M
    {
       //extract information:
       oru16_MaxNumberOfBlockLength = (static_cast<uint16_t>((static_cast<uint16_t>(c_Data[0])) << 8U)) + (c_Data[1]);
+      tgl_assert(this->pc_SecuritySubLayer != NULL);
+      if (this->pc_SecuritySubLayer->GetEncryptionIsActive() == true)
+      {
+         //if traffic encryption is active we need to consider that the service size that can effectively
+         // be transferred is reduced by the protocol overhead needed for encryption
+         //4bytes header + padding to multiples of 16 bytes
+         const uint16_t u16_EncryptionOverhead = (4U + ((oru16_MaxNumberOfBlockLength) % 16U));
+         if (u16_EncryptionOverhead < oru16_MaxNumberOfBlockLength)
+         {
+            oru16_MaxNumberOfBlockLength -= u16_EncryptionOverhead;
+         }
+         else
+         {
+            oru16_MaxNumberOfBlockLength = 0U;
+         }
+      }
    }
    if (opu8_NrCode != NULL)
    {
@@ -1573,7 +1607,7 @@ int32_t C_OscProtocolDriverOsy::OsyFactoryMode(const uint8_t ou8_Operation, uint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   ReadCertificateSerialNumber service implementation
+/*! \brief   ReadAuthenticationCertificateSerialNumber service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1594,8 +1628,8 @@ int32_t C_OscProtocolDriverOsy::OsyFactoryMode(const uint8_t ou8_Operation, uint
    C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8_t> & orc_SerialNumber,
-                                                               uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsyReadAuthenticationCertificateSerialNumber(std::vector<uint8_t> & orc_SerialNumber,
+                                                                             uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
 
@@ -1607,7 +1641,8 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
    // if it does not have a valid certificate serial number.
    //Unfortunately there are incorrect implementations that send "ok" with a zero length value.
    //We will play nice and accept such responses.
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER, 0U, false, orc_SerialNumber,
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_AUTHENTICATION_CERTIFICATE_SERIAL_NUMBER, 0U, false,
+                                       orc_SerialNumber,
                                        u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
@@ -1637,13 +1672,13 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
       (*opu8_NrCode) = u8_NrErrorCode;
    }
 
-   m_LogServiceError("ReadDataByIdentifier::CertificateSerialNumber", s32_Return, u8_NrErrorCode);
+   m_LogServiceError("ReadDataByIdentifier::CertificateAuthenticationSerialNumber", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   ReadCertificateSerialNumberL7 service implementation
+/*! \brief   ReadAuthenticationCertificateSerialNumberL7 service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1664,8 +1699,8 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<uint8
    C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumberL7(std::vector<uint8_t> & orc_SerialNumber,
-                                                                 uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsyReadAuthenticationCertificateSerialNumberL7(std::vector<uint8_t> & orc_SerialNumber,
+                                                                               uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
 
@@ -1673,8 +1708,8 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumberL7(std::vector<uin
 
    orc_SerialNumber.clear();
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER_L7, 1U, false, orc_SerialNumber,
-                                       u8_NrErrorCode);
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_AUTHENTICATION_CERTIFICATE_SERIAL_NUMBER_L7, 1U, false,
+                                       orc_SerialNumber, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
       //Strip leading zeroes for compatibility (see #100795 for details)
@@ -1693,13 +1728,13 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumberL7(std::vector<uin
       (*opu8_NrCode) = u8_NrErrorCode;
    }
 
-   m_LogServiceError("ReadDataByIdentifier::CertificateSerialNumberL7", s32_Return, u8_NrErrorCode);
+   m_LogServiceError("ReadDataByIdentifier::CertificateAuthenticationSerialNumberL7", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   WriteSecurityKey service implementation
+/*! \brief   WriteSecurityAuthenticationKey service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1723,10 +1758,10 @@ int32_t C_OscProtocolDriverOsy::OsyReadCertificateSerialNumberL7(std::vector<uin
    C_RANGE    parameter orc_PublicKeyModulus, orc_PublicKeyExponent, orc_SerialNumber does not match the size expectation
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsyWriteSecurityKey(const std::vector<uint8_t> & orc_PublicKeyModulus,
-                                                    const std::vector<uint8_t> & orc_PublicKeyExponent,
-                                                    const std::vector<uint8_t> & orc_CertificateSerialNumber,
-                                                    uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsyWriteSecurityAuthenticationKey(const std::vector<uint8_t> & orc_PublicKeyModulus,
+                                                                  const std::vector<uint8_t> & orc_PublicKeyExponent,
+                                                                  const std::vector<uint8_t> & orc_CertificateSerialNumber,
+                                                                  uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
    uint8_t u8_NrErrorCode = 0U;
@@ -1752,19 +1787,19 @@ int32_t C_OscProtocolDriverOsy::OsyWriteSecurityKey(const std::vector<uint8_t> &
       (void)memcpy(&c_Data[orc_PublicKeyModulus.size() + 4], &orc_CertificateSerialNumber[0],
                    orc_CertificateSerialNumber.size());
 
-      s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_KEY, c_Data, u8_NrErrorCode);
+      s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_AUTHENTICATION_KEY, c_Data, u8_NrErrorCode);
       if (opu8_NrCode != NULL)
       {
          (*opu8_NrCode) = u8_NrErrorCode;
       }
    }
-   m_LogServiceError("WriteDataByIdentifier::SecurityKey", s32_Return, u8_NrErrorCode);
+   m_LogServiceError("WriteDataByIdentifier::SecurityAuthenticationKey", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   ReadSecurityActivation service implementation
+/*! \brief   ReadSecurityAuthenticationActivation service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1783,15 +1818,16 @@ int32_t C_OscProtocolDriverOsy::OsyWriteSecurityKey(const std::vector<uint8_t> &
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsyReadSecurityActivation(bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
-                                                          uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsyReadSecurityAuthenticationActivation(bool & orq_SecurityOn,
+                                                                        uint8_t & oru8_SecurityAlgorithm,
+                                                                        uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
 
    std::vector<uint8_t> c_Data;
    uint8_t u8_NrErrorCode = 0U;
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SECURITY_ACTIVATION, 2U, true, c_Data,
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SECURITY_AUTHENTICATION_ACTIVATION, 2U, true, c_Data,
                                        u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
@@ -1804,13 +1840,13 @@ int32_t C_OscProtocolDriverOsy::OsyReadSecurityActivation(bool & orq_SecurityOn,
       (*opu8_NrCode) = u8_NrErrorCode;
    }
 
-   m_LogServiceError("ReadDataByIdentifier::SecurityActivation", s32_Return, u8_NrErrorCode);
+   m_LogServiceError("ReadDataByIdentifier::SecurityAuthenticationActivation", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   WriteSecurityActivation service implementation
+/*! \brief   WriteSecurityAuthenticationActivation service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1829,9 +1865,9 @@ int32_t C_OscProtocolDriverOsy::OsyReadSecurityActivation(bool & orq_SecurityOn,
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsyWriteSecurityActivation(const bool oq_SecurityOn,
-                                                           const uint8_t ou8_SecurityAlgorithm,
-                                                           uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsyWriteSecurityAuthenticationActivation(const bool oq_SecurityOn,
+                                                                         const uint8_t ou8_SecurityAlgorithm,
+                                                                         uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
    uint8_t u8_NrErrorCode = 0U;
@@ -1842,13 +1878,104 @@ int32_t C_OscProtocolDriverOsy::OsyWriteSecurityActivation(const bool oq_Securit
    c_Data[0] = (oq_SecurityOn == true) ? 0x01U : 0x00U;
    c_Data[1] = ou8_SecurityAlgorithm;
 
-   s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_ACTIVATION, c_Data, u8_NrErrorCode);
+   s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_AUTHENTICATION_ACTIVATION, c_Data, u8_NrErrorCode);
    if (opu8_NrCode != NULL)
    {
       (*opu8_NrCode) = u8_NrErrorCode;
    }
 
-   m_LogServiceError("WriteDataByIdentifier::SecurityActivation", s32_Return, u8_NrErrorCode);
+   m_LogServiceError("WriteDataByIdentifier::SecurityAuthenticationActivation", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadSecurityTrafficEncryptionActivation service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[out] orq_SecurityOn               read flag if security is on or off on the node
+   \param[out] oru8_SecurityAlgorithm       read used security algorithm of the node
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::OsyReadSecurityTrafficEncryptionActivation(bool & orq_SecurityOn,
+                                                                           uint8_t & oru8_SecurityAlgorithm,
+                                                                           uint8_t * const opu8_NrCode)
+{
+   int32_t s32_Return;
+
+   std::vector<uint8_t> c_Data;
+   uint8_t u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SECURITY_TRAFFIC_ENCRYPTION_ACTIVATION, 2U, true, c_Data,
+                                       u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      orq_SecurityOn = ((c_Data[0] & 0x01U) == 0x01U) ? true : false;
+      oru8_SecurityAlgorithm = c_Data[1];
+   }
+
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::SecurityTrafficEncryptionActivation", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteSecurityTrafficEncryptionActivation service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[in]  oq_SecurityOn          new flag if security is on or off on the node
+   \param[in]  ou8_SecurityAlgorithm  new used security algorithm of the node
+   \param[out] opu8_NrCode            if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::OsyWriteSecurityTrafficEncryptionActivation(const bool oq_SecurityOn,
+                                                                            const uint8_t ou8_SecurityAlgorithm,
+                                                                            uint8_t * const opu8_NrCode)
+{
+   int32_t s32_Return;
+   uint8_t u8_NrErrorCode = 0U;
+
+   std::vector<uint8_t> c_Data;
+
+   c_Data.resize(2);
+   c_Data[0] = (oq_SecurityOn == true) ? 0x01U : 0x00U;
+   c_Data[1] = ou8_SecurityAlgorithm;
+
+   s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_TRAFFIC_ENCRYPTION_ACTIVATION, c_Data, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("WriteDataByIdentifier::SecurityTrafficEncryptionActivation", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
@@ -2270,7 +2397,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadDataPoolData(const uint8_t ou8_DataPoolIn
          c_Request.c_Data[1] = au8_Identifier[0];
          c_Request.c_Data[2] = au8_Identifier[1];
          c_Request.c_Data[3] = au8_Identifier[2];
-         s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+         s32_Return = m_SendRequest(c_Request);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -2377,7 +2504,7 @@ int32_t C_OscProtocolDriverOsy::OsyWriteDataPoolData(const uint8_t ou8_DataPoolI
          c_Request.c_Data[3] = au8_Identifier[2];
          (void)std::memcpy(&c_Request.c_Data[4], &orc_DataToWrite[0], orc_DataToWrite.size());
 
-         s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+         s32_Return = m_SendRequest(c_Request);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -2543,7 +2670,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8_t ou8_Data
          c_Request.c_Data[2] = au8_Identifier[0];
          c_Request.c_Data[3] = au8_Identifier[1];
          c_Request.c_Data[4] = au8_Identifier[2];
-         s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+         s32_Return = m_SendRequest(c_Request);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -2659,7 +2786,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8_t ou
          c_Request.c_Data[7] = static_cast<uint8_t>(ou32_Hysteresis >> 8U);
          c_Request.c_Data[8] = static_cast<uint8_t>(ou32_Hysteresis & 0xFFU);
 
-         s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+         s32_Return = m_SendRequest(c_Request);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -2749,7 +2876,7 @@ int32_t C_OscProtocolDriverOsy::OsyStopDataPoolEvents(uint8_t * const opu8_NrCod
       c_Request.c_Data[0] = mhu8_OSY_SI_READ_DATA_POOL_DATA_EVENT_DRIVEN;
       c_Request.c_Data[1] = 0U; // Deactivate transmission
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -3457,14 +3584,14 @@ int32_t C_OscProtocolDriverOsy::SetTransportProtocol(C_OscProtocolDriverOsyTpBas
 /*! \brief   Make client and server identifiers known
 
    Set client and server node identifiers.
-   If a transport protocol ist installed the new identifiers will be set there, too.
+   If a transport protocol is installed the new identifiers will be set there, too.
 
    \param[in] orc_ClientId    new client ID (= our own ID)
    \param[in] orc_ServerId    new server ID (= ID of server we communicate with)
 
    \return
    C_NO_ERR   no problems
-   C_CONFIG   IDs were set, but could not be propagated to the installed transport protocol
+   C_CONFIG   IDs were set, but could not be propagated to the installed transport protocol or the security sub layer
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscProtocolDriverOsy::SetNodeIdentifiers(const C_OscProtocolDriverOsyNode & orc_ClientId,
@@ -3474,6 +3601,13 @@ int32_t C_OscProtocolDriverOsy::SetNodeIdentifiers(const C_OscProtocolDriverOsyN
 
    mc_ClientId = orc_ClientId;
    mc_ServerId = orc_ServerId;
+
+   //set up instance of SSL helper
+   this->pc_SecuritySubLayer = C_OscProtocolSecuritySubLayer::h_GetConfigByNodeId(orc_ServerId);
+   if (this->pc_SecuritySubLayer == NULL)
+   {
+      s32_Return = C_CONFIG;
+   }
 
    //propagate to installed transport protocol:
    if (mpc_TransportProtocol != NULL)
@@ -3752,7 +3886,7 @@ int32_t C_OscProtocolDriverOsy::m_RoutineControl(const uint16_t ou16_RoutineIden
          (void)std::memcpy(&c_Request.c_Data[4], &orc_SendData[0], u32_SendPayloadSize);
       }
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -3803,24 +3937,27 @@ int32_t C_OscProtocolDriverOsy::m_RoutineControl(const uint16_t ou16_RoutineIden
 
    Request the seed for key generation from server.
    The sub-function means the level of security.
-   The seed consist of 8bytes.
 
-   Two modes are supported:
+   Two modes are supported.
    - Non-secure mode:
-      oru8_SecurityAlgorithm is set to 0
-      32 bit value for the seed
+      Neither authentication nor encryption are active.
+      Static 32 bit value is reported as seed.
    - Secure mode:
-      8 bit value for the used security algorithm -> oru8_SecurityAlgorithm
-      64 bit value for the seed -> oru64_Seed
+      Authentication or encryption or both are active.
+      If authentication is active: A random 64 bit value is reported as seed
+      If encryption is active: A random AES init vector is reported.
 
    The request is the same for both modes.
 
-   \param[in]  ou8_SecurityLevel      level of requested security (= sub-function)
-   \param[out] orq_SecureMode         true: secure mode was detected
-                                      false: non secure mode detected
-   \param[out] oru64_Seed             seed for key generation
-   \param[out] oru8_SecurityAlgorithm Read security algorithm
-   \param[out] opu8_NrCode            if != NULL: negative response code in case of an error response
+   \param[in]  ou8_SecurityLevel               level of requested security (= sub-function)
+   \param[out] orq_SecureMode                  true: secure mode was detected (authentication or encryption on)
+                                               false: non secure mode detected (authentication and encryption off)
+   \param[out] oru64_Seed                      seed for key generation
+   \param[out] orq_AuthenticationActive        Flag if authentication is active
+   \param[out] orq_TrafficEncryptionActive     Flag if traffic encryption is active
+   \param[out] orc_TrafficEncryptionInitVector Traffic encryption init vector
+                                                   For AES_CBC_128_WITH_PKCS7_PADDING 128 bit random value
+   \param[out] opu8_NrCode                     if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -3828,12 +3965,15 @@ int32_t C_OscProtocolDriverOsy::m_RoutineControl(const uint16_t ou16_RoutineIden
    C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
-   C_RD_WR    unexpected content in response (here: wrong data identifier ID or unexpected size)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID,
+              unexpected size or not supported algorithm)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8_t ou8_SecurityLevel, bool & orq_SecureMode,
-                                                             uint64_t & oru64_Seed, uint8_t & oru8_SecurityAlgorithm,
+                                                             uint64_t & oru64_Seed, bool & orq_AuthenticationActive,
+                                                             bool & orq_TrafficEncryptionActive,
+                                                             std::vector<uint8_t> & orc_TrafficEncryptionInitVector,
                                                              uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
@@ -3847,35 +3987,112 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8_t ou8_S
 
    s32_Return = m_SecurityAccess(ou8_SecurityLevel, c_SendData, 0U, 4U, c_ReceiveData, u8_NrErrorCode);
 
-   if (c_ReceiveData.size() == 4)
+   if (s32_Return == C_NO_ERR)
    {
-      // Non secure mode
-      orq_SecureMode = false;
-      oru8_SecurityAlgorithm = 0U;
-      oru64_Seed = ((static_cast<uint64_t>(c_ReceiveData[0])) << 24U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[1])) << 16U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[2])) << 8U) +
-                   (static_cast<uint64_t>(c_ReceiveData[3]));
-   }
-   else if (c_ReceiveData.size() == 10)
-   {
-      // Secure mode
-      orq_SecureMode = true;
-      // c_ReceiveData[1] is reserved
-      oru8_SecurityAlgorithm = c_ReceiveData[0];
-      oru64_Seed = ((static_cast<uint64_t>(c_ReceiveData[2])) << 56U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[3])) << 48U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[4])) << 40U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[5])) << 32U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[6])) << 24U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[7])) << 16U) +
-                   ((static_cast<uint64_t>(c_ReceiveData[8])) << 8U) +
-                   (static_cast<uint64_t>(c_ReceiveData[9]));
-   }
-   else
-   {
-      // Not expected size
-      s32_Return = C_RD_WR;
+      if (c_ReceiveData.size() == 4)
+      {
+         // Non secure mode
+         orq_SecureMode = false;
+         orq_AuthenticationActive = false;
+         orq_TrafficEncryptionActive = false;
+         oru64_Seed = ((static_cast<uint64_t>(c_ReceiveData[0])) << 24U) +
+                      ((static_cast<uint64_t>(c_ReceiveData[1])) << 16U) +
+                      ((static_cast<uint64_t>(c_ReceiveData[2])) << 8U) +
+                      (static_cast<uint64_t>(c_ReceiveData[3]));
+      }
+      else
+      {
+         const uint8_t u8_SecurityAlgorithms = c_ReceiveData[0];
+         bool q_SecurityAlgorithmsValid;
+         // Secure mode
+         orq_SecureMode = true;
+         // c_ReceiveData[1] is reserved
+
+         /*
+         Read security algorithms for authentication and traffic encryption:
+                                                     Low nibble for secure authentication:
+                                                        0 = RSA_1024_WITH_PKCS1_PADDING
+                                                        1 = No secure authentication active
+                                                     High nibble for traffic encryption:
+                                                        0 = No traffic encryption active
+                                                        1 = AES_CBC_128_WITH_PKCS7_PADDING
+         */
+         // Check for invalid values
+         q_SecurityAlgorithmsValid = ((u8_SecurityAlgorithms & 0xEEU) == 0x00U) ? true : false;
+
+         if (q_SecurityAlgorithmsValid == true)
+         {
+            uint32_t u32_SizeExpectation = 2U;
+
+            // Get the active states
+            orq_AuthenticationActive = ((u8_SecurityAlgorithms & 0x01U) == 0x01U) ? false : true;
+            orq_TrafficEncryptionActive = ((u8_SecurityAlgorithms & 0x10U) == 0x10U) ? true : false;
+
+            // For checking expected size
+            if (orq_AuthenticationActive == true)
+            {
+               // For 64 bit random value
+               u32_SizeExpectation += 8U;
+            }
+            else
+            {
+               // For 32 bit fixed value
+               u32_SizeExpectation += 4U;
+            }
+            if (orq_TrafficEncryptionActive == true)
+            {
+               // For 128 bit random value
+               u32_SizeExpectation += 16U;
+            }
+
+            if (c_ReceiveData.size() == u32_SizeExpectation)
+            {
+               // Authentication part
+               if (orq_AuthenticationActive == true)
+               {
+                  oru64_Seed = ((static_cast<uint64_t>(c_ReceiveData[2])) << 56U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[3])) << 48U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[4])) << 40U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[5])) << 32U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[6])) << 24U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[7])) << 16U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[8])) << 8U) +
+                               (static_cast<uint64_t>(c_ReceiveData[9]));
+               }
+               else
+               {
+                  oru64_Seed = ((static_cast<uint64_t>(c_ReceiveData[2])) << 24U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[3])) << 16U) +
+                               ((static_cast<uint64_t>(c_ReceiveData[4])) << 8U) +
+                               (static_cast<uint64_t>(c_ReceiveData[5]));
+               }
+
+               // Traffic encryption part
+               if (orq_TrafficEncryptionActive == true)
+               {
+                  uint32_t u32_ByteOffset = 6U;
+
+                  if (orq_AuthenticationActive == true)
+                  {
+                     u32_ByteOffset += 4U;
+                  }
+
+                  orc_TrafficEncryptionInitVector.resize(16);
+                  (void)std::memcpy(&orc_TrafficEncryptionInitVector[0], &c_ReceiveData[u32_ByteOffset], 16);
+               }
+            }
+            else
+            {
+               // Not expected size
+               s32_Return = C_RD_WR;
+            }
+         }
+         else
+         {
+            // Not expected value for security algorithms
+            s32_Return = C_RD_WR;
+         }
+      }
    }
 
    if (opu8_NrCode != NULL)
@@ -3903,7 +4120,7 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8_t ou8_S
    The key consist of 4 bytes.
 
    \param[in]  ou8_SecurityLevel     level of requested security (= sub-function)
-   \param[out] ou32_Key              key for security access
+   \param[in]  ou32_SecurityKey      Security key for security access
    \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
 
    \return
@@ -3916,8 +4133,8 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8_t ou8_S
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel, const uint32_t ou32_Key,
-                                                         uint8_t * const opu8_NrCode)
+int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel,
+                                                         const uint32_t ou32_SecurityKey, uint8_t * const opu8_NrCode)
 {
    int32_t s32_Return;
 
@@ -3926,10 +4143,10 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_Secur
    uint8_t u8_NrErrorCode = 0U;
 
    c_SendData.resize(4);
-   c_SendData[0] = static_cast<uint8_t>(ou32_Key >> 24U);
-   c_SendData[1] = static_cast<uint8_t>(ou32_Key >> 16U);
-   c_SendData[2] = static_cast<uint8_t>(ou32_Key >> 8U);
-   c_SendData[3] = static_cast<uint8_t>(ou32_Key & 0xFFU);
+   c_SendData[0] = static_cast<uint8_t>(ou32_SecurityKey >> 24U);
+   c_SendData[1] = static_cast<uint8_t>(ou32_SecurityKey >> 16U);
+   c_SendData[2] = static_cast<uint8_t>(ou32_SecurityKey >> 8U);
+   c_SendData[3] = static_cast<uint8_t>(ou32_SecurityKey & 0xFFU);
    c_ReceiveData.resize(0);
 
    s32_Return = m_SecurityAccess(ou8_SecurityLevel + 1U, c_SendData, 4U, 0U, c_ReceiveData, u8_NrErrorCode);
@@ -3940,7 +4157,7 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_Secur
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
-      c_ErrorText.PrintFormatted("SecurityAccessSendKey(Level: %d, Key: 0x%08X)", ou8_SecurityLevel, ou32_Key);
+      c_ErrorText.PrintFormatted("SecurityAccessSendKey(Level: %d, Key: 0x%08X)", ou8_SecurityLevel, ou32_SecurityKey);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -3956,9 +4173,25 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_Secur
    Send the computed key to the server.
    The sub-function + 1 means the level of security.
 
-   \param[in]  ou8_SecurityLevel     level of requested security (= sub-function)
-   \param[out] orc_Key               key for security access
-   \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
+   At least authentication or traffic encryption must be active here. If not the other OsySecurityAccessSendKey must
+   be used.
+
+   \param[in]  ou8_SecurityLevel                    level of requested security (= sub-function)
+   \param[in]  orc_AuthenticationKey                authentication key for security access
+                                                    Must have the size:
+                                                       - 0 if authentication is off
+                                                       - 128 if authentication is on
+   \param[in]  ou32_SecurityKey                     Security key for security access
+                                                    Is only used if authentication is off (size of orc_AuthenticationKey == 0)
+   \param[in] orc_TrafficEncryptionPublicClientKey  traffic encryption public client key to send for security access
+                                                    Must have the size:
+                                                       - 0 if traffic encryption is off
+                                                       - 33 if traffic encryption is on
+   \param[out] orc_TrafficEncryptionPublicServerKey traffic encryption public server key to receive for security access
+                                                    Will have the size:
+                                                       - 0 if traffic encryption is off
+                                                       - 33 if traffic encryption is on
+   \param[out] opu8_NrCode                          if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -3968,26 +4201,78 @@ int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_Secur
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
+   C_RANGE    orc_AuthenticationKey or orc_TrafficEncryptionPublicClientKey have invalid length
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscProtocolDriverOsy::OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel,
-                                                         const std::vector<uint8_t> & orc_Key,
+                                                         const std::vector<uint8_t> & orc_AuthenticationKey,
+                                                         const uint32_t ou32_SecurityKey,
+                                                         const std::vector<uint8_t> & orc_TrafficEncryptionPublicClientKey, std::vector<uint8_t> & orc_TrafficEncryptionPublicServerKey,
                                                          uint8_t * const opu8_NrCode)
 {
-   int32_t s32_Return;
-
-   std::vector<uint8_t> c_ReceiveData;
+   int32_t s32_Return = C_RANGE;
    uint8_t u8_NrErrorCode = 0U;
 
-   c_ReceiveData.resize(0);
-
-   s32_Return = m_SecurityAccess(ou8_SecurityLevel + 1U, orc_Key,
-                                 static_cast<uint16_t>(orc_Key.size()), 0U, c_ReceiveData, u8_NrErrorCode);
-   if (opu8_NrCode != NULL)
+   if (((orc_AuthenticationKey.size() == 128) && (orc_TrafficEncryptionPublicClientKey.size() == 33)) ||
+       ((orc_AuthenticationKey.size() == 0) && (orc_TrafficEncryptionPublicClientKey.size() == 33)) ||
+       ((orc_AuthenticationKey.size() == 128) && (orc_TrafficEncryptionPublicClientKey.size() == 0)))
    {
-      (*opu8_NrCode) = u8_NrErrorCode;
+      std::vector<uint8_t> c_SendData;
+      uint16_t u16_ExpectedSizeToSend = 0U;
+      uint16_t u16_ExpectedSizeToReceive = 0U;
+      uint16_t u16_TrafficEncryptionOffset;
+      bool q_TrafficEncryptionActive = false;
+
+      if (orc_TrafficEncryptionPublicClientKey.size() != 0)
+      {
+         u16_ExpectedSizeToSend += static_cast<uint16_t>(orc_TrafficEncryptionPublicClientKey.size());
+         q_TrafficEncryptionActive = true;
+      }
+
+      if (orc_AuthenticationKey.size() == 0)
+      {
+         // Using the "normal" security key
+         u16_TrafficEncryptionOffset = sizeof(ou32_SecurityKey);
+         u16_ExpectedSizeToSend += u16_TrafficEncryptionOffset;
+         c_SendData.resize(u16_ExpectedSizeToSend);
+
+         // Security key is at the beginning
+         c_SendData[0] = static_cast<uint8_t>(ou32_SecurityKey >> 24U);
+         c_SendData[1] = static_cast<uint8_t>(ou32_SecurityKey >> 16U);
+         c_SendData[2] = static_cast<uint8_t>(ou32_SecurityKey >> 8U);
+         c_SendData[3] = static_cast<uint8_t>(ou32_SecurityKey & 0xFFU);
+      }
+      else
+      {
+         // Alternatively the authentication key
+         u16_TrafficEncryptionOffset = static_cast<uint16_t>(orc_AuthenticationKey.size());
+         u16_ExpectedSizeToSend += u16_TrafficEncryptionOffset;
+         c_SendData.resize(u16_ExpectedSizeToSend);
+
+         // Authentication key is at the beginning
+         (void)std::memcpy(&c_SendData[0], &orc_AuthenticationKey[0], u16_TrafficEncryptionOffset);
+      }
+
+      if (q_TrafficEncryptionActive == true)
+      {
+         // Traffic encryption is at the end when active
+         (void)std::memcpy(&c_SendData[u16_TrafficEncryptionOffset], &orc_TrafficEncryptionPublicClientKey[0],
+                           orc_TrafficEncryptionPublicClientKey.size());
+         u16_ExpectedSizeToReceive = static_cast<uint16_t>(orc_TrafficEncryptionPublicClientKey.size());
+      }
+
+      orc_TrafficEncryptionPublicServerKey.resize(u16_ExpectedSizeToReceive);
+
+      s32_Return = m_SecurityAccess(ou8_SecurityLevel + 1U, c_SendData,
+                                    u16_ExpectedSizeToSend, u16_ExpectedSizeToReceive,
+                                    orc_TrafficEncryptionPublicServerKey,
+                                    u8_NrErrorCode);
+      if (opu8_NrCode != NULL)
+      {
+         (*opu8_NrCode) = u8_NrErrorCode;
+      }
    }
+
    if (s32_Return != C_NO_ERR)
    {
       C_SclString c_ErrorText;
@@ -4060,7 +4345,7 @@ int32_t C_OscProtocolDriverOsy::m_SecurityAccess(const uint8_t ou8_SubFunction,
          }
       }
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -4453,6 +4738,152 @@ void C_OscProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32_t o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send request via installed transport protocol
+
+   If encryption is active then this function will wrap up the service into a SecuredDataTransmission service using
+    the security sub layer. Only services requests that need encryption according to protocol specification will be
+    wrapped.
+   Otherwise requests will be sent as they are.
+
+   \param[in]  orc_Service           request to send
+
+   \return
+   C_NO_ERR    service added
+   C_RANGE     service size out of range
+   C_OVERFLOW  Tx queue is already full
+   C_NOACT     could not add to queue (out of memory; should not happen in real life)
+   C_CHECKSUM  failed to wrap up/encrypt service
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::m_SendRequest(const C_OscProtocolDriverOsyService & orc_Service)
+{
+   int32_t s32_Return = C_NO_ERR;
+   const C_OscProtocolDriverOsyService * pc_Request = &orc_Service;
+   C_OscProtocolDriverOsyService c_EncryptedRequest;
+
+   tgl_assert(this->pc_SecuritySubLayer != NULL);
+   if (this->pc_SecuritySubLayer->GetEncryptionIsActive() == true)
+   {
+      bool q_NeedsEncryption = true; //preset: most services need encryption
+      //explicitly check for services that do not need encryption:
+      if (orc_Service.c_Data.size() > 0)
+      {
+         const uint8_t u8_Service = orc_Service.c_Data[0];
+         switch (u8_Service)
+         {
+         case mhu8_OSY_SI_TESTER_PRESENT:
+         case mhu8_OSY_SI_READ_DATA_BY_IDENTIFIER:
+         case mhu8_OSY_SI_DIAGNOSTIC_SESSION_CONTROL:
+         case mhu8_OSY_SI_ECU_RESET:
+         case mhu8_OSY_SI_READ_SERIAL_NUMBER:
+         case mhu8_OSY_SI_SECURITY_ACCESS:
+         case mhu8_OSY_SI_SECURED_DATA_TRANSMISSION:
+            q_NeedsEncryption = false;
+            break;
+         case mhu8_OSY_SI_ROUTINE_CONTROL:
+            if (orc_Service.c_Data.size() > 2U)
+            {
+               const uint16_t u16_Routine =
+                  (static_cast<uint16_t>((static_cast<uint16_t>(orc_Service.c_Data[1]) << 8U)) + orc_Service.c_Data[2]);
+               if ((u16_Routine == mhu16_OSY_RC_SID_REQUEST_PROGRAMMING) ||
+                   (u16_Routine == mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1) ||
+                   (u16_Routine == mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2) ||
+                   (u16_Routine == mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3))
+               {
+                  q_NeedsEncryption = false;
+               }
+            }
+            break;
+         default:
+            break;
+         }
+      }
+      if (q_NeedsEncryption == true)
+      {
+         s32_Return = this->pc_SecuritySubLayer->WrapRequest(orc_Service, c_EncryptedRequest);
+         if (s32_Return != C_NO_ERR)
+         {
+            osc_write_log_error("Traffic encryption", "Could not create SecuredDataTransmission request. Detail: " +
+                                C_SclString::IntToStr(s32_Return));
+            s32_Return = C_CHECKSUM;
+         }
+         pc_Request = &c_EncryptedRequest;
+      }
+   }
+
+   if (s32_Return == C_NO_ERR)
+   {
+      //pass on the original or encrypted request to the installed TP
+      s32_Return = mpc_TransportProtocol->SendRequest(*pc_Request);
+      if (s32_Return != C_NO_ERR)
+      {
+         s32_Return = C_NOACT;
+      }
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get response via installed transport protocol
+
+   If encryption is active then this function will unwrap incoming SecuredDataTransmission services using
+    the security sub layer.
+   Negative responses to SecuredDataTransmission will lead to a C_WARN on this level.
+   Other negative responses (unencrypted or encrypted) will be passed to caller.
+
+   \param[in]  orc_Service           received response (unencrypted if applicable)
+
+   \return
+   C_NO_ERR    service read; data in orc_Service
+   C_WARN      error response to SecuredDataTransmission received
+   C_NOACT     no new response received
+   C_CHECKSUM  failed to unwrap/decrypt service
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscProtocolDriverOsy::m_ReadResponse(C_OscProtocolDriverOsyService & orc_Service)
+{
+   int32_t s32_Return = mpc_TransportProtocol->ReadResponse(orc_Service);
+
+   tgl_assert(this->pc_SecuritySubLayer != NULL);
+
+   if ((s32_Return == C_NO_ERR) && (this->pc_SecuritySubLayer->GetEncryptionIsActive() == true))
+   {
+      //try to decrypt only if we *do* have a SecuredDataTransmission service
+      //otherwise we have an unencrypted response which we just pass through
+      //(not all services need encryption even if encryption is basically active)
+      if ((orc_Service.c_Data.size() > 0) &&
+          ((orc_Service.c_Data[0]) == (mhu8_OSY_SI_SECURED_DATA_TRANSMISSION | 0x40U)))
+      {
+         C_OscProtocolDriverOsyService c_DecryptedResponse;
+         s32_Return = this->pc_SecuritySubLayer->UnwrapResponse(orc_Service, c_DecryptedResponse);
+         if (s32_Return == C_NO_ERR)
+         {
+            orc_Service = c_DecryptedResponse;
+         }
+         else
+         {
+            osc_write_log_error("Traffic encryption",
+                                "Could not decrypt incoming SecuredDataTransmission response. Detail: " +
+                                C_SclString::IntToStr(s32_Return));
+            s32_Return = C_CHECKSUM;
+         }
+      }
+      else if ((orc_Service.c_Data.size() == 3U) && (orc_Service.c_Data[0] == mhu8_OSY_NR_SI) &&
+               (orc_Service.c_Data[1] == mhu8_OSY_SI_SECURED_DATA_TRANSMISSION))
+      {
+         //negative response to SecuredDataTransmission
+         s32_Return = C_WARN;
+         m_LogServiceError("SecuredDataTransmission", s32_Return, orc_Service.c_Data[2]);
+      }
+      else
+      {
+         //no special handling needed
+      }
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request Download service implementation
 
    Send request and wait for response.
@@ -4461,6 +4892,9 @@ void C_OscProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32_t o
    Initiate a programming sequence. Must be called before service TransferData.
    Address and memory length is fixed to 4bytes each.
    Data format is set to 0x00 (no encryption and no compression on transferred data).
+
+   If traffic encryption is active the function will consider the overhead needed for encryption when calculating
+    oru32_MaxBlockLength (done on client side).
 
    \param[in]  ou32_StartAddress     first address in flash to write to
    \param[in]  ou32_Size             number of bytes to be written to flash memory
@@ -4506,7 +4940,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
       c_Request.c_Data[9] = static_cast<uint8_t>(ou32_Size >> 8U);
       c_Request.c_Data[10] = static_cast<uint8_t>(ou32_Size & 0xFFU);
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -4537,6 +4971,22 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
                      (static_cast<uint32_t>(c_Response.c_Data[2U + static_cast<size_t>(u8_Index)]) <<
                       (((u8_LengthFormat - 1U) - u8_Index) * 8U));
                }
+               tgl_assert(pc_SecuritySubLayer != NULL);
+               if (pc_SecuritySubLayer->GetEncryptionIsActive() == true)
+               {
+                  //if traffic encryption is active we need to consider that the service size that can effectively
+                  // be transferred is reduced by the protocol overhead needed for encryption
+                  //4bytes header + padding to multiples of 16 bytes
+                  const uint32_t u32_EncryptionOverhead = (4U + ((oru32_MaxBlockLength) % 16U));
+                  if (u32_EncryptionOverhead < oru32_MaxBlockLength)
+                  {
+                     oru32_MaxBlockLength -= u32_EncryptionOverhead;
+                  }
+                  else
+                  {
+                     oru32_MaxBlockLength = 0U;
+                  }
+               }
             }
             break;
          case C_WARN:
@@ -4554,8 +5004,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
    {
       C_SclString c_ErrorText;
       c_ErrorText.PrintFormatted("RequestDownload(Address: 0x%08X, Size: 0x%08X, MaxBlockLength: %u)",
-                                 ou32_StartAddress,
-                                 ou32_Size, oru32_MaxBlockLength);
+                                 ou32_StartAddress, ou32_Size, oru32_MaxBlockLength);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -4572,6 +5021,9 @@ int32_t C_OscProtocolDriverOsy::OsyRequestDownload(const uint32_t ou32_StartAddr
    Size is fixed to 4bytes.
    Mode of operation is set to 0x03 ("replace file")
    Data format is set to 0x00 (no encryption and no compression of transferred data).
+
+   If traffic encryption is active the function will consider the overhead needed for encryption when calculating
+    oru32_MaxBlockLength (done on client side).
 
    \param[in]  orc_FilePath          file path to send
    \param[in]  ou32_FileSize         number of bytes to be written
@@ -4625,7 +5077,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestFileTransfer(const C_SclString & orc_F
       c_Request.c_Data[8 + static_cast<size_t>(u16_PathLength)] = static_cast<uint8_t>(ou32_FileSize >> 8U);
       c_Request.c_Data[9 + static_cast<size_t>(u16_PathLength)] = static_cast<uint8_t>(ou32_FileSize);
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -4656,6 +5108,22 @@ int32_t C_OscProtocolDriverOsy::OsyRequestFileTransfer(const C_SclString & orc_F
                   oru32_MaxBlockLength +=
                      (static_cast<uint32_t>(c_Response.c_Data[3U + static_cast<size_t>(u8_Index)]) <<
                       (((u8_LengthFormat - 1U) - u8_Index) * 8U));
+               }
+               tgl_assert(pc_SecuritySubLayer != NULL);
+               if (pc_SecuritySubLayer->GetEncryptionIsActive() == true)
+               {
+                  //if traffic encryption is active we need to consider that the service size that can effectively
+                  // be transferred is reduced by the protocol overhead needed for encryption
+                  //4bytes header + padding to multiples of 16 bytes
+                  const uint32_t u32_EncryptionOverhead = (4U + ((oru32_MaxBlockLength) % 16U));
+                  if (u32_EncryptionOverhead < oru32_MaxBlockLength)
+                  {
+                     oru32_MaxBlockLength -= u32_EncryptionOverhead;
+                  }
+                  else
+                  {
+                     oru32_MaxBlockLength = 0U;
+                  }
                }
             }
             break;
@@ -4725,7 +5193,7 @@ int32_t C_OscProtocolDriverOsy::OsyTransferData(const uint8_t ou8_BlockSequenceC
       c_Request.c_Data[1] = ou8_BlockSequenceCounter;
       (void)std::memcpy(&c_Request.c_Data[2], &orc_Data[0], u16_NumberOfBytes);
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -4820,7 +5288,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestTransferExitAddressBased(const bool oq
          c_Request.c_Data[0] = mhu8_OSY_SI_REQUEST_TRANSFER_EXIT;
       }
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -4901,7 +5369,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestTransferExitFileBased(const uint8_t (&
          c_Request.c_Data[static_cast<size_t>(u32_Counter) + 1U] = orau8_Signature[u32_Counter];
       }
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -4944,6 +5412,7 @@ int32_t C_OscProtocolDriverOsy::OsyRequestTransferExitFileBased(const uint8_t (&
 
    As the openSYDE protocol can only handle transfers up to 4kB bigger packages are split up into multiple
     services (each transferring (C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10) bytes).
+    Additional overhead needed for encryption is also considered.
 
    \param[in]     ou32_MemoryAddress NVM memory address to read (first read byte)
    \param[in,out] orc_DataRecord     in: size defines number of bytes to read
@@ -4973,15 +5442,25 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
    }
    else
    {
-      //worst case protocol overhead:
+      //Protocol overhead for ReadMemoryByAddress:
       //1 byte service ID
       //1 byte FormatIdentifier
       //1..4 bytes address
       //1..4 bytes size
-      const uint32_t u32_BLOCK_SIZE = (C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10U);
+      uint32_t u32_BlockSize = (C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10U);
+
+      //if traffic encryption is active we need to consider that the service size that can effectively
+      // be transferred is reduced by the protocol overhead needed for encryption
+      //4bytes header + padding to multiples of 16 bytes
+      tgl_assert(this->pc_SecuritySubLayer != NULL);
+      if (this->pc_SecuritySubLayer->GetEncryptionIsActive() == true)
+      {
+         const uint16_t u16_EncryptionOverhead = static_cast<uint16_t>(4U + ((u32_BlockSize) % 16U));
+         u32_BlockSize -= u16_EncryptionOverhead;
+      }
 
       //split up into smaller blocks:
-      for (uint32_t u32_ReadIndex = 0U; u32_ReadIndex < orc_DataRecord.size(); u32_ReadIndex += u32_BLOCK_SIZE)
+      for (uint32_t u32_ReadIndex = 0U; u32_ReadIndex < orc_DataRecord.size(); u32_ReadIndex += u32_BlockSize)
       {
          C_OscProtocolDriverOsyService c_Request;
          std::vector<uint8_t> c_MemoryAddress;
@@ -4990,9 +5469,9 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
          uint8_t u8_MemorySizeByteCount;
          const uint32_t u32_MemoryAddress = ou32_MemoryAddress + u32_ReadIndex;
          uint32_t u32_Size = static_cast<uint32_t>(orc_DataRecord.size() - u32_ReadIndex);
-         if (u32_Size > u32_BLOCK_SIZE)
+         if (u32_Size > u32_BlockSize)
          {
-            u32_Size = u32_BLOCK_SIZE;
+            u32_Size = u32_BlockSize;
          }
 
          //Convert to bytes
@@ -5014,7 +5493,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
          (void)std::memcpy(&c_Request.c_Data[static_cast<size_t>(2) + u8_MemoryAddressByteCount], &c_MemorySize[0],
                            c_MemorySize.size());
 
-         s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+         s32_Return = m_SendRequest(c_Request);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -5066,6 +5545,7 @@ int32_t C_OscProtocolDriverOsy::OsyReadMemoryByAddress(const uint32_t ou32_Memor
    A client can check for this limit using OsyReadMaxNumberOfBlockLength().
 
    This function uses "mu16_MaxServiceSize" to split the individual write services into suitable chunks.
+   Additional overhead needed for encryption is also considered.
 
    \param[in]  ou32_MemoryAddress   NVM memory address to write to (first written byte)
    \param[in]  orc_DataRecord       Data bytes to write
@@ -5101,6 +5581,16 @@ int32_t C_OscProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32_t ou32_Memo
       //1..4 bytes address
       //1..4 bytes size
       const uint32_t u32_BlockSize = static_cast<uint32_t>(mu16_MaxServiceSize) - 10U;
+
+      //if traffic encryption is active we need to consider that the service size that can effectively
+      // be transferred is reduced by the protocol overhead needed for encryption
+      //4bytes header + padding to multiples of 16 bytes
+      tgl_assert(this->pc_SecuritySubLayer != NULL);
+      if (this->pc_SecuritySubLayer->GetEncryptionIsActive() == true)
+      {
+         const uint16_t u16_EncryptionOverhead = static_cast<uint16_t>(4U + ((u32_BlockSize) % 16U));
+         mu16_MaxServiceSize -= u16_EncryptionOverhead;
+      }
 
       //split up into smaller blocks:
       for (uint32_t u32_WriteIndex = 0U; u32_WriteIndex < orc_DataRecord.size(); u32_WriteIndex += u32_BlockSize)
@@ -5141,7 +5631,7 @@ int32_t C_OscProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32_t ou32_Memo
             &c_Request.c_Data[static_cast<size_t>(2) + u8_MemoryAddressByteCount + u8_MemorySizeByteCount],
             &orc_DataRecord[u32_WriteIndex], u32_Size);
 
-         s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+         s32_Return = m_SendRequest(c_Request);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -5293,7 +5783,7 @@ int32_t C_OscProtocolDriverOsy::OsyTesterPresent(const uint8_t ou8_SuppressRespo
       c_Request.c_Data[0] = mhu8_OSY_SI_TESTER_PRESENT;
       c_Request.c_Data[1] = static_cast<uint8_t>(ou8_SuppressResponseMsg << 7U);
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -5381,7 +5871,7 @@ int32_t C_OscProtocolDriverOsy::OsyEcuReset(const uint8_t ou8_ResetType)
       c_Request.c_Data[0] = mhu8_OSY_SI_ECU_RESET;
       c_Request.c_Data[1] = ou8_ResetType;
 
-      s32_Return = mpc_TransportProtocol->SendRequest(c_Request);
+      s32_Return = m_SendRequest(c_Request);
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_NOACT;
@@ -5575,12 +6065,15 @@ int32_t C_OscProtocolDriverOsy::OsyReadFlashBlockData(const uint8_t ou8_FlashBlo
    std::vector<uint8_t> c_ReceiveData;
    std::vector<uint8_t> c_SendData;
    std::vector<char_t> c_Text;
+   const uint32_t u32_PrevTimeout = this->mu32_TimeoutPollingMs;
 
    c_SendData.resize(1);
    c_SendData[0] = ou8_FlashBlock;
 
+   this->mu32_TimeoutPollingMs = hu32_READ_FLASHBLOCK_DATA_TIMEOUT;
    s32_Return = m_RoutineControl(mhu16_OSY_RC_SID_READ_FLASH_BLOCK_DATA, mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE,
                                  c_SendData, 0U, false, c_ReceiveData, u8_NrErrorCode);
+   this->mu32_TimeoutPollingMs = u32_PrevTimeout;
 
    if (s32_Return == C_NO_ERR)
    {
@@ -5968,6 +6461,12 @@ C_SclString C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const int32
       case (C_OscProtocolDriverOsy::hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED):
          c_Text += "requiredTimeDelayNotExpired";
          break;
+      case (C_OscProtocolDriverOsy::hu8_NR_SECURE_DATA_TRANSMISSION_NOT_ALLOWED):
+         c_Text += "secureDataTransmissionNotAllowed";
+         break;
+      case (C_OscProtocolDriverOsy::hu8_NR_SECURE_DATA_VERIFICATION_FAILED):
+         c_Text += "secureDataVerificationFailed";
+         break;
       case (C_OscProtocolDriverOsy::hu8_NR_CODE_UPLOAD_DOWNLOAD_NOT_ACCEPTED):
          c_Text += "uploadDownloadNotAccepted";
          break;
@@ -5986,8 +6485,11 @@ C_SclString C_OscProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const int32
    case C_RD_WR:
       c_Text = "Unexpected protocol response";
       break;
+   case C_CHECKSUM:
+      c_Text = "Security handling error";
+      break;
    default:
-      c_Text = "Undefined error code";
+      c_Text = ("Undefined error code " + C_SclString::IntToStr(os32_FunctionResult));
       break;
    }
    return c_Text;

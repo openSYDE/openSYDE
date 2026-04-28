@@ -302,6 +302,9 @@ void C_SdNdeDalLogJobPropertiesWidget::m_GetSupportedLocalData() const
       case 1:
          this->mpc_Ui->pc_ComboBoxLocalData->addItem("Interval");
          break;
+      case 2:
+         this->mpc_Ui->pc_ComboBoxLocalData->addItem("On Receive");
+         break;
       default:
          break;
       }
@@ -407,17 +410,15 @@ void C_SdNdeDalLogJobPropertiesWidget::m_OnLocalDataChanged(const int32_t os32_N
    switch (os32_NewIndex)
    {
    case 0:
+   case 2:
       this->mpc_Ui->pc_GbxLoggingInterval->setVisible(false);
       this->mpc_Ui->pc_GbxLogDuration->setVisible(false);
       this->mpc_Ui->pc_GbxMaxLogEntries->setVisible(true);
-      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->setVisible(false);
       break;
    case 1:
       this->mpc_Ui->pc_GbxLoggingInterval->setVisible(true);
       this->mpc_Ui->pc_GbxLogDuration->setVisible(true);
       this->mpc_Ui->pc_GbxMaxLogEntries->setVisible(false);
-      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->setVisible(true);
-      this->mpc_Ui->pc_WidgetAdditionalTriggerProperties->Reload();
       break;
    default:
       break;

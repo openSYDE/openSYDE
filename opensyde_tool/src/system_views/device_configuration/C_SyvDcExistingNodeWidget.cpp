@@ -507,7 +507,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
                      tgl_assert(pc_Squad != NULL);
                      if (pc_Squad != NULL)
                      {
-                        const uint32_t u32_CountSubNodes = pc_Squad->c_SubNodeIndexes.size();
+                        const uint32_t u32_CountSubNodes = static_cast<uint32_t>(pc_Squad->c_SubNodeIndexes.size());
                         if (u32_CountSubNodes == c_SubNodeIdsToOldNodeIds.size())
                         {
                            std::map<uint8_t, C_OscDcDeviceOldComConfig>::const_iterator c_ItSubeNodeIds;

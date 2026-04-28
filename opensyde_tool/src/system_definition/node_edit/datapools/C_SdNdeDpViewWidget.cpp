@@ -429,9 +429,13 @@ void C_SdNdeDpViewWidget::NavigateToNextDataPool(const bool oq_Forwards)
       tgl_assert(s32_NewDpIndex >= 0);
       if (s32_NewDpIndex >= 0)
       {
-         this->SetActualDataPool(s32_NewDpIndex); // first: update internal indices
+         QApplication::setOverrideCursor(Qt::WaitCursor); // big DP can take some time to load
+         QApplication::processEvents();                   // update cursor
+         this->SetActualDataPool(s32_NewDpIndex);         // first: update internal indices
          this->m_EmitActualDataPool(this->me_ActiveDataPoolType, this->ms32_ActiveDataPoolWidget);
          this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->ms32_ActiveDataPoolWidget);
+         QApplication::restoreOverrideCursor(); // get old cursor again
+         QApplication::processEvents();         // update cursor
       }
    }
 }

@@ -966,7 +966,7 @@ QStringList C_SdNdeHalcConfigTreeModel::mh_ConvertBitmasksToStringList(const C_O
    c_Retval.reserve(c_Display.size());
    for (uint32_t u32_It = 0UL; u32_It < c_Display.size(); ++u32_It)
    {
-      c_Retval.push_back(c_Display[u32_It].c_str());
+      c_Retval.append(c_Display[u32_It].c_str());
    }
    return c_Retval;
 }

@@ -777,11 +777,11 @@ void C_SdTopologyScene::CopyFromSnapshotToScene(const stw::opensyde_gui_logic::C
    //Copy nodes
    c_NodeIndices = this->m_CopyFromSnapshotToSceneHandleNodes(orc_Snapshot, c_MapOldBusIndexToNewBusIndex);
    //Copy other elements
-   c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.size());
-   c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.size());
-   c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size());
-   c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.size());
-   c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size());
+   c_OtherIndices.push_back(static_cast<uint>(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.size()));
+   c_OtherIndices.push_back(static_cast<uint>(C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.size()));
+   c_OtherIndices.push_back(static_cast<uint>(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()));
+   c_OtherIndices.push_back(static_cast<uint>(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.size()));
+   c_OtherIndices.push_back(static_cast<uint>(C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size()));
    for (u32_ItElem = 0; u32_ItElem < orc_Snapshot.c_Boundaries.size(); ++u32_ItElem)
    {
       C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.push_back(orc_Snapshot.c_Boundaries[u32_ItElem]);

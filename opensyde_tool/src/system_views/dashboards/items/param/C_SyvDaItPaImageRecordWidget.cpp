@@ -634,7 +634,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
                else
                {
                   this->mpc_Ui->pc_ProgressRead->SetProgress((this->mu32_CurrentNode * 100U) /
-                                                             this->mc_AllNodeIndexes.size());
+                                                             static_cast<uint32_t>(this->mc_AllNodeIndexes.size()));
                }
             }
             else

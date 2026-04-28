@@ -57,6 +57,10 @@ void C_OscDataLoggerJobAdditionalTriggerExpertMode::CalcHash(uint32_t & oru32_Ha
    stw::scl::C_SclChecksums::CalcCRC32(
       this->c_TriggerConfiguration.c_str(),
       this->c_TriggerConfiguration.Length(), oru32_HashValue);
+   for (uint32_t u32_It = 0UL; u32_It < this->c_TriggerDataElementIds.size(); ++u32_It)
+   {
+      this->c_TriggerDataElementIds[u32_It].CalcHash(oru32_HashValue);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

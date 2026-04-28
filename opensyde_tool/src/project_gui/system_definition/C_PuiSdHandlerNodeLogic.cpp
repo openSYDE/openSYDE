@@ -1073,7 +1073,7 @@ bool C_PuiSdHandlerNodeLogic::NodeSupportsCanFd(const std::vector<uint32_t> & or
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_PuiSdHandlerNodeLogic::GetOscNodesSize(void) const
 {
-   return this->mc_CoreDefinition.c_Nodes.size();
+   return static_cast<uint32_t>(this->mc_CoreDefinition.c_Nodes.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1085,7 +1085,7 @@ uint32_t C_PuiSdHandlerNodeLogic::GetOscNodesSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_PuiSdHandlerNodeLogic::GetOscNodeSquadsSize(void) const
 {
-   return this->mc_CoreDefinition.c_NodeSquads.size();
+   return static_cast<uint32_t>(this->mc_CoreDefinition.c_NodeSquads.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1519,7 +1519,7 @@ int32_t C_PuiSdHandlerNodeLogic::AddDataPool(const uint32_t & oru32_NodeIndex, c
       else
       {
          //Go to "total" end
-         u32_ItTargetIndex = rc_OscNode.c_DataPools.size();
+         u32_ItTargetIndex = static_cast<uint32_t>(rc_OscNode.c_DataPools.size());
       }
 
       //Insert

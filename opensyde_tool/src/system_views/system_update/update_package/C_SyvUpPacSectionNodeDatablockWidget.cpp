@@ -502,7 +502,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::UpdateDeviceInformation(const C_SyvUp
    //get number of applications present on target
    if (orc_DeviceInformation.pc_OpenSydeDevice != NULL)
    {
-      u32_AppCountOnTarget = orc_DeviceInformation.pc_OpenSydeDevice->c_Applications.size();
+      u32_AppCountOnTarget = static_cast<uint32_t>(orc_DeviceInformation.pc_OpenSydeDevice->c_Applications.size());
    }
    else if (orc_DeviceInformation.pc_StwDevice != NULL)
    {

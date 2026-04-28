@@ -69,6 +69,7 @@ public:
    int32_t CheckAllPaths(uint32_t & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
                          QStringList * const opc_MissingDataBlocks, QStringList * const opc_MissingParamFiles,
                          QStringList * const opc_MissingFiles) const;
+   bool CheckSecuritySettingsChanged(void) const;
 
    int32_t GetUpdatePackage(std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
                             std::vector<uint32_t> & orc_NodesOrder, std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> * const opc_AllApplications =
@@ -112,11 +113,9 @@ private:
    void m_HideShowOptionalSections(void);
    void m_SkipUpdateOfFile(void);
    void m_ShowInExplorer(void) const;
-   void m_OpenPemFileSettings(void);
 
    void m_AdaptFile(const QString & orc_Path);
    QString m_GetDialogPath(void);
-   void m_AddSecurityCertificatePackage(void);
 
    C_SyvUpPacListDelegate mc_Delegate;
    stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
@@ -131,10 +130,8 @@ private:
    QAction * mpc_RemoveAllSectionFilesAction;
    QAction * mpc_RemoveAllNodeFilesAction;
    QAction * mpc_HideShowOptionalSectionsAction;
-   QAction * mpc_AddSecurityCertificatePackageAction;
    QAction * mpc_SkipUpdateOfFile;
    QAction * mpc_ShowInExplorerAction;
-   QAction * mpc_PemFileSettings;
 
    QString mc_LastPath;
 

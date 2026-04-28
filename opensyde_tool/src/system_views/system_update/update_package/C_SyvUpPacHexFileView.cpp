@@ -296,7 +296,8 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OscHexFile & orc_HexF
    {
       const stw::diag_lib::C_XFLECUInformation & rc_CurInfo = c_InfoBlocks[s32_ItAppl];
       orc_Content += "<h3>" +
-                     static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1, 2, 10, QChar('0')) +
+                     static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1, 2, 10,
+                                                                                  static_cast<QChar>('0')) +
                      "</h3>";
       orc_Content += "<table>";
       orc_Content += "<tr>";

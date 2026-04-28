@@ -661,7 +661,7 @@ uint32_t C_CamMosFilterTableModel::m_AddNewItem(const uint32_t ou32_SelectedInde
    }
    else
    {
-      u32_Index = mc_FilterItemsData.size();
+      u32_Index = static_cast<uint32_t>(mc_FilterItemsData.size());
    }
 
    // add in table and data handling
@@ -699,7 +699,7 @@ std::vector<uint32_t> C_CamMosFilterTableModel::m_PasteItems(const uint32_t ou32
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_CamMosFilterTableModel::m_GetSizeItems() const
 {
-   return this->mc_FilterItemsData.size();
+   return static_cast<uint32_t>(this->mc_FilterItemsData.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

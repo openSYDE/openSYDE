@@ -114,16 +114,13 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Delete(void)
             pc_View->clearSelection();
          }
          //Store last
-         for (uint32_t u32_Index = this->mc_Indices.size(); u32_Index > 0UL; --u32_Index)
+         for (uint32_t u32_Index = static_cast<uint32_t>(this->mc_Indices.size()); u32_Index > 0U; --u32_Index)
          {
             tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(
                           this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex,
-                          this->mc_Indices[static_cast<std::vector<uint32_t>::size_type >(u32_Index - 1UL)],
-                          this->mc_OscContent[static_cast<std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement>
-                                                          ::
-                                                          size_type >(u32_Index - 1UL)],
-                          this->mc_UiContent[static_cast<std::vector<C_PuiSdNodeDataPoolListElement>::size_type >(
-                                                u32_Index - 1UL)]) ==
+                          this->mc_Indices[static_cast<size_t>(u32_Index) - 1U],
+                          this->mc_OscContent[static_cast<size_t>(u32_Index) - 1U],
+                          this->mc_UiContent[static_cast<size_t>(u32_Index) - 1U]) ==
                        C_NO_ERR);
          }
          //Remove action
@@ -186,11 +183,11 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetInitialData(
    //Adapt data set size to requirement
    if (pc_List != NULL)
    {
-      const uint32_t u32_DataSetSize = pc_List->c_DataSets.size();
+      const uint32_t u32_DataSetSize = static_cast<uint32_t>(pc_List->c_DataSets.size());
       for (uint32_t u32_ItOscData = 0; u32_ItOscData < this->mc_OscContent.size(); ++u32_ItOscData)
       {
          C_OscNodeDataPoolListElement & rc_OscData = this->mc_OscContent[u32_ItOscData];
-         const uint32_t u32_InitialDataSetSize = rc_OscData.c_DataSetValues.size();
+         const uint32_t u32_InitialDataSetSize = static_cast<uint32_t>(rc_OscData.c_DataSetValues.size());
          rc_OscData.c_DataSetValues.resize(u32_DataSetSize);
          //Initialize data set content
          for (uint32_t u32_ItNewDataSet = u32_InitialDataSetSize; u32_ItNewDataSet < u32_DataSetSize;
@@ -220,29 +217,21 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
    {
       pc_View->clearSelection();
       //New selection
-      for (uint32_t u32_ItSection = 0UL; u32_ItSection < orc_Items.size(); ++u32_ItSection)
+      for (uint32_t u32_ItSection = 0U; u32_ItSection < orc_Items.size(); ++u32_ItSection)
       {
          const std::vector<uint32_t> & rc_Section = orc_Items[u32_ItSection];
-         if (rc_Section.size() > 0UL)
+         if (rc_Section.size() > 0U)
          {
-            pc_View->SelectRange(rc_Section[0UL], rc_Section[static_cast<std::vector<uint32_t>::
-                                                                         size_type>(static_cast<uint32_t>(rc_Section
-                                                                                                          .size())
-                                                                                    -
-                                                                                    1UL)]);
+            pc_View->SelectRange(rc_Section[0U], rc_Section[rc_Section.size() - 1U]);
             //scroll to last
-            if ((oq_ScrollToLast) && (u32_ItSection == (static_cast<uint32_t>(orc_Items.size()) - 1UL)))
+            if ((oq_ScrollToLast) && (u32_ItSection == (static_cast<uint32_t>(orc_Items.size()) - 1U)))
             {
                C_SdNdeDpListTableModel * const pc_Model =
                   this->mpc_DataPoolListModelViewManager->GetElementModel(
                      this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
                if (pc_Model != NULL)
                {
-                  pc_View->scrollTo(pc_Model->index(rc_Section[static_cast<std::vector<uint32_t>::
-                                                                           size_type>(static_cast<uint32_t>(rc_Section
-                                                                                                            .size())
-                                                                                      -
-                                                                                      1UL)], 0));
+                  pc_View->scrollTo(pc_Model->index(rc_Section[rc_Section.size() - 1U], 0));
                }
             }
          }

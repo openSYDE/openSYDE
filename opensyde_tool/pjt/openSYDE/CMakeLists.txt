@@ -257,7 +257,7 @@ set(OPENSYDE_SOURCES
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.cpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.cpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.cpp
-   ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.cpp
+   ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSecurityOptionsPopUp.cpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFilesListWidget.cpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFilesWidget.cpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.cpp
@@ -529,6 +529,7 @@ set(OPENSYDE_SOURCES
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardsWidget.cpp
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardWidget.cpp
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardSelectorTabWidget.cpp
+   ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaTrafficEncryptionStatusHelper.cpp
    ${PROJECT_ROOT}/src/scene_base/C_SebScene.cpp
    ${PROJECT_ROOT}/src/scene_base/C_SebGraphicsView.cpp
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardScene.cpp
@@ -1045,6 +1046,7 @@ set(OPENSYDE_SOURCES
    ${PROJECT_ROOT}/src/opensyde_gui_elements/C_OgeTreeViewCheckable.cpp
    ${PROJECT_ROOT}/src/table_base/tree_base/C_TblTreeModelCheckable.cpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/datapools/C_SdNdeDpImportRamView.cpp
+   ${PROJECT_ROOT}/src/opensyde_gui_elements/push_button/C_OgePubIconMenu.cpp
 )
 
 set(OPENSYDE_HEADERS
@@ -1157,7 +1159,7 @@ set(OPENSYDE_HEADERS
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.hpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.hpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.hpp
-   ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.hpp
+   ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSecurityOptionsPopUp.hpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFilesListWidget.hpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.hpp
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.hpp
@@ -1430,6 +1432,7 @@ set(OPENSYDE_HEADERS
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardsWidget.hpp
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardWidget.hpp
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardSelectorTabWidget.hpp
+   ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaTrafficEncryptionStatusHelper.hpp
    ${PROJECT_ROOT}/src/scene_base/C_SebScene.hpp
    ${PROJECT_ROOT}/src/scene_base/C_SebGraphicsView.hpp
    ${PROJECT_ROOT}/src/system_views/dashboards/C_SyvDaDashboardScene.hpp
@@ -1960,6 +1963,7 @@ set(OPENSYDE_HEADERS
    ${PROJECT_ROOT}/src/opensyde_gui_elements/C_OgeTreeViewCheckable.hpp
    ${PROJECT_ROOT}/src/table_base/tree_base/C_TblTreeModelCheckable.hpp
    ${PROJECT_ROOT}/src/system_definition/node_edit/datapools/C_SdNdeDpImportRamView.hpp
+   ${PROJECT_ROOT}/src/opensyde_gui_elements/push_button/C_OgePubIconMenu.hpp
 )
 
 set(OPENSYDE_FORMS
@@ -2134,7 +2138,7 @@ set(OPENSYDE_FORMS
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.ui
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileEntry.ui
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.ui
-   ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.ui
+   ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSecurityOptionsPopUp.ui
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacPemFilesWidget.ui
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.ui
    ${PROJECT_ROOT}/src/system_views/system_update/update_package/C_SyvUpPacSecureArchiveDialog.ui

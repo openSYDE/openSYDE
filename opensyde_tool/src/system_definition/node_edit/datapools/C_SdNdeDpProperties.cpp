@@ -123,9 +123,9 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
       const int32_t s32_Minor = static_cast<int32_t>(this->mpc_OscDataPool->au8_Version[1]);
       const int32_t s32_Revision = static_cast<int32_t>(this->mpc_OscDataPool->au8_Version[2]);
       const QString c_Version = static_cast<QString>("v%1.%2r%3")
-                                .arg(s32_Major, 2, 10, QChar('0'))
-                                .arg(s32_Minor, 2, 10, QChar('0'))
-                                .arg(s32_Revision, 2,  10, QChar('0'));
+                                .arg(s32_Major, 2, 10, static_cast<QChar>('0'))
+                                .arg(s32_Minor, 2, 10, static_cast<QChar>('0'))
+                                .arg(s32_Revision, 2,  10, static_cast<QChar>('0'));
       // load actual datapool values
       this->mpc_Ui->pc_LineEditDatapoolName->setText(this->mpc_OscDataPool->c_Name.c_str());
       this->mpc_Ui->pc_CommentText->setText(this->mpc_OscDataPool->c_Comment.c_str());

@@ -127,12 +127,12 @@ void C_SdNdeUnoDataPoolListMoveCommand::m_DoMoveRows(const std::vector<uint32_t>
             {
                //Qt interface seems to insert the items before removing anything so the "new position" has to have an
                // bigger offset
-               u32_TargetIndex += rc_Section.size();
+               u32_TargetIndex += static_cast<uint32_t>(rc_Section.size());
                //We insert after removing so this has to be considered
                u32_TargetIndexParam = u32_TargetIndex - 1UL;
             }
             this->m_MoveItems(rc_Section, u32_TargetIndexParam);
-            u32_TargetAccessIndex += rc_Section.size();
+            u32_TargetAccessIndex += static_cast<uint32_t>(rc_Section.size());
          }
       }
    }

@@ -15,6 +15,7 @@
 #include <QWidget>
 
 #include "stwtypes.hpp"
+#include "C_SclString.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 

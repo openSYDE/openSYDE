@@ -156,10 +156,10 @@ uint32_t C_PuiBsElements::Count(void) const
 {
    uint32_t u32_Retval = 0;
 
-   u32_Retval += this->c_Boundaries.size();
-   u32_Retval += this->c_Images.size();
-   u32_Retval += this->c_LineArrows.size();
-   u32_Retval += this->c_TextElements.size();
+   u32_Retval += static_cast<uint32_t>(this->c_Boundaries.size());
+   u32_Retval += static_cast<uint32_t>(this->c_Images.size());
+   u32_Retval += static_cast<uint32_t>(this->c_LineArrows.size());
+   u32_Retval += static_cast<uint32_t>(this->c_TextElements.size());
    return u32_Retval;
 }
 
@@ -239,7 +239,7 @@ void C_PuiBsElements::SetDataZetOffset(const float64_t of64_HighestUsedZetValue)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddBoundary(const C_PuiBsBoundary & orc_Data)
 {
-   tgl_assert(this->InsertBoundary(this->c_Boundaries.size(), orc_Data) == C_NO_ERR);
+   tgl_assert(this->InsertBoundary(static_cast<uint32_t>(this->c_Boundaries.size()), orc_Data) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -276,7 +276,7 @@ int32_t C_PuiBsElements::InsertBoundary(const uint32_t & oru32_Index, const C_Pu
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddImage(const C_PuiBsImage & orc_Data)
 {
-   tgl_assert(this->InsertImage(this->c_Images.size(), orc_Data) == C_NO_ERR);
+   tgl_assert(this->InsertImage(static_cast<uint32_t>(this->c_Images.size()), orc_Data) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ int32_t C_PuiBsElements::InsertImage(const uint32_t & oru32_Index, const C_PuiBs
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddLineArrow(const C_PuiBsLineArrow & orc_Data)
 {
-   tgl_assert(this->InsertLineArrow(this->c_LineArrows.size(), orc_Data) == C_NO_ERR);
+   tgl_assert(this->InsertLineArrow(static_cast<uint32_t>(this->c_LineArrows.size()), orc_Data) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -350,7 +350,7 @@ int32_t C_PuiBsElements::InsertLineArrow(const uint32_t & oru32_Index, const C_P
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddTextElement(const C_PuiBsTextElement & orc_Data)
 {
-   tgl_assert(this->InsertTextElement(this->c_TextElements.size(), orc_Data) == C_NO_ERR);
+   tgl_assert(this->InsertTextElement(static_cast<uint32_t>(this->c_TextElements.size()), orc_Data) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

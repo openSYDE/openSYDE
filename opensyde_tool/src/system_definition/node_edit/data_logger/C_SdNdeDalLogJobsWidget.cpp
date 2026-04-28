@@ -197,7 +197,7 @@ void C_SdNdeDalLogJobsWidget::LoadLogJobs(void)
 
    if (pc_Node != NULL)
    {
-      const uint32_t u32_LogJobCount = pc_Node->c_DataLoggerJobs.size();
+      const uint32_t u32_LogJobCount = static_cast<uint32_t>(pc_Node->c_DataLoggerJobs.size());
 
       if (pc_Node->c_Properties.q_XappSupport == true)
       {
@@ -386,7 +386,7 @@ void C_SdNdeDalLogJobsWidget::m_OnDeleteLogJob()
 
             const C_OscNode * const pc_Node =
                C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-            this->m_UpdateLogJobCountLabel(pc_Node->c_DataLoggerJobs.size());
+            this->m_UpdateLogJobCountLabel(static_cast<uint32_t>(pc_Node->c_DataLoggerJobs.size()));
 
             // if all log jobs are deleted, show the overview
             if (pc_Node->c_DataLoggerJobs.size() == 0)

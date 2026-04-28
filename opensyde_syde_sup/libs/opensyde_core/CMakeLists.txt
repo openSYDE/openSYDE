@@ -2,7 +2,7 @@
 # It can be included from the CMakeLists.txt file of an application.
 # Some optional parts of the core can be skipped by setting options in the application CMakeLists.txt file before
 #  including this file in order to keep build times low.
-#  List of the groups (all but "COMMON_SOURCES" are skipable):
+#  List of the groups (all but "COMMON_SOURCES" are skippable):
 #     COMMON_SOURCES             basic infrastructure (also requires a target layer, e.g. for Windows or a
 #                                                      corresponding implementation for e.g. Linux)
 #     ZIPPING                    zip/unzip functionality
@@ -13,7 +13,7 @@
 #     PROTOCOL_DRIVERS_BASIC     communication protocol drivers basic update
 #     PROTOCOL_DRIVERS_SYSTEM    communication protocol drivers system update
 #     PROTOCOL_DRIVERS_MONITOR   communication protocol drivers monitor (openSYDE CAN Monitor basics)
-#     PROTOCOL_DRIVERS_COMMON    communication protocol drivers common 
+#     PROTOCOL_DRIVERS_COMMON    communication protocol drivers common
 #                                (openSYDE, STW Flashloader, KEFEX, Data Dealer, Dispatcher interface)
 #     PROTOCOL_LOGGING           protocol logging
 #     X_CONFIG_GENERATION        X-App configuration generation functionality
@@ -21,8 +21,8 @@
 #     SYSTEM_PACKAGE_HANDLING    system package base functionality
 #     WINDOWS_DRIVERS            windows target drivers: CAN and Ethernet dispatchers
 #     WINDOWS_TARGET             windows target glue layer
-#     SECURITY                   security features like authentification, secure update, secure communication
-#                                 (note: zipping sources are also needed if security sources are included)
+#     SECURITY                   security features like authentication, secure update, secure communication
+#                                 (note: OpenSSL also needed to be provided by application)
 #
 # This CMakeLists.txt defined the library "opensyde_core" to be linked from the application.
 # As the openSYDE core needs the "precomp_headers.hpp" that is placed with the application, the path
@@ -44,6 +44,33 @@
 # minimum 3.16 for precompiled headers
 cmake_minimum_required(VERSION 3.16)
 project("opensyde_core")
+
+# --- Dependency checks ------------------------------------------------------------------------------------------------
+# Some packages depend on others. To make life simpler for applications we drag in required other packages
+#  even if "_SKIP_"ed.
+if(NOT OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON)
+   #We also need the security package (e.g. for routines for traffic encryption)
+   if (OPENSYDE_CORE_SKIP_SECURITY)
+      set(OPENSYDE_CORE_SKIP_SECURITY 0)
+      message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON not set: forcing OPENSYDE_CORE_SKIP_SECURITY to 0")
+   endif()
+endif()
+
+if(NOT OPENSYDE_CORE_SKIP_SECURITY)
+   #We also need the zipping package
+   if (OPENSYDE_CORE_SKIP_ZIPPING)
+      set(OPENSYDE_CORE_SKIP_ZIPPING 0)
+      message("OPENSYDE_CORE_SKIP_SECURITY not set: forcing OPENSYDE_CORE_SKIP_ZIPPING to 0")
+   endif()
+endif()
+
+if (NOT OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM)
+   #We also need the zipping package (for handling .syde_sup packages)
+   if (OPENSYDE_CORE_SKIP_ZIPPING)
+      set(OPENSYDE_CORE_SKIP_ZIPPING 0)
+      message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM not set: forcing OPENSYDE_CORE_SKIP_ZIPPING to 0")
+   endif()
+endif()
 
 # --- Project source files ---------------------------------------------------------------------------------------------
 #basic infrastructure (also requires Windows target layer, or a corresponding implementation for e.g. Linux)
@@ -273,6 +300,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElement.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementId.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementOptArrayOptValidId.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListId.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeOpenSydeServerSettings.cpp
@@ -378,6 +406,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElement.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementId.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementOptArrayId.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListElementOptArrayOptValidId.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolListId.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeOpenSydeServerSettings.hpp
@@ -518,6 +547,8 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolDriverOsy.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolSerialNumber.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolDriverOsyTpBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolSecuritySubLayer.cpp
+
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscHexFile.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscCanDispatcherOsyRouter.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscDiagProtocolBase.cpp
@@ -544,6 +575,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolDriverOsy.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolSerialNumber.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolDriverOsyTpBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscProtocolSecuritySubLayer.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscHexFile.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscCanDispatcherOsyRouter.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OscDiagProtocolBase.hpp
@@ -816,7 +848,7 @@ else()
    )
 endif()
 
-# security features like authentification, secure update, secure communication
+# security features like authentication, secure update, secure communication
 if(OPENSYDE_CORE_SKIP_SECURITY)
    message("OPENSYDE_CORE_SKIP_SECURITY detected ... skipping package")
 else()
@@ -831,10 +863,9 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityAesCbc.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityAesFile.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdsa.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdh.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdhAes.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityRsa.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/aes/AES.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/security_algorithms_generic/osy_crypto_algorithm_ecdh.c
 
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPem.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityPemBase.hpp
@@ -844,16 +875,14 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityAesCbc.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityAesFile.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdsa.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdh.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityEcdhAes.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OscSecurityRsa.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/security/aes/AES.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/security_algorithms_generic/osy_crypto_algorithm_ecdh.h
    )
 
    set(OPENSYDE_CORE_SECURITY_INCLUDE_DIRECTORIES
       ${CMAKE_CURRENT_SOURCE_DIR}/security
       ${CMAKE_CURRENT_SOURCE_DIR}/security/aes
-      ${CMAKE_CURRENT_SOURCE_DIR}/security/security_algorithms_generic
    )
 endif()
 

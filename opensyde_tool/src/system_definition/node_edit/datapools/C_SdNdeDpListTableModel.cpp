@@ -391,7 +391,7 @@ int32_t C_SdNdeDpListTableModel::rowCount(const QModelIndex & orc_Parent) const
 
    if (!orc_Parent.isValid())
    {
-      s32_Retval = this->mc_DpListInfoAll.size();
+      s32_Retval = static_cast<int32_t>(this->mc_DpListInfoAll.size());
    }
    return s32_Retval;
 }
@@ -1155,18 +1155,19 @@ std::vector<std::vector<uint32_t> > C_SdNdeDpListTableModel::DoInsertRows(
    {
       uint32_t u32_Counter = 0UL;
       c_Retval = C_Uti::h_GetContiguousSectionsAscending(orc_Rows);
-      C_PuiSdHandler::h_GetInstance()->ReserveDataPoolListElements(this->mu32_NodeIndex,
-                                                                   this->mu32_DataPoolIndex,
-                                                                   this->mu32_ListIndex,
-                                                                   orc_OscInsertedElements.size());
-      for (uint32_t u32_ItSection = 0UL; u32_ItSection < c_Retval.size(); ++u32_ItSection)
+      C_PuiSdHandler::h_GetInstance()->ReserveDataPoolListElements(
+         this->mu32_NodeIndex,
+         this->mu32_DataPoolIndex,
+         this->mu32_ListIndex,
+         static_cast<uint32_t>(orc_OscInsertedElements.size()));
+      for (uint32_t u32_ItSection = 0U; u32_ItSection < static_cast<uint32_t>(c_Retval.size()); ++u32_ItSection)
       {
          const std::vector<uint32_t> & rc_Section = c_Retval[u32_ItSection];
          if (rc_Section.size() > 0UL)
          {
             this->beginInsertRows(QModelIndex(), rc_Section[0UL],
                                   rc_Section[static_cast<std::vector<uint32_t>::size_type>(rc_Section.size() - 1UL)]);
-            for (uint32_t u32_ItItem = 0UL; u32_ItItem < rc_Section.size(); ++u32_ItItem)
+            for (uint32_t u32_ItItem = 0U; u32_ItItem < rc_Section.size(); ++u32_ItItem)
             {
                C_PuiSdHandler::h_GetInstance()->InsertDataPoolListElement(this->mu32_NodeIndex,
                                                                           this->mu32_DataPoolIndex,
@@ -1175,11 +1176,11 @@ std::vector<std::vector<uint32_t> > C_SdNdeDpListTableModel::DoInsertRows(
                                                                           orc_UiInsertedElements[u32_Counter]);
                ++u32_Counter;
             }
+            this->m_FillDpListInfo();
             this->endInsertRows();
          }
       }
       this->mc_ErrorManager.OnErrorChange();
-      this->m_FillDpListInfo();
       Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
    }
    return c_Retval;
@@ -1188,8 +1189,8 @@ std::vector<std::vector<uint32_t> > C_SdNdeDpListTableModel::DoInsertRows(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert items into model
 
-   \param[in]  os32_Col     Starting column
-   \param[in]  os32_Count   Number of inserted items
+   \param[in]  os32_Col    Starting column
+   \param[in]  os32_Count  Number of inserted items
    \param[in]  orc_Parent  Parent
 
    \return
@@ -1204,9 +1205,8 @@ bool C_SdNdeDpListTableModel::insertColumns(const int32_t os32_Col, const int32_
 
    if ((os32_Count > 0) && (os32_Col >= 0))
    {
-      this->m_FillDpListInfo();
       beginInsertColumns(orc_Parent, os32_Col, (os32_Col + os32_Count) - 1);
-      //No action as change was already done before (function call just for signals)
+      this->m_FillDpListInfo();
       endInsertColumns();
       q_Retval =  true;
    }
@@ -1224,37 +1224,35 @@ void C_SdNdeDpListTableModel::DoRemoveRows(const std::vector<uint32_t> & orc_Row
    const std::vector<std::vector<uint32_t> > c_ContiguousSections = C_Uti::h_GetContiguousSectionsAscending(orc_Rows);
 
    //Start deleting from back (easier to keep indices valid)
-   for (uint32_t u32_ItSection = c_ContiguousSections.size(); u32_ItSection > 0UL; --u32_ItSection)
+   for (uint32_t u32_ItSection = static_cast<uint32_t>(c_ContiguousSections.size()); u32_ItSection > 0U;
+        --u32_ItSection)
    {
-      const std::vector<uint32_t> & rc_Section =
-         c_ContiguousSections[static_cast<std::vector<uint32_t>::size_type>(u32_ItSection - 1UL)];
-      if (rc_Section.size() > 0UL)
+      const std::vector<uint32_t> & rc_Section = c_ContiguousSections[static_cast<size_t>(u32_ItSection) - 1];
+      if (rc_Section.size() > 0U)
       {
-         this->beginRemoveRows(QModelIndex(), rc_Section[0UL],
-                               rc_Section[static_cast<std::vector<uint32_t>::size_type>(rc_Section.size() - 1UL)]);
-         for (uint32_t u32_ItItem = rc_Section.size(); u32_ItItem > 0UL; --u32_ItItem)
+         this->beginRemoveRows(QModelIndex(), rc_Section[0U], rc_Section[rc_Section.size() - 1]);
+         for (uint32_t u32_ItItem = static_cast<uint32_t>(rc_Section.size()); u32_ItItem > 0UL; --u32_ItItem)
          {
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveDataPoolListElement(this->mu32_NodeIndex,
-                                                                                  this->mu32_DataPoolIndex,
-                                                                                  this->mu32_ListIndex,
-                                                                                  rc_Section[static_cast<std::vector<uint32_t>
-                                                                                                         ::size_type>(
-                                                                                                u32_ItItem - 1UL)]) ==
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveDataPoolListElement(
+                          this->mu32_NodeIndex,
+                          this->mu32_DataPoolIndex,
+                          this->mu32_ListIndex,
+                          rc_Section[static_cast<size_t>(u32_ItItem) - 1]) ==
                        C_NO_ERR);
          }
+         this->m_FillDpListInfo();
          this->endRemoveRows();
       }
    }
    this->mc_ErrorManager.OnErrorChange();
-   this->m_FillDpListInfo();
    Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove columns from model
 
-   \param[in]  os32_Col     Starting column
-   \param[in]  os32_Count   Number of removed items
+   \param[in]  os32_Col    Starting column
+   \param[in]  os32_Count  Number of removed items
    \param[in]  orc_Parent  Parent
 
    \return
@@ -1269,9 +1267,8 @@ bool C_SdNdeDpListTableModel::removeColumns(const int32_t os32_Col, const int32_
 
    if ((os32_Count > 0) && (os32_Col >= 0))
    {
-      this->m_FillDpListInfo();
       beginRemoveColumns(orc_Parent, os32_Col, (os32_Col + os32_Count) - 1);
-      //No action as change was already done before (function call just for signals)
+      this->m_FillDpListInfo();
       endRemoveColumns();
       q_Retval = true;
    }
@@ -1322,7 +1319,7 @@ void C_SdNdeDpListTableModel::DoMoveRows(const std::vector<uint32_t> & orc_Selec
             {
                //Qt interface seems to insert the items before removing anything so the "new position" has to have an
                // bigger offset
-               u32_TargetIndex += rc_Section.size();
+               u32_TargetIndex +=  static_cast<uint32_t>(rc_Section.size());
                //We insert after removing so this has to be considered
                u32_TargetIndexParam = u32_TargetIndex - 1UL;
             }
@@ -1330,11 +1327,11 @@ void C_SdNdeDpListTableModel::DoMoveRows(const std::vector<uint32_t> & orc_Selec
                                 rc_Section[static_cast<std::vector<uint32_t>::size_type>(rc_Section.size() - 1UL)],
                                 QModelIndex(), u32_TargetIndex);
             this->m_MoveItems(rc_Section, u32_TargetIndexParam);
+            this->m_FillDpListInfo();
             this->endMoveRows();
-            u32_TargetAccessIndex += rc_Section.size();
+            u32_TargetAccessIndex +=  static_cast<uint32_t>(rc_Section.size());
          }
       }
-      this->m_FillDpListInfo();
    }
 }
 
@@ -2260,7 +2257,7 @@ void C_SdNdeDpListTableModel::m_FillDpListElementInfo(const uint32_t ou32_Elemen
             // Icon
             rc_Data.c_InvalidIconRole.push_back(QString::number(20)); // icon size
             //Show error
-            rc_Data.c_InvalidIconRole.push_back("://images/Error_iconV2.svg");
+            rc_Data.c_InvalidIconRole.emplace_back("://images/Error_iconV2.svg");
          }
          else
          {
@@ -2276,11 +2273,11 @@ void C_SdNdeDpListTableModel::m_FillDpListElementInfo(const uint32_t ou32_Elemen
          rc_Data.c_IconIconRole.push_back(QString::number(16)); // icon size
          if (e_DataPoolType == C_OscNodeDataPool::E_Type::eNVM)
          {
-            rc_Data.c_IconIconRole.push_back(":/images/system_definition/IconParameter.svg");
+            rc_Data.c_IconIconRole.emplace_back(":/images/system_definition/IconParameter.svg");
          }
          else // DIAG Datapool
          {
-            rc_Data.c_IconIconRole.push_back(":/images/system_definition/IconVariable.svg");
+            rc_Data.c_IconIconRole.emplace_back(":/images/system_definition/IconVariable.svg");
             //no extra handling for COMM & HAL Datapools because they do not use this list visualization
          }
       }

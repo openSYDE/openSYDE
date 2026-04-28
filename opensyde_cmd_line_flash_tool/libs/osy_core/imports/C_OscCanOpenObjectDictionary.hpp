@@ -29,8 +29,8 @@ namespace opensyde_core
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-///container for on object dictionary entry
-class C_OscCanOpenObject
+///container for on object dictionary entry (or sub-entry)
+class C_OscCanOpenObjectData
 {
 private:
    uint16_t mu16_Size; //size in bytes
@@ -83,7 +83,7 @@ public:
    stw::scl::C_SclString c_Denotation;
    bool q_IsMappableIntoPdo;
 
-   C_OscCanOpenObject();
+   C_OscCanOpenObjectData();
 
    bool IsReadable(void) const;  //do the access rights permit reading ?
    bool IsWriteable(void) const; //do the access rights permit writing ?
@@ -103,7 +103,16 @@ public:
    void CalcHash(uint32_t & oru32_HashValue) const;
 
    //less than operator for sorting:
-   bool operator < (const C_OscCanOpenObject & orc_Object) const;
+   bool operator < (const C_OscCanOpenObjectData & orc_Object) const;
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+class C_OscCanOpenObject :
+   public C_OscCanOpenObjectData
+{
+public:
+   std::map<uint8_t, C_OscCanOpenObjectData> c_SubObjects;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,11 +121,13 @@ public:
 class C_OscCanOpenObjectDictionary
 {
 private:
-   int32_t m_AppendEdsBlock(const stw::scl::C_SclString & orc_Blockname, stw::scl::C_SclIniFile & orc_IniFile);
+   int32_t m_CheckForExistingObjects(const stw::scl::C_SclString & orc_Blockname, stw::scl::C_SclIniFile & orc_IniFile);
    int32_t m_GetObjectDescription(const uint16_t ou16_Index, const uint8_t ou8_SubIndex, const bool oq_IsSubIndex,
-                                  const stw::scl::C_SclStringList & orc_SectionValues, C_OscCanOpenObject & orc_Object);
+                                  stw::scl::C_SclIniSection & orc_Section, C_OscCanOpenObjectData & orc_Object);
+   void m_RememberFileHash();
 
    stw::scl::C_SclString mc_LastError;
+   uint32_t mu32_OriginalFileHash;
 
    int32_t m_IsSectionRo(const uint16_t ou16_PdoIndex, const bool oq_MessageIsTx, const uint8_t ou8_OdSubIndex,
                          bool & orq_IsRo) const;
@@ -129,7 +140,7 @@ public:
    static const uint16_t hu16_OD_INDEX_EMCY = 0x1014U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_CONSUMER = 0x1016U;
    static const uint16_t hu16_OD_INDEX_HEARTBEAT_PRODUCER = 0x1017U;
-   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1300U;
+   static const uint16_t hu16_OD_INDEX_FIRST_SRDO = 0x1301U;
    static const uint16_t hu16_OD_INDEX_FIRST_RX_PDO = 0x1400U;
    static const uint16_t hu16_OD_INDEX_FIRST_TX_PDO = 0x1800U;
    static const uint8_t hu8_OD_SUB_INDEX_COB_ID = 0x1U;
@@ -147,20 +158,27 @@ public:
    static const uint16_t hu16_OD_PDO_MAPPING_OFFSET = 0x200U;
 
    C_OscCanOpenEdsInfoBlock c_InfoBlock;
-   stw::scl::C_SclDynamicArray<C_OscCanOpenObject> c_Objects;
+
+   //all objects loaded from file; key = object index
+   std::map<uint16_t, C_OscCanOpenObject> c_OdObjects;
+
+   //Textual content of loaded EDS file to use e.g. for re-saving to file
+   stw::scl::C_SclStringList c_TextFileContent;
+
+   C_OscCanOpenObjectDictionary();
 
    int32_t LoadFromFile(const stw::scl::C_SclString & orc_File);
-   stw::scl::C_SclString GetLastErrorText(void) const;
+   stw::scl::C_SclString GetLastErrorText() const;
    void CalcHash(uint32_t & oru32_HashValue) const;
 
    //General
-   uint8_t GetNumHeartbeatConsumers(void) const;
+   uint8_t GetNumHeartbeatConsumers() const;
    int32_t IsHeartbeatConsumerRo(bool & orq_IsRo) const;
    bool IsHeartbeatProducerSupported(void) const;
    int32_t IsHeartbeatProducerRo(bool & orq_IsRo) const;
-   bool IsEmcySupported(void) const;
-   uint8_t GetGranularity(void) const;
-   std::set<uint8_t> GetAllAvailableFactorySettingsSubIndices(void) const;
+   bool IsEmcySupported() const;
+   uint8_t GetGranularity() const;
+   std::set<uint8_t> GetAllAvailableFactorySettingsSubIndices() const;
    std::set<uint8_t> GetAllAvailableSubIndices(const uint16_t ou16_OdIndex) const;
 
    //Message
@@ -174,8 +192,9 @@ public:
    int32_t IsPdoMappingRo(const uint16_t ou16_PdoIndex, const bool oq_MessageIsTx, bool & orq_IsRo) const;
 
    //Util
-   const C_OscCanOpenObject * GetCanOpenObject(const uint16_t ou16_OdIndex) const;
-   const C_OscCanOpenObject * GetCanOpenSubIndexObject(const uint16_t ou16_OdIndex, const uint8_t ou8_OdSubIndex) const;
+   const C_OscCanOpenObjectData * GetCanOpenObject(const uint16_t ou16_OdIndex) const;
+   const C_OscCanOpenObjectData * GetCanOpenSubIndexObject(const uint16_t ou16_OdIndex,
+                                                           const uint8_t ou8_OdSubIndex) const;
    bool CheckObjectPresentByIndex(const uint16_t ou16_OdIndex, const uint8_t ou8_OdSubIndex) const;
    void GetMappableObjects(std::map<uint32_t, std::vector<uint32_t> > & orc_SubIndices)
    const;

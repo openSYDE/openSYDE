@@ -241,7 +241,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
          else
          {
             //Reserve
-            pc_DatabaseItem->ReserveChildrenSpace(c_Messages.size());
+            pc_DatabaseItem->ReserveChildrenSpace(static_cast<uint32_t>(c_Messages.size()));
             //Each message
             for (std::vector<QString>::const_iterator c_ItMessage = c_Messages.begin();
                  c_ItMessage != c_Messages.end(); ++c_ItMessage)
@@ -278,7 +278,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
          else
          {
             //Reserve
-            pc_DatabaseItem->ReserveChildrenSpace(rc_Messages.size());
+            pc_DatabaseItem->ReserveChildrenSpace(static_cast<uint32_t>(rc_Messages.size()));
             //Each message
             for (QMap<QString, C_CamDbOsyMessageId>::const_iterator c_ItMessage = rc_Messages.begin();
                  c_ItMessage != rc_Messages.end(); ++c_ItMessage)

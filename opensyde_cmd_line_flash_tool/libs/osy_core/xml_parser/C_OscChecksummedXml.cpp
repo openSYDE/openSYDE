@@ -137,15 +137,16 @@ int32_t C_OscChecksummedXml::SaveToFile(const C_SclString & orc_FileName)
 
 void C_OscChecksummedXml::m_CalcXmlCrcNode(uint16_t & oru16_Crc)
 {
-   std::vector<C_OscXmlAttribute> c_Attributes;
    C_SclString c_NodeLv1;
    C_SclString c_Text;
+
    c_NodeLv1 = this->SelectNodeChild();
 
    mu16_CrcDepth++;
    C_SclChecksums::CalcCRC16(&mu16_CrcDepth, 2U, oru16_Crc);
    while (c_NodeLv1 != "")
    {
+      std::vector<C_OscXmlAttribute> c_Attributes;
       C_SclChecksums::CalcCRC16(c_NodeLv1.c_str(), c_NodeLv1.Length(), oru16_Crc);
       c_Attributes = this->GetAttributes();
       for (uint32_t u32_Index = 0U; u32_Index < c_Attributes.size(); u32_Index++)

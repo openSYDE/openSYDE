@@ -220,7 +220,7 @@ uint32_t C_PuiSdNodeCanMessageSyncManager::GetUniqueMessageCount(const C_OscCanP
 
    if (opu32_SignalCount == NULL)
    {
-      u32_Count = mh_GetUniqueMessages(*pc_UniqueMessages, oq_CanOpenActive).size();
+      u32_Count = static_cast<uint32_t>(mh_GetUniqueMessages(*pc_UniqueMessages, oq_CanOpenActive).size());
    }
    else
    {
@@ -229,7 +229,7 @@ uint32_t C_PuiSdNodeCanMessageSyncManager::GetUniqueMessageCount(const C_OscCanP
       uint32_t u32_MsgCounter;
 
       // Message count
-      u32_Count = c_UniqueMsgIds.size();
+      u32_Count = static_cast<uint32_t>(c_UniqueMsgIds.size());
 
       // Signal count
       *opu32_SignalCount = 0;

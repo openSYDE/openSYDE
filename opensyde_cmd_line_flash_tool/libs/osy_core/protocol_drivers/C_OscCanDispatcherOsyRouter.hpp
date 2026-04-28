@@ -53,6 +53,8 @@ public:
    //lint -e{8001}  //name of function dictated by base class
    virtual int32_t CAN_Get_System_Time(uint64_t & oru64_SystemTimeUs) const;
 
+   uint8_t GetNrCodeOfCanInit() const;
+
 protected:
    //lint -e{8001}  //name of function dictated by base class
    virtual int32_t m_CAN_Read_Msg(stw::can::T_STWCAN_Msg_RX & orc_Message);
@@ -71,6 +73,8 @@ private:
    uint8_t mu8_RoutingChannel; ///< Output channel for legacy routing on node
    uint32_t mu32_FilterId;
    uint32_t mu32_FilterMask;
+
+   uint8_t mu8_NrCode;
 
    std::list<stw::can::T_STWCAN_Msg_RX> mc_AsyncMessages;
 };

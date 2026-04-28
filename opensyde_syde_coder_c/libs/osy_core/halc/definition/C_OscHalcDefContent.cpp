@@ -490,6 +490,83 @@ int32_t C_OscHalcDefContent::SetBitmask(const stw::scl::C_SclString & orc_Displa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set string value
+
+   \param[in]  orc_Value   Value
+
+   \return
+   C_NO_ERR Value set
+   C_RANGE String too long
+   C_CONFIG Type invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscHalcDefContent::SetStringValue(const std::string & orc_Value)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if ((this->GetArray() == true) && (this->GetComplexType() == C_OscHalcDefContent::eCT_STRING))
+   {
+      if ((orc_Value.size() + 1UL) <= this->GetArraySize())
+      {
+         std::vector<int8_t> c_Values;
+         c_Values.resize(this->GetArraySize(), 0U);
+         for (uint32_t u32_ItChar = 0UL; u32_ItChar < orc_Value.size(); ++u32_ItChar)
+         {
+            const int8_t s8_Value = orc_Value[u32_ItChar];
+            c_Values[u32_ItChar] = s8_Value;
+         }
+         this->SetValueArrS8(c_Values);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get string value
+
+   \param[in,out]  orc_Value  Value
+
+   \return
+   C_NO_ERR Value set
+   C_CONFIG Type invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscHalcDefContent::GetStringValue(std::string & orc_Value) const
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if ((this->GetArray() == true) && (this->GetComplexType() == C_OscHalcDefContent::eCT_STRING))
+   {
+      orc_Value = "";
+      for (uint32_t u32_ItChar = 0UL; u32_ItChar < this->GetArraySize(); ++u32_ItChar)
+      {
+         const char_t cn_CurChar = static_cast<char_t>(this->GetValueArrS8Element(u32_ItChar));
+         if (cn_CurChar != '\0')
+         {
+            orc_Value += cn_CurChar;
+         }
+         else
+         {
+            break;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

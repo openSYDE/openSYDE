@@ -146,6 +146,22 @@ public:
    //-----------------------------------------------------------------------------
    virtual int32_t CAN_Get_System_Time(uint64_t & oru64_SystemTimeUs) const = 0;
 
+   //-----------------------------------------------------------------------------
+   /*!
+      \brief   Sleep until RX CAN frame is available
+
+      This function shall check whether at least one RX CAN frame is available for reading.
+      It shall use operating system functions to wait without actively wasting CPU time.
+      Depending on the type of CAN driver this is typically done with some kind of "select" or "poll" mechanism.
+      If such a passive mechanism is not available then the function shall at least pass a minimum of CPU time to
+       other threads and then return.
+       In this scenario the function may return before the MaxWaitTime has elapsed.
+
+      \param[in]   ou32_MaxWaitTimeMs   maximum number of ms to wait
+   */
+   //-----------------------------------------------------------------------------
+   virtual void WaitForRxFrame(const uint32_t ou32_MaxWaitTimeMs);
+
    void SetCommChannel(const uint8_t ou8_CommChannel);
    uint8_t GetCommChannel(void) const;
 

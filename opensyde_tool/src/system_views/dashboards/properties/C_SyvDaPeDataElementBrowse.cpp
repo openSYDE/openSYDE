@@ -52,6 +52,7 @@ int32_t C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 0;
                                                       will be marked as used an will be disabled. Usable for non NVM list mode
    \param[in]      oq_UseInSysViews                   True if the dialog is used within system views/commissioning, false otherwise
    \param[in]      ou32_SdDataLoggerUseCaseNodeIndex  System definition data logger use case: node index
+   \param[in]      oq_ShowStringElements              Optional flag to hide all string elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_ViewIndex,
@@ -59,8 +60,8 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
                                                        const bool oq_ShowArrayElements,
                                                        const bool oq_ShowArrayIndexElements,
                                                        const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
-                                                       const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews,
-                                                       const uint32_t ou32_SdDataLoggerUseCaseNodeIndex) :
+                                                       const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements, const bool oq_UseInSysViews, const uint32_t ou32_SdDataLoggerUseCaseNodeIndex,
+                                                       const bool oq_ShowStringElements) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeDataElementBrowse),
    mpc_ContextMenu(NULL),
@@ -141,7 +142,8 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
                                         oq_ShowArrayIndexElements,
                                         oq_Show64BitValues,
                                         oq_ShowNvmLists,
-                                        opc_AlreasyUsedElements, oq_UseInSysViews, ou32_SdDataLoggerUseCaseNodeIndex);
+                                        opc_AlreasyUsedElements, oq_UseInSysViews, ou32_SdDataLoggerUseCaseNodeIndex,
+                                        oq_ShowStringElements);
    }
    //After tree was filled
    m_UpdateSelection(0);
@@ -337,7 +339,7 @@ void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
    {
       m_HandleHiding();
       this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setVisible(false);
-      m_UpdateSelection(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size());
+      m_UpdateSelection(static_cast<int32_t>(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size()));
    }
    else
    {
@@ -348,7 +350,7 @@ void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
       }
       else
       {
-         m_UpdateSelection(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size());
+         m_UpdateSelection(static_cast<int32_t>(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size()));
       }
       this->mpc_Ui->pc_GroupBoxInitialSignalNoElements->setVisible(false);
       this->mpc_Ui->pc_GroupBoxInitialDataElementNoElements->setVisible(false);

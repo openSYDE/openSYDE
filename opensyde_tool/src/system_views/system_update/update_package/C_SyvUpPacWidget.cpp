@@ -576,7 +576,9 @@ void C_SyvUpPacWidget::m_FileCheckTimer(void)
 
    if (s32_Return == C_NO_ERR)
    {
-      if ((this->mpc_Ui->pc_ListWidget->count() == 0) || (u32_CountFiles == 0))
+      const bool q_SecuritySettingsChanged = this->mpc_Ui->pc_ListWidget->CheckSecuritySettingsChanged();
+      if ((this->mpc_Ui->pc_ListWidget->count() == 0) ||
+          ((u32_CountFiles == 0) && (q_SecuritySettingsChanged == false)))
       {
          // No nodes for updating
          s32_Return = C_NOACT;
@@ -661,8 +663,8 @@ void C_SyvUpPacWidget::m_SetUpdatePackageStatusNotLocked(const QStringList & orc
           (orc_MissingFiles.length() > 0))
       {
          const int32_t s32_TotalMissingFiles =
-            static_cast<int32_t>(orc_MissingDataBlocks.length()) + orc_MissingParamFiles.length() +
-            orc_MissingFiles.length();
+            static_cast<int32_t>(orc_MissingDataBlocks.length() + orc_MissingParamFiles.length() +
+                                 orc_MissingFiles.length());
          c_TooltipHeading = C_GtGetText::h_GetText("Update Package Invalid");
          if (orc_MissingDataBlocks.length() > 0)
          {

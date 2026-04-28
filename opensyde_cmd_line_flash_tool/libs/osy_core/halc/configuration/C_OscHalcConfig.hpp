@@ -75,6 +75,11 @@ public:
                                                          const bool oq_UseChannelIndex,
                                                          const stw::scl::C_SclString & orc_DisplayName,
                                                          const bool oq_Value);
+   int32_t SetDomainChannelParameterConfigElementString(const uint32_t ou32_DomainIndex,
+                                                        const uint32_t ou32_ChannelIndex,
+                                                        const uint32_t ou32_ParameterIndex,
+                                                        const uint32_t ou32_ElementIndex, const bool oq_UseChannelIndex,
+                                                        const std::string & orc_Value);
    int32_t GetRelevantIndicesForSelectedUseCase(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
                                                 const bool oq_UseChannelIndex,
                                                 std::vector<uint32_t> * const opc_ParameterIndices,
@@ -87,6 +92,8 @@ public:
                                bool * const opq_ChannelsInvalid,
                                std::vector<uint32_t> * const opc_InvalidChannelIndices) const;
    virtual void CalcHash(uint32_t & oru32_HashValue) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
 private:
    std::vector<C_OscHalcConfigDomain> mc_Domains; ///< Domains of HALC configuration (synced with C_OscHalcDefBase)

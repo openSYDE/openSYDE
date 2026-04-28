@@ -31,8 +31,6 @@ public:
    void AdaptFile(const QString & orc_File, C_SyvUpPacListNodeItemWidget * const opc_App) override;
    void SetSkipOfUpdateFile(const bool oq_Skip, C_SyvUpPacListNodeItemWidget * const opc_App) override;
    void RemoveFile(C_SyvUpPacListNodeItemWidget * const opc_App) override;
-   void OpenPemFileSettings(C_SyvUpPacListNodeItemWidget * const opc_App) override;
-
    void PrepareExportConfig(stw::opensyde_gui_logic::C_SyvUpPacConfigNode & orc_NodeConfig) const
    override;
    void LoadImportConfig(const stw::opensyde_gui_logic::C_SyvUpPacConfig & orc_Config) override;

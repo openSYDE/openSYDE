@@ -32,7 +32,8 @@ public:
    {
       eCT_PLAIN,
       eCT_ENUM,
-      eCT_BIT_MASK
+      eCT_BIT_MASK,
+      eCT_STRING
    };
 
    C_OscHalcDefContent();
@@ -51,6 +52,9 @@ public:
                                std::vector<bool> * const opc_Values) const;
    int32_t GetBitmask(const stw::scl::C_SclString & orc_DisplayName, bool & orq_Value) const;
    int32_t SetBitmask(const stw::scl::C_SclString & orc_DisplayName, const bool oq_Value);
+
+   int32_t SetStringValue(const std::string & orc_Value);
+   int32_t GetStringValue(std::string & orc_Value) const;
 
    virtual void CalcHash(uint32_t & oru32_HashValue) const;
    virtual void CalcHashElement(uint32_t & oru32_HashValue, const uint32_t ou32_Index) const;

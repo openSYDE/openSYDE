@@ -209,12 +209,15 @@ void C_GiSvDaParam::DeleteData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active   Flag if connection is active or not active now
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active)
+void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                             bool> & orc_MappingNodeToTrafficEncryptionStatus)
 {
    this->mq_Connected = oq_Active;
+   Q_UNUSED(orc_MappingNodeToTrafficEncryptionStatus)
    if (this->mpc_ParamWidget != NULL)
    {
       this->mpc_ParamWidget->ConnectionActiveChanged(oq_Active);

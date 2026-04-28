@@ -84,6 +84,20 @@ private:
                                          std::vector<stw::scl::C_SclString> * const opc_CreatedFiles,
                                          const std::map<uint32_t,
                                                         stw::scl::C_SclString> & orc_NodeIndicesToNameMap);
+   static int32_t mh_LoadDataLoggers(std::vector<C_OscDataLoggerJob> & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                     const stw::scl::C_SclString & orc_BasePath);
+   static int32_t mh_SaveDataLoggers(const std::vector<C_OscDataLoggerJob> & orc_Config,
+                                     C_OscXmlParserBase & orc_XmlParser, const stw::scl::C_SclString & orc_BasePath,
+                                     std::vector<stw::scl::C_SclString> * const opc_CreatedFiles);
+   static int32_t mh_LoadXappProperties(C_OscXappProperties & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                        const stw::scl::C_SclString & orc_BasePath);
+   static int32_t mh_SaveXappProperties(const C_OscNode & orc_Config, C_OscXmlParserBase & orc_XmlParser,
+                                        const stw::scl::C_SclString & orc_BasePath,
+                                        std::vector<stw::scl::C_SclString> * const opc_CreatedFiles);
+   static int32_t mh_LoadOsyServerSettings(C_OscNodeOpenSydeServerSettings & orc_Config,
+                                           C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveOsyServerSettings(const C_OscNodeOpenSydeServerSettings & orc_Config,
+                                        C_OscXmlParserBase & orc_XmlParser);
    static stw::scl::C_SclString mh_DiagnosticServerToString(const C_OscNodeProperties::E_DiagnosticServerProtocol &
                                                             ore_DiagnosticProtocol);
    static int32_t mh_StringToDiagnosticServer(const stw::scl::C_SclString & orc_String,
@@ -92,6 +106,10 @@ private:
                                                        ore_FlashLoader);
    static int32_t mh_StringToFlashLoader(const stw::scl::C_SclString & orc_String,
                                          C_OscNodeProperties::E_FlashLoaderProtocol & ore_Type);
+   static stw::scl::C_SclString mh_MaxServiceSizeModeTypeToString(const C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType &
+                                                                  ore_MaxServiceSizeModeType);
+   static int32_t mh_StringToMaxServiceSizeModeType(const stw::scl::C_SclString & orc_String,
+                                                    C_OscNodeOpenSydeServerSettings::E_MaxServiceSizeModeType & ore_Type);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

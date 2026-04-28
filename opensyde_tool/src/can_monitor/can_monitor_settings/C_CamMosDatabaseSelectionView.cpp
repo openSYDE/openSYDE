@@ -179,7 +179,7 @@ void C_CamMosDatabaseSelectionView::selectionChanged(const QItemSelection & orc_
                                                      const QItemSelection & orc_Deselected)
 {
    QTreeView::selectionChanged(orc_Selected, orc_Deselected);
-   Q_EMIT this->SigSelectionChanged(this->selectedIndexes().size());
+   Q_EMIT this->SigSelectionChanged(static_cast<int32_t>(this->selectedIndexes().size()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

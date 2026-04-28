@@ -163,7 +163,7 @@ void C_SyvUpPacPemFilesListWidget::DropEvent(QDropEvent * const opc_Event)
    if (pc_MimeData->hasUrls())
    {
       const QList<QUrl>  c_Urls = pc_MimeData->urls();
-      const int32_t s32_UrlsCount = c_Urls.size();
+      const int32_t s32_UrlsCount = static_cast<int32_t>(c_Urls.size());
       for (int32_t s32_It = 0; s32_It < s32_UrlsCount; ++s32_It)
       {
          const QUrl & rc_Url = c_Urls.at(s32_It);
@@ -283,11 +283,11 @@ QString C_SyvUpPacPemFilesListWidget::m_LastSuffixOfFileName(const QString & orc
    QString c_Result = "";
    const QFileInfo c_FileInfo(orc_File);
    const QString c_FileName = c_FileInfo.fileName();
-   const int32_t s32_LastFoundIndex = c_FileName.lastIndexOf('.');
+   const int64_t s64_LastFoundIndex = c_FileName.lastIndexOf('.');
 
-   if (s32_LastFoundIndex != -1)
+   if (s64_LastFoundIndex != -1)
    {
-      c_Result = c_FileName.mid(s32_LastFoundIndex + 1).toLower();
+      c_Result = c_FileName.mid(s64_LastFoundIndex + 1).toLower();
    }
    return c_Result;
 }

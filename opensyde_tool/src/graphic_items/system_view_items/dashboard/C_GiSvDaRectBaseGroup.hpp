@@ -68,7 +68,8 @@ public:
 
    virtual void UpdateShowValue(void);
    virtual void UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value);
-   virtual void ConnectionActiveChanged(const bool oq_Active);
+   virtual void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                         bool> & orc_MappingNodeToTrafficEncryptionStatus);
    void ConnectionActiveStarted();
    virtual void EditModeActiveChanged(const bool oq_Active);
    virtual void SendCurrentValue(void);
@@ -121,6 +122,8 @@ protected:
                           const bool oq_UseScaling) override;
    void m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight) override;
    virtual void m_ForceWidgetResize(const QSizeF & orc_NewSize);
+   bool m_GetViewNodeEncrypted(
+      const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;
 
    QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
    void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
@@ -175,6 +178,7 @@ private:
    uint32_t mu32_NextManualActionIndex; ///< 0: Inactive
    // Else: If current is finished this is the next index to try,
    // else reset
+   QMap<uint32_t, bool> mc_MappingNodeToTrafficEncryptionStatus;
 
    static const QString mhc_ICON_READ;
    static const QString mhc_ICON_READ_ABORT;
@@ -197,6 +201,8 @@ private:
    void m_LoadSvWriteData(const stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase & orc_Data);
    void m_UpdateSvWriteData(stw::opensyde_gui_logic::C_PuiSvDbWriteWidgetBase & orc_Data) const;
    QString m_GetItemsForButtonToolTip(void) const;
+   void m_HandleWarningIconForTrafficEncryption(void);
+   bool m_RequireWarningForTrafficEncryption(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

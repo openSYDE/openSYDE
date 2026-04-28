@@ -89,7 +89,7 @@ C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw::opensyde_gui_element
    //Initial display
    if (pc_List != NULL)
    {
-      m_OnDataSetCountChange(pc_List->c_DataSets.size());
+      m_OnDataSetCountChange(static_cast<uint32_t>(pc_List->c_DataSets.size()));
    }
    m_OnDataSetSelectionChange(0);
 
@@ -576,7 +576,7 @@ void C_SdNdeDpListDataSetWidget::m_DoPaste(void)
    if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OscNames,
                                                                       c_OscDataSetValues) == stw::errors::C_NO_ERR)
    {
-      if (m_IsThereStillSpaceForDataSets(c_OscNames.size()) == true)
+      if (m_IsThereStillSpaceForDataSets(static_cast<uint32_t>(c_OscNames.size())) == true)
       {
          this->mpc_Ui->pc_TableView->Paste();
       }

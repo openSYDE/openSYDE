@@ -52,7 +52,9 @@ public:
    void Save(void) override;
 
    void RegisterWidgets(stw::opensyde_gui_logic::C_SyvComDriverDiag & orc_ComDriver) override;
-   void ConnectionActiveChanged(const bool oq_Active) override;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
+   override;
    void UpdateShowValues(void) override;
    void UpdateTransmissionConfiguration(void) override;
    void HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) override;

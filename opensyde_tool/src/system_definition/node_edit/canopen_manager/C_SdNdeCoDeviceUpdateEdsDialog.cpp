@@ -853,7 +853,7 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_AddNewMessage(const C_OscCanMessage & or
    tgl_assert(c_NewOscMessage.c_Signals.size() == orc_ImportedUiMessageData.c_Signals.size());
    if (c_NewOscMessage.c_Signals.size() == orc_ImportedUiMessageData.c_Signals.size())
    {
-      const uint32_t u32_SignalOffset = orc_NewOscSignalData.size();
+      const uint32_t u32_SignalOffset = static_cast<uint32_t>(orc_NewOscSignalData.size());
       for (uint32_t u32_ItSignal = 0UL; u32_ItSignal < c_NewOscMessage.c_Signals.size(); ++u32_ItSignal)
       {
          C_OscCanSignal & rc_NewOscSignal = c_NewOscMessage.c_Signals[u32_ItSignal];
@@ -960,7 +960,7 @@ void C_SdNdeCoDeviceUpdateEdsDialog::mh_TransferMessageSignals(const C_OscCanMes
                                                                const std::vector<C_OscNodeDataPoolListElement> & orc_SourceOscSignalData, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_SourceUiSignalData, C_OscCanMessage & orc_TargetOscMessageData, C_PuiSdNodeCanMessage & orc_TargetUiMessageData, std::vector<C_OscNodeDataPoolListElement> & orc_TargetOscSignalData,
                                                                std::vector<C_PuiSdNodeDataPoolListElement> & orc_TargetUiSignalData)
 {
-   const uint32_t u32_SignalOffset = orc_TargetOscSignalData.size();
+   const uint32_t u32_SignalOffset = static_cast<uint32_t>(orc_TargetOscSignalData.size());
 
    //Replace
    orc_TargetOscMessageData.c_Signals = orc_SourceOscMessage.c_Signals;

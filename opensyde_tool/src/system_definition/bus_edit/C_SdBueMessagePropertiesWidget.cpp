@@ -2135,7 +2135,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
       }
       else
       {
-         u32_Size = orc_MatchingMessageIds.size();
+         u32_Size = static_cast<uint32_t>(orc_MatchingMessageIds.size());
       }
 
       c_NodeIndexes.reserve(u32_Size);

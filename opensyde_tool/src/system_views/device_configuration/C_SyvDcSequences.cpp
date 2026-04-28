@@ -1567,7 +1567,7 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint
    C_CONFIG   no dispatcher installed
               no com driver installed
    C_RANGE    Broadcast protocol not initialized
-   C_CHECKSUM At least one node has security activated and not all node ids are unique
+   C_CHECKSUM At least one node has security feature activated and not all node ids are unique
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
@@ -1641,14 +1641,13 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
                   q_UniqueId = false;
                   if (this->mq_SecurityFeatureUsed == true)
                   {
-                     // Special case: In case of at least one node with active security no broadcasts
+                     // Special case: In case of at least one node with active protocol security no broadcasts
                      // can be used by the configuration sequence. Therefore the node IDs must be unique for
                      // using direct communication.
                      s32_Return = C_CHECKSUM;
-
                      osc_write_log_error("Scan CAN get info from openSYDE devices",
-                                         "At least one node has the security feature activated and at least"
-                                         " one node ID is not unique. Node ID: "  +
+                                         "At least one node has secure authentication or traffic encryption "
+                                         "activated and at least one node ID is not unique. Node ID: " +
                                          C_SclString::IntToStr(this->mc_DeviceInfoResult[u32_ResultCounter].u8_NodeId));
                   }
                   break;
@@ -1681,7 +1680,8 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
             }
             else
             {
-               const uint32_t u32_ReadSnrResultExtIndex = u32_DeviceInfoIndex - c_ReadSnResult.size();
+               const uint32_t u32_ReadSnrResultExtIndex =
+                  u32_DeviceInfoIndex - static_cast<uint32_t>(c_ReadSnResult.size());
                // all above must be the extended SNR results
                tgl_assert(u32_ReadSnrResultExtIndex < c_ReadSnResultExt.size());
                c_CurSenderId = c_ReadSnResultExt[u32_ReadSnrResultExtIndex].c_SenderId;
@@ -1730,7 +1730,7 @@ int32_t C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
               no com driver installed
-   C_CHECKSUM At least one node has security activated and not all node ids are unique
+   C_CHECKSUM At least one node has security featureactivated and not all node ids are unique
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
@@ -1845,15 +1845,13 @@ int32_t C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
                      {
                         q_UniqueIdOrIp = false;
 
-                        // Special case: In case of at least one node with active security no broadcasts
+                        // Special case: In case of at least one node with active protocol security no broadcasts
                         // can be used by the configuration sequence. Therefore the node ids must be unique for
                         // using direct communication.
                         s32_Return = C_CHECKSUM;
-
                         osc_write_log_error("Scan ETH get info from openSYDE devices",
-                                            "At least one node has the security feature activated and at least"
-                                            " one node ID or node IP is not unique.");
-
+                                            "At least one node has secure authentication or traffic encryption "
+                                            "activated and at least one node ID or node IP is not unique.");
                         break;
                      }
                   }
@@ -1938,6 +1936,7 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
    this->m_RunConfEthOpenSydeDevicesProgress(0U);
    if (this->mpc_ComDriver != NULL)
    {
+      bool q_EnterPreProgrammingRequired = true;
       // Vector with server ids of all configured nodes and its connected and actual used bus
       std::vector<C_OscProtocolDriverOsyNode> c_UsedServerIds;
 
@@ -1955,13 +1954,16 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
          else
          {
             s32_Return = this->m_RunConfEthOpenSydeDevicesWithoutBroadcasts(c_UsedServerIds);
+            //we already entered PreProgramming; no need to do this anymore; otherwise m_ConfigureNodes would try
+            // via a broadcast which would fail if traffic encryption is active
+            q_EnterPreProgrammingRequired = false;
          }
       }
 
       //from here on the sequence is the same as for CAN: use utility function
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = m_ConfigureNodes(false, c_UsedServerIds);
+         s32_Return = m_ConfigureNodes(false, c_UsedServerIds, q_EnterPreProgrammingRequired);
       }
    }
 
@@ -2007,7 +2009,7 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithBroadcasts(
 
       // Progress calculation for sequence 0% - 30%
       this->m_RunConfEthOpenSydeDevicesProgress(
-         (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+         (u32_DeviceCounter * 30U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size()));
 
       for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
       {
@@ -2144,7 +2146,7 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
 
       // Progress calculation for sequence 0% - 30%
       this->m_RunConfEthOpenSydeDevicesProgress(
-         (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+         (u32_DeviceCounter * 30U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size()));
 
       for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
       {
@@ -2332,6 +2334,7 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
 
    \param[in]  oq_ViaCan            true: running via CAN; false: running via Etherner (only used for user feedback)
    \param[in]  orc_UsedServerIds    Vector with server ids of all configured nodes and their connected and used bus
+   \param[in]  oq_EnterPreProgrammingRequired  true: function will try to enter PreProgramming state for all nodes
 
    \return
    C_NO_ERR    all devices are configured
@@ -2342,13 +2345,11 @@ int32_t C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
-                                           std::vector<C_OscProtocolDriverOsyNode> & orc_UsedServerIds)
+                                           std::vector<C_OscProtocolDriverOsyNode> & orc_UsedServerIds,
+                                           const bool oq_EnterPreProgrammingRequired)
 {
-   int32_t s32_Return;
+   int32_t s32_Return = C_NO_ERR;
    uint32_t u32_DeviceCounter;
-
-   // * broadcast: "RequestProgramming"
-   bool q_RequestNotAccepted;
 
    // Progress calculation for sequence 30%
    if (oq_ViaCan == true)
@@ -2362,22 +2363,26 @@ int32_t C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
 
    tgl_assert(this->mc_DeviceConfiguration.size() == orc_UsedServerIds.size());
 
-   s32_Return = this->mpc_ComDriver->SendOsyBroadcastRequestProgramming(q_RequestNotAccepted);
-   if (s32_Return == C_NO_ERR)
+   if (oq_EnterPreProgrammingRequired == true)
    {
-      // Check the result
-      if (q_RequestNotAccepted == true)
+      // * broadcast: "RequestProgramming"
+      bool q_RequestNotAccepted;
+      s32_Return = this->mpc_ComDriver->SendOsyBroadcastRequestProgramming(q_RequestNotAccepted);
+      if (s32_Return == C_NO_ERR)
       {
-         // at least one node answered with a negative response
-         s32_Return = C_WARN;
+         // Check the result
+         if (q_RequestNotAccepted == true)
+         {
+            // at least one node answered with a negative response
+            s32_Return = C_WARN;
+         }
       }
-   }
-
-   if (s32_Return != C_NO_ERR)
-   {
-      osc_write_log_error("Configure openSYDE devices",
-                          "openSYDE broadcast request programming failed with error: " +
-                          C_SclString::IntToStr(s32_Return));
+      if (s32_Return != C_NO_ERR)
+      {
+         osc_write_log_error("Configure openSYDE devices",
+                             "openSYDE broadcast request programming failed with error: " +
+                             C_SclString::IntToStr(s32_Return));
+      }
    }
 
    // * broadcast: "ecu reset"
@@ -2432,12 +2437,12 @@ int32_t C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
          if (oq_ViaCan == true)
          {
             this->m_RunConfCanOpenSydeDevicesProgress(
-               60U + ((u32_DeviceCounter * 10U) / this->mc_DeviceConfiguration.size()));
+               60U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          else
          {
             this->m_RunConfEthOpenSydeDevicesProgress(
-               60U + ((u32_DeviceCounter * 10U) / this->mc_DeviceConfiguration.size()));
+               60U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
 
          //first time we need to explicitly contact the node: reconnect (required for Ethernet)
@@ -2483,12 +2488,12 @@ int32_t C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
          if (oq_ViaCan == true)
          {
             this->m_RunConfCanOpenSydeDevicesProgress(
-               70U + ((u32_DeviceCounter * 10U) / this->mc_DeviceConfiguration.size()));
+               70U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          else
          {
             this->m_RunConfEthOpenSydeDevicesProgress(
-               70U + ((u32_DeviceCounter * 10U) / this->mc_DeviceConfiguration.size()));
+               70U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          // *** "SetBitrate"
          s32_Return = this->m_SetCanOpenSydeBitrate(orc_UsedServerIds[u32_DeviceCounter],
@@ -2511,13 +2516,12 @@ int32_t C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
          if (oq_ViaCan == true)
          {
             this->m_RunConfCanOpenSydeDevicesProgress(
-               80U + ((u32_DeviceCounter * 10U) / this->mc_DeviceConfiguration.size()));
+               80U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          else
          {
-            this->m_RunConfEthOpenSydeDevicesProgress(80U +
-                                                      ((u32_DeviceCounter * 10U) /
-                                                       this->mc_DeviceConfiguration.size()));
+            this->m_RunConfEthOpenSydeDevicesProgress(
+               80U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          // *** "SetIPAddressForChannel"
          s32_Return = this->m_SetEthOpenSydeIpAddress(orc_UsedServerIds[u32_DeviceCounter],
@@ -2544,13 +2548,12 @@ int32_t C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
          if (oq_ViaCan == true)
          {
             this->m_RunConfCanOpenSydeDevicesProgress(
-               90U + ((u32_DeviceCounter * 10U) / this->mc_DeviceConfiguration.size()));
+               90U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          else
          {
-            this->m_RunConfEthOpenSydeDevicesProgress(90U +
-                                                      ((u32_DeviceCounter * 10U) /
-                                                       this->mc_DeviceConfiguration.size()));
+            this->m_RunConfEthOpenSydeDevicesProgress(
+               90U + ((u32_DeviceCounter * 10U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
          }
          // *** "setNodeIDForChannel"
          s32_Return = this->m_SetOpenSydeNodeIds(orc_UsedServerIds[u32_DeviceCounter],
@@ -2628,7 +2631,7 @@ int32_t C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
 
          // Progress calculation for sequence 0% - 50%
          this->m_RunConfCanStwFlashloaderDevicesProgress(
-            (u32_DeviceCounter * 50U) / this->mc_DeviceConfiguration.size());
+            (u32_DeviceCounter * 50U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size()));
 
          tgl_assert(rc_CurConfig.c_NodeIds.size() == rc_CurConfig.c_BusIds.size());
          tgl_assert(rc_CurConfig.c_NodeIds.size() == rc_CurConfig.c_CanBitrates.size());
@@ -2696,7 +2699,7 @@ int32_t C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
 
             // Progress calculation for sequence 50% - 100%
             this->m_RunConfCanStwFlashloaderDevicesProgress(
-               50U + ((u32_DeviceCounter * 50U) / this->mc_DeviceConfiguration.size()));
+               50U + ((u32_DeviceCounter * 50U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size())));
 
             // ** perform "node_wakeup(serial_number)"
             // ** perform "node_companyid(Y*)"
@@ -2812,6 +2815,7 @@ int32_t C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
 
    if (this->mpc_ComDriver != NULL)
    {
+      bool q_EnterPreProgrammingRequired = true;
       // Vector with server ids of all configured nodes and its connected and actual used bus
       std::vector<C_OscProtocolDriverOsyNode> c_UsedServerIds;
 
@@ -2830,13 +2834,16 @@ int32_t C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
          {
             // Security is enabled on at least one node, so no broadcasts can be used
             s32_Return = m_RunConfCanOpenSydeDevicesWithoutBroadcasts(c_UsedServerIds);
+            //we already entered PreProgramming; no need to do this anymore; otherwise m_ConfigureNodes would try
+            // via a broadcast which would fail if traffic encryption is active
+            q_EnterPreProgrammingRequired = false;
          }
       }
 
       //from here on the sequence is the same as for Ethernet: use utility function
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = m_ConfigureNodes(true, c_UsedServerIds);
+         s32_Return = m_ConfigureNodes(true, c_UsedServerIds, q_EnterPreProgrammingRequired);
       }
    }
 
@@ -2895,7 +2902,7 @@ int32_t C_SyvDcSequences::m_RunConfCanOpenSydeDevicesWithBroadcasts(
 
          // Progress calculation for sequence 0% - 30%
          this->m_RunConfCanOpenSydeDevicesProgress(
-            (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+            (u32_DeviceCounter * 30U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size()));
 
          for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
          {
@@ -3019,7 +3026,7 @@ int32_t C_SyvDcSequences::m_RunConfCanOpenSydeDevicesWithoutBroadcasts(
 
       // Progress calculation for sequence 0% - 30%
       this->m_RunConfCanOpenSydeDevicesProgress(
-         (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+         (u32_DeviceCounter * 30U) / static_cast<uint32_t>(this->mc_DeviceConfiguration.size()));
 
       for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
       {

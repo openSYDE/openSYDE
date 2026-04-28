@@ -882,7 +882,7 @@ void C_SdNdeDpListsTreeWidget::selectionChanged(const QItemSelection & orc_Selec
    }
 
    //Notify parent
-   Q_EMIT this->SigSelectionChanged(m_GetSelectedIndices().size(), true);
+   Q_EMIT (this->SigSelectionChanged(static_cast<uint32_t>(m_GetSelectedIndices().size()), true));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -309,7 +309,7 @@ int32_t C_SdNdeCoPdoTableModel::rowCount(const QModelIndex & orc_Parent) const
 
    if (!orc_Parent.isValid())
    {
-      s32_Retval = this->mc_PdoTableData.size();
+      s32_Retval = static_cast<int32_t>(this->mc_PdoTableData.size());
    }
    return s32_Retval;
 }

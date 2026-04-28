@@ -22,15 +22,20 @@ set(OPENSYDE_CORE_SKIP_CODE_GENERATION             0)
 set(OPENSYDE_CORE_SKIP_PROJECT_HANDLING            0)
 set(OPENSYDE_CORE_SKIP_PARAM_SET                   0)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_BASIC      1)
-set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING     1)
-set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION   1)
-set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION         1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_SYSTEM     1)
+set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_MONITOR    1)
 set(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS_COMMON     1)
+set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING            1)
+set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION         1)
+set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION   1)
+set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING     1)
 set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS             1)
 set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET              0)
-set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING            1)
+set(OPENSYDE_CORE_SKIP_SECURITY                    1)
+
 add_subdirectory(../libs/osy_core ${CMAKE_BINARY_DIR}/osy_core)
+
+
 
 # --- Project source file ----------------------------------------------------------------------------------------------
 set(OPENSYDE_SYDE_CODER_C_SOURCES
@@ -69,7 +74,7 @@ set(CMAKE_C_FLAGS "-Wall -Wextra -Wc99-c11-compat -Wunused -Wuninitialized -Wmay
    -Wdouble-promotion -Wfloat-equal -Wmissing-include-dirs -Wshadow -Wundef \
    -Wunused-macros -Wcast-align -Wlogical-op -Wno-multichar -Wredundant-decls -Wnested-externs")
 # For C++ do not add "-Wdouble-promotion" as it causes a warning in tinyxml.cpp which we do not want to modify
-set(CMAKE_CXX_FLAGS "-std=c++98 -Wall -Wextra -Wunused -Wuninitialized -Wmaybe-uninitialized -Wsign-compare  \
+set(CMAKE_CXX_FLAGS "-std=c++03 -Wall -Wextra -Wunused -Wuninitialized -Wmaybe-uninitialized -Wsign-compare  \
    -Wmissing-include-dirs -Wshadow -Wlogical-op -Wno-multichar -Wredundant-decls")
 
 # link standard libraries statically

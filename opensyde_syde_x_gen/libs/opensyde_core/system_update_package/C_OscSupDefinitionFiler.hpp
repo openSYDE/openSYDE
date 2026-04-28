@@ -30,7 +30,8 @@ class C_OscSupDefinitionFiler
 public:
    static int32_t h_CreateUpdatePackageDefFile(const stw::scl::C_SclString & orc_Path,
                                                const C_OscSupDefinition & orc_SupDefContent,
-                                               const std::vector<stw::scl::C_SclString> & orc_Files);
+                                               const std::vector<stw::scl::C_SclString> & orc_Files,
+                                               const bool oq_UseMinorVersion1);
    static int32_t h_LoadUpdatePackageDefFile(const stw::scl::C_SclString & orc_TargetUnzipPath, const bool oq_IsZip,
                                              const stw::scl::C_SclString & orc_PackagePath,
                                              uint32_t & oru32_FileVersion, stw::scl::C_SclString & orc_FilePackagePath,

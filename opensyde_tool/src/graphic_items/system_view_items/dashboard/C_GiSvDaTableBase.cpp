@@ -246,21 +246,20 @@ void C_GiSvDaTableBase::UpdateTransparency(const uint32_t ou32_DataElementIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active   Flag if connection is active or not active now
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active)
+void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus)
 {
-   if (oq_Active == true)
-   {
-      tgl_assert(this->mpc_TableWidget != NULL);
-      if (this->mpc_TableWidget != NULL)
-      {
-         this->mpc_TableWidget->UpdateStaticValues();
-      }
-   }
+   C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active, orc_MappingNodeToTrafficEncryptionStatus);
 
-   C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
+   tgl_assert(this->mpc_TableWidget != NULL);
+   if (this->mpc_TableWidget != NULL)
+   {
+      this->mpc_TableWidget->UpdateStaticValues();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -758,6 +757,24 @@ const
       }
    }
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get view node encrypted
+
+   \param[in]  orc_DataPoolElementId   Datapool element ID
+
+   \return
+   Flags
+
+   \retval   True    View node encrypted
+   \retval   False   View node not encrypted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaTableBase::GetViewNodeEncrypted(
+   const opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
+{
+   return this->m_GetViewNodeEncrypted(orc_DataPoolElementId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -214,21 +214,10 @@ int32_t C_OscExportOsyInit::h_CreateSourceCode(const C_SclString & orc_FilePath,
       c_Lines.Add("#define OSY_INIT_DPD_CAN_ROUTING_FIFO_SIZE_RX       " +
                   C_SclString::IntToStr(orc_Node.c_Properties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx) +
                   "U");
-      //get size of greatest element so we know how to set up the buffers
-      //add protocol overhead for DPD and NVM access services (greatest overhead: write_memory_by_address)
-      u32_BufferSize = mh_GetSizeOfLargestDataPoolElement(orc_Node.c_DataPools) + 11U;
-      //add an additional 2 bytes; compensates for an buffer size issue with older server implementations; #62305
-      u32_BufferSize += 2U;
-      //consider minimum for non-DP services
-      if (u32_BufferSize < hu8_MIN_SIZE_DPD_BUF_INSTANCE)
-      {
-         u32_BufferSize = hu8_MIN_SIZE_DPD_BUF_INSTANCE;
-      }
-      //limit to maximum service size; larger access must be segmented by protocol driver
-      if (u32_BufferSize > C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE)
-      {
-         u32_BufferSize = C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE;
-      }
+
+      u32_BufferSize = orc_Node.c_Properties.c_OpenSydeServerSettings.GetTransportBufferSizeInByte(
+         orc_Node.c_DataPools,
+         C_OscProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE);
 
       c_Lines.Add("#define OSY_INIT_DPD_BUF_SIZE_INSTANCE              " + C_SclString::IntToStr(u32_BufferSize) + "U");
       c_Lines.Add("#define OSY_INIT_DPD_MAX_NUM_CYCLIC_TRANSMISSIONS   " +
@@ -615,60 +604,6 @@ bool C_OscExportOsyInit::mh_IsDpdInitRequired(const C_OscNodeComInterfaceSetting
            ((orc_Settings.q_IsDiagnosisEnabled == true) ||
             (orc_Settings.q_IsRoutingEnabled == true) ||
             (orc_Settings.q_IsUpdateEnabled == true)));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility: get size of greatest Datapool element or list
-
-   For NVM Datapools:
-   *  Go through vector of Datapools and check which is the greatest list
-   For other Datapools:
-   *  Go through vector of Datapools and check which is the greatest element
-
-   This is used for defining the buffer size for the protocol driver. So the function considers local and remote
-    Datapools.
-
-   \param[in] orc_DataPools            Datapools to scan
-
-   \return
-   size of the greatest Datapool element/list in bytes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32_t C_OscExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OscNodeDataPool> & orc_DataPools)
-{
-   uint32_t u32_GreatestSize = 0U;
-
-   for (uint32_t u32_DataPool = 0U; u32_DataPool < orc_DataPools.size(); u32_DataPool++)
-   {
-      for (uint32_t u32_List = 0U; u32_List < orc_DataPools[u32_DataPool].c_Lists.size(); u32_List++)
-      {
-         if ((orc_DataPools[u32_DataPool].e_Type == C_OscNodeDataPool::eNVM) ||
-             (orc_DataPools[u32_DataPool].e_Type == C_OscNodeDataPool::eHALC_NVM))
-         {
-            const uint32_t u32_NumBytesUsed = orc_DataPools[u32_DataPool].c_Lists[u32_List].GetNumBytesUsed();
-            if (u32_NumBytesUsed > u32_GreatestSize)
-            {
-               u32_GreatestSize = u32_NumBytesUsed;
-            }
-         }
-         else
-         {
-            for (uint32_t u32_Element = 0U;
-                 u32_Element < orc_DataPools[u32_DataPool].c_Lists[u32_List].c_Elements.size();
-                 u32_Element++)
-            {
-               const uint32_t u32_Size =
-                  orc_DataPools[u32_DataPool].c_Lists[u32_List].c_Elements[u32_Element].GetSizeByte();
-               if (u32_Size > u32_GreatestSize)
-               {
-                  u32_GreatestSize = u32_Size;
-               }
-            }
-         }
-      }
-   }
-
-   return u32_GreatestSize;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -548,7 +548,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
       const QString c_SimplifiedComment = static_cast<QString>(pc_List->c_Comment.c_str()).simplified();
 
       this->mpc_Ui->pc_LineEditName->SetName(pc_List->c_Name.c_str());
-      this->mpc_Ui->pc_LineEditName->SetCounter(pc_List->c_Elements.size());
+      this->mpc_Ui->pc_LineEditName->SetCounter(static_cast<uint32_t>(pc_List->c_Elements.size()));
       this->mpc_Ui->pc_LabelComment->SetCompleteText(c_SimplifiedComment);
       this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                            pc_List->c_Comment.c_str());

@@ -606,7 +606,9 @@ uint32_t C_HexFile::SaveToFile(const char_t * const opcn_FileName)
 
    if (LineInit() != NULL) // HEX Data loaded?
    {
-      pc_File = std::fopen(opcn_FileName, "wt"); // yes, now open acFileName
+      // write binary file to avoid OS-specific handling of newlines
+      pc_File = std::fopen(opcn_FileName, "wb"); // yes, now open acFileName
+
 
       if (pc_File == NULL)
       {
@@ -618,7 +620,9 @@ uint32_t C_HexFile::SaveToFile(const char_t * const opcn_FileName)
          while ((pu8_HexLine = NextLine()) != NULL)
          {
             fputs(mh_HexLineString(pu8_HexLine), pc_File); // write string into file
-            fputs("\n", pc_File);
+            // we always create CR/LF to avoid different hex-file data on different OS
+            fputs("\r\n", pc_File);
+
          }
 
          (void)fclose(pc_File);

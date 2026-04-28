@@ -219,7 +219,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
       disconnect(this->mpc_Ui->pc_SpinBoxBusId, static_cast<void (QSpinBox::*)(
                                                                int32_t)>(&C_OgeSpxNumber::valueChanged), this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
-      disconnect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::stateChanged, this,
+      disconnect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::checkStateChanged, this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       disconnect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
@@ -237,7 +237,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
                     &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
          disconnect(this->mpc_Ui->pc_ComboBoxCANFDBitRate, &C_OgeCbxText::SigErrorFixed, this,
                     &C_SdBueBusEditPropertiesWidget::m_CanFdBitrateFixed);
-         disconnect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::stateChanged, this,
+         disconnect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::checkStateChanged, this,
                     &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
          disconnect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::toggled, this,
                     &C_SdBueBusEditPropertiesWidget::m_HandleEnableCanFdChange);
@@ -435,7 +435,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
       connect(this->mpc_Ui->pc_SpinBoxBusId, static_cast<void (QSpinBox::*)(
                                                             int32_t)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
-      connect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::stateChanged, this,
+      connect(this->mpc_Ui->pc_CheckBoxUsableForRouting, &QCheckBox::checkStateChanged, this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       connect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
@@ -452,7 +452,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
                  &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
          connect(this->mpc_Ui->pc_ComboBoxCANFDBitRate, &C_OgeCbxText::SigErrorFixed, this,
                  &C_SdBueBusEditPropertiesWidget::m_CanFdBitrateFixed);
-         connect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::stateChanged, this,
+         connect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::checkStateChanged, this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterCanFdChange);
          connect(this->mpc_Ui->pc_CheckBoxEnableCANFD, &QCheckBox::toggled, this,
                  &C_SdBueBusEditPropertiesWidget::m_HandleEnableCanFdChange);

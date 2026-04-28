@@ -316,7 +316,7 @@ C_SydeSup::E_Result C_SydeSupLinux::m_OpenEthernet(void)
    Return the version number of the running application
     in the commonly used STW format: "Vx.yyrz".
 
-   Here for Linux: use configuration in version_config.h
+   Here for Linux: use configuration in version_config.hpp
 
    \param[in]  orc_ApplicationFileName    file name of running application (can help to implement on some targets)
 

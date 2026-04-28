@@ -135,8 +135,11 @@ C_SclStringList C_OscComFlashloaderInformation::FlashloaderInformationToText(voi
    c_Line.PrintFormatted("NVM writing available: %d",
                          (c_AvailableFeatures.q_FlashloaderCanWriteToNvm == true) ? 1 : 0);
    c_Text.Add(c_Line);
-   c_Line.PrintFormatted("Security supported: %d",
-                         (c_AvailableFeatures.q_SupportsSecurity == true) ? 1 : 0);
+   c_Line.PrintFormatted("Security authentication supported: %d",
+                         (c_AvailableFeatures.q_SupportsSecurityAuthentication == true) ? 1 : 0);
+   c_Text.Add(c_Line);
+   c_Line.PrintFormatted("Security traffic encryption supported: %d",
+                         (c_AvailableFeatures.q_SupportsSecurityTrafficEncryption == true) ? 1 : 0);
    c_Text.Add(c_Line);
    c_Line.PrintFormatted("Disabling debugger supported: %d",
                          (c_AvailableFeatures.q_SupportsDebuggerOff == true) ? 1 : 0);

@@ -228,7 +228,7 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
          if (pc_Arrow != NULL)
          {
             //Map
-            u32_Index = opc_Snapshot->c_LineArrows.size();
+            u32_Index = static_cast<uint32_t>(opc_Snapshot->c_LineArrows.size());
             orc_Map.insert(pc_Arrow->GetId(),
                            C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eLINE_ARROW),
                                                   u32_Index));
@@ -248,7 +248,7 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
          if (pc_Boundary != NULL)
          {
             //Map
-            u32_Index = opc_Snapshot->c_Boundaries.size();
+            u32_Index = static_cast<uint32_t>(opc_Snapshot->c_Boundaries.size());
             orc_Map.insert(pc_Boundary->GetId(),
                            C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eBOUNDARY),
                                                   u32_Index));
@@ -274,7 +274,7 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
          if (pc_TextElement != NULL)
          {
             //Map
-            u32_Index = opc_Snapshot->c_TextElements.size();
+            u32_Index = static_cast<uint32_t>(opc_Snapshot->c_TextElements.size());
             orc_Map.insert(pc_TextElement->GetId(),
                            C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eTEXT_ELEMENT),
                                                   u32_Index));

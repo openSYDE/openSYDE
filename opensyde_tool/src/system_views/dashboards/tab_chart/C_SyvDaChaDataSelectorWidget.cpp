@@ -295,6 +295,25 @@ void C_SyvDaChaDataSelectorWidget::ResetError(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
+
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaDataSelectorWidget::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                            bool> & orc_MappingNodeToTrafficEncryptionStatus)
+{
+   uint32_t u32_Index;
+
+   for (u32_Index = 0U; u32_Index < this->mc_DataPoolElementsDataItemWidgets.size(); ++u32_Index)
+   {
+      this->mc_DataPoolElementsDataItemWidgets[u32_Index]->ConnectionActiveChanged(oq_Active,
+                                                                                   orc_MappingNodeToTrafficEncryptionStatus);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget

@@ -52,7 +52,10 @@ extern T_stwtypes_h_undefined_type gt_stwtypes_h_FailBuild;
 #endif
 
 //long long is only available from C11 so we are in compiler specific terrain for 64bit values
-#if defined _MSC_VER || defined __BORLANDC__
+#if defined _LP64
+typedef unsigned long uint64; ///< data type unsigned 64bit (requires compiler option "--long-long")
+typedef signed long sint64;   ///< data type signed 64bit (requires compiler option "--long-long")
+#elif defined _MSC_VER || defined __BORLANDC__
 typedef signed __int64 sint64;
 typedef unsigned __int64 uint64;
 #elif defined __GNUC__

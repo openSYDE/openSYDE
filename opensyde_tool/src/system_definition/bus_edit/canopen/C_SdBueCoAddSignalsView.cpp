@@ -219,7 +219,7 @@ uint32_t C_SdBueCoAddSignalsView::mh_CountUnique(const QModelIndexList & orc_Ind
    for (std::map<uint32_t, std::vector<uint32_t> >::const_iterator c_It = c_Rows.cbegin();
         c_It != c_Rows.cend(); ++c_It)
    {
-      u32_Retval += c_It->second.size();
+      u32_Retval += static_cast<uint32_t>(c_It->second.size());
    }
    return u32_Retval;
 }

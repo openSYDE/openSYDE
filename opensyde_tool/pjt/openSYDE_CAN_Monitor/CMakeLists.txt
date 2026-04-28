@@ -107,6 +107,7 @@ set (OPENSYDE_INCLUDES
 set (OPENSYDE_LIB_INCLUDES
    ${PROJECT_ROOT}/libs/gettext
    ${PROJECT_ROOT}/libs/flexlexer
+   ${PROJECT_ROOT}/libs/openssl/include
 )
 
 # --- PROJECT SOURCE FILE PATHS ----------------------------------------------------------------------------------------
@@ -705,7 +706,7 @@ set(OPENSYDE_FORMS
 
 # OPENSYDE CORE
 # only include relevant modules (include directories and source files)
-set(OPENSYDE_CORE_SKIP_ZIPPING                     1)
+set(OPENSYDE_CORE_SKIP_ZIPPING                     0)
 set(OPENSYDE_CORE_SKIP_IMPORTS                     1)
 set(OPENSYDE_CORE_SKIP_CODE_GENERATION             1)
 set(OPENSYDE_CORE_SKIP_PROJECT_HANDLING            0)
@@ -720,7 +721,7 @@ set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION   1)
 set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING     1)
 set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS             0)
 set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET              0)
-set(OPENSYDE_CORE_SKIP_SECURITY                    1)
+set(OPENSYDE_CORE_SKIP_SECURITY                    0)
 
 add_subdirectory(${PROJECT_ROOT}/libs/opensyde_core ${CMAKE_BINARY_DIR}/opensyde_core)
 
@@ -735,6 +736,8 @@ set(OPENSYDE_LINK_LIBRARIES
    version
    ws2_32   #WinSock
    Iphlpapi #IP helper API
+   ${PROJECT_ROOT}/libs/openssl/libssl.a
+   ${PROJECT_ROOT}/libs/openssl/libcrypto.a
    ${PROJECT_ROOT}/libs/gettext/libintl.a
    ${PROJECT_ROOT}/libs/blf_driver_library/libvector_blf.a
    ${PROJECT_ROOT}/libs/zlib/libzlibstatic.a
@@ -765,6 +768,8 @@ qt_add_executable(openSYDE_CAN_Monitor
 # marking library modules with the keyword "SYSTEM" to suppress its warnings
 target_include_directories(openSYDE_CAN_Monitor PRIVATE ${OPENSYDE_INCLUDES})
 target_include_directories(openSYDE_CAN_Monitor SYSTEM PRIVATE ${OPENSYDE_LIB_INCLUDES})
+# core also needs path to openSSL:
+target_include_directories(opensyde_core PRIVATE ${PROJECT_ROOT}/libs/openssl/include)
 
 target_link_libraries(openSYDE_CAN_Monitor PRIVATE ${OPENSYDE_LINK_LIBRARIES})
 

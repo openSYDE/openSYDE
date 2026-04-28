@@ -36,6 +36,10 @@ public:
                                               C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveDataElementOptArrayId(const C_OscNodeDataPoolListElementOptArrayId & orc_Config,
                                            C_OscXmlParserBase & orc_XmlParser);
+   static int32_t h_LoadDataElementOptArrayOptValidId(C_OscNodeDataPoolListElementOptArrayOptValidId & orc_Config,
+                                                      C_OscXmlParserBase & orc_XmlParser);
+   static void h_SaveDataElementOptArrayOptValidId(const C_OscNodeDataPoolListElementOptArrayOptValidId & orc_Config,
+                                                   C_OscXmlParserBase & orc_XmlParser);
 
 private:
    C_OscDataLoggerJobFiler();
@@ -55,6 +59,10 @@ private:
                                                         C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveJobAdditionalTriggerExpertMode(const C_OscDataLoggerJobAdditionalTriggerExpertMode & orc_Config,
                                                      C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadJobAdditionalTriggerExpertModeTriggerDataElements(
+      std::vector<C_OscNodeDataPoolListElementOptArrayId> & orc_Config, C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveJobAdditionalTriggerExpertModeTriggerDataElements(
+      const std::vector<C_OscNodeDataPoolListElementOptArrayId> & orc_Config, C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadConfiguredDataElements(std::vector<C_OscDataLoggerDataElementReference> & orc_Config,
                                                 C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveConfiguredDataElements(const std::vector<C_OscDataLoggerDataElementReference> & orc_Config,

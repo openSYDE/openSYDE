@@ -72,9 +72,9 @@ C_TglCriticalSection C_OscIpDispatcherWinSock::mhc_LockBuffer;
    Initialize elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OscIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void)
+C_OscIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void) :
+   x_Socket(m_WsInvalidSocket())
 {
-   x_Socket = m_WsInvalidSocket();
    (void)std::memset(&au8_IpAddress[0], 0U, 4U);
 }
 

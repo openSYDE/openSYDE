@@ -218,7 +218,8 @@ void C_FlaMainWindow::m_SaveUserSettings(void)
    C_UsHandler::h_GetInstance()->SetScreenPos(this->normalGeometry().topLeft());
    C_UsHandler::h_GetInstance()->SetAppSize(this->normalGeometry().size());
    C_UsHandler::h_GetInstance()->SetAppMaximized(this->isMaximized());
-   C_UsHandler::h_GetInstance()->SetAppScreenIndex(QGuiApplication::screens().indexOf(this->screen()));
+   C_UsHandler::h_GetInstance()->SetAppScreenIndex(
+      static_cast<uint32_t>(QGuiApplication::screens().indexOf(this->screen())));
 
    // splitter
    // update to actual value if settings are not collapsed
@@ -1076,8 +1077,10 @@ void C_FlaMainWindow::m_CountTime(void) const
    const uint64_t u64_ElapsedMin = (u64_ELAPSED_MS / u64_MS_TO_MIN) % u64_MODULOR_OPERATION_VALUE;
    const uint64_t u64_ElapsedHours = u64_ELAPSED_MS / u64_MS_TO_HOURS;
 
-   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedHours, 2, 10, QChar('0')).
-                          arg(u64_ElapsedMin, 2, 10, QChar('0')).arg(u64_ElapsedSeconds, 2, 10, QChar('0'));
+   const QString c_Time = static_cast<QString>("%1:%2:%3").
+                          arg(u64_ElapsedHours, 2, 10, static_cast<QChar>('0')).
+                          arg(u64_ElapsedMin, 2, 10, static_cast<QChar>('0')).
+                          arg(u64_ElapsedSeconds, 2, 10, static_cast<QChar>('0'));
 
    this->mpc_Ui->pc_UpdateWidget->SetElapsedTime(c_Time);
 }

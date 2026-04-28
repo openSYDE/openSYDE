@@ -23,7 +23,7 @@
 #include "C_SdNdeDalTriggerCheckHelper.hpp"
 #include "C_PuiSdUtil.hpp"
 #include "C_OgeWiCustomMessage.hpp"
-// #include "C_OgeWiUtil.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -72,15 +72,13 @@ C_SdNdeDalLogJobAdditionalTriggerDialog::C_SdNdeDalLogJobAdditionalTriggerDialog
    this->mrc_ParentDialog.SetWidget(this);
 
    // Set no padding for this button
-   // C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PbAddDataElement, "Padding", false);
-
-   // "Add data element" button disabled for R36
-   this->mpc_Ui->pc_PbAddDataElement->setVisible(false);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PbAddDataElement, "Align", "right");
 
    // Add data element
    const QSize c_SIZE(13, 13);
    this->mpc_Ui->pc_PbAddDataElement->setIconSize(c_SIZE);
    this->mpc_Ui->pc_PbAddDataElement->SetCustomIcon("://images/IconAddEnabled.svg", "://images/IconAddDisabled.svg");
+   this->mpc_Ui->pc_PbAddDataElement->SetTextRightAligned();
 
    connect(this->mpc_Ui->pc_PushButtonCancel_2, &QPushButton::clicked, this,
            &C_SdNdeDalLogJobAdditionalTriggerDialog::m_CancelClicked);
@@ -191,9 +189,8 @@ bool C_SdNdeDalLogJobAdditionalTriggerDialog::m_SaveTriggerCondition()
 
    if (this->mq_TriggerConditionValid == true)
    {
+      // Note: The expression may be empty, in that case an empty condition will be stored.
       const C_SclString c_TriggerCondition = this->mpc_Ui->pc_TextEditTriggerCondition->toPlainText().toStdString();
-
-      tgl_assert(c_TriggerCondition.IsEmpty() == false);
 
       // save the expression
       C_PuiSdHandler::h_GetInstance()->SetDataLoggerAdditionalTriggerExpertModeString(this->mu32_NodeIndex,
@@ -214,9 +211,9 @@ void C_SdNdeDalLogJobAdditionalTriggerDialog::m_AddDataElementClicked()
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
 
    // Single element selection only
-   C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, 0U, false, false, true, true,
+   C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, 0U, false, false, false, true,
                                                                                  true, true, NULL, false,
-                                                                                 this->mu32_NodeIndex);
+                                                                                 this->mu32_NodeIndex, true);
 
    //Resize
    c_New->SetSize(QSize(800, 800));
@@ -247,9 +244,11 @@ void C_SdNdeDalLogJobAdditionalTriggerDialog::m_AddDataElementClicked()
                   rc_ConfiguredElementOptArrayId.u32_ListIndex,
                   rc_ConfiguredElementOptArrayId.u32_ElementIndex);
 
+            // Fetch the existing trigger condition
             QString c_TriggerCondition = this->mpc_Ui->pc_TextEditTriggerCondition->toPlainText();
             if (pc_Element != NULL)
             {
+               // Add the selected data element to the condition
                const QString c_ElementName = C_PuiSdUtil::h_GetNamespaceDatapoolElement(rc_ConfiguredElementOptArrayId);
                //if no previous trigger condition exists
                if (c_TriggerCondition.isEmpty())
@@ -299,20 +298,10 @@ void C_SdNdeDalLogJobAdditionalTriggerDialog::m_ValidateTriggerCondition()
    if (c_TriggerCondition.IsEmpty() == false)
    {
       const bool q_ReturnVal = C_SdNdeDalTriggerCheckHelper::h_Check(this->mu32_NodeIndex,
-                                                                     this->mu32_DataLoggerJobIndex, c_TriggerCondition,
+                                                                     c_TriggerCondition,
                                                                      &c_ErrorString,
                                                                      &q_AreVariablesValid, &q_IsSyntaxValid);
 
-      // std::cout << "h_Check: " << q_ReturnVal << std::endl;
-
-      // this->mpc_Ui->pc_LabelNamingCheckResult->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 : %2")).arg(
-      //                                                     q_AreVariablesValid).arg(
-      //                                                     c_ErrorString.c_str()));
-      // this->mpc_Ui->pc_LabelSyntaxCheckResult->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 : %2")).arg(
-      //                                                     q_IsSyntaxValid).arg(
-      //                                                     c_ErrorString.c_str()));
-
-      //
       if (q_ReturnVal == true)
       {
          this->mq_TriggerConditionValid = true;

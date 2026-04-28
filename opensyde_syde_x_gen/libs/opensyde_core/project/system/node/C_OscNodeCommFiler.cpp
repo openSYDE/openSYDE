@@ -572,7 +572,7 @@ int32_t C_OscNodeCommFiler::h_LoadNodeComMessage(C_OscCanMessage & orc_NodeComMe
    else
    {
       //Default
-      orc_NodeComMessage.u32_TimeoutMs = (3UL * orc_NodeComMessage.u32_CycleTimeMs) + 10UL;
+      orc_NodeComMessage.u32_TimeoutMs = (3U * orc_NodeComMessage.u32_CycleTimeMs) + 10U;
    }
 
    if (orc_XmlParser.SelectNodeChild("name") == "name")

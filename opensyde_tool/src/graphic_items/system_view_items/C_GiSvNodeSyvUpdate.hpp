@@ -76,8 +76,20 @@ private:
    C_GiSvNodeSyvUpdate & operator =(const C_GiSvNodeSyvUpdate &) &; //lint !e1511 //we want to hide the base func.
 
    void m_InitIcons(void);
+   void m_SetSvgForTopLeftIcon(void);
+   QString m_GetSvgForTopLeftIcon(void);
+   void m_GetCurrentNodeSecurityState(bool & orq_AuthenticationNecessary, bool & orq_TrafficEncryptionNecessary,
+                                      bool & orq_DebuggerEnabled, bool * const opq_AuthenticationSupported = NULL,
+                                      bool * const opq_TrafficEncryptionSupported = NULL,
+                                      bool * const opq_DebuggerChangeSupported = NULL) const;
+   QString m_GetSvgDependingOnState(const bool oq_AuthenticationNecessary, const bool oq_TrafficEncryptionNecessary,
+                                    const bool oq_DebuggerEnabled);
+   void m_AppendSecurityToolTipIfNecessary(QString & orc_Text);
+   void m_AppendSecurityToolTipState(QString & orc_Text, const bool oq_FeatureSupported, const bool oq_FeatureActive,
+                                     const bool oq_HideStateIfNotSupported);
    void m_RefreshDialog(void);
 
+   C_GiInfo * mpc_IconTopRight;
    C_GiInfo * mpc_IconTopLeft;
    C_GiInfo * mpc_IconBottom;
    C_SyvUpNodePropertiesDialog * mpc_InfoDialog;

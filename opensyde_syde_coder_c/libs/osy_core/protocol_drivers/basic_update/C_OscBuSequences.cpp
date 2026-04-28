@@ -12,9 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <cstring>
+
 #include "stwtypes.hpp"
 #include "stwerrors.h"
-
 #include "TglTime.hpp"
 #include "C_SclDateTime.hpp"
 #include "C_OscLoggingHandler.hpp"
@@ -79,7 +80,7 @@ int32_t C_OscBuSequences::Init(stw::can::C_CanDispatcher * const opc_CanDispatch
    m_ReportProgress(s32_Return, "Starting the initialization of CAN driver and protocol ...");
 
    const uint8_t u8_MINIMUM_PERCENTAGE = 0;
-   m_ReportProgressPercentage(u8_MINIMUM_PERCENTAGE);
+   m_ReportProgressPercentage(u8_MINIMUM_PERCENTAGE, false);
 
    // Save for timeout calculation
    ms32_CanBitrate = os32_CanBitrate;
@@ -389,7 +390,7 @@ int32_t C_OscBuSequences::ReadDeviceInformation(void)
 
    m_ReportProgress(s32_Return, "Read device information finished.");
    const uint8_t u8_PROGRESS_PERCENTAGE = 2;
-   m_ReportProgressPercentage(u8_PROGRESS_PERCENTAGE);
+   m_ReportProgressPercentage(u8_PROGRESS_PERCENTAGE, false);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -461,11 +462,15 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
       const uint8_t u8_SECURITY_LEVEL = 3U;
       bool q_SecureMode;
       uint64_t u64_Seed;
-      uint8_t ou8_SecurityAlgorithm;
+      bool q_AuthenticationActive;
+      bool q_TrafficEncryptionActive;
+      std::vector<uint8_t> c_TrafficEncryptionInitVector;
 
       c_LogActivity = "Security Access";
       s32_Return = mc_OsyProtocol.OsySecurityAccessRequestSeed(u8_SECURITY_LEVEL, q_SecureMode, u64_Seed,
-                                                               ou8_SecurityAlgorithm, &u8_NumberCode);
+                                                               q_AuthenticationActive,
+                                                               q_TrafficEncryptionActive,
+                                                               c_TrafficEncryptionInitVector, &u8_NumberCode);
 
       if ((s32_Return == C_WARN) &&
           (u8_NumberCode == C_OscProtocolDriverOsy::hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED))
@@ -479,12 +484,14 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
          stw::tgl::TglSleep(1000);
 
          s32_Return = mc_OsyProtocol.OsySecurityAccessRequestSeed(u8_SECURITY_LEVEL, q_SecureMode, u64_Seed,
-                                                                  ou8_SecurityAlgorithm, &u8_NumberCode);
+                                                                  q_AuthenticationActive,
+                                                                  q_TrafficEncryptionActive,
+                                                                  c_TrafficEncryptionInitVector, &u8_NumberCode);
       }
 
       if (q_SecureMode == true)
       {
-         osc_write_log_error(c_LogActivity, "Security request returned security is on. "
+         osc_write_log_error(c_LogActivity, "SecurityAccess request reported that security is on. "
                              "No security support here. Use openSYDE GUI tool for this feature.");
          s32_Return = C_CONFIG;
       }
@@ -500,6 +507,9 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
 
          if (u64_Seed != 42U)
          {
+            //Do not consider this an error: older server implementations could return a value of zero
+            // to signal that the level was already unlocked. This is described as valid in the UDS standard
+            // but not on the openSYDE protocol specification. In any case we need to ignore to stay compatible.
             const C_SclString c_Tmp =
                "Received seed in non secure mode does not match the expected value, expected: 42, got " +
                C_SclString::IntToStr(u64_Seed);
@@ -579,6 +589,15 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
    {
       bool q_ErrorOccurred = false;
       c_LogActivity = "Flash";
+      uint64_t u64_TotalSizeTransferred = 0;
+      uint64_t u64_TotalSize = 0;
+      //Get total size of all blocks in bytes
+      for (uint16_t u16_Area = 0U; u16_Area < pc_HexDump->at_Blocks.GetLength(); u16_Area++)
+      {
+         u64_TotalSize +=
+            static_cast<uint64_t>(static_cast<uint32_t>(pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength()));
+      }
+      m_CurrentHexFileSizeInBytes(u64_TotalSize);
 
       //flash all areas
       for (uint16_t u16_Area = 0U; u16_Area < pc_HexDump->at_Blocks.GetLength(); u16_Area++)
@@ -639,12 +658,13 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
                   c_Text.PrintFormatted("Transferring area %02d/%02d  byte %08d/%08d",
                                         u16_Area + 1, pc_HexDump->at_Blocks.GetLength(),
                                         s32_Size - s32_RemainingBytes, s32_Size);
+                  u64_TotalSizeTransferred += c_Data.size();
                   m_ReportProgress(s32_Return, c_Text);
 
                   const uint8_t u8_MAX_PERCENTAGE = 100;
                   const uint8_t u8_Percentage =
-                     static_cast<uint8_t>((u8_MAX_PERCENTAGE * (s32_Size - s32_RemainingBytes)) / s32_Size);
-                  m_ReportProgressPercentage(u8_Percentage);
+                     static_cast<uint8_t>((u8_MAX_PERCENTAGE * u64_TotalSizeTransferred) / u64_TotalSize);
+                  m_ReportProgressPercentage(u8_Percentage, true);
 
                   s32_RemainingBytes -= static_cast<int32_t>(c_Data.size());
                   u8_BlockSequenceCounter = (u8_BlockSequenceCounter < 0xFFU) ? (u8_BlockSequenceCounter + 1U) : 0x00U;
@@ -669,7 +689,7 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
                                   u16_Area + 1, pc_HexDump->at_Blocks.GetLength(), s32_Size, s32_Size);
 
             const uint8_t u8_MAX_PERCENTAGE = 100;
-            m_ReportProgressPercentage(u8_MAX_PERCENTAGE);
+            m_ReportProgressPercentage(u8_MAX_PERCENTAGE, false);
 
             m_ReportProgress(s32_Return, c_Text);
             m_ReportProgress(s32_Return, "Finished writing area, finalizing ...");
@@ -829,11 +849,14 @@ void C_OscBuSequences::PrepareForDestruction(void)
    Has only to be overridden if needed.
 
    \param[in]       ou8_ProgressInPercentage     Progress in percentage
+   \param[in]       oq_IsCaluclatedPercentage       Is the ou8_ProgressInPercentage is caluclated or default
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscBuSequences::m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage)
+void C_OscBuSequences::m_ReportProgressPercentage(const uint8_t ou8_ProgressInPercentage,
+                                                  const bool oq_IsCaluclatedPercentage)
 {
-   std::cout << "Progress in Percentage: " << static_cast<int32_t>(ou8_ProgressInPercentage) << std::endl;
+   std::cout << "Progress in Percentage: " << static_cast<int32_t>(ou8_ProgressInPercentage) <<
+      ", IsCaluclatedPercentage = " << oq_IsCaluclatedPercentage << std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -890,4 +913,51 @@ void C_OscBuSequences::m_ReportFlashloaderInformationRead(const C_SclString & or
       std::cout << c_Text.Strings[u32_Line].c_str() << "\n";
       osc_write_log_info("Flashloader Info", c_Text.Strings[u32_Line]);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Total number of current Hex File size in bytes
+
+   \param[in]       ou64_CurrentHexFileSizeInBytes     Amount of hex file size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscBuSequences::m_CurrentHexFileSizeInBytes(const uint64_t ou64_CurrentHexFileSizeInBytes)
+{
+   std::cout << "Total Hex-file size in bytes = " << ou64_CurrentHexFileSizeInBytes << std::endl;
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get All Hex Files size in bytes
+
+   \param[in]       orc_HexFiles     vector of all hex files
+
+   \return
+   uint64_t    return All Hex Files size in bytes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint64_t C_OscBuSequences::h_GetAllHexFilesSize(const std::vector<std::string> & orc_HexFiles)
+{
+   uint32_t u32_SignatureBlockAddress = 0;
+   C_OscHexFile c_HexFile;
+   uint64_t u64_AllHexFilesSize = 0;
+
+   for (uint32_t u32_Index = 0; u32_Index < static_cast<uint32_t>(orc_HexFiles.size()); ++u32_Index)
+   {
+      const int32_t s32_Return = h_ReadHexFile(orc_HexFiles[u32_Index], c_HexFile, u32_SignatureBlockAddress);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         uint32_t u32_Return;
+         const stw::hex_file::C_HexDataDump * const pc_HexDump = c_HexFile.GetDataDump(u32_Return);
+
+         if (pc_HexDump != NULL)
+         {
+            for (uint16_t u16_Area = 0U; u16_Area < pc_HexDump->at_Blocks.GetLength(); u16_Area++)
+            {
+               u64_AllHexFilesSize +=
+                  static_cast<uint64_t>(static_cast<uint32_t>(pc_HexDump->at_Blocks[u16_Area].au8_Data.GetLength()));
+            }
+         }
+      }
+   }
+   return u64_AllHexFilesSize;
 }

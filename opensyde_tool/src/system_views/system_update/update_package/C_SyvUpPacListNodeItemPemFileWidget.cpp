@@ -60,21 +60,8 @@ C_SyvUpPacListNodeItemPemFileWidget::C_SyvUpPacListNodeItemPemFileWidget(const u
                                                                          const bool oq_StwFlashloader,
                                                                          QWidget * const opc_Parent) :
    C_SyvUpPacListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
-                                oq_StwFlashloader, opc_Parent),
-   me_StateSecurity(C_OscViewNodeUpdate::eST_SEC_NO_CHANGE),
-   me_StateDebugger(C_OscViewNodeUpdate::eST_DEB_NO_CHANGE)
+                                oq_StwFlashloader, opc_Parent)
 {
-   this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security UNKNOWN"));
-   this->mpc_Ui->pc_LabelSecurity->SetFontPixel(10);
-   this->mpc_Ui->pc_LabelSecurity->SetForegroundColor(0);
-   this->mpc_Ui->pc_LabelSecurity->SetBackgroundColor(9);
-   this->mpc_Ui->pc_LabelSecurity->setVisible(false);
-
-   this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger UNKNOWN"));
-   this->mpc_Ui->pc_LabelDebugger->SetFontPixel(10);
-   this->mpc_Ui->pc_LabelDebugger->SetForegroundColor(0);
-   this->mpc_Ui->pc_LabelDebugger->SetBackgroundColor(9);
-   this->mpc_Ui->pc_LabelDebugger->setVisible(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -134,68 +121,6 @@ void C_SyvUpPacListNodeItemPemFileWidget::ViewFileInfo(void)
 bool C_SyvUpPacListNodeItemPemFileWidget::IsViewFileInfoPossible(void) const
 {
    return this->GetAppFilePath().compare("") != 0;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set pem states
-
-   \param[in]  oe_StateSecurity  Security state of node
-   \param[in]  oe_StateDebugger  Debugger state of node
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListNodeItemPemFileWidget::SetPemStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                       const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
-{
-   this->me_StateDebugger = oe_StateDebugger;
-   this->me_StateSecurity = oe_StateSecurity;
-
-   //lint -e{9042} Warning wanted if new cases are added
-   switch (this->me_StateSecurity)
-   {
-   case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
-      this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security UNKNOWN"));
-      break;
-   case C_OscViewNodeUpdate::eST_SEC_ACTIVATE:
-      this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security ON"));
-      break;
-   case C_OscViewNodeUpdate::eST_SEC_DEACTIVATE:
-      this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security OFF"));
-      break;
-   }
-
-   //lint -e{9042} Warning wanted if new cases are added
-   switch (this->me_StateDebugger)
-   {
-   case C_OscViewNodeUpdate::eST_DEB_NO_CHANGE:
-      this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger UNKNOWN"));
-      break;
-   case C_OscViewNodeUpdate::eST_DEB_ACTIVATE:
-      this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger ON"));
-      break;
-   case C_OscViewNodeUpdate::eST_DEB_DEACTIVATE:
-      this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger OFF"));
-      break;
-   }
-
-   this->mpc_Ui->pc_LabelSecurity->setVisible(this->me_StateSecurity != C_OscViewNodeUpdate::eST_SEC_NO_CHANGE);
-   this->mpc_Ui->pc_LabelDebugger->setVisible(this->me_StateDebugger != C_OscViewNodeUpdate::eST_DEB_NO_CHANGE);
-
-   //Adapt file path label to changes in layout
-   this->m_UpateFilePathLabel();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the states of the node
-
-   \param[out]      ore_StateSecurity   Security state of node
-   \param[out]      ore_StateDebugger   Debugger state of node
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListNodeItemPemFileWidget::GetPemStates(C_OscViewNodeUpdate::E_StateSecurity & ore_StateSecurity,
-                                                       C_OscViewNodeUpdate::E_StateDebugger & ore_StateDebugger) const
-{
-   ore_StateDebugger = this->me_StateDebugger;
-   ore_StateSecurity = this->me_StateSecurity;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -294,8 +219,7 @@ void C_SyvUpPacListNodeItemPemFileWidget::m_LoadFileInformation(bool & orq_FileE
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUpPacListNodeItemPemFileWidget::m_CreateToolTipTitle(void) const
 {
-   QString c_Title = static_cast<QString>("%1: PEM File").
-                     arg(this->mc_OwnerSectionName);
+   QString c_Title = static_cast<QString>("%1: PEM File").arg(this->mc_OwnerSectionName);
 
    return c_Title;
 }

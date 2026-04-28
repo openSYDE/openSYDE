@@ -506,7 +506,7 @@ uint32_t C_SdNdeDbViewWidget::m_AddApplication(C_OscNodeApplication & orc_Applic
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
-      u32_Retval = pc_Node->c_Applications.size();
+      u32_Retval = static_cast<uint32_t>(pc_Node->c_Applications.size());
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertApplication(this->mu32_NodeIndex, u32_Retval,
                                                                     orc_Application) == C_NO_ERR);
       //No reload required
@@ -618,7 +618,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
 
       //Resize
-      c_New->SetSize(QSize(810, 573));
+      c_New->SetSize(QSize(810, 655));
 
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {

@@ -973,7 +973,7 @@ void C_SdHandlerWidget::m_Export(void)
                                                                                        c_TxIter->q_IsExtended));
                            c_CanMessageIds.insert(c_TxIter->u32_CanId);
                            // count signals
-                           u32_NumOfInputSignals += c_TxIter->c_Signals.size();
+                           u32_NumOfInputSignals += static_cast<uint32_t>(c_TxIter->c_Signals.size());
                         }
                         else
                         {
@@ -1020,7 +1020,7 @@ void C_SdHandlerWidget::m_Export(void)
                                                                                        c_RxIter->q_IsExtended));
                            c_CanMessageIds.insert(c_RxIter->u32_CanId);
                            // count signals
-                           u32_NumOfInputSignals += c_RxIter->c_Signals.size();
+                           u32_NumOfInputSignals += static_cast<uint32_t>(c_RxIter->c_Signals.size());
                         }
                         else
                         {
@@ -1045,7 +1045,7 @@ void C_SdHandlerWidget::m_Export(void)
                   // save current node
                   c_CommDef.c_Nodes.push_back(c_CurrentCieNode);
 
-                  u32_NumOfInputMessages = c_CanMessageIds.size();
+                  u32_NumOfInputMessages = static_cast<uint32_t>(c_CanMessageIds.size());
 
                   if (s32_Error != C_NO_ERR)
                   {
@@ -1062,7 +1062,8 @@ void C_SdHandlerWidget::m_Export(void)
             }
 
             // export to file
-            C_CieUtil::h_ExportFile(c_CommDef, this, c_UniqueNodeIndexes.size(), u32_NumOfInputMessages,
+            C_CieUtil::h_ExportFile(c_CommDef, this,
+                                    static_cast<uint32_t>(c_UniqueNodeIndexes.size()), u32_NumOfInputMessages,
                                     u32_NumOfInputSignals);
          }
       }

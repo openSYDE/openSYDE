@@ -228,7 +228,7 @@ C_PuiSvDashboard C_SyvDaUnoAddDeleteBaseCommand::m_GetDataBackup(void) const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvDaUnoAddDeleteBaseCommand::m_GetStoredReadRailCount(void) const
 {
-   return this->mc_SavedRailAssignments.size();
+   return static_cast<int32_t>(this->mc_SavedRailAssignments.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -340,8 +340,9 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_LabelData,
                                                                           C_PuiSvDbDataElement::eLABEL) == C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eLABEL),
-                                                           this->mc_DataBackup.GetLabels().size() - 1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::eLABEL),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetLabels().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
@@ -353,8 +354,9 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_ParamData,
                                                                           C_PuiSvDbDataElement::ePARAM) == C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::ePARAM),
-                                                           this->mc_DataBackup.GetParams().size() - 1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::ePARAM),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetParams().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
@@ -367,8 +369,9 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                                                           C_PuiSvDbDataElement::eSPIN_BOX) ==
                                             C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eSPIN_BOX),
-                                                           this->mc_DataBackup.GetSpinBoxes().size() - 1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::eSPIN_BOX),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetSpinBoxes().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
@@ -381,71 +384,67 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                                                           C_PuiSvDbDataElement::eSLIDER) ==
                                             C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eSLIDER),
-                                                           this->mc_DataBackup.GetSliders().size() - 1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::eSLIDER),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetSliders().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
                            if (pc_ProgressBar != NULL)
                            {
                               const C_PuiSvDbProgressBar * const pc_ProgressBarData =
-                                 pc_Dashboard->GetProgressBar(
-                                    u32_Index);
+                                 pc_Dashboard->GetProgressBar(u32_Index);
                               if (pc_ProgressBarData != NULL)
                               {
-                                 tgl_assert(this->mc_DataBackup.AddWidget(pc_ProgressBarData,
-                                                                          C_PuiSvDbDataElement::
-                                                                          ePROGRESS_BAR) == C_NO_ERR);
+                                 tgl_assert(
+                                    this->mc_DataBackup.AddWidget(pc_ProgressBarData,
+                                                                  C_PuiSvDbDataElement::ePROGRESS_BAR) == C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::ePROGRESS_BAR),
-                                                           this->mc_DataBackup.GetProgressBars().size() - 1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::ePROGRESS_BAR),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetProgressBars().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
                            if (pc_Toggle != NULL)
                            {
-                              const C_PuiSvDbToggle * const pc_ToggleData =
-                                 pc_Dashboard->GetToggle(
-                                    u32_Index);
+                              const C_PuiSvDbToggle * const pc_ToggleData = pc_Dashboard->GetToggle(u32_Index);
                               if (pc_ToggleData != NULL)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_ToggleData, C_PuiSvDbDataElement::
                                                                           eTOGGLE) == C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eTOGGLE),
-                                                           this->mc_DataBackup.GetToggles().size() -
-                                                           1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::eTOGGLE),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetToggles().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
                            if (pc_PieChart != NULL)
                            {
-                              const C_PuiSvDbPieChart * const pc_PieChartData =
-                                 pc_Dashboard->GetPieChart(
-                                    u32_Index);
+                              const C_PuiSvDbPieChart * const pc_PieChartData = pc_Dashboard->GetPieChart(u32_Index);
                               if (pc_PieChartData != NULL)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_PieChartData, C_PuiSvDbDataElement::
                                                                           ePIE_CHART) == C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::ePIE_CHART),
-                                                           this->mc_DataBackup.GetPieCharts().size() -
-                                                           1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::ePIE_CHART),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetPieCharts().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }
                            if (pc_Table != NULL)
                            {
-                              const C_PuiSvDbTable * const pc_TableData =
-                                 pc_Dashboard->GetTable(
-                                    u32_Index);
+                              const C_PuiSvDbTable * const pc_TableData = pc_Dashboard->GetTable(u32_Index);
                               if (pc_TableData != NULL)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_TableData, C_PuiSvDbDataElement::
                                                                           eTABLE) == C_NO_ERR);
                                  this->mc_MapTypeAndIndexToId.insert(
-                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eTABLE),
-                                                           this->mc_DataBackup.GetTables().size() - 1UL),
+                                    C_PuiBsTemporaryDataId(
+                                       static_cast<int32_t>(C_PuiSvDbDataElement::eTABLE),
+                                       static_cast<uint32_t>(this->mc_DataBackup.GetTables().size()) - 1UL),
                                     u64_CurUniqueId);
                               }
                            }

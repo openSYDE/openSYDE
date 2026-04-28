@@ -1126,7 +1126,6 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogConnectStatesStringForSubN
       const QString c_Failed = static_cast<QString>(C_GtGetText::h_GetText("Failed"));
       const QString c_Yes = static_cast<QString>(C_GtGetText::h_GetText("Yes"));
       const QString c_No = static_cast<QString>(C_GtGetText::h_GetText("No"));
-      const QString c_Skipped = static_cast<QString>(C_GtGetText::h_GetText("Skipped"));
       const C_OscSuSequencesNodeConnectStates & rc_States = opc_SubNodeData->GetNodeConnectStates();
       const C_GiSvSubNodeData::C_GiSvSubNodeDataPreconditionErrors & rc_PreconditionErrors =
          opc_SubNodeData->GetNodeConnectPreconditionErrors();
@@ -1139,23 +1138,17 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogConnectStatesStringForSubN
                                           mh_GetSuSequenceNodeStateString(rc_States.e_InformationRead),
                                           1);
 
-      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Client authentication required?"),
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Client secure authentication required?"),
                                           ((rc_States.q_AuthenticationNecessary == true) ? c_Yes : c_No),
                                           1);
 
-      if (rc_States.q_AuthenticationNecessary == true)
-      {
-         c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Client authentication"),
-                                             ((rc_States.q_AuthenticationError == false) ? c_Ok : c_Failed),
-                                             2);
-      }
-      else
-      {
-         // No security active
-         c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Running authentication"),
-                                             c_Skipped,
-                                             2);
-      }
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Traffic encryption required?"),
+                                          ((rc_States.q_TrafficEncryptionNecessary == true) ? c_Yes : c_No),
+                                          1);
+
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Security access"),
+                                          ((rc_States.q_SecurityAccessError == false) ? c_Ok : c_Failed),
+                                          2);
 
       c_Text +=
          mh_GetTableLineForBrowser(static_cast<QString>(C_GtGetText::h_GetText(
@@ -1167,13 +1160,19 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogConnectStatesStringForSubN
                                              rc_PreconditionErrors.q_NvmWriteError),
                                           2);
 
-      c_Text += mh_GetTableLineForBrowser(static_cast<QString>(C_GtGetText::h_GetText("PEM file")), "",
+      c_Text += mh_GetTableLineForBrowser(static_cast<QString>(C_GtGetText::h_GetText("Security settings")), "",
                                           1);
       c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText(
-                                             "Security supported?"),
+                                             "Authentication supported?"),
                                           mh_GetSuSequenceNodePreconditionString(
-                                             rc_States.c_AvailableFeatures.q_SupportsSecurity,
+                                             rc_States.c_AvailableFeatures.q_SupportsSecurityAuthentication,
                                              rc_PreconditionErrors.q_PemWriteError),
+                                          2);
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText(
+                                             "Traffic encryption supported?"),
+                                          mh_GetSuSequenceNodePreconditionString(
+                                             rc_States.c_AvailableFeatures.q_SupportsSecurityTrafficEncryption,
+                                             rc_PreconditionErrors.q_TrafficEncryptionEnableError),
                                           2);
       c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Activating debugger supported?"),
                                           mh_GetSuSequenceNodePreconditionString(
@@ -1184,6 +1183,20 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogConnectStatesStringForSubN
                                           mh_GetSuSequenceNodePreconditionString(
                                              rc_States.c_AvailableFeatures.q_SupportsDebuggerOff,
                                              rc_PreconditionErrors.q_DebuggerDisableError),
+                                          2);
+
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Authentication enabled?"),
+                                          ((rc_States.c_AvailableFeatures.q_SupportsSecurityAuthentication) ?
+                                           ((rc_States.q_AuthenticationNecessary == true) ? c_Yes : c_No) : c_No),
+                                          2);
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Traffic encryption enabled?"),
+                                          ((rc_States.c_AvailableFeatures.q_SupportsSecurityTrafficEncryption) ?
+                                           ((rc_States.q_TrafficEncryptionNecessary == true) ? c_Yes : c_No) : "-"),
+                                          2);
+      c_Text += mh_GetTableLineForBrowser(C_GtGetText::h_GetText("Debugger disabled?"),
+                                          ((rc_States.c_AvailableFeatures.q_SupportsDebuggerOff &&
+                                            rc_States.c_AvailableFeatures.q_SupportsDebuggerOn) ?
+                                           ((rc_States.q_DebuggerEnabled == false) ? c_Yes : c_No) : "-"),
                                           2);
 
       c_Text += mh_GetTableLineForBrowser(static_cast<QString>(C_GtGetText::h_GetText("Routing")), "",
@@ -1426,43 +1439,50 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
             2);
       }
 
-      // PEM file
-      if (rc_States.c_StatePemFile.c_FileName != "")
+      // security settings
       {
-         const C_OscSuSequencesNodePemFileStates & rc_FileState = rc_States.c_StatePemFile;
+         const C_OscSuSequencesNodeSecuritySettingsStates & rc_SettingsState = rc_States.c_StateSecuritySettings;
 
-         q_AtLeastOneFile = true;
+         if (rc_SettingsState.c_FileName != "")
+         {
+            q_AtLeastOneFile = true;
 
+            c_Text += mh_GetTableLineForBrowser(
+               C_GtGetText::h_GetText("File ") + static_cast<QString>(rc_SettingsState.c_FileName.c_str()) + ":",
+               "",
+               1);
+
+            c_Text += mh_GetTableLineForBrowser(
+               C_GtGetText::h_GetText("Loading file"),
+               mh_GetSuSequenceNodeFileLoadStateString(rc_SettingsState.e_FileExists, rc_SettingsState.e_FileLoaded),
+               2);
+
+            // secure authentication PEM file
+            c_Text += mh_GetTableLineForBrowser(
+               C_GtGetText::h_GetText("Extracting file"),
+               mh_GetSuSequenceNodeStateString(rc_SettingsState.e_PemFileExtracted),
+               2);
+
+            c_Text += mh_GetTableLineForBrowser(
+               C_GtGetText::h_GetText("Sending public key of file"),
+               mh_GetSuSequenceNodeStateString(rc_SettingsState.e_SecureAuthenticationKeySent),
+               2);
+         }
+
+         // security flag states
          c_Text += mh_GetTableLineForBrowser(
-            C_GtGetText::h_GetText("File ") + static_cast<QString>(rc_FileState.c_FileName.c_str()) + ":",
-            "",
-            1);
-
-         c_Text += mh_GetTableLineForBrowser(
-            C_GtGetText::h_GetText("Loading file"),
-            mh_GetSuSequenceNodeFileLoadStateString(rc_FileState.e_FileExists, rc_FileState.e_FileLoaded),
+            C_GtGetText::h_GetText("Sending secure authentication enable flag"),
+            mh_GetSuSequenceNodeStateString(rc_SettingsState.e_SecureAuthenticationFlagSent),
             2);
 
-         // PEM file itself
          c_Text += mh_GetTableLineForBrowser(
-            C_GtGetText::h_GetText("Extracting file"),
-            mh_GetSuSequenceNodeStateString(rc_FileState.e_PemFileExtracted),
-            2);
-
-         c_Text += mh_GetTableLineForBrowser(
-            C_GtGetText::h_GetText("Sending public key of file"),
-            mh_GetSuSequenceNodeStateString(rc_FileState.e_SecurityKeySent),
-            2);
-
-         // PEM file states
-         c_Text += mh_GetTableLineForBrowser(
-            C_GtGetText::h_GetText("Sending security enable flag"),
-            mh_GetSuSequenceNodeStateString(rc_FileState.e_SecurityFlagSent),
+            C_GtGetText::h_GetText("Sending traffic encryption enable flag"),
+            mh_GetSuSequenceNodeStateString(rc_SettingsState.e_TrafficEncryptionFlagSent),
             2);
 
          c_Text += mh_GetTableLineForBrowser(
             C_GtGetText::h_GetText("Sending debugger enable flag"),
-            mh_GetSuSequenceNodeStateString(rc_FileState.e_DebuggerFlagSent),
+            mh_GetSuSequenceNodeStateString(rc_SettingsState.e_DebuggerFlagSent),
             2);
       }
 
@@ -1613,7 +1633,8 @@ QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodePreconditionString(cons
    QString c_Text;
    const QString c_Yes = static_cast<QString>(C_GtGetText::h_GetText("Yes"));
    const QString c_No = static_cast<QString>(C_GtGetText::h_GetText("No"));
-   const QString c_NoButNeeded = static_cast<QString>(C_GtGetText::h_GetText("<b>No (Is needed!)</b>"));
+   const QString c_NoButNeeded =
+      static_cast<QString>(C_GtGetText::h_GetText("<b>No (Service is activated in Update Package)</b>"));
 
    if (oq_FeatureSupported == true)
    {

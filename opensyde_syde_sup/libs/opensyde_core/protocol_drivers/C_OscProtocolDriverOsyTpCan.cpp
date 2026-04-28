@@ -739,10 +739,10 @@ int32_t C_OscProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberRes
          {
             //negative response detected
             q_NegativeResponseReceived = true;
-            //Node id was not set, node has security activated.
+            //Node id was not set, node has security feature activated.
             if (c_Response.au8_Data[3] == 0x22U)
             {
-               m_LogWarningWithHeader("Broadcast: Negative response received. Node has security activated.",
+               m_LogWarningWithHeader("Broadcast: Negative response received. Node has security feature activated.",
                                       TGL_UTIL_FUNC_ID);
             }
             else

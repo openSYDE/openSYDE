@@ -152,8 +152,8 @@ int32_t C_OscViewFiler::h_LoadViewsOsc(std::vector<C_OscViewData> & orc_Views,
          if (u32_ExpectedSize != orc_Views.size())
          {
             C_SclString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected view count, expected: %i, got %i", u32_ExpectedSize,
-                                 orc_Views.size());
+            c_Tmp.PrintFormatted("Unexpected view count, expected: %u, got %u", u32_ExpectedSize,
+                                 static_cast<uint32_t>(orc_Views.size()));
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
@@ -313,7 +313,7 @@ void C_OscViewFiler::h_SaveNodeUpdateInformation(const std::vector<C_OscViewNode
       }
       mh_SaveNodeUpdateInformationSkipUpdateOfFiles(c_SkipFlags, orc_XmlParser);
 
-      C_OscViewFiler::mh_SaveNodeUpdateInformationPem(rc_NodeUpdateInformation, orc_XmlParser);
+      C_OscViewFiler::mh_SaveNodeUpdateInformationSecurity(rc_NodeUpdateInformation, orc_XmlParser);
 
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "node-update-information");
@@ -336,7 +336,7 @@ void C_OscViewFiler::h_SavePc(const C_OscViewPc & orc_OscPc, C_OscXmlParserBase 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  String to pem file state debugger
+/*! \brief  String to security option debugger activation
 
    \param[in]   orc_String    String
    \param[out]  ore_State     State
@@ -346,8 +346,8 @@ void C_OscViewFiler::h_SavePc(const C_OscViewPc & orc_OscPc, C_OscXmlParserBase 
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscViewFiler::h_StringToPemFileStateDebugger(const C_SclString & orc_String,
-                                                       C_OscViewNodeUpdate::E_StateDebugger & ore_State)
+int32_t C_OscViewFiler::h_StringToSecurityOptionDebugger(const C_SclString & orc_String,
+                                                         C_OscViewNodeUpdate::E_StateDebugger & ore_State)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -373,7 +373,7 @@ int32_t C_OscViewFiler::h_StringToPemFileStateDebugger(const C_SclString & orc_S
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  String to pem file state security
+/*! \brief  String to security option secure authentication
 
    \param[in]   orc_String    String
    \param[out]  ore_State     State
@@ -383,8 +383,8 @@ int32_t C_OscViewFiler::h_StringToPemFileStateDebugger(const C_SclString & orc_S
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscViewFiler::h_StringToPemFileStateSecurity(const C_SclString & orc_String,
-                                                       C_OscViewNodeUpdate::E_StateSecurity & ore_State)
+int32_t C_OscViewFiler::h_StringToSecurityOptionAuthentication(const C_SclString & orc_String,
+                                                               C_OscViewNodeUpdate::E_StateSecureAuthentication & ore_State)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -410,15 +410,52 @@ int32_t C_OscViewFiler::h_StringToPemFileStateSecurity(const C_SclString & orc_S
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Pem file state debugger to string
+/*! \brief  String to security option traffic encryption
+
+   \param[in]   orc_String    String
+   \param[out]  ore_State     State
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscViewFiler::h_StringToSecurityOptionEncryption(const C_SclString & orc_String,
+                                                           C_OscViewNodeUpdate::E_StateTrafficEncryption & ore_State)
+{
+   int32_t s32_Retval = C_NO_ERR;
+
+   if (orc_String.AnsiCompare("activate") == 0)
+   {
+      ore_State = C_OscViewNodeUpdate::eST_TEN_ACTIVATE;
+   }
+   else if (orc_String.AnsiCompare("deactivate") == 0)
+   {
+      ore_State = C_OscViewNodeUpdate::eST_TEN_DEACTIVATE;
+   }
+   else if (orc_String.AnsiCompare("no-change") == 0)
+   {
+      ore_State = C_OscViewNodeUpdate::eST_TEN_NO_CHANGE;
+   }
+   else
+   {
+      //Default
+      ore_State = C_OscViewNodeUpdate::eST_TEN_NO_CHANGE;
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Security option debugger activation to string
 
    \param[in]  oe_State    State
 
    \return
-   Stringified pem file state debugger to string
+   Stringified option
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_OscViewFiler::h_PemFileStateDebuggerToString(const C_OscViewNodeUpdate::E_StateDebugger oe_State)
+C_SclString C_OscViewFiler::h_SecurityOptionDebuggerToString(const C_OscViewNodeUpdate::E_StateDebugger oe_State)
 {
    C_SclString c_Retval;
 
@@ -441,15 +478,16 @@ C_SclString C_OscViewFiler::h_PemFileStateDebuggerToString(const C_OscViewNodeUp
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Pem file state security to string
+/*! \brief  Security option secure authentication to string
 
    \param[in]  oe_State    State
 
    \return
-   Stringified pem file state security to string
+   Stringified option
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_OscViewFiler::h_PemFileStateSecurityToString(const C_OscViewNodeUpdate::E_StateSecurity oe_State)
+C_SclString C_OscViewFiler::h_SecurityOptionAuthenticationToString(
+   const C_OscViewNodeUpdate::E_StateSecureAuthentication oe_State)
 {
    C_SclString c_Retval;
 
@@ -462,6 +500,38 @@ C_SclString C_OscViewFiler::h_PemFileStateSecurityToString(const C_OscViewNodeUp
       c_Retval = "deactivate";
       break;
    case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
+      c_Retval = "no-change";
+      break;
+   default:
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Security option traffic encryption to string
+
+   \param[in]  oe_State    State
+
+   \return
+   Stringified option
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscViewFiler::h_SecurityOptionEncryptionToString(
+   const C_OscViewNodeUpdate::E_StateTrafficEncryption oe_State)
+{
+   C_SclString c_Retval;
+
+   switch (oe_State)
+   {
+   case C_OscViewNodeUpdate::eST_TEN_ACTIVATE:
+      c_Retval = "activate";
+      break;
+   case C_OscViewNodeUpdate::eST_TEN_DEACTIVATE:
+      c_Retval = "deactivate";
+      break;
+   case C_OscViewNodeUpdate::eST_TEN_NO_CHANGE:
       c_Retval = "no-change";
       break;
    default:
@@ -793,7 +863,7 @@ int32_t C_OscViewFiler::mh_LoadOneNodeUpdateInformation(C_OscViewNodeUpdate & or
       orc_NodeUpdateInformation.SetSkipUpdateOfParamInfosFlags(c_ParamSetSkipFlags);
       orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_FileBasedSkipFlags, C_OscViewNodeUpdate::eFTP_FILE_BASED);
 
-      s32_Retval = C_OscViewFiler::mh_LoadNodeUpdateInformationPem(orc_NodeUpdateInformation, orc_XmlParser);
+      s32_Retval = C_OscViewFiler::mh_LoadNodeUpdateInformationSecurity(orc_NodeUpdateInformation, orc_XmlParser);
    }
 
    return s32_Retval;
@@ -895,7 +965,7 @@ void C_OscViewFiler::mh_LoadNodeUpdateInformationSkipUpdateOfFiles(std::vector<b
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load node update information pem
+/*! \brief  Load node update information security (PEM file and settings)
 
    \param[in,out]  orc_NodeUpdateInformation    Node update information
    \param[in,out]  orc_XmlParser                XML parser
@@ -907,8 +977,8 @@ void C_OscViewFiler::mh_LoadNodeUpdateInformationSkipUpdateOfFiles(std::vector<b
    \retval   C_CONFIG   Error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPem(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
-                                                        C_OscXmlParserBase & orc_XmlParser)
+int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationSecurity(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
+                                                             C_OscXmlParserBase & orc_XmlParser)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -930,8 +1000,8 @@ int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPem(C_OscViewNodeUpdate & or
       }
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = C_OscViewFiler::mh_LoadNodeUpdateInformationPemStates(orc_NodeUpdateInformation,
-                                                                            orc_XmlParser);
+         s32_Retval = C_OscViewFiler::mh_LoadNodeUpdateInformationSecurityStates(orc_NodeUpdateInformation,
+                                                                                 orc_XmlParser);
       }
       if (s32_Retval == C_NO_ERR)
       {
@@ -944,7 +1014,7 @@ int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPem(C_OscViewNodeUpdate & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load node update information pem states
+/*! \brief  Load node update information security states
 
    \param[in,out]  orc_NodeUpdateInformation    Node update information
    \param[in,out]  orc_XmlParser                XML parser
@@ -956,20 +1026,22 @@ int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPem(C_OscViewNodeUpdate & or
    \retval   C_CONFIG   Error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPemStates(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
-                                                              C_OscXmlParserBase & orc_XmlParser)
+int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationSecurityStates(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
+                                                                   C_OscXmlParserBase & orc_XmlParser)
 {
    int32_t s32_Retval = orc_XmlParser.SelectNodeChildError("states");
 
    if (s32_Retval == C_NO_ERR)
    {
-      C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity = C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
+      C_OscViewNodeUpdate::E_StateSecureAuthentication e_StateSecureAuthentication =
+         C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
       C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger = C_OscViewNodeUpdate::eST_DEB_NO_CHANGE;
+      C_OscViewNodeUpdate::E_StateTrafficEncryption e_StateTrafficEncryption = C_OscViewNodeUpdate::eST_TEN_NO_CHANGE;
       s32_Retval = orc_XmlParser.SelectNodeChildError("security");
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = C_OscViewFiler::h_StringToPemFileStateSecurity(
-            orc_XmlParser.GetNodeContent().c_str(), e_StateSecurity);
+         s32_Retval = C_OscViewFiler::h_StringToSecurityOptionAuthentication(
+            orc_XmlParser.GetNodeContent().c_str(), e_StateSecureAuthentication);
          if (s32_Retval == C_NO_ERR)
          {
             //Return
@@ -981,7 +1053,7 @@ int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPemStates(C_OscViewNodeUpdat
          s32_Retval = orc_XmlParser.SelectNodeChildError("debugger");
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_OscViewFiler::h_StringToPemFileStateDebugger(
+            s32_Retval = C_OscViewFiler::h_StringToSecurityOptionDebugger(
                orc_XmlParser.GetNodeContent().c_str(), e_StateDebugger);
             if (s32_Retval == C_NO_ERR)
             {
@@ -992,7 +1064,20 @@ int32_t C_OscViewFiler::mh_LoadNodeUpdateInformationPemStates(C_OscViewNodeUpdat
       }
       if (s32_Retval == C_NO_ERR)
       {
-         orc_NodeUpdateInformation.SetStates(e_StateSecurity, e_StateDebugger);
+         if (orc_XmlParser.SelectNodeChild("traffic-encryption") == "traffic-encryption")
+         {
+            s32_Retval = C_OscViewFiler::h_StringToSecurityOptionEncryption(
+               orc_XmlParser.GetNodeContent().c_str(), e_StateTrafficEncryption);
+            if (s32_Retval == C_NO_ERR)
+            {
+               //Return
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "states");
+            }
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         orc_NodeUpdateInformation.SetStates(e_StateSecureAuthentication, e_StateDebugger, e_StateTrafficEncryption);
 
          //Return
          tgl_assert(orc_XmlParser.SelectNodeParent() == "pem-file");
@@ -1152,24 +1237,28 @@ void C_OscViewFiler::mh_SaveNodeUpdateInformationSkipUpdateOfFiles(const std::ve
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Save node update information pem
+/*! \brief  Save node update information security (PEM file and settings)
 
    \param[in]      orc_NodeUpdateInformation    Node update information
    \param[in,out]  orc_XmlParser                XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscViewFiler::mh_SaveNodeUpdateInformationPem(const C_OscViewNodeUpdate & orc_NodeUpdateInformation,
-                                                     C_OscXmlParserBase & orc_XmlParser)
+void C_OscViewFiler::mh_SaveNodeUpdateInformationSecurity(const C_OscViewNodeUpdate & orc_NodeUpdateInformation,
+                                                          C_OscXmlParserBase & orc_XmlParser)
 {
-   C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
+   C_OscViewNodeUpdate::E_StateSecureAuthentication e_StateSecureAuthentication;
    C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
+   C_OscViewNodeUpdate::E_StateTrafficEncryption e_StateTrafficEncryption;
    orc_XmlParser.CreateAndSelectNodeChild("pem-file");
    orc_XmlParser.SetAttributeBool("skip", orc_NodeUpdateInformation.GetSkipUpdateOfPemFile());
    orc_XmlParser.CreateNodeChild("path", orc_NodeUpdateInformation.GetPemFilePath());
    orc_XmlParser.CreateAndSelectNodeChild("states");
-   orc_NodeUpdateInformation.GetStates(e_StateSecurity, e_StateDebugger);
-   orc_XmlParser.CreateNodeChild("security", C_OscViewFiler::h_PemFileStateSecurityToString(e_StateSecurity));
-   orc_XmlParser.CreateNodeChild("debugger", C_OscViewFiler::h_PemFileStateDebuggerToString(e_StateDebugger));
+   orc_NodeUpdateInformation.GetStates(e_StateSecureAuthentication, e_StateDebugger, e_StateTrafficEncryption);
+   orc_XmlParser.CreateNodeChild("security",
+                                 C_OscViewFiler::h_SecurityOptionAuthenticationToString(e_StateSecureAuthentication));
+   orc_XmlParser.CreateNodeChild("debugger", C_OscViewFiler::h_SecurityOptionDebuggerToString(e_StateDebugger));
+   orc_XmlParser.CreateNodeChild("traffic-encryption",
+                                 C_OscViewFiler::h_SecurityOptionEncryptionToString(e_StateTrafficEncryption));
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "pem-file");
    //Return

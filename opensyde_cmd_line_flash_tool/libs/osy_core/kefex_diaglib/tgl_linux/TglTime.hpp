@@ -27,6 +27,7 @@ namespace tgl
 class C_TglDateTime
 {
 public:
+   //lint -save -e8010 //incorrect "m" prefixes; kept for compatibility with existing applications
    uint16_t mu16_Year; ///< absolute year number, e.g. 2017
    uint8_t mu8_Month;  ///< 1 .. 12
    uint8_t mu8_Day;    ///< 1 .. 31
@@ -35,11 +36,13 @@ public:
    uint8_t mu8_Minute;         ///< 0 .. 59
    uint8_t mu8_Second;         ///< 0 .. 59
    uint16_t mu16_MilliSeconds; ///< 0 .. 999
+   //lint -restore
 };
 
 void TglGetDateTimeNow(C_TglDateTime & orc_DateTime);
 void TglDelayUs(const uint32_t ou32_NumberUs);
 void TglSleep(const uint32_t ou32_NumberMs);
+void TglSleepPolling();
 uint32_t TglGetTickCount(void);
 uint64_t TglGetTickCountUs(void);
 

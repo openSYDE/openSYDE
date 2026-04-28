@@ -27,6 +27,7 @@
 #include "stwtypes.hpp"
 #include "C_OscProtocolSerialNumber.hpp"
 #include "C_OscProtocolDriverOsyTpBase.hpp"
+#include "C_OscProtocolSecuritySubLayer.hpp"
 #include "stw_can.hpp" //for CAN message type
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -108,6 +109,9 @@ private:
 
    static void mh_ConvertVariableToNecessaryBytes(const uint32_t ou32_Variable, std::vector<uint8_t> & orc_Bytes);
 
+   int32_t m_SendRequest(const C_OscProtocolDriverOsyService & orc_Service);
+   int32_t m_ReadResponse(C_OscProtocolDriverOsyService & orc_Service);
+
    //service IDs:
    static const uint8_t mhu8_OSY_SI_DIAGNOSTIC_SESSION_CONTROL = 0x10U;
    static const uint8_t mhu8_OSY_SI_ECU_RESET                  = 0x11U;
@@ -122,6 +126,7 @@ private:
    static const uint8_t mhu8_OSY_SI_REQUEST_FILE_TRANSFER      = 0x38U;
    static const uint8_t mhu8_OSY_SI_WRITE_MEMORY_BY_ADDRESS    = 0x3DU;
    static const uint8_t mhu8_OSY_SI_TESTER_PRESENT             = 0x3EU;
+   static const uint8_t mhu8_OSY_SI_SECURED_DATA_TRANSMISSION  = 0x84U;
    static const uint8_t mhu8_OSY_SI_READ_DATA_POOL_DATA_EVENT_DRIVEN = 0xBAU;
    static const uint8_t mhu8_OSY_SI_READ_DATA_POOL_DATA_BY_ID  = 0xBBU;
    static const uint8_t mhu8_OSY_SI_WRITE_DATA_POOL_DATA_BY_ID = 0xBCU;
@@ -132,51 +137,53 @@ private:
    static const uint8_t mhu8_OSY_NR_SI = 0x7FU;
 
    //data identifiers:
-   static const uint16_t mhu16_OSY_DI_BOOT_SOFTWARE_IDENTIFICATION     = 0xF180U;
-   static const uint16_t mhu16_OSY_DI_APPLICATION_SOFTWARE_FINGERPRINT = 0xF184U;
-   static const uint16_t mhu16_OSY_DI_ACTIVE_DIAGNOSTIC_SESSION        = 0xF186U;
-   static const uint16_t mhu16_OSY_DI_ECU_SERIAL_NUMBER                = 0xF18CU;
-   static const uint16_t mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER       = 0xF192U;
-   static const uint16_t mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION      = 0xF193U;
-   static const uint16_t mhu16_OSY_DI_LIST_OF_FEATURES                 = 0xA800U;
-   static const uint16_t mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH       = 0xA801U;
-   static const uint16_t mhu16_OSY_DI_DATARATE_1                       = 0xA810U;
-   static const uint16_t mhu16_OSY_DI_DATARATE_2                       = 0xA811U;
-   static const uint16_t mhu16_OSY_DI_DATARATE_3                       = 0xA812U;
-   static const uint16_t mhu16_OSY_DI_PROTOCOL_VERSION                 = 0xA813U;
-   static const uint16_t mhu16_OSY_DI_PROTOCOL_DRIVER_IMPLEMENTATION_VERSION = 0xA814U;
-   static const uint16_t mhu16_OSY_DI_FLASHLOADER_PROTOCOL_VERSION     = 0xA815U;
-   static const uint16_t mhu16_OSY_DI_MAX_NUM_ASYNC                    = 0xA817U;
-   static const uint16_t mhu16_OSY_DI_FLASH_COUNT                      = 0xA819U;
-   static const uint16_t mhu16_OSY_DI_DEVICE_NAME                      = 0xA81AU;
-   static const uint16_t mhu16_OSY_DI_APPLICATION_NAME                 = 0xA81BU;
-   static const uint16_t mhu16_OSY_DI_APPLICATION_VERSION              = 0xA81CU;
-   static const uint16_t mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT  = 0xA81DU;
-   static const uint16_t mhu16_OSY_DI_ECU_SERIAL_NUMBER_EXT            = 0xA81EU;
-   static const uint16_t mhu16_OSY_DI_SUB_NODE_ID                      = 0xA81FU;
-   static const uint16_t mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER        = 0xA820U;
-   static const uint16_t mhu16_OSY_DI_SECURITY_ACTIVATION              = 0xA821U;
-   static const uint16_t mhu16_OSY_DI_DEBUGGER_ACTIVATION              = 0xA822U;
-   static const uint16_t mhu16_OSY_DI_SECURITY_KEY                     = 0xA823U;
+   static const uint16_t mhu16_OSY_DI_BOOT_SOFTWARE_IDENTIFICATION                = 0xF180U;
+   static const uint16_t mhu16_OSY_DI_APPLICATION_SOFTWARE_FINGERPRINT            = 0xF184U;
+   static const uint16_t mhu16_OSY_DI_ACTIVE_DIAGNOSTIC_SESSION                   = 0xF186U;
+   static const uint16_t mhu16_OSY_DI_ECU_SERIAL_NUMBER                           = 0xF18CU;
+   static const uint16_t mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER                  = 0xF192U;
+   static const uint16_t mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION                 = 0xF193U;
+   static const uint16_t mhu16_OSY_DI_LIST_OF_FEATURES                            = 0xA800U;
+   static const uint16_t mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH                  = 0xA801U;
+   static const uint16_t mhu16_OSY_DI_DATARATE_1                                  = 0xA810U;
+   static const uint16_t mhu16_OSY_DI_DATARATE_2                                  = 0xA811U;
+   static const uint16_t mhu16_OSY_DI_DATARATE_3                                  = 0xA812U;
+   static const uint16_t mhu16_OSY_DI_PROTOCOL_VERSION                            = 0xA813U;
+   static const uint16_t mhu16_OSY_DI_PROTOCOL_DRIVER_IMPLEMENTATION_VERSION      = 0xA814U;
+   static const uint16_t mhu16_OSY_DI_FLASHLOADER_PROTOCOL_VERSION                = 0xA815U;
+   static const uint16_t mhu16_OSY_DI_MAX_NUM_ASYNC                               = 0xA817U;
+   static const uint16_t mhu16_OSY_DI_FLASH_COUNT                                 = 0xA819U;
+   static const uint16_t mhu16_OSY_DI_DEVICE_NAME                                 = 0xA81AU;
+   static const uint16_t mhu16_OSY_DI_APPLICATION_NAME                            = 0xA81BU;
+   static const uint16_t mhu16_OSY_DI_APPLICATION_VERSION                         = 0xA81CU;
+   static const uint16_t mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT             = 0xA81DU;
+   static const uint16_t mhu16_OSY_DI_ECU_SERIAL_NUMBER_EXT                       = 0xA81EU;
+   static const uint16_t mhu16_OSY_DI_SUB_NODE_ID                                 = 0xA81FU;
+   static const uint16_t mhu16_OSY_DI_AUTHENTICATION_CERTIFICATE_SERIAL_NUMBER    = 0xA820U;
+   static const uint16_t mhu16_OSY_DI_SECURITY_AUTHENTICATION_ACTIVATION          = 0xA821U;
+   static const uint16_t mhu16_OSY_DI_DEBUGGER_ACTIVATION                         = 0xA822U;
+   static const uint16_t mhu16_OSY_DI_SECURITY_AUTHENTICATION_KEY                 = 0xA823U;
+   static const uint16_t mhu16_OSY_DI_AUTHENTICATION_CERTIFICATE_SERIAL_NUMBER_L7 = 0xA824U;
+   static const uint16_t mhu16_OSY_DI_SECURITY_TRAFFIC_ENCRYPTION_ACTIVATION      = 0xA825U;
    //routine identifiers
-   static const uint16_t mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION     = 0x0202U;
-   static const uint16_t mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                  = 0x0203U;
-   static const uint16_t mhu16_OSY_RC_SID_TUNNEL_CAN_MESSAGE                = 0x0204U;
-   static const uint16_t mhu16_OSY_RC_SID_ROUTE_IP_2_IP_COMMUNICATION       = 0x0205U;
-   static const uint16_t mhu16_OSY_RC_SID_REQUEST_PROGRAMMING               = 0x0206U;
-   static const uint16_t mhu16_OSY_RC_RC_SID_SET_BITRATE                    = 0x0207U;
-   static const uint16_t mhu16_OSY_RC_SID_CHECK_FLASH_MEMORY_AVAILABILITY   = 0x0208U;
-   static const uint16_t mhu16_OSY_RC_SID_READ_FLASH_BLOCK_DATA             = 0x0209U;
+   static const uint16_t mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION               = 0x0202U;
+   static const uint16_t mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                            = 0x0203U;
+   static const uint16_t mhu16_OSY_RC_SID_TUNNEL_CAN_MESSAGE                          = 0x0204U;
+   static const uint16_t mhu16_OSY_RC_SID_ROUTE_IP_2_IP_COMMUNICATION                 = 0x0205U;
+   static const uint16_t mhu16_OSY_RC_SID_REQUEST_PROGRAMMING                         = 0x0206U;
+   static const uint16_t mhu16_OSY_RC_RC_SID_SET_BITRATE                              = 0x0207U;
+   static const uint16_t mhu16_OSY_RC_SID_CHECK_FLASH_MEMORY_AVAILABILITY             = 0x0208U;
+   static const uint16_t mhu16_OSY_RC_SID_READ_FLASH_BLOCK_DATA                       = 0x0209U;
    static const uint16_t mhu16_OSY_RC_SID_CONFIGURE_FLASHLOADER_COMMUNICATION_CHANNEL = 0x0210U;
-   static const uint16_t mhu16_OSY_RC_SID_READ_DATAPOOL_META_DATA           = 0x0211U;
-   static const uint16_t mhu16_OSY_RC_SID_VERIFY_DATAPOOL                   = 0x0212U;
-   static const uint16_t mhu16_OSY_RC_SID_NOTIFY_NVM_DATA_CHANGED           = 0x0213U;
-   static const uint16_t mhu16_OSY_RC_SID_SET_NODE_ID_FOR_CHANNEL           = 0x0214U;
-   static const uint16_t mhu16_OSY_RC_SID_SET_IP_ADDRESS_FOR_CHANNEL        = 0x0215U;
-   static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1  = 0x0216U;
-   static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2  = 0x0217U;
-   static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3  = 0x0218U;
-   static const uint16_t mhu16_OSY_RC_SID_FACTORY_MODE                      = 0x0225U;
+   static const uint16_t mhu16_OSY_RC_SID_READ_DATAPOOL_META_DATA                     = 0x0211U;
+   static const uint16_t mhu16_OSY_RC_SID_VERIFY_DATAPOOL                             = 0x0212U;
+   static const uint16_t mhu16_OSY_RC_SID_NOTIFY_NVM_DATA_CHANGED                     = 0x0213U;
+   static const uint16_t mhu16_OSY_RC_SID_SET_NODE_ID_FOR_CHANNEL                     = 0x0214U;
+   static const uint16_t mhu16_OSY_RC_SID_SET_IP_ADDRESS_FOR_CHANNEL                  = 0x0215U;
+   static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1            = 0x0216U;
+   static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2            = 0x0217U;
+   static const uint16_t mhu16_OSY_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3            = 0x0218U;
+   static const uint16_t mhu16_OSY_RC_SID_FACTORY_MODE                                = 0x0225U;
 
    //routine sub-functions
    static const uint8_t mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE           = 0x01U;
@@ -249,7 +256,9 @@ public:
       bool q_EthernetToEthernetRoutingSupported;   ///< true: E2E routing supported
       bool q_FileBasedTransferExitResultAvailable; ///< true: FileBasedTransferExitResult can be read
       bool q_ExtendedSerialNumberModeImplemented;  ///< true: The device has the extended serial number format
-      bool q_SupportsSecurity;                     ///< true: The device supports the security feature
+      bool q_SupportsSecurityAuthentication;       ///< true: The device supports the security authentication feature
+      bool q_SupportsSecurityTrafficEncryption;    ///< true: The device supports the security openSYDE protocol traffic
+                                                   // encryption feature
       bool q_SupportsDebuggerOff;                  ///< true: The debugger interface of the device can be deactivated
       bool q_SupportsDebuggerOn;                   ///< true: The debugger interface of the device can be activated
    };
@@ -382,16 +391,21 @@ public:
    int32_t OsyReadFlashBlockData(const uint8_t ou8_FlashBlock, C_FlashBlockInfo & orc_BlockInfo,
                                  uint8_t * const opu8_NrCode = NULL);
    int32_t OsySecurityAccessRequestSeed(const uint8_t ou8_SecurityLevel, bool & orq_SecureMode, uint64_t & oru64_Seed,
-                                        uint8_t & oru8_SecurityAlgorithm, uint8_t * const opu8_NrCode = NULL);
-   int32_t OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel, const uint32_t ou32_Key,
+                                        bool & orq_AuthenticationActive, bool & orq_TrafficEncryptionActive,
+                                        std::vector<uint8_t> & orc_TrafficEncryptionInitVector,
+                                        uint8_t * const opu8_NrCode = NULL);
+   int32_t OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel, const uint32_t ou32_SecurityKey,
                                     uint8_t * const opu8_NrCode = NULL);
-   int32_t OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel, const std::vector<uint8_t> & orc_Key,
+   int32_t OsySecurityAccessSendKey(const uint8_t ou8_SecurityLevel, const std::vector<uint8_t> & orc_AuthenticationKey,
+                                    const uint32_t ou32_SecurityKey,
+                                    const std::vector<uint8_t> & orc_TrafficEncryptionPublicClientKey,
+                                    std::vector<uint8_t> & orc_TrafficEncryptionPublicServerKey,
                                     uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestDownload(const uint32_t ou32_StartAddress, const uint32_t ou32_Size,
                               uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestFileTransfer(const stw::scl::C_SclString & orc_FilePath, const uint32_t ou32_FileSize,
                                   uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode = NULL);
-   int32_t OsyTransferData(const uint8_t ou8_BlockSequenceCounter, std::vector<uint8_t> & orc_Data,
+   int32_t OsyTransferData(const uint8_t ou8_BlockSequenceCounter, const std::vector<uint8_t> & orc_Data,
                            uint8_t * const opu8_NrCode = NULL);
    int32_t OsyRequestTransferExitAddressBased(const bool oq_SendSignatureBlockAddress,
                                               const uint32_t ou32_SignatureBlockAddress,
@@ -403,15 +417,22 @@ public:
    int32_t OsyFactoryMode(const uint8_t ou8_Operation, uint8_t * const opu8_NrCode = NULL);
 
    //Security
-   int32_t OsyReadCertificateSerialNumber(std::vector<uint8_t> & orc_SerialNumber, uint8_t * const opu8_NrCode = NULL);
-   int32_t OsyWriteSecurityKey(const std::vector<uint8_t> & orc_PublicKeyModulus,
-                               const std::vector<uint8_t> & orc_PublicKeyExponent,
-                               const std::vector<uint8_t> & orc_CertificateSerialNumber,
-                               uint8_t * const opu8_NrCode = NULL);
-   int32_t OsyReadSecurityActivation(bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
-                                     uint8_t * const opu8_NrCode = NULL);
-   int32_t OsyWriteSecurityActivation(const bool oq_SecurityOn, const uint8_t ou8_SecurityAlgorithm,
-                                      uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyReadAuthenticationCertificateSerialNumber(std::vector<uint8_t> & orc_SerialNumber,
+                                                        uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyReadAuthenticationCertificateSerialNumberL7(std::vector<uint8_t> & orc_SerialNumber,
+                                                          uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyWriteSecurityAuthenticationKey(const std::vector<uint8_t> & orc_PublicKeyModulus,
+                                             const std::vector<uint8_t> & orc_PublicKeyExponent,
+                                             const std::vector<uint8_t> & orc_CertificateSerialNumber,
+                                             uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyReadSecurityAuthenticationActivation(bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+                                                   uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyWriteSecurityAuthenticationActivation(const bool oq_SecurityOn, const uint8_t ou8_SecurityAlgorithm,
+                                                    uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyReadSecurityTrafficEncryptionActivation(bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+                                                      uint8_t * const opu8_NrCode = NULL);
+   int32_t OsyWriteSecurityTrafficEncryptionActivation(const bool oq_SecurityOn, const uint8_t ou8_SecurityAlgorithm,
+                                                       uint8_t * const opu8_NrCode = NULL);
    int32_t OsyReadDebuggerEnabled(bool & orq_DebuggerEnabled, uint8_t * const opu8_NrCode = NULL);
    int32_t OsyWriteDebuggerEnabled(const bool oq_DebuggerEnabled, uint8_t * const opu8_NrCode = NULL);
 
@@ -419,8 +440,13 @@ public:
    int32_t OsyTesterPresent(const uint8_t ou8_SuppressResponseMsg, uint8_t * const opu8_NrCode = NULL);
    int32_t OsyEcuReset(const uint8_t ou8_ResetType = C_OscProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON);
 
+   //SSL utility:
+   C_OscProtocolSecuritySubLayer * pc_SecuritySubLayer;
+
    // Default Timeout
    static const uint32_t hu32_DEFAULT_TIMEOUT = 1000U; // In ms
+   // Timeout for ReadFlashBlockData
+   static const uint32_t hu32_READ_FLASHBLOCK_DATA_TIMEOUT = 5000U; // In ms
    // Cyclic time till the registered function mpr_OnOsyWaitTime will be called in m_PollForSpecificServiceResponse
    static const uint32_t hu32_DEFAULT_HANDLE_WAIT_TIME = 2000U; // In ms
    // Sessions for service OsyDiagnosticSessionControl
@@ -441,6 +467,8 @@ public:
    static const uint8_t hu8_NR_CODE_INVALID_KEY                        = 0x35U;
    static const uint8_t hu8_NR_CODE_EXCEEDED_NUMBER_OF_ATTEMPTS        = 0x36U;
    static const uint8_t hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED    = 0x37U;
+   static const uint8_t hu8_NR_SECURE_DATA_TRANSMISSION_NOT_ALLOWED    = 0x39U;
+   static const uint8_t hu8_NR_SECURE_DATA_VERIFICATION_FAILED         = 0x3AU;
    static const uint8_t hu8_NR_CODE_UPLOAD_DOWNLOAD_NOT_ACCEPTED       = 0x70U;
    static const uint8_t hu8_NR_CODE_GENERAL_PROGRAMMING_FAILURE        = 0x72U;
    static const uint8_t hu8_NR_CODE_RESPONSE_PENDING                   = 0x78U;
@@ -460,4 +488,4 @@ public:
 }
 } //end of namespace
 
-#endif // C_OscPROTOCOLDRIVEROSY_HPP
+#endif

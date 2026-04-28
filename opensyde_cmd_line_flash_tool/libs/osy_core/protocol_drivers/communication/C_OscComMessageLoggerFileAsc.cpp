@@ -331,7 +331,7 @@ C_SclString C_OscComMessageLoggerFileAsc::mh_GetAscTimeString(void)
    c_Temp.PrintFormatted("%.2d", c_Time.tm_sec);
    c_Result += c_Temp + ".";
    // Get the milliseconds
-   c_Temp.PrintFormatted("%.3d", u32_TimeMs % 1000U);
+   c_Temp.PrintFormatted("%.3u", u32_TimeMs % 1000U);
    c_Result += c_Temp + " ";
    c_Result += C_SclString::IntToStr(1900 + c_Time.tm_year);
 

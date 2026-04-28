@@ -67,10 +67,6 @@ C_SdNdeDalTabContentWidget::C_SdNdeDalTabContentWidget(QWidget * const opc_Paren
            &C_SdNdeDalTabContentWidget::SetNodeDataLoggerJob);
    connect(this->mpc_Ui->pc_LogJobsWidget, &C_SdNdeDalLogJobsWidget::SigNumLogJobsChanged,
            this, &C_SdNdeDalTabContentWidget::m_NumDataLoggersChanged);
-
-   connect(this->mpc_Ui->pc_LogJobDataSelectionWidget, &C_SdNdeDalLogJobDataSelectionWidget::SigNumElementsChanged,
-           this->mpc_Ui->pc_LogJobPropertiesWidget,
-           &C_SdNdeDalLogJobPropertiesWidget::ReloadAdditionalTrigger);
    connect(this->mpc_Ui->pc_LogJobPropertiesWidget, &C_SdNdeDalLogJobPropertiesWidget::SigLogJobNameModified,
            this->mpc_Ui->pc_LogJobsWidget, &C_SdNdeDalLogJobsWidget::OnLogJobNameModified);
    connect(this->mpc_Ui->pc_LogJobsWidget, &C_SdNdeDalLogJobsWidget::SigShowOverview,

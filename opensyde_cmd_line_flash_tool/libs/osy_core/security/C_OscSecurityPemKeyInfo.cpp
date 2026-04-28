@@ -3,7 +3,12 @@
    \file
    \brief       PEM key info part
 
-   PEM key info part
+   Container class for storing key information from a .pem file:
+   * private key
+   * certificate information:
+   ** public key
+   ** "key usage" and "extended key usage" flags
+
 
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -32,6 +37,43 @@ using namespace stw::opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Default constructor of utility class
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OscSecurityPemKeyInfo::C_CertificateKeyUsageInformation::C_CertificateKeyUsageInformation()
+{
+   this->Clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Preset all flags to false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSecurityPemKeyInfo::C_CertificateKeyUsageInformation::Clear()
+{
+   q_KeyUsageDefined = false;
+   q_KeyUsageDigitalSignature = false;
+   q_KeyUsageNonRepudiation = false;
+   q_KeyUsageKeyEncipherment = false;
+   q_KeyUsageDataEncipherment = false;
+   q_KeyUsageKeyAgreement = false;
+   q_KeyUsageKeyCertSign = false;
+   q_KeyUsageCrlSign = false;
+   q_KeyUsageEncipherOnly = false;
+   q_KeyUsageDecipherOnly = false;
+
+   q_ExtendedKeyUsageDefined = false;
+   q_ExtendedKeyUsageServerAuth = false;
+   q_ExtendedKeyUsageClientAuth = false;
+   q_ExtendedKeyUsageEmailProtection = false;
+   q_ExtendedKeyUsageCodeSigning = false;
+   q_ExtendedKeyUsageOcspSigning = false;
+   q_ExtendedKeyUsageTimeStamping = false;
+   q_ExtendedKeyUsageDvcs = false;
+   q_ExtendedKeyUsageAnyExtendedKeyUsage = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -45,71 +87,93 @@ C_OscSecurityPemKeyInfo::C_OscSecurityPemKeyInfo()
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscSecurityPemKeyInfo::Clear()
 {
-   this->mc_PrivKeyTextDecoded.clear();
-   this->mc_PubKeySerialNumber.clear();
-   this->mc_PubKeySerialNumber.clear();
+   this->mc_KeyUsageInformation.Clear();
+   this->mc_PrivateKey.clear();
+   this->mc_X509CertificateData.clear();
+   this->mc_CertificateSerialNumber.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get private key text decoded
 
+   Get private key value.
+   Format: binary array
+
    \return
    Priv key text decoded
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPrivKeyTextDecoded() const
+const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPrivateKey() const
 {
-   return this->mc_PrivKeyTextDecoded;
+   return this->mc_PrivateKey;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get pub key text decoded
+/*! \brief  Get X.509 certificate data
+
+   Return the binary representation of the whole X.509 "Certificate" section of a pem file.
+   i.e. the base64 data converted to binary form.
 
    \return
-   Pub key text decoded
+   Certificate data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPubKeyTextDecoded() const
+const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetX509CertificateData() const
 {
-   return this->mc_PubKeyTextDecoded;
+   return this->mc_X509CertificateData;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get public key serial number
+/*! \brief  Get certificate serial number
+
+   Format: binary array
 
    \return
-   Pub key serial number
+   Certificate serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPubKeySerialNumber() const
+const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetCertificateSerialNumber() const
 {
-   return this->mc_PubKeySerialNumber;
+   return this->mc_CertificateSerialNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check valid key
-
-   \param[in,out]  orc_ErrorMessage       Error message
-   \param[in]      oq_CheckSerialNumber   Check serial number
+/*! \brief  Get key usage information
 
    \return
-   Flags
-
-   \retval   True    Is valid key
-   \retval   False   Is not valid key
+   Key usage information
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OscSecurityPemKeyInfo::CheckValidKey(std::string & orc_ErrorMessage, const bool oq_CheckSerialNumber) const
+const C_OscSecurityPemKeyInfo::C_CertificateKeyUsageInformation & C_OscSecurityPemKeyInfo::GetKeyUsageInformation()
+const
+{
+   return mc_KeyUsageInformation;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check for presence of key information
+
+   Check whether the instance contains non-zero length certificate and private key information.
+   If information is missing the function will fill a text string with details.
+
+   \param[out]     orc_ErrorMessage       Details about what information is missing
+   \param[in]      oq_CheckSerialNumber   true: also check for non-zero length certificate serial number
+
+   \retval   true    All requested information present
+   \retval   false   At least one piece of information (certificate, private key, serial number) not present
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscSecurityPemKeyInfo::AreKeysAvailable(std::string & orc_ErrorMessage, const bool oq_CheckSerialNumber) const
 {
    bool q_Retval = false;
 
-   if (this->GetPubKeyTextDecoded().size() > 0UL)
+   if (this->GetX509CertificateData().size() > 0UL)
    {
-      if (this->GetPrivKeyTextDecoded().size() > 0UL)
+      if (this->GetPrivateKey().size() > 0UL)
       {
          if (oq_CheckSerialNumber)
          {
-            if (this->GetPubKeySerialNumber().size() > 0UL)
+            if (this->GetCertificateSerialNumber().size() > 0UL)
             {
                q_Retval = true;
             }
@@ -138,32 +202,57 @@ bool C_OscSecurityPemKeyInfo::CheckValidKey(std::string & orc_ErrorMessage, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set private key text decoded
 
+   Set private key value.
+   Format: binary array
+
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscSecurityPemKeyInfo::SetPrivKeyTextDecoded(const std::vector<uint8_t> & orc_Value)
+void C_OscSecurityPemKeyInfo::SetPrivateKey(const std::vector<uint8_t> & orc_Value)
 {
-   this->mc_PrivKeyTextDecoded = orc_Value;
+   this->mc_PrivateKey = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set public key text decoded
+/*! \brief  Set X.509 certificate data
+
+   Set X.509 certificate value.
+   Set the binary representation of the whole X.509 "Certificate" section of a pem file.
+
+   Technically:
+   Everything between the "BEGIN CERTIFICATE" and "END CERTIFICATE" lines converted from base64 to binary.
+
+   This will typically include the public key, certificate information (e.g. serial number, flags).
 
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscSecurityPemKeyInfo::SetPubKeyTextDecoded(const std::vector<uint8_t> & orc_Value)
+void C_OscSecurityPemKeyInfo::SetX509CertificateData(const std::vector<uint8_t> & orc_Value)
 {
-   this->mc_PubKeyTextDecoded = orc_Value;
+   this->mc_X509CertificateData = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set public key serial number
+/*! \brief  Set certificate serial number
+
+   Format: binary array describing a large integer (big endian; without leading zeroes)
 
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OscSecurityPemKeyInfo::SetPubKeySerialNumber(const std::vector<uint8_t> & orc_Value)
+void C_OscSecurityPemKeyInfo::SetCertificateSerialNumber(const std::vector<uint8_t> & orc_Value)
 {
-   this->mc_PubKeySerialNumber = orc_Value;
+   this->mc_CertificateSerialNumber = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set key usage information
+
+   \param[in]  orc_KeyUsage   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSecurityPemKeyInfo::SetKeyUsageInformation(
+   const C_OscSecurityPemKeyInfo::C_CertificateKeyUsageInformation & orc_KeyUsage)
+{
+   this->mc_KeyUsageInformation = orc_KeyUsage;
 }

@@ -63,7 +63,6 @@ public:
    virtual void RemoveFile(C_SyvUpPacListNodeItemWidget * const opc_App);
    void RemoveAllFiles(void);
    virtual void UpdateDeviceInformation(const stw::opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceInformation);
-   virtual void OpenPemFileSettings(C_SyvUpPacListNodeItemWidget * const opc_App);
    virtual void PrepareExportConfig(stw::opensyde_gui_logic::C_SyvUpPacConfigNode & orc_NodeConfig) const = 0;
    virtual void LoadImportConfig(const stw::opensyde_gui_logic::C_SyvUpPacConfig & orc_Config) = 0;
    virtual uint32_t Type(void) const = 0;
@@ -142,9 +141,6 @@ private:
    void m_ButtonAddNewFile(void);
    void m_RestartMovie(void);
    void m_UpdateLabelNoFiles(void);
-
-   static void mh_FillDoFlashWithPemStates(const C_SyvUpPacListNodeItemWidget * const opc_App,
-                                           stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_DoFlash);
 
    uint32_t mu32_PositionNumber;
    uint32_t mu32_State;

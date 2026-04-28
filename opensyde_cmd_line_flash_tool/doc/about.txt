@@ -18,12 +18,12 @@ Features:
 * Report progress to command line and exit with defined result codes
 
 Non-Features (that are all supported in openSYDE GUI and SYDEsup):
-* Only address based targets supported (no filebased support)
+* Only address based targets supported (no file based support)
 * Only CAN bus supported (no Ethernet support)
-* Only local busses are supported (no routing)
-* Only openSYDE protocol support
-* Only HEX files support
-* No security support (public/private key authentication)
+* Only local buses are supported (no routing)
+* Only openSYDE protocol support (no STW Flashloader legacy support)
+* Only HEX files support (no .syde_psi NVM parameter files)
+* No secure authentication support (public/private key authentication)
 * No device name check (HEX file device name vs. device name)
 * No check if update is necessary
 

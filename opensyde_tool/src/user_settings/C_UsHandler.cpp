@@ -1320,7 +1320,7 @@ void C_UsHandler::AddToRecentProjects(const QString & orc_Str)
    QString c_Copy = orc_Str;
 
    //Always use same notation
-   c_Copy.replace(QChar('\\'), QChar('/'));
+   c_Copy.replace(static_cast<QChar>('\\'), static_cast<QChar>('/'));
    //Check if new -> else erase then add again (Should be at top)
    RemoveOfRecentProjects(c_Copy);
    //Add

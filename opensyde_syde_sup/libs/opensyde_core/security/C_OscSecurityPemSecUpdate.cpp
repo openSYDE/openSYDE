@@ -96,7 +96,7 @@ int32_t C_OscSecurityPemSecUpdate::LoadFromFile(const std::string & orc_FileName
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Read private key
 
-   Here: we expect an elliptic curve private key
+   Here: we extract an elliptic curve private key and store it in mc_KeyInfo.
 
    \param[in]      orc_FileContent     File content
    \param[in,out]  orc_ErrorMessage    Error message
@@ -121,13 +121,20 @@ int32_t C_OscSecurityPemSecUpdate::m_ReadPrivateKey(const std::vector<uint8_t> &
       EVP_PKEY * const pc_PrivKey = PEM_read_bio_PrivateKey(pc_PrivKeyFile, NULL, NULL, NULL);
 
       BIO_free(pc_PrivKeyFile);
-      if (pc_PrivKey != NULL)
+      if ((pc_PrivKey != NULL) && (EVP_PKEY_is_a(pc_PrivKey, "EC") == 1))
       {
          //extract the ECDSA key from the private key portion
+         //This approach uses deprecated API
+         //But the newer suggested API (EVP_PKEY_get_raw_private_key)
+         // will not work with secp256r1 keys. At least up to OpenSSL 3.6:
+         // "This function only works for algorithms that support raw private keys."
+         //Another alternative approach via the OSSL API also failed:
+         // EVP_PKEY_todata fails with the key extracted from .pem file.
+         //So keep with the deprecated but straightforward approach for now.
          EC_KEY * const pc_EcdsaKey = EVP_PKEY_get1_EC_KEY(pc_PrivKey);
          if (pc_EcdsaKey != NULL)
          {
-            //get the private key as BIGNUM (needed for later conversion)
+            //Get the private key as BIGNUM (needed for later conversion)
             const BIGNUM * const pc_PrivBigNum = EC_KEY_get0_private_key(pc_EcdsaKey);
 
             if (pc_PrivBigNum != NULL)

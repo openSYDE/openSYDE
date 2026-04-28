@@ -408,8 +408,8 @@ void C_SdNdeHalcChannelTreeModel::CheckError(const uint32_t ou32_DomainIndex)
 
             // update domain and channel visualization
             Q_EMIT (dataChanged(GetModelIndexFromIndexes(ou32_DomainIndex, 0, true),
-                                GetModelIndexFromIndexes(ou32_DomainIndex, pc_Domain->c_ChannelConfigs.size(),
-                                                         true),
+                                GetModelIndexFromIndexes(
+                                   ou32_DomainIndex, static_cast<uint32_t>(pc_Domain->c_ChannelConfigs.size()), true),
                                 QVector<int32_t>() << static_cast<int32_t>(Qt::DecorationRole)));
             Q_EMIT (dataChanged(GetModelIndexFromIndexes(ou32_DomainIndex, 0 /*irrelevant*/, false),
                                 GetModelIndexFromIndexes(ou32_DomainIndex, 0 /*irrelevant*/, false),

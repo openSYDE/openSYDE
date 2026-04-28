@@ -247,12 +247,15 @@ void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active   Flag if connection is active or not active now
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active) const
+void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                      bool> & orc_MappingNodeToTrafficEncryptionStatus)
+const
 {
-   this->mpc_Content->ConnectionActiveChanged(oq_Active);
+   this->mpc_Content->ConnectionActiveChanged(oq_Active, orc_MappingNodeToTrafficEncryptionStatus);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

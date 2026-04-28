@@ -542,7 +542,7 @@ uint32_t C_SdBueJ1939AddMessagesFromCatalogTreeModel::GetCheckedItemCount() cons
    // Only message items are checkable. Hence fetches all checked messages.
    this->GetCheckedItems(c_MessageIndices, c_SignalIndices);
 
-   return c_MessageIndices.size();
+   return static_cast<uint32_t>(c_MessageIndices.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

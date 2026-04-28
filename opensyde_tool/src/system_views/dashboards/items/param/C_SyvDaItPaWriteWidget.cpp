@@ -427,7 +427,7 @@ void C_SyvDaItPaWriteWidget::m_WriteChangedElementsOfNode(void)
                else
                {
                   this->mpc_Ui->pc_ProgressWrite->SetProgress((this->mu32_CurrentNode * 100U) /
-                                                              this->mc_AllNodeIndexes.size());
+                                                              static_cast<uint32_t>(this->mc_AllNodeIndexes.size()));
                }
             }
             else
@@ -543,7 +543,7 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
                else
                {
                   this->mpc_Ui->pc_ProgressRead->SetProgress((this->mu32_CurrentNode * 100U) /
-                                                             this->mc_AllNodeIndexes.size());
+                                                             static_cast<uint32_t>(this->mc_AllNodeIndexes.size()));
                }
             }
             else
@@ -825,7 +825,7 @@ void C_SyvDaItPaWriteWidget::m_WriteCrcOfNode(void)
                else
                {
                   this->mpc_Ui->pc_ProgressCrc->SetProgress((this->mu32_CurrentNode * 100U) /
-                                                            this->mc_AllNodeIndexes.size());
+                                                            static_cast<uint32_t>(this->mc_AllNodeIndexes.size()));
                }
             }
             else

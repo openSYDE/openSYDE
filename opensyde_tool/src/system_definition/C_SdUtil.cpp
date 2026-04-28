@@ -404,7 +404,7 @@ void C_SdUtil::h_SortSourceDescending(std::vector<uint32_t> & orc_Source, std::v
       c_NewSource.reserve(orc_Source.size());
       c_NewTarget.reserve(orc_Target.size());
       //Reposition
-      for (uint32_t u32_It = c_IndexMap.size(); u32_It > 0; --u32_It)
+      for (uint32_t u32_It = static_cast<uint32_t>(c_IndexMap.size()); u32_It > 0; --u32_It)
       {
          const uint32_t u32_PreviousIndex = u32_It - 1U;
          if (c_IndexMap[u32_PreviousIndex] >= 0)
@@ -605,8 +605,8 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OscNode & orc_Node, const C_O
 
    //original(when the project has been saved) devdef size of the specific element
    uint32_t u32_InterfaceSize = (ore_BusType == C_OscSystemBus::E_Type::eETHERNET) ?
-                                c_EthernetInterfaces.size() :
-                                c_CanInterfaces.size();
+                                static_cast<uint32_t>(c_EthernetInterfaces.size()) :
+                                static_cast<uint32_t>(c_CanInterfaces.size());
 
    u32_InterfaceSize = (u32_NumBusses <= u32_InterfaceSize) ? u32_NumBusses : u32_InterfaceSize;
 
@@ -981,8 +981,9 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
          //Extended type
          if (orc_Message.q_IsExtended == true)
          {
-            c_Info.push_back(C_GtGetText::h_GetText("Message extended flag changed from \"extended\" to \"standard\" "
-                                                    "due to ECoS protocol restrictions."));
+            c_Info.emplace_back(C_GtGetText::h_GetText(
+                                   "Message extended flag changed from \"extended\" to \"standard\" "
+                                   "due to ECoS protocol restrictions."));
             orc_Message.q_IsExtended = false;
          }
          //CAN ID
@@ -1010,8 +1011,9 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
          //Extended type
          if (orc_Message.q_IsExtended == false)
          {
-            c_Info.push_back(C_GtGetText::h_GetText("Message extended flag changed from \"standard\" to \"extended\" "
-                                                    "due to J1939 protocol restrictions."));
+            c_Info.emplace_back(C_GtGetText::h_GetText(
+                                   "Message extended flag changed from \"standard\" to \"extended\" "
+                                   "due to J1939 protocol restrictions."));
             orc_Message.q_IsExtended = true;
          }
          break;
@@ -1829,7 +1831,7 @@ QString C_SdUtil::h_GetToolTipContentDpList(const uint32_t & oru32_NodeIndex, co
    }
 
    // datasets
-   const uint32_t u32_DatasetNumber = pc_DpList->c_DataSets.size();
+   const uint32_t u32_DatasetNumber = static_cast<uint32_t>(pc_DpList->c_DataSets.size());
 
    if (u32_DatasetNumber == 0)
    {
@@ -2213,7 +2215,7 @@ void C_SdUtil::h_SortIndicesDescendingAndSync(std::vector<uint32_t> & orc_Indice
       c_IndicesTmp.reserve(orc_IndicesTmp.size());
       c_OscContentTmp.reserve(orc_OscContentTmp.size());
       c_UiContentTmp.reserve(orc_UiContentTmp.size());
-      for (uint32_t u32_ItIndex = c_IndexMap.size(); u32_ItIndex > 0; --u32_ItIndex)
+      for (uint32_t u32_ItIndex = static_cast<uint32_t>(c_IndexMap.size()); u32_ItIndex > 0; --u32_ItIndex)
       {
          if (c_IndexMap[static_cast<uint32_t>(u32_ItIndex - 1U)] >= 0)
          {
@@ -2507,8 +2509,8 @@ int32_t C_SdUtil::h_GetMessageCountOfNode(const uint32_t ou32_NodeIndex, const u
 
                   if (oe_Protocol != C_OscCanProtocol::eCAN_OPEN)
                   {
-                     const uint32_t u32_SignalSize1 = pc_DataPoolList1->c_Elements.size();
-                     const uint32_t u32_SignalSize2 = pc_DataPoolList2->c_Elements.size();
+                     const uint32_t u32_SignalSize1 = static_cast<uint32_t>(pc_DataPoolList1->c_Elements.size());
+                     const uint32_t u32_SignalSize2 = static_cast<uint32_t>(pc_DataPoolList2->c_Elements.size());
 
                      oru32_RxMessageCount += static_cast<uint32_t>(rc_MessageContainer.c_RxMessages.size());
                      oru32_TxMessageCount += static_cast<uint32_t>(rc_MessageContainer.c_TxMessages.size());
@@ -2544,7 +2546,7 @@ int32_t C_SdUtil::h_GetMessageCountOfNode(const uint32_t ou32_NodeIndex, const u
 
                            if (opu32_SignalCount != NULL)
                            {
-                              *opu32_SignalCount += rc_Msg.c_Signals.size();
+                              *opu32_SignalCount += static_cast<uint32_t>(rc_Msg.c_Signals.size());
                            }
                         }
                      }
@@ -2572,7 +2574,7 @@ int32_t C_SdUtil::h_GetMessageCountOfNode(const uint32_t ou32_NodeIndex, const u
 
                            if (opu32_SignalCount != NULL)
                            {
-                              *opu32_SignalCount += rc_Msg.c_Signals.size();
+                              *opu32_SignalCount += static_cast<uint32_t>(rc_Msg.c_Signals.size());
                            }
                         }
                      }

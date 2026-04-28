@@ -252,9 +252,9 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       c_ToolTipText = this->mpc_Ui->pc_TextEditDpComment->toPlainText();
       c_ToolTipText += C_GtGetText::h_GetText("\n\nVersion: ");
       c_ToolTipText += static_cast<QString>("v%1.%2r%3").
-                       arg(pc_OscDataPool->au8_Version[0], 2, 10, QChar('0')).
-                       arg(pc_OscDataPool->au8_Version[1], 2, 10, QChar('0')).
-                       arg(pc_OscDataPool->au8_Version[2], 2, 10, QChar('0'));
+                       arg(pc_OscDataPool->au8_Version[0], 2, 10, static_cast<QChar>('0')).
+                       arg(pc_OscDataPool->au8_Version[1], 2, 10, static_cast<QChar>('0')).
+                       arg(pc_OscDataPool->au8_Version[2], 2, 10, static_cast<QChar>('0'));
 
       c_ToolTipText += C_GtGetText::h_GetText("\n\nConfiguration:\n");
 

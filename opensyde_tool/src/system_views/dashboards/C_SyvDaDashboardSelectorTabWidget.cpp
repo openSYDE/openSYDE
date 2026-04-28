@@ -29,6 +29,7 @@
 #include "C_SclString.hpp"
 #include "constants.hpp"
 #include "C_SyvDaDashboardScreenshot.hpp"
+#include "C_SyvDaTrafficEncryptionStatusHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
@@ -241,7 +242,7 @@ void C_SyvDaDashboardSelectorTabWidget::SetViewIndex(const uint32_t ou32_Value)
          uint32_t u32_LastIteration;
          //Copy all indices to add
          std::vector<uint32_t> c_Iteration = c_LeftToAdd;
-         u32_LastIteration = c_LeftToAdd.size();
+         u32_LastIteration = static_cast<uint32_t>(c_LeftToAdd.size());
          //Reset next indices to add
          c_LeftToAdd.clear();
          for (uint32_t u32_ItDashboard = 0; u32_ItDashboard < c_Iteration.size(); ++u32_ItDashboard)
@@ -445,6 +446,9 @@ void C_SyvDaDashboardSelectorTabWidget::RegisterWidgets(C_SyvComDriverDiag & orc
 void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Active)
 {
    int32_t s32_Counter;
+   const QMap<uint32_t,
+              bool> c_MappingNodeToTrafficEncryptionStatus =
+      C_SyvDaTrafficEncryptionStatusHelper::h_GetMappingNodeToTrafficEncryptionStatus(this->mu32_ViewIndex, oq_Active);
 
    this->mq_Connected = oq_Active;
 
@@ -455,14 +459,14 @@ void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Ac
 
       if (pc_WidgetRef != NULL)
       {
-         pc_WidgetRef->ConnectionActiveChanged(oq_Active);
+         pc_WidgetRef->ConnectionActiveChanged(oq_Active, c_MappingNodeToTrafficEncryptionStatus);
       }
    }
 
    for (QList<C_SyvDaTearOffWidget *>::const_iterator c_ItItem = this->mc_TearedOffWidgets.begin();
         c_ItItem != this->mc_TearedOffWidgets.end(); ++c_ItItem)
    {
-      (*c_ItItem)->ConnectionActiveChanged(oq_Active, false);
+      (*c_ItItem)->ConnectionActiveChanged(oq_Active, c_MappingNodeToTrafficEncryptionStatus, false);
    }
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
@@ -1289,6 +1293,10 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32_t ou32_Data
       {
          QPoint c_Pos = orc_Pos;
          QSize c_Size = orc_Size;
+         const QMap<uint32_t,
+                    bool> c_MappingNodeToTrafficEncryptionStatus =
+            C_SyvDaTrafficEncryptionStatusHelper::h_GetMappingNodeToTrafficEncryptionStatus(this->mu32_ViewIndex,
+                                                                                            this->mq_Connected);
          //Pop up
          C_SyvDaTearOffWidget * const pc_Widget = new C_SyvDaTearOffWidget(this->mu32_ViewIndex, ou32_DataIndex,
                                                                            pc_DashBoard->GetName(), opc_Widget);
@@ -1319,12 +1327,13 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32_t ou32_Data
             // Only check the coordinates when loading the tear off state. It can be possible, that the
             // monitor setup of the user has changed
             C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(
-               c_Pos, c_Size, QGuiApplication::screens().indexOf(this->screen()), QSize(1000, 800));
+               c_Pos, c_Size, static_cast<uint32_t>(QGuiApplication::screens().indexOf(this->screen())),
+               QSize(1000, 800));
          }
          pc_Widget->setGeometry(QRect(c_Pos, c_Size));
          pc_Widget->SetEditMode(this->mq_EditMode);
          pc_Widget->SetEnabled(!this->mq_Connected);
-         pc_Widget->ConnectionActiveChanged(this->mq_Connected, true);
+         pc_Widget->ConnectionActiveChanged(this->mq_Connected, c_MappingNodeToTrafficEncryptionStatus, true);
          pc_Widget->SetDarkMode(pc_View->GetDarkModeActive());
          //Window title
          pc_Widget->setWindowTitle("openSYDE - " + pc_DashBoard->GetName());
@@ -1364,7 +1373,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Da
 
    if (pc_View != NULL)
    {
-      const uint32_t u32_Index = pc_View->GetDashboards().size();
+      const uint32_t u32_Index = static_cast<uint32_t>(pc_View->GetDashboards().size());
       if (C_PuiSvHandler::h_GetInstance()->InsertDashboard(this->mu32_ViewIndex, u32_Index, orc_Data, true,
                                                            opc_Rails) == C_NO_ERR)
       {
@@ -1421,7 +1430,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const int32_t os32_TabIndex)
                if (pc_View != NULL)
                {
                   //Use free index (there might be other dashboards!)
-                  const uint32_t u32_FreeIndex = pc_View->GetDashboards().size();
+                  const uint32_t u32_FreeIndex = static_cast<uint32_t>(pc_View->GetDashboards().size());
                   //Insert one after the last one (least conflict potential)
                   C_PuiSvDashboard c_DefaultDashboard;
                   c_DefaultDashboard.SetName(C_GtGetText::h_GetText("Dashboard"));

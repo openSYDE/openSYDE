@@ -112,7 +112,7 @@ public:
    int32_t SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                        const bool oq_SkipFile);
    int32_t SetNodeUpdateInformationStates(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                          const stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity, const stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger);
+                                          const stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecureAuthentication oe_StateSecureAuthentication, const stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger, const opensyde_core::C_OscViewNodeUpdate::E_StateTrafficEncryption oe_StateTrafficEncryption);
    int32_t SetNodeUpdateInformationParamInfoContent(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                     const uint32_t ou32_Index, const QString & orc_FilePath,
                                                     const uint32_t ou32_LastKnownCrc);

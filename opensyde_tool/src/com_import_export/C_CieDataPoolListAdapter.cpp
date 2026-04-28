@@ -362,7 +362,7 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
 
       mh_FillUpUiStructureForSignals(*c_MessageIter, false, c_DefaultUiSignal, orc_DataPoolListStructure,
                                      pu8_DefaultMinMaxValuesUsed);
-      u32_SignalCounter += c_MessageIter->c_Signals.size();
+      u32_SignalCounter += static_cast<uint32_t>(c_MessageIter->c_Signals.size());
       orc_DataPoolListStructure.c_Ui.c_UiRxMessageData.push_back(c_UiMessage);
    }
    // Tx messages
@@ -400,7 +400,7 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
 
       mh_FillUpUiStructureForSignals(*c_MessageIter, true, c_DefaultUiSignal, orc_DataPoolListStructure,
                                      pu8_DefaultMinMaxValuesUsed);
-      u32_SignalCounter += c_MessageIter->c_Signals.size();
+      u32_SignalCounter += static_cast<uint32_t>(c_MessageIter->c_Signals.size());
       orc_DataPoolListStructure.c_Ui.c_UiTxMessageData.push_back(c_UiMessage);
    }
 

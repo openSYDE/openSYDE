@@ -370,10 +370,12 @@ bool C_GiSvDaToggleBase::CallProperties(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
+void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                  bool> & orc_MappingNodeToTrafficEncryptionStatus)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
@@ -399,7 +401,7 @@ void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
             this->mpc_CheckBoxWidget->setChecked(c_VariantValue.toBool());
          }
 
-         C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
+         C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active, orc_MappingNodeToTrafficEncryptionStatus);
 
          if (pc_Box->e_ElementWriteMode == C_PuiSvDbToggle::eWM_ON_CHANGE)
          {

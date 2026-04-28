@@ -144,7 +144,7 @@ C_SclString C_OscComMessageLoggerData::h_GetTimestampAsString(const uint64_t ou6
    u64_TimeStampTemp /= 60U; // To hours
    u32_Hours = static_cast<uint32_t>(u64_TimeStampTemp);
 
-   c_TimeStamp.PrintFormatted("%02d:%02d:%02d.%03d.%03d",
+   c_TimeStamp.PrintFormatted("%02u:%02d:%02d.%03d.%03d",
                               u32_Hours, u8_Min, u8_Sec, u16_MilliSec, u16_MicroSec);
 
    return c_TimeStamp;

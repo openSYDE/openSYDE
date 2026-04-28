@@ -38,7 +38,7 @@ public:
       eFTP_FILE_BASED
    };
 
-   enum E_StateSecurity
+   enum E_StateSecureAuthentication
    {
       eST_SEC_NO_CHANGE,
       eST_SEC_ACTIVATE,
@@ -50,6 +50,13 @@ public:
       eST_DEB_NO_CHANGE,
       eST_DEB_ACTIVATE,
       eST_DEB_DEACTIVATE
+   };
+
+   enum E_StateTrafficEncryption
+   {
+      eST_TEN_NO_CHANGE,
+      eST_TEN_ACTIVATE,
+      eST_TEN_DEACTIVATE
    };
 
    void CalcHash(uint32_t & oru32_HashValue) const;
@@ -86,8 +93,10 @@ public:
    bool GetSkipUpdateOfPemFile(void) const;
 
    //State elements
-   void SetStates(const E_StateSecurity oe_StateSecurity, const E_StateDebugger oe_StateDebugger);
-   void GetStates(E_StateSecurity & ore_StateSecurity, E_StateDebugger & ore_StateDebugger) const;
+   void SetStates(const E_StateSecureAuthentication oe_StateSecureAuthentication,
+                  const E_StateDebugger oe_StateDebugger, const E_StateTrafficEncryption oe_StateTrafficEncryption);
+   void GetStates(E_StateSecureAuthentication & ore_StateSecureAuthentication, E_StateDebugger & ore_StateDebugger,
+                  E_StateTrafficEncryption & ore_StateTrafficEncryption) const;
 
    void OnSyncNodeApplicationAdded(const uint32_t ou32_ApplicationIndex,
                                    const C_OscNodeApplication::E_Type oe_ApplicationType,
@@ -125,8 +134,9 @@ private:
    stw::scl::C_SclString mc_PemFilePath;
    bool mq_SkipUpdateOfPemFile;
 
-   E_StateSecurity me_StateSecurity;
+   E_StateSecureAuthentication me_StateSecureAuthentication;
    E_StateDebugger me_StateDebugger;
+   E_StateTrafficEncryption me_StateTrafficEncryption;
 
    static const int32_t mhs32_PARAMETER_SET_INDEX = 2;
 

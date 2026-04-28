@@ -291,7 +291,9 @@ QVariant C_CamGenTableModel::headerData(const int32_t os32_Section, const Qt::Or
             c_Header = C_GtGetText::h_GetText("ECeS: When sending automatic calculation of the CRC and incrementing of "
                                               "the block counter is applied.\n"
                                               "ECoS: When sending the inverted second frame will be sent automatically "
-                                              "immediately after the first frame gets sent.");
+                                              "immediately after the first frame gets sent.\n\n"
+                                              "Note: This option is only available for protocol messages "
+                                              "added from openSYDE *syde_sysdef database.");
             break;
          default:
             tgl_assert(false);
@@ -487,7 +489,8 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const int32_t o
                      {
                         c_Tmp += " ";
                      }
-                     c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
+                     c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16,
+                                                             static_cast<QChar>('0')).toUpper();
                   }
                   c_Retval = c_Tmp;
                }
@@ -1132,7 +1135,8 @@ QString C_CamGenTableModel::UpdateDataForAutoProtocol(const QModelIndex & orc_In
          }
          else
          {
-            c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
+            c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16,
+                                                    static_cast<QChar>('0')).toUpper();
          }
       }
    }
@@ -1202,7 +1206,7 @@ std::vector<uint32_t> C_CamGenTableModel::m_PasteItems(const uint32_t ou32_Selec
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_CamGenTableModel::m_GetSizeItems(void) const
 {
-   return C_CamProHandler::h_GetInstance()->GetMessages().size();
+   return static_cast<uint32_t>(C_CamProHandler::h_GetInstance()->GetMessages().size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1256,7 +1260,7 @@ std::vector<uint32_t> C_CamGenTableModel::m_AddNewMessages(const uint32_t ou32_S
    }
    else
    {
-      u32_Index = C_CamProHandler::h_GetInstance()->GetMessages().size();
+      u32_Index = static_cast<uint32_t>(C_CamProHandler::h_GetInstance()->GetMessages().size());
    }
 
    if (orc_Data.size() > 0UL)

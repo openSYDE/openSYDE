@@ -54,7 +54,7 @@ C_SdNdeDalLogJobsListModel::C_SdNdeDalLogJobsListModel(QObject * const opc_Paren
 void C_SdNdeDalLogJobsListModel::UpdateData(const uint32_t ou32_NodeIndex)
 {
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
-   const uint32_t u32_LogJobCount = pc_Node->c_DataLoggerJobs.size();
+   const uint32_t u32_LogJobCount = static_cast<uint32_t>(pc_Node->c_DataLoggerJobs.size());
 
    this->mc_LogJobsList.clear();
    this->mc_LogJobsList.reserve(u32_LogJobCount);
@@ -230,7 +230,7 @@ bool C_SdNdeDalLogJobsListModel::setData(const QModelIndex & orc_Index, const QV
 int32_t C_SdNdeDalLogJobsListModel::rowCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
-   return this->mc_LogJobsList.size();
+   return static_cast<int32_t>(this->mc_LogJobsList.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

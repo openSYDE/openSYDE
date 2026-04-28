@@ -570,8 +570,11 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
 {
    C_OscCanMessageIdentificationIndices c_MessageId;
 
-   //If current selected
-   this->mpc_Ui->pc_SigPropertiesWidget->ReloadPosition();
+   if (this->mpc_Ui->pc_SigPropertiesWidget->isVisible())
+   {
+      //If current selected
+      this->mpc_Ui->pc_SigPropertiesWidget->ReloadPosition();
+   }
    //If not current selected
    if (this->m_GetMessageId(c_MessageId) == C_NO_ERR)
    {

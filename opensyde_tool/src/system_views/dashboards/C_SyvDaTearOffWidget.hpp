@@ -60,7 +60,9 @@ public:
    void Save(void) const;
    void HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) const;
    void RegisterWidgets(stw::opensyde_gui_logic::C_SyvComDriverDiag & orc_ComDriver) const;
-   void ConnectionActiveChanged(const bool oq_Active, const bool oq_WidgetTabOnly = false) const;
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus,
+                                const bool oq_WidgetTabOnly = false) const;
    void UpdateShowValues(void) const;
    void UpdateTransmissionConfiguration(void) const;
 

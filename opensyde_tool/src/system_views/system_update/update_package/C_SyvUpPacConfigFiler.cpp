@@ -373,9 +373,13 @@ void C_SyvUpPacConfigFiler::mh_SaveNodeUpdateInformationPem(const C_SyvUpPacConf
    orc_XmlParser.CreateNodeChild("path", orc_NodeConfig.c_PemFilePath.toStdString());
    orc_XmlParser.CreateAndSelectNodeChild("states");
    orc_XmlParser.CreateNodeChild("security",
-                                 C_OscViewFiler::h_PemFileStateSecurityToString(orc_NodeConfig.e_StateSecurity));
+                                 C_OscViewFiler::h_SecurityOptionAuthenticationToString(orc_NodeConfig.
+                                                                                        e_StateSecureAuthentication));
    orc_XmlParser.CreateNodeChild("debugger",
-                                 C_OscViewFiler::h_PemFileStateDebuggerToString(orc_NodeConfig.e_StateDebugger));
+                                 C_OscViewFiler::h_SecurityOptionDebuggerToString(orc_NodeConfig.e_StateDebugger));
+   orc_XmlParser.CreateNodeChild("traffic-encryption",
+                                 C_OscViewFiler::h_SecurityOptionEncryptionToString(orc_NodeConfig.
+                                                                                    e_StateTrafficEncryption));
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "pem-file");
    //Return
@@ -732,12 +736,13 @@ int32_t C_SyvUpPacConfigFiler::mh_LoadNodeUpdateInformationPemStates(C_SyvUpPacC
       s32_Retval = orc_XmlParser.SelectNodeChildError("security");
       if (s32_Retval == C_NO_ERR)
       {
-         C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity = C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
-         s32_Retval = C_OscViewFiler::h_StringToPemFileStateSecurity(
-            orc_XmlParser.GetNodeContent().c_str(), e_StateSecurity);
+         C_OscViewNodeUpdate::E_StateSecureAuthentication e_StateSecureAuthentication =
+            C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
+         s32_Retval = C_OscViewFiler::h_StringToSecurityOptionAuthentication(
+            orc_XmlParser.GetNodeContent().c_str(), e_StateSecureAuthentication);
          if (s32_Retval == C_NO_ERR)
          {
-            orc_NodeConfig.e_StateSecurity = e_StateSecurity;
+            orc_NodeConfig.e_StateSecureAuthentication = e_StateSecureAuthentication;
             //Return
             tgl_assert(orc_XmlParser.SelectNodeParent() == "states");
          }
@@ -748,11 +753,27 @@ int32_t C_SyvUpPacConfigFiler::mh_LoadNodeUpdateInformationPemStates(C_SyvUpPacC
          s32_Retval = orc_XmlParser.SelectNodeChildError("debugger");
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_OscViewFiler::h_StringToPemFileStateDebugger(
+            s32_Retval = C_OscViewFiler::h_StringToSecurityOptionDebugger(
                orc_XmlParser.GetNodeContent().c_str(), e_StateDebugger);
             if (s32_Retval == C_NO_ERR)
             {
                orc_NodeConfig.e_StateDebugger = e_StateDebugger;
+               //Return
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "states");
+            }
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         C_OscViewNodeUpdate::E_StateTrafficEncryption e_StateTrafficEncryption =
+            C_OscViewNodeUpdate::eST_TEN_NO_CHANGE;
+         if (orc_XmlParser.SelectNodeChild("traffic-encryption") == "traffic-encryption")
+         {
+            s32_Retval = C_OscViewFiler::h_StringToSecurityOptionEncryption(
+               orc_XmlParser.GetNodeContent().c_str(), e_StateTrafficEncryption);
+            if (s32_Retval == C_NO_ERR)
+            {
+               orc_NodeConfig.e_StateTrafficEncryption = e_StateTrafficEncryption;
                //Return
                tgl_assert(orc_XmlParser.SelectNodeParent() == "states");
             }

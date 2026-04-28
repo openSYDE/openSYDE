@@ -686,7 +686,8 @@ bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
    for (uint32_t u32_ItDevice1 = 0U; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
    {
       const C_OscDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
-      for (uint32_t u32_ItDevice2 = u32_ItDevice1 + 1U; u32_ItDevice2 < this->mc_FoundDevices.size(); ++u32_ItDevice2)
+      for (uint32_t u32_ItDevice2 = u32_ItDevice1 + 1U;
+           u32_ItDevice2 < static_cast<uint32_t>(this->mc_FoundDevices.size()); ++u32_ItDevice2)
       {
          const C_OscDcDeviceInformation & rc_Device2 = this->mc_FoundDevices[u32_ItDevice2];
 
@@ -1819,7 +1820,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const int32_t os32_ActualResult)
          uint32_t u32_DeviceCounter;
          if (os32_ActualResult == C_NO_ERR)
          {
-            u32_DeviceTotal = c_DeviceInfos.size();
+            u32_DeviceTotal = static_cast<uint32_t>(c_DeviceInfos.size());
          }
          else
          {
@@ -2646,8 +2647,8 @@ void C_SyvDcWidget::m_Timer(void)
                {
                   c_Message.SetCustomMinHeight(200, 230);
                   c_Message.SetDescription(
-                     C_GtGetText::h_GetText("At least one node has security activated "
-                                            "and at least one node ID is not unique."));
+                     C_GtGetText::h_GetText("At least one node has secure authentication or traffic encryption "
+                                            "activated and at least one node ID is not unique."));
                   c_Message.SetDetails(C_GtGetText::h_GetText(
                                           "This combination is not supported by the device configuration."));
                }

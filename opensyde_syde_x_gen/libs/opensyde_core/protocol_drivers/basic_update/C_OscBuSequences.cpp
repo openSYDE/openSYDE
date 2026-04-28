@@ -12,9 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <cstring>
+
 #include "stwtypes.hpp"
 #include "stwerrors.h"
-
 #include "TglTime.hpp"
 #include "C_SclDateTime.hpp"
 #include "C_OscLoggingHandler.hpp"
@@ -461,11 +462,15 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
       const uint8_t u8_SECURITY_LEVEL = 3U;
       bool q_SecureMode;
       uint64_t u64_Seed;
-      uint8_t ou8_SecurityAlgorithm;
+      bool q_AuthenticationActive;
+      bool q_TrafficEncryptionActive;
+      std::vector<uint8_t> c_TrafficEncryptionInitVector;
 
       c_LogActivity = "Security Access";
       s32_Return = mc_OsyProtocol.OsySecurityAccessRequestSeed(u8_SECURITY_LEVEL, q_SecureMode, u64_Seed,
-                                                               ou8_SecurityAlgorithm, &u8_NumberCode);
+                                                               q_AuthenticationActive,
+                                                               q_TrafficEncryptionActive,
+                                                               c_TrafficEncryptionInitVector, &u8_NumberCode);
 
       if ((s32_Return == C_WARN) &&
           (u8_NumberCode == C_OscProtocolDriverOsy::hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED))
@@ -479,12 +484,14 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
          stw::tgl::TglSleep(1000);
 
          s32_Return = mc_OsyProtocol.OsySecurityAccessRequestSeed(u8_SECURITY_LEVEL, q_SecureMode, u64_Seed,
-                                                                  ou8_SecurityAlgorithm, &u8_NumberCode);
+                                                                  q_AuthenticationActive,
+                                                                  q_TrafficEncryptionActive,
+                                                                  c_TrafficEncryptionInitVector, &u8_NumberCode);
       }
 
       if (q_SecureMode == true)
       {
-         osc_write_log_error(c_LogActivity, "Security request returned security is on. "
+         osc_write_log_error(c_LogActivity, "SecurityAccess request reported that security is on. "
                              "No security support here. Use openSYDE GUI tool for this feature.");
          s32_Return = C_CONFIG;
       }
@@ -500,6 +507,9 @@ int32_t C_OscBuSequences::UpdateNode(const C_SclString & orc_HexFilePath, const 
 
          if (u64_Seed != 42U)
          {
+            //Do not consider this an error: older server implementations could return a value of zero
+            // to signal that the level was already unlocked. This is described as valid in the UDS standard
+            // but not on the openSYDE protocol specification. In any case we need to ignore to stay compatible.
             const C_SclString c_Tmp =
                "Received seed in non secure mode does not match the expected value, expected: 42, got " +
                C_SclString::IntToStr(u64_Seed);

@@ -17,9 +17,9 @@
 #include "C_OscCanOpenEdsDeviceInfoBlock.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-
 using namespace stw::errors;
 using namespace stw::opensyde_core;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,45 +66,29 @@ C_OscCanOpenEdsDeviceInfoBlock::C_OscCanOpenEdsDeviceInfoBlock() :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OscCanOpenEdsDeviceInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_VendorName.c_str(), this->c_VendorName.Length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_VendorNumber.c_str(), this->c_VendorNumber.Length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_ProductName.c_str(), this->c_ProductName.Length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_ProductNumber.c_str(), this->c_ProductNumber.Length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_RevisionNumber.c_str(), this->c_RevisionNumber.Length(),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_OrderCode.c_str(), this->c_OrderCode.Length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate10, sizeof(this->q_BaudRate10),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate20, sizeof(this->q_BaudRate20),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate50, sizeof(this->q_BaudRate50),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate125, sizeof(this->q_BaudRate125),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate250, sizeof(this->q_BaudRate250),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate500, sizeof(this->q_BaudRate500),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate800, sizeof(this->q_BaudRate800),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate1000, sizeof(this->q_BaudRate1000),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_SimpleBootUpMaster, sizeof(this->q_SimpleBootUpMaster),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_SimpleBootUpSlave, sizeof(this->q_SimpleBootUpSlave),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_Granularity, sizeof(this->u8_Granularity),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(this->c_DynamicChannelsSupported.c_str(),
-                                       this->c_DynamicChannelsSupported.Length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_GroupMessaging, sizeof(this->q_GroupMessaging),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_NrOfRxPdo, sizeof(this->u16_NrOfRxPdo),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_NrOfTxPdo, sizeof(this->u16_NrOfTxPdo),
-                                       oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->q_LssSupported, sizeof(this->q_LssSupported),
-                                       oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_VendorName.c_str(), this->c_VendorName.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_VendorNumber.c_str(), this->c_VendorNumber.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_ProductName.c_str(), this->c_ProductName.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_ProductNumber.c_str(), this->c_ProductNumber.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_RevisionNumber.c_str(), this->c_RevisionNumber.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_OrderCode.c_str(), this->c_OrderCode.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate10, sizeof(this->q_BaudRate10), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate20, sizeof(this->q_BaudRate20), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate50, sizeof(this->q_BaudRate50), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate125, sizeof(this->q_BaudRate125), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate250, sizeof(this->q_BaudRate250), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate500, sizeof(this->q_BaudRate500), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate800, sizeof(this->q_BaudRate800), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_BaudRate1000, sizeof(this->q_BaudRate1000), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_SimpleBootUpMaster, sizeof(this->q_SimpleBootUpMaster), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_SimpleBootUpSlave, sizeof(this->q_SimpleBootUpSlave), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u8_Granularity, sizeof(this->u8_Granularity), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_DynamicChannelsSupported.c_str(),
+                             this->c_DynamicChannelsSupported.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_GroupMessaging, sizeof(this->q_GroupMessaging), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u16_NrOfRxPdo, sizeof(this->u16_NrOfRxPdo), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u16_NrOfTxPdo, sizeof(this->u16_NrOfTxPdo), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->q_LssSupported, sizeof(this->q_LssSupported), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -742,7 +742,8 @@ int32_t C_OscHalcConfigFiler::mh_SaveIoParameters(const std::vector<C_OscHalcCon
 int32_t C_OscHalcConfigFiler::mh_SaveIoParameter(const C_OscHalcConfigParameter & orc_Parameter,
                                                  C_OscXmlParserBase & orc_XmlParser, const C_SclString & orc_BaseNode)
 {
-   int32_t s32_Retval;
+   int32_t s32_Retval = C_NO_ERR;
+   bool q_ValueHandled = false;
 
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("value") == "value");
    switch (orc_Parameter.c_Value.GetComplexType())
@@ -761,12 +762,25 @@ int32_t C_OscHalcConfigFiler::mh_SaveIoParameter(const C_OscHalcConfigParameter 
       orc_XmlParser.SetAttributeString("base-type",
                                        C_OscHalcDefStructFiler::h_GetTypeString(orc_Parameter.c_Value.GetType()));
       break;
+   case C_OscHalcDefContent::eCT_STRING:
+      {
+         std::string c_Tmp;
+         orc_XmlParser.SetAttributeString("type", "string");
+         orc_Parameter.c_Value.GetStringValue(c_Tmp);
+         orc_XmlParser.SetAttributeString("value", c_Tmp);
+         orc_XmlParser.SetAttributeUint32("strlen", orc_Parameter.c_Value.GetArraySize() - 1UL);
+         q_ValueHandled = true;
+      }
+      break;
    default:
       break;
    }
    orc_XmlParser.SetAttributeBool("is-array", orc_Parameter.c_Value.GetArray());
    orc_XmlParser.SetAttributeUint32("array-size", orc_Parameter.c_Value.GetArraySize());
-   s32_Retval = C_OscHalcDefStructFiler::h_SaveSimpleValueAsAttribute("value", orc_XmlParser, orc_Parameter.c_Value);
+   if (q_ValueHandled == false)
+   {
+      s32_Retval = C_OscHalcDefStructFiler::h_SaveSimpleValueAsAttribute("value", orc_XmlParser, orc_Parameter.c_Value);
+   }
    if (s32_Retval == C_NO_ERR)
    {
       const std::vector<std::pair<stw::scl::C_SclString,

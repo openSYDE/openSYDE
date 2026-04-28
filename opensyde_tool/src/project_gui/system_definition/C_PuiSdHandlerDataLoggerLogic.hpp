@@ -9,6 +9,8 @@
 #define C_PUISDHANDLERDATALOGGERLOGIC_HPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QMap>
+
 #include "C_PuiSdHandlerCanOpenLogic.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -73,6 +75,7 @@ protected:
 
    void m_AddLastKnownHalcCrc(const stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId & orc_Id,
                               const C_PuiSdLastKnownHalElementId & orc_Crc);
+   void m_FixDataLoggerTriggerIssues(void) override;
 
    void m_HandleSyncNodeDeleted(void) override;
    void m_HandleSyncBusDeleted(const uint32_t ou32_BusIndex) override;
@@ -118,15 +121,58 @@ protected:
    override;
 
 private:
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeAdded(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger, const uint32_t ou32_Index);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeHalc(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger, const uint32_t ou32_Index,
+      const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId,
+                     stw::opensyde_core::C_OscNodeDataPoolListElementOptArrayId> & orc_MapCurToNew);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolAdded(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolMoved(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolSourceIndex,
+      const uint32_t ou32_DataPoolTargetIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolAboutToBeDeleted(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolListAdded(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolListMoved(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListSourceIndex,
+      const uint32_t ou32_ListTargetIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolListAboutToBeDeleted(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolListElementAdded(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+      const uint32_t ou32_ElementIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolListElementMoved(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+      const uint32_t ou32_ElementSourceIndex, const uint32_t ou32_ElementTargetIndex);
+   static void mh_HandleSyncDataLoggerAdditionalTriggerNodeDataPoolListElementAboutToBeDeleted(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger,
+      const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+      const uint32_t ou32_ElementIndex);
+
    void m_HandleNodeAboutToBeDeleted(const uint32_t ou32_Index, const bool oq_OnlyMarkInvalid = false);
+   static void mh_HandleDataLoggerAdditionalTriggerNodeAboutToBeDeleted(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger, const uint32_t ou32_Index,
+      const bool oq_OnlyMarkInvalid);
+
    void m_HandlePossibleRouteChange(void);
    void m_ValidateAllRoutesForOneNode(const uint32_t ou32_Index);
    static std::map<stw::scl::C_SclString, bool> mh_GetExistingDataLoggerNames(
       const stw::opensyde_core::C_OscNode & orc_Node);
-   static void mh_HandleSyncDataLoggerElementAboutToBeDeleted(
-      stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Properties,
-      const stw::opensyde_core::C_OscDataLoggerDataElementReference & orc_Element);
-   static bool mh_CheckIdRelevantForSync(const stw::opensyde_core::C_OscDataLoggerJobProperties & orc_Properties);
+   static void mh_HandleSyncDataElementInvalid(
+      stw::opensyde_core::C_OscDataLoggerJobAdditionalTriggerProperties & orc_Trigger);
+   static bool mh_CheckNodeReachable(QMap<uint32_t, bool> & orc_MapOfReachableNodes,
+                                     const uint32_t ou32_SourceNodeIndex, const uint32_t ou32_TargetNodeIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -33,6 +33,7 @@
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_UsHandler.hpp"
 #include "C_SyvUpPacSecurityCertificatePackageDialog.hpp"
+#include "C_SyvUpPacSecurityOptionsPopUp.hpp"
 #include "C_OscXceBase.hpp"
 #include "C_OscXceUpdatePackageParameters.hpp"
 #include "C_OscXceCreate.hpp"
@@ -84,11 +85,15 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
    mq_StwFlashloader(false),
    mq_Connected(false),
    mq_EmptyOptionalSectionsVisible(true),
-   mq_ShowAddSecurityPack(false),
+   mq_ShowAddSecurityButton(false),
    mu32_PositionNumber(ou32_PositionNumber),
    mu32_FilesUpdated(0U),
+   me_StateSecureAuthentication(C_OscViewNodeUpdate::eST_SEC_NO_CHANGE),
+   me_StateDebugger(C_OscViewNodeUpdate::eST_DEB_NO_CHANGE),
+   me_StateTrafficEncryption(C_OscViewNodeUpdate::eST_TEN_NO_CHANGE),
    mpc_FilesWidget(NULL),
-   mpc_FilesWidgetSeparator(NULL)
+   mpc_FilesWidgetSeparator(NULL),
+   mpc_SecurityMenu(NULL)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -96,21 +101,47 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
                                                                    "HasColor9Background", true);
    this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(0);
 
+   this->mpc_Ui->pc_LabelAuth->setText(C_GtGetText::h_GetText("Security UNKNOWN"));
+   this->mpc_Ui->pc_LabelAuth->SetFontPixel(10);
+   this->mpc_Ui->pc_LabelAuth->SetForegroundColor(0);
+   this->mpc_Ui->pc_LabelAuth->SetBackgroundColor(9);
+   this->mpc_Ui->pc_LabelAuth->setVisible(false);
+   this->mpc_Ui->pc_LabelAuth->SetToolTipInformation(C_GtGetText::h_GetText("Authentication"),
+                                                     C_GtGetText::h_GetText(
+                                                        "Status of the security setting \"Authentication\"\n\n"
+                                                        "ON:  Enable client authenticaiton of this node on next system update.\n"
+                                                        "OFF: Disable client authenticaiton of this node on next system update."));
+
+   this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger UNKNOWN"));
+   this->mpc_Ui->pc_LabelDebugger->SetFontPixel(10);
+   this->mpc_Ui->pc_LabelDebugger->SetForegroundColor(0);
+   this->mpc_Ui->pc_LabelDebugger->SetBackgroundColor(9);
+   this->mpc_Ui->pc_LabelDebugger->setVisible(false);
+   this->mpc_Ui->pc_LabelDebugger->SetToolTipInformation(C_GtGetText::h_GetText("Debugger"),
+                                                         C_GtGetText::h_GetText(
+                                                            "Status of the security setting \"Debugger\"\n\n"
+                                                            "ON:  Enable debugger of this node on next system update.\n"
+                                                            "OFF: Disable debugger of this node on next system update."));
+
+   this->mpc_Ui->pc_LabelTrafficEncryption->setText(C_GtGetText::h_GetText("TrafficEncryption UNKNOWN"));
+   this->mpc_Ui->pc_LabelTrafficEncryption->SetFontPixel(10);
+   this->mpc_Ui->pc_LabelTrafficEncryption->SetForegroundColor(0);
+   this->mpc_Ui->pc_LabelTrafficEncryption->SetBackgroundColor(9);
+   this->mpc_Ui->pc_LabelTrafficEncryption->setVisible(false);
+   this->mpc_Ui->pc_LabelTrafficEncryption->SetToolTipInformation(C_GtGetText::h_GetText("Traffic Encryption"),
+                                                                  C_GtGetText::h_GetText(
+                                                                     "Status of the security setting \"Traffic Encryption\"\n\n"
+                                                                     "ON:  Enable client traffic encryption of this node on next system update.\n"
+                                                                     "OFF: Disable client traffic encryption of this node on next system update."));
+
    this->m_UpdateTitle();
 
    this->m_Init();
 
-   this->mpc_Ui->pc_PbAddSecurityPackage->SetCustomIcons("://images/system_views/IconAddKey.svg",
-                                                         "://images/system_views/IconAddKey.svg",
-                                                         "://images/system_views/IconAddKey.svg",
-                                                         "://images/system_views/IconAddKeyDisabled.svg");
-   this->mpc_Ui->pc_PbAddSecurityPackage->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                   "Create Security Certificate Package"),
-                                                                C_GtGetText::h_GetText(
-                                                                   "Security Certificate Package enables "
-                                                                   "file-based targets to execute the openSYDE client security features "
-                                                                   "like 'Secure Autentication' and 'Secure Updates'. "
-                                                                   "\nAll relevant PEM files and configuration is packed together."));
+   this->mpc_Ui->pc_PbAddSecurityPackage->SetSvg("://images/system_views/IconAddKey.svg",
+                                                 "://images/system_views/IconAddKeyDisabled.svg");
+   this->mpc_Ui->pc_PbAddSecurityPackage->setIconSize(QSize(20, 20));
+   this->mpc_Ui->pc_PbAddSecurityPackage->setText("");
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_WidgetTitle->SetColorReserved(mc_STYLE_GUIDE_COLOR_10);
@@ -142,7 +173,7 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
       QVector<bool> c_Flags = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str()).
                               GetSvNode(orc_NodeName).GetSectionsExpanded();
 
-      s32_ExpectedSections = this->mc_DatablockWidgets.size();
+      s32_ExpectedSections = static_cast<int32_t>(this->mc_DatablockWidgets.size());
       if (this->mpc_FilesWidget != NULL)
       {
          ++s32_ExpectedSections;
@@ -169,9 +200,6 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
    this->mpc_Ui->pc_ScrollArea->setVisible(false);
    this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(25);
    this->mpc_Ui->pc_FrameSepTop->setVisible(false);
-
-   connect(this->mpc_Ui->pc_PbAddSecurityPackage, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
-           &C_SyvUpPacNodeWidget::AddSecurityCertificatePackage);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -207,6 +235,7 @@ C_SyvUpPacNodeWidget::~C_SyvUpPacNodeWidget()
    }
 
    delete this->mpc_Ui;
+   delete this->mpc_SecurityMenu;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -380,7 +409,7 @@ void C_SyvUpPacNodeWidget::SetDisconnected(void)
    this->mq_Connected = false;
 
    this->mpc_Ui->pc_LabIconLock->setVisible(false);
-   this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(this->mq_ShowAddSecurityPack);
+   this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(this->mq_ShowAddSecurityButton);
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -477,6 +506,12 @@ void C_SyvUpPacNodeWidget::AddNewFile(const QString & orc_File, const bool oq_Pa
    {
       this->mpc_FilesWidget->AddFile(orc_File);
       this->mpc_FilesWidget->Expand(true);
+
+      // special case PEM file: ask user to update security flags
+      if (oq_PemFile == true)
+      {
+         this->m_AskForAuthFlagAdaption();
+      }
    }
 
    // special case security certificate package: warn user if there is more than one
@@ -610,6 +645,11 @@ void C_SyvUpPacNodeWidget::PrepareExportConfig(C_SyvUpPacConfigNode & orc_NodeCo
    {
       this->mpc_FilesWidget->PrepareExportConfig(orc_NodeConfig);
    }
+
+   // security states
+   orc_NodeConfig.e_StateSecureAuthentication = this->me_StateSecureAuthentication;
+   orc_NodeConfig.e_StateDebugger = this->me_StateDebugger;
+   orc_NodeConfig.e_StateTrafficEncryption = this->me_StateTrafficEncryption;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -618,9 +658,10 @@ void C_SyvUpPacNodeWidget::PrepareExportConfig(C_SyvUpPacConfigNode & orc_NodeCo
    \param[out]  orc_Config    Import configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacNodeWidget::LoadImportConfig(const C_SyvUpPacConfig & orc_Config) const
+void C_SyvUpPacNodeWidget::LoadImportConfig(const C_SyvUpPacConfig & orc_Config)
 {
    int32_t s32_DatablockCounter;
+   uint32_t u32_ConfigCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -631,6 +672,29 @@ void C_SyvUpPacNodeWidget::LoadImportConfig(const C_SyvUpPacConfig & orc_Config)
    {
       this->mpc_FilesWidget->LoadImportConfig(orc_Config);
    }
+
+   // security settings
+   for (u32_ConfigCounter = 0; u32_ConfigCounter < orc_Config.c_NodeConfigs.size(); ++u32_ConfigCounter)
+   {
+      // Search the matching configuration
+      if ((orc_Config.c_NodeConfigs[u32_ConfigCounter].c_Name == this->mc_NodeName) &&
+          (orc_Config.c_NodeConfigs[u32_ConfigCounter].c_DeviceType == this->mc_DeviceType))
+      {
+         this->me_StateSecureAuthentication = orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateSecureAuthentication;
+         this->me_StateDebugger = orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateDebugger;
+         this->me_StateTrafficEncryption = orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateTrafficEncryption;
+         break;
+      }
+   }
+
+   // update data handling
+   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(
+                 this->mu32_ViewIndex, this->mu32_NodeIndex,
+                 this->me_StateSecureAuthentication, this->me_StateDebugger,
+                 this->me_StateTrafficEncryption) == C_NO_ERR);
+
+   // update UI
+   this->m_ShowSecurityStates();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -678,6 +742,33 @@ int32_t C_SyvUpPacNodeWidget::CheckAllFiles(uint32_t & oru32_CountFiles, QString
    this->mpc_Ui->pc_LabIconWarning->setVisible(s32_Return != C_NO_ERR);
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check security settings changed
+
+   \return
+   Flags
+
+   \retval   True    Security settings changed
+   \retval   False   Security settings not changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpPacNodeWidget::CheckSecuritySettingsChanged() const
+{
+   bool q_Retval;
+
+   if ((this->me_StateSecureAuthentication != C_OscViewNodeUpdate::eST_SEC_NO_CHANGE) ||
+       (this->me_StateDebugger != C_OscViewNodeUpdate::eST_DEB_NO_CHANGE) ||
+       (this->me_StateTrafficEncryption != C_OscViewNodeUpdate::eST_TEN_NO_CHANGE))
+   {
+      q_Retval = true;
+   }
+   else
+   {
+      q_Retval = false;
+   }
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -895,7 +986,6 @@ int32_t C_SyvUpPacNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlash & orc
                                                C_OscSuSequences::C_DoFlash * const opc_AllApplications)
 {
    int32_t s32_Return = C_NOACT;
-   bool q_NoErr = false;
    int32_t s32_DatablockCounter;
 
    this->mu32_FilesUpdated = 0U;
@@ -905,11 +995,7 @@ int32_t C_SyvUpPacNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlash & orc
       const C_SyvUpPacSectionNodeDatablockWidget * const pc_DbWidget = this->mc_DatablockWidgets[s32_DatablockCounter];
       s32_Return = pc_DbWidget->GetUpdatePackage(orc_ApplicationsToWrite, opc_AllApplications,
                                                  this->mu32_FilesUpdated);
-      if (s32_Return == C_NO_ERR)
-      {
-         q_NoErr = true;
-      }
-      else if (s32_Return != C_NOACT)
+      if ((s32_Return != C_NOACT) && (s32_Return != C_NO_ERR))
       {
          // C_NOACT is in this case no error yet
          break;
@@ -920,19 +1006,33 @@ int32_t C_SyvUpPacNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlash & orc
       }
    }
 
-   if (((s32_Return == C_NO_ERR) ||
-        (s32_Return == C_NOACT)) &&
-       (this->mpc_FilesWidget != NULL))
+   if (((s32_Return == C_NO_ERR) || (s32_Return == C_NOACT)) && (this->mpc_FilesWidget != NULL))
    {
       s32_Return = this->mpc_FilesWidget->GetUpdatePackage(orc_ApplicationsToWrite, opc_AllApplications,
                                                            this->mu32_FilesUpdated);
    }
 
-   if ((q_NoErr == true) &&
-       (s32_Return == C_NOACT))
+   if ((s32_Return == C_NO_ERR) || (s32_Return == C_NOACT))
    {
-      // C_NOACT is no error if at least one GetUpdatePackage call returned with C_NO_ERR
-      s32_Return = C_NO_ERR;
+      C_OscSuSequences::h_FillDoFlashWithSecurityOptions(this->me_StateSecureAuthentication,
+                                                         this->me_StateTrafficEncryption,
+                                                         this->me_StateDebugger,
+                                                         orc_ApplicationsToWrite);
+      if (opc_AllApplications != NULL)
+      {
+         C_OscSuSequences::h_FillDoFlashWithSecurityOptions(this->me_StateSecureAuthentication,
+                                                            this->me_StateTrafficEncryption, this->me_StateDebugger,
+                                                            *opc_AllApplications);
+      }
+
+      if (s32_Return == C_NOACT)
+      {
+         if (orc_ApplicationsToWrite.IsAnyActionRequired())
+         {
+            // C_NOACT is no error if update is required
+            s32_Return = C_NO_ERR;
+         }
+      }
    }
 
    return s32_Return;
@@ -1008,40 +1108,6 @@ void C_SyvUpPacNodeWidget::UpdateSectionsVisibility(void) const
       }
    }
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Add a new Security Certificate Pacakege
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacNodeWidget::AddSecurityCertificatePackage()
-{
-   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
-   C_SyvUpPacSecurityCertificatePackageDialog * const pc_SecurityCertificatePackageDialog =
-      new C_SyvUpPacSecurityCertificatePackageDialog(*c_PopUpDialog);
-
-   //Resize
-   c_PopUpDialog->SetSize(QSize(1152, 853));
-
-   Q_UNUSED(pc_SecurityCertificatePackageDialog)
-
-   // "Create" clicked
-   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
-   {
-      const bool q_OptionAddPemFiles = pc_SecurityCertificatePackageDialog->GetOptionAddPemFiles();
-      const bool q_OptionAddSecureAuthentification =
-         pc_SecurityCertificatePackageDialog->GetOptionAddSecureAuthentification();
-      const QString c_Password = pc_SecurityCertificatePackageDialog->GetPassword();
-      const QString c_PublicKeyPath = pc_SecurityCertificatePackageDialog->GetPublicKeyPath();
-      const std::vector<stw::scl::C_SclString> c_PemFiles = pc_SecurityCertificatePackageDialog->GetPemFiles();
-      this->m_OnCreatePackage(c_PublicKeyPath, c_Password, c_PemFiles, q_OptionAddPemFiles,
-                              q_OptionAddSecureAuthentification);
-   }
-   if (c_PopUpDialog != NULL)
-   {
-      c_PopUpDialog->HideOverlay();
-      c_PopUpDialog->deleteLater();
-   }
-} //lint !e429  //no memory leak because of the parent of c_PopUpDialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten show event slot
@@ -1397,12 +1463,54 @@ void C_SyvUpPacNodeWidget::m_Init(void)
          this->mpc_FilesWidget->SetCountSkippedParamSetFiles(u32_DatablockParamSetFiles);
          // last parameter is "0", since this case has no Data Block output files
          this->mpc_FilesWidget->InitWidget(this->mu32_ViewIndex, this->mu32_PositionNumber,
-                                           this->mu32_NodeIndex, this->mc_NodeName, pc_Node->c_Applications.size(), 0);
+                                           this->mu32_NodeIndex, this->mc_NodeName,
+                                           static_cast<uint32_t>(pc_Node->c_Applications.size()), 0);
       }
 
-      // Show "Add security package"-Button only if file based and X.App support is enabled:
-      this->mq_ShowAddSecurityPack = pc_Node->c_Properties.q_XappSupport && this->mq_FileBased;
-      this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(this->mq_ShowAddSecurityPack);
+      // security settings (for openSYDE nodes only)
+      this->mq_ShowAddSecurityButton = (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_OPEN_SYDE);
+      this->mpc_Ui->pc_PbAddSecurityPackage->setVisible(this->mq_ShowAddSecurityButton);
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+      if (pc_View != NULL)
+      {
+         const C_OscViewNodeUpdate * const pc_UpdateInfo = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
+         if (pc_UpdateInfo != NULL)
+         {
+            pc_UpdateInfo->GetStates(this->me_StateSecureAuthentication, this->me_StateDebugger,
+                                     this->me_StateTrafficEncryption);
+            this->m_ShowSecurityStates();
+         }
+      }
+
+      // Show menu with "Add security package" only if file based and X.App support is enabled:
+      if ((pc_Node->c_Properties.q_XappSupport == true) && (this->mq_FileBased == true))
+      {
+         this->mpc_Ui->pc_PbAddSecurityPackage->SetToolTipInformation(
+            C_GtGetText::h_GetText("Security Settings"),
+            C_GtGetText::h_GetText(
+               "Manage the node's security settings like authentication, traffic encryption and debugger mode. \n\n"
+               "For nodes with x-app support: create Security Certificate Package (*.syde_xcert) that enables "
+               "file-based targets to execute the openSYDE client security features "
+               "like 'Secure Autentication' and 'Secure Updates'."));
+
+         //menu
+         this->mpc_SecurityMenu = new C_OgeMuSections(this);
+         this->mpc_SecurityMenu->addAction(C_GtGetText::h_GetText("Security Settings"),
+                                           this, &C_SyvUpPacNodeWidget::m_OpenSecuritySettings);
+         this->mpc_SecurityMenu->addAction(C_GtGetText::h_GetText("Create Security Package"),
+                                           this, &C_SyvUpPacNodeWidget::m_AddSecurityCertificatePackage);
+         this->mpc_SecurityMenu->setMinimumWidth(165);
+         this->mpc_Ui->pc_PbAddSecurityPackage->setMenu(this->mpc_SecurityMenu);
+      }
+      else
+      {
+         this->mpc_Ui->pc_PbAddSecurityPackage->SetToolTipInformation(
+            C_GtGetText::h_GetText("Security Settings"),
+            C_GtGetText::h_GetText(
+               "Manage the node's security settings like authentication, traffic encryption and debugger mode."));
+         connect(this->mpc_Ui->pc_PbAddSecurityPackage, &stw::opensyde_gui_elements::C_OgePubIconMenu::clicked,
+                 this, &C_SyvUpPacNodeWidget::m_OpenSecuritySettings);
+      }
    }
 
    this->mpc_Ui->pc_ScrollAreaLayout->addSpacerItem(pc_Spacer);
@@ -1721,6 +1829,37 @@ void C_SyvUpPacNodeWidget::m_CheckForMultipleSecurityCertificatePackages(const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Ask for authentication flag activation when user added a PEM file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_AskForAuthFlagAdaption(void)
+{
+   // only ask if authentication is not yet set to "activate"
+   if (this->me_StateSecureAuthentication != opensyde_core::C_OscViewNodeUpdate::eST_SEC_ACTIVATE)
+   {
+      C_OgeWiCustomMessage c_MessageResult(this, C_OgeWiCustomMessage::eQUESTION);
+      c_MessageResult.SetHeading(C_GtGetText::h_GetText("Activate Authentication"));
+      c_MessageResult.SetDescription(
+         C_GtGetText::h_GetText("You added a PEM file. Do you want to activate secure authentication on the device?"));
+      c_MessageResult.SetOkButtonText(C_GtGetText::h_GetText("Activate Authentication"));
+      c_MessageResult.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
+      if (c_MessageResult.Execute() == C_OgeWiCustomMessage::eOK)
+      {
+         this->me_StateSecureAuthentication = opensyde_core::C_OscViewNodeUpdate::eST_SEC_ACTIVATE;
+
+         // update data handling
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(
+                       this->mu32_ViewIndex, this->mu32_NodeIndex,
+                       this->me_StateSecureAuthentication, this->me_StateDebugger,
+                       this->me_StateTrafficEncryption) == C_NO_ERR);
+
+         // update UI
+         this->m_ShowSecurityStates();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if mime valid
 
    \param[in]   opc_Mime                  Mime to check
@@ -1810,19 +1949,53 @@ bool C_SyvUpPacNodeWidget::m_CheckMime(const QMimeData * const opc_Mime, const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add a new Security Certificate Package
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_AddSecurityCertificatePackage()
+{
+   const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
+   C_SyvUpPacSecurityCertificatePackageDialog * const pc_SecurityCertificatePackageDialog =
+      new C_SyvUpPacSecurityCertificatePackageDialog(*c_PopUpDialog);
+
+   //Resize
+   c_PopUpDialog->SetSize(QSize(1152, 853));
+
+   Q_UNUSED(pc_SecurityCertificatePackageDialog)
+
+   // "Create" clicked
+   if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      const bool q_OptionAddPemFiles = pc_SecurityCertificatePackageDialog->GetOptionAddPemFiles();
+      const bool q_OptionAddSecureAuthentication =
+         pc_SecurityCertificatePackageDialog->GetOptionAddSecureAuthentication();
+      const QString c_Password = pc_SecurityCertificatePackageDialog->GetPassword();
+      const QString c_PublicKeyPath = pc_SecurityCertificatePackageDialog->GetPublicKeyPath();
+      const std::vector<stw::scl::C_SclString> c_PemFiles = pc_SecurityCertificatePackageDialog->GetPemFiles();
+      this->m_OnCreatePackage(c_PublicKeyPath, c_Password, c_PemFiles, q_OptionAddPemFiles,
+                              q_OptionAddSecureAuthentication);
+   }
+   if (c_PopUpDialog != NULL)
+   {
+      c_PopUpDialog->HideOverlay();
+      c_PopUpDialog->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of c_PopUpDialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates the security certificate package
 
    \param[in]       orc_PublicKeyPath                    pem file path
    \param[in]       orc_Password                         security password
    \param[in, out]  orc_CertificatesPath                 list of pem files added
    \param[in]       oq_OptionAddPemFiles                 Option add pem files
-   \param[in]       oq_OptionAddSecureAuthentification   Option add secure authentification
+   \param[in]       oq_OptionAddSecureAuthentication   Option add secure authentication
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::m_OnCreatePackage(const QString & orc_PublicKeyPath, const QString & orc_Password,
                                              const std::vector<stw::scl::C_SclString> & orc_CertificatesPath,
                                              const bool oq_OptionAddPemFiles,
-                                             const bool oq_OptionAddSecureAuthentification)
+                                             const bool oq_OptionAddSecureAuthentication)
 {
    QString c_FilterName;
    QString c_DefaultFilename;
@@ -1866,7 +2039,7 @@ void C_SyvUpPacNodeWidget::m_OnCreatePackage(const QString & orc_PublicKeyPath, 
       {
          c_UsedCertificatesPath = orc_CertificatesPath;
       }
-      if (oq_OptionAddSecureAuthentification)
+      if (oq_OptionAddSecureAuthentication)
       {
          c_UpdatePackageParameters.resize(1);
          c_UpdatePackageParameters.at(0).c_AuthenticationKeyPath = orc_PublicKeyPath.toStdString().c_str();
@@ -1905,4 +2078,100 @@ void C_SyvUpPacNodeWidget::m_OnCreatePackage(const QString & orc_PublicKeyPath, 
          c_MessageResult.Execute();
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Open security settings popup dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_OpenSecuritySettings(void)
+{
+   // Open the dialog
+   {
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+      const C_SyvUpPacSecurityOptionsPopUp * const pc_InfoDialog =
+         new C_SyvUpPacSecurityOptionsPopUp(*c_New, this->me_StateSecureAuthentication, this->me_StateDebugger,
+                                            this->me_StateTrafficEncryption, this->mc_NodeName);
+
+      //Resize
+      c_New->SetSize(QSize(600, 420));
+
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+      {
+         this->me_StateSecureAuthentication = pc_InfoDialog->GetComboBoxSecState();
+         this->me_StateDebugger = pc_InfoDialog->GetComboBoxDebState();
+         this->me_StateTrafficEncryption = pc_InfoDialog->GetComboBoxTenState();
+      }
+
+      if (c_New != NULL)
+      {
+         c_New->HideOverlay();
+         c_New->deleteLater();
+      }
+   } //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
+
+   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(
+                 this->mu32_ViewIndex, this->mu32_NodeIndex,
+                 this->me_StateSecureAuthentication, this->me_StateDebugger,
+                 this->me_StateTrafficEncryption) == C_NO_ERR);
+
+   // Update UI
+   this->m_ShowSecurityStates();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show security states (debugger, authentication, traffic encryption)
+
+   \param[in]  oq_Visible  Visible
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacNodeWidget::m_ShowSecurityStates(void) const
+{
+   //lint -e{9042} Warning wanted if new cases are added
+   switch (this->me_StateSecureAuthentication)
+   {
+   case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
+      this->mpc_Ui->pc_LabelAuth->setText(C_GtGetText::h_GetText("Auth UNKNOWN"));
+      break;
+   case C_OscViewNodeUpdate::eST_SEC_ACTIVATE:
+      this->mpc_Ui->pc_LabelAuth->setText(C_GtGetText::h_GetText("Auth ON"));
+      break;
+   case C_OscViewNodeUpdate::eST_SEC_DEACTIVATE:
+      this->mpc_Ui->pc_LabelAuth->setText(C_GtGetText::h_GetText("Auth OFF"));
+      break;
+   }
+
+   //lint -e{9042} Warning wanted if new cases are added
+   switch (this->me_StateDebugger)
+   {
+   case C_OscViewNodeUpdate::eST_DEB_NO_CHANGE:
+      this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger UNKNOWN"));
+      break;
+   case C_OscViewNodeUpdate::eST_DEB_ACTIVATE:
+      this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger ON"));
+      break;
+   case C_OscViewNodeUpdate::eST_DEB_DEACTIVATE:
+      this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger OFF"));
+      break;
+   }
+
+   //lint -e{9042} Warning wanted if new cases are added
+   switch (this->me_StateTrafficEncryption)
+   {
+   case C_OscViewNodeUpdate::eST_TEN_NO_CHANGE:
+      this->mpc_Ui->pc_LabelTrafficEncryption->setText(C_GtGetText::h_GetText("TrafficEncr UNKNOWN"));
+      break;
+   case C_OscViewNodeUpdate::eST_TEN_ACTIVATE:
+      this->mpc_Ui->pc_LabelTrafficEncryption->setText(C_GtGetText::h_GetText("TrafficEncr ON"));
+      break;
+   case C_OscViewNodeUpdate::eST_TEN_DEACTIVATE:
+      this->mpc_Ui->pc_LabelTrafficEncryption->setText(C_GtGetText::h_GetText("TrafficEncr OFF"));
+      break;
+   }
+
+   this->mpc_Ui->pc_LabelAuth->setVisible(
+      this->me_StateSecureAuthentication != C_OscViewNodeUpdate::eST_SEC_NO_CHANGE);
+   this->mpc_Ui->pc_LabelDebugger->setVisible(this->me_StateDebugger != C_OscViewNodeUpdate::eST_DEB_NO_CHANGE);
+   this->mpc_Ui->pc_LabelTrafficEncryption->setVisible(
+      this->me_StateTrafficEncryption != C_OscViewNodeUpdate::eST_TEN_NO_CHANGE);
 }

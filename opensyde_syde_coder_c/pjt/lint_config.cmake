@@ -1,5 +1,3 @@
-#set(PC_LINT_CONFIG_DIR "./../temp_CMakeLists_Debug/pclint")
-
 set(PC_LINT_CONFIG_DIR "pclint_config")
 
 
@@ -20,9 +18,13 @@ function(add_pc_lint target)
         # if false, do nothing, we do not need this lib, as it is 3rd party
         if(TARGET ${lib_tmp})
             get_target_property(link_libs_directories_tmp ${lib_tmp} INCLUDE_DIRECTORIES)
-            foreach (lib ${link_libs_directories_tmp})
-                list(APPEND link_libs_directories_all ${lib})
-            endforeach (lib)
+            # we are not interested if there are no link_libs at all
+            if (NOT link_libs_directories_tmp STREQUAL "link_libs_directories_tmp-NOTFOUND")
+	       foreach (lib ${link_libs_directories_tmp})
+	          list(APPEND link_libs_directories_all ${lib})
+	          #message("lint_config: Appended: " ${lib})
+           endforeach (lib)
+           endif()
         endif()
     endforeach (lib_tmp)
         
@@ -36,6 +38,9 @@ function(add_pc_lint target)
     foreach (dir ${link_libs_directories_all})
         list(APPEND all_includes ${dir})
     endforeach (dir)
+
+    # remove duplicate entries from all_includes
+    list(REMOVE_DUPLICATES all_includes)
 
     # make the directories "indirects" for pclint
     # set(all_includes_transformed)

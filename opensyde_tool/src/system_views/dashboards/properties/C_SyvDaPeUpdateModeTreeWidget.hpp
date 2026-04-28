@@ -42,7 +42,7 @@ private:
    std::vector<stw::opensyde_gui_logic::C_SyvDaPeUpdateModeTableModel *> mc_Models;
 
    void m_Clear(void);
-   void m_OnExpandRequested(QTreeWidgetItem * const opc_Item, const bool oq_Expand);
+   void m_OnExpandRequested(const QTreeWidgetItem * const opc_Item, const bool oq_Expand);
    void m_OnCollapse(const QModelIndex & orc_Index) const;
    void m_OnExpand(const QModelIndex & orc_Index) const;
    void m_ScrollBarRangeChanged(const int32_t os32_Min, const int32_t os32_Max) const;

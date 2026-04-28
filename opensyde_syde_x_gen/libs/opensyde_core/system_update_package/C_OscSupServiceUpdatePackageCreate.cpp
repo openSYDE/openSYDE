@@ -27,6 +27,7 @@
 #include "C_OscDeviceDefinitionFiler.hpp"
 #include "C_OscSuSequences.hpp"
 #include "TglFile.hpp"
+#include "TglUtils.hpp"
 #include "C_SclIniFile.hpp"
 #include "C_OscSuSequences.hpp"
 #include "C_OscUtils.hpp"
@@ -634,9 +635,7 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_SupDefParamAdapter(const uint32_t
       c_SupDefNodeContent.u8_Active = orc_ActiveNodes[u32_Pos];
       // in case we have an active node and (!) application(s) for update are available
       if ((c_SupDefNodeContent.u8_Active == C_OscSupNodeDefinitionFiler::hu8_ACTIVE_NODE) &&
-          ((orc_ApplicationsToWrite[u32_Pos].c_FilesToFlash.size() > 0) ||
-           (orc_ApplicationsToWrite[u32_Pos].c_FilesToWriteToNvm.size() > 0) ||
-           (orc_ApplicationsToWrite[u32_Pos].c_PemFile != "")))
+          (orc_ApplicationsToWrite[u32_Pos].IsAnyActionRequired()))
       {
          // get update position of node
          // nodes update order only contains active nodes with applications
@@ -675,13 +674,18 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_SupDefParamAdapter(const uint32_t
       }
 
       // get PEM file and its settings of node
-      if (orc_ApplicationsToWrite[u32_Pos].c_PemFile != "")
       {
          const C_SclString c_Tmp = TglExtractFileName(orc_ApplicationsToWrite[u32_Pos].c_PemFile);
          c_SupDefNodeContent.c_PemFile = c_Tmp;
 
-         c_SupDefNodeContent.q_SendSecurityEnabledState = orc_ApplicationsToWrite[u32_Pos].q_SendSecurityEnabledState;
-         c_SupDefNodeContent.q_SecurityEnabled = orc_ApplicationsToWrite[u32_Pos].q_SecurityEnabled;
+         c_SupDefNodeContent.q_SendSecureAuthenticationEnabledState =
+            orc_ApplicationsToWrite[u32_Pos].q_SendSecureAuthenticationEnabledState;
+         c_SupDefNodeContent.q_SecureAuthenticationEnabled =
+            orc_ApplicationsToWrite[u32_Pos].q_SecureAuthenticationEnabled;
+         c_SupDefNodeContent.q_SendTrafficEncryptionEnabledState =
+            orc_ApplicationsToWrite[u32_Pos].q_SendTrafficEncryptionEnabledState;
+         c_SupDefNodeContent.q_TrafficEncryptionEnabled =
+            orc_ApplicationsToWrite[u32_Pos].q_TrafficEncryptionEnabled;
          c_SupDefNodeContent.q_SendDebuggerEnabledState = orc_ApplicationsToWrite[u32_Pos].q_SendDebuggerEnabledState;
          c_SupDefNodeContent.q_DebuggerEnabled = orc_ApplicationsToWrite[u32_Pos].q_DebuggerEnabled;
       }
@@ -827,6 +831,7 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_CreateDefFilesAndZipSecureFiles(
    std::vector<stw::scl::C_SclString> c_SecDefFilesAbs;
    std::vector<stw::scl::C_SclString> c_NodeFoldersRel;
    std::vector<stw::scl::C_SclString> c_NodeFoldersAbs;
+   const bool q_RequireMinorVersion1 = mh_CheckMinorVersion1Required(orc_ActiveNodes, orc_ApplicationsToWrite);
 
    mh_GetNodeFolderNames(orc_SystemDefinition, orc_PackagePathTmp, c_NodeFoldersAbs, c_NodeFoldersRel);
    mh_GetSydeSecureDefFileNames(orc_SystemDefinition, orc_PackagePathTmp, c_SecDefFilesAbs, c_SecDefFilesRel);
@@ -835,13 +840,13 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_CreateDefFilesAndZipSecureFiles(
                                            c_NodeFoldersAbs, c_SecFiles);
    // create and store 'service_update_package' file
    s32_Return = C_OscSupDefinitionFiler::h_CreateUpdatePackageDefFile(orc_PackagePathTmp, orc_SupDefContent,
-                                                                      c_SecPackageFilesRel);
+                                                                      c_SecPackageFilesRel, q_RequireMinorVersion1);
    if (s32_Return == C_NO_ERR)
    {
       s32_Return = mh_HandleNodeDefCreation(orc_ActiveNodes, c_SecDefFilesAbs, c_SecDefFilesRel, orc_AddSignatureNodes,
                                             static_cast<uint32_t>(orc_SystemDefinition.c_Nodes.size()),
                                             orc_SupDefContent.c_Nodes,
-                                            c_SecFiles);
+                                            c_SecFiles, q_RequireMinorVersion1);
    }
    if (s32_Return == C_NO_ERR)
    {
@@ -956,6 +961,7 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_CreateNodesZip(const std::vector<
    \param[in]      ou32_NodeCount         Node count
    \param[in,out]  orc_SupDefNodes        Sup def nodes
    \param[in,out]  orc_SecFiles           Sec files
+   \param[in]      oq_UseMinorVersion1    Use minor version 1
 
    \return
    STW error codes
@@ -966,8 +972,8 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_CreateNodesZip(const std::vector<
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscSupServiceUpdatePackageCreate::mh_HandleNodeDefCreation(const std::vector<uint8_t> & orc_ActiveNodes,
-                                                                     const std::vector<C_SclString> & orc_SecDefFilesAbs, const std::vector<C_SclString> & orc_SecDefFilesRel, const std::vector<uint8_t> & orc_AddSignatureNodes, const uint32_t ou32_NodeCount, std::vector<C_OscSupNodeDefinition> & orc_SupDefNodes,
-                                                                     std::vector<std::set<C_SclString> > & orc_SecFiles)
+                                                                     const std::vector<C_SclString> & orc_SecDefFilesAbs, const std::vector<C_SclString> & orc_SecDefFilesRel, const std::vector<uint8_t> & orc_AddSignatureNodes, const uint32_t ou32_NodeCount, std::vector<C_OscSupNodeDefinition> & orc_SupDefNodes, std::vector<std::set<C_SclString> > & orc_SecFiles,
+                                                                     const bool oq_UseMinorVersion1)
 {
    int32_t s32_Return;
 
@@ -993,7 +999,7 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_HandleNodeDefCreation(const std::
          }
       }
    }
-   s32_Return = C_OscSupNodeDefinitionFiler::h_SaveNodes(orc_SecDefFilesAbs, orc_SupDefNodes);
+   s32_Return = C_OscSupNodeDefinitionFiler::h_SaveNodes(orc_SecDefFilesAbs, orc_SupDefNodes, oq_UseMinorVersion1);
    //Add new files
    if (s32_Return == C_NO_ERR)
    {
@@ -1213,4 +1219,43 @@ int32_t C_OscSupServiceUpdatePackageCreate::mh_GetPemFileContent(const std::vect
       s32_Retval = C_RD_WR;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check minor version 1 required
+
+   \param[in]  orc_ActiveNodes            Active nodes
+   \param[in]  orc_ApplicationsToWrite    Applications to write
+
+   \return
+   Flags
+
+   \retval   True    Minor version 1 required
+   \retval   False   Minor version 1 not required
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscSupServiceUpdatePackageCreate::mh_CheckMinorVersion1Required(const std::vector<uint8_t> & orc_ActiveNodes,
+                                                                       const std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite)
+{
+   bool q_Retval = false;
+
+   tgl_assert((orc_ApplicationsToWrite.size() == orc_ActiveNodes.size()));
+   if (orc_ApplicationsToWrite.size() == orc_ActiveNodes.size())
+   {
+      for (uint32_t u32_It = 0UL; (u32_It < orc_ApplicationsToWrite.size()) && (q_Retval == false); ++u32_It)
+      {
+         if (orc_ActiveNodes[u32_It] == 1U)
+         {
+            const C_OscSuSequences::C_DoFlash & rc_Application = orc_ApplicationsToWrite[u32_It];
+            if ((rc_Application.q_SendTrafficEncryptionEnabledState == true) ||
+                ((rc_Application.c_PemFile == "") &&
+                 ((rc_Application.q_SendSecureAuthenticationEnabledState == true) ||
+                  (rc_Application.q_SendDebuggerEnabledState == true))))
+            {
+               q_Retval = true;
+            }
+         }
+      }
+   }
+   return q_Retval;
 }

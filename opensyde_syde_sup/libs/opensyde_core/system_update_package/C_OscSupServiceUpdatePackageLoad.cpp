@@ -239,7 +239,7 @@ int32_t C_OscSupServiceUpdatePackageLoad::h_ProcessPackage(const C_SclString & o
                                                                           orc_WarningMessages,
                                                                           orc_ErrorMessage, oq_IsZip);
          }
-         else if (u32_FileVersion == 2U)
+         else if ((u32_FileVersion == 2U) || (u32_FileVersion == 0x102U))
          {
             if (!oq_IsZip)
             {
@@ -262,7 +262,7 @@ int32_t C_OscSupServiceUpdatePackageLoad::h_ProcessPackage(const C_SclString & o
                   s32_Return = mh_UnpackAndLoadNodes(orc_SystemDefinition, c_PackageFiles, c_TargetUnzipPath,
                                                      orc_ActiveNodes, c_UpdatePosition, orc_ApplicationsToWrite,
                                                      orc_NodesUpdateOrder, orc_DecryptNodes, orc_DecryptNodesPassword,
-                                                     orc_NodeSignatureKeys);
+                                                     orc_NodeSignatureKeys, (u32_FileVersion == 0x102U));
                }
             }
          }
@@ -460,6 +460,7 @@ int32_t C_OscSupServiceUpdatePackageLoad::mh_SetNodesUpdateOrder(const map<uint3
    \param[in]      orc_DecryptNodes          list of all nodes contains information which node is decrypted
    \param[in]      orc_DecryptNodesPassword  list of all nodes contains information which node uses which password
    \param[in]      orc_NodeSignatureKeys     list of all nodes contains information which key to use for which node
+   \param[in]      oq_UseMinorVersion1       Use minor version 1
 
    \return
    STW error codes
@@ -477,8 +478,8 @@ int32_t C_OscSupServiceUpdatePackageLoad::mh_UnpackAndLoadNodes(const C_OscSyste
                                                                 const stw::scl::C_SclString & orc_TargetUnzipPath,
                                                                 const std::vector<uint8_t> & orc_ActiveNodes,
                                                                 const std::vector<uint32_t> & orc_UpdatePosition,
-                                                                std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite, std::vector<uint32_t> & orc_NodesUpdateOrder, const std::vector<uint8_t> & orc_DecryptNodes, const std::vector<C_SclString> & orc_DecryptNodesPassword,
-                                                                const std::vector<std::vector<uint8_t> > & orc_NodeSignatureKeys)
+                                                                std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite, std::vector<uint32_t> & orc_NodesUpdateOrder, const std::vector<uint8_t> & orc_DecryptNodes, const std::vector<C_SclString> & orc_DecryptNodesPassword, const std::vector<std::vector<uint8_t> > & orc_NodeSignatureKeys,
+                                                                const bool oq_UseMinorVersion1)
 {
    int32_t s32_Return = mh_CheckCommonSecurityParameters(orc_DecryptNodes, orc_DecryptNodesPassword,
                                                          orc_NodeSignatureKeys,
@@ -508,7 +509,7 @@ int32_t C_OscSupServiceUpdatePackageLoad::mh_UnpackAndLoadNodes(const C_OscSyste
                                       orc_TargetUnzipPath, c_AbsFiles, c_RelFiles);
          s32_Return = C_OscSupNodeDefinitionFiler::h_LoadNodes(c_AbsFiles, c_NodeFoldersAbs, orc_ActiveNodes,
                                                                orc_ApplicationsToWrite, c_UpdateOrderByNodes,
-                                                               orc_UpdatePosition, c_Signatures);
+                                                               orc_UpdatePosition, c_Signatures, oq_UseMinorVersion1);
 
          if (s32_Return == C_NO_ERR)
          {

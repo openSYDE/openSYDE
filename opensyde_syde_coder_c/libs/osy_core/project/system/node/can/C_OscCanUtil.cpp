@@ -10,6 +10,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <cstring>
 #include "stwtypes.hpp"
 #include "C_OscCanUtil.hpp"
 #include "C_OscNodeDataPoolContentUtil.hpp"

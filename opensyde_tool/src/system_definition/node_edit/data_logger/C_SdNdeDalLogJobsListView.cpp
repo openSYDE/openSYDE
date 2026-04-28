@@ -134,6 +134,9 @@ void C_SdNdeDalLogJobsListView::SetSelection(const C_SdNdeDalLogJobsListView::E_
       case eLOGJOB_ADDED: // set selection to the newly added job to the end of the list
          {
             const QModelIndex c_ModelIndex = this->mc_Model.index(static_cast<int32_t>(u32_RowCount - 1), 0);
+            // clear selection, necessary for new items
+            this->selectionModel()->select(c_ModelIndex, QItemSelectionModel::ClearAndSelect);
+            // change focus
             this->setCurrentIndex(c_ModelIndex);
             break;
          }
@@ -198,7 +201,7 @@ void C_SdNdeDalLogJobsListView::LoadSelectedLogJobName(const uint32_t ou32_NodeI
 void C_SdNdeDalLogJobsListView::selectionChanged(const QItemSelection & orc_Selected,
                                                  const QItemSelection & orc_Deselected)
 {
-   const uint32_t u32_SelectedItemCount = this->selectedIndexes().size();
+   const uint32_t u32_SelectedItemCount = static_cast<uint32_t>(this->selectedIndexes().size());
    const uint32_t u32_RowCount = this->mc_Model.rowCount();
 
    // Atleast one list item selected

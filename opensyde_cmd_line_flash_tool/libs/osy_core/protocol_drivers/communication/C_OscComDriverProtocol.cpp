@@ -65,9 +65,9 @@ C_OscComDriverProtocol::C_OscComDriverProtocol(void) :
    mpc_CanTransportProtocolBroadcast(NULL),
    mpc_IpTransportProtocolBroadcast(NULL),
    mpc_SysDef(NULL),
+   mu32_ActiveBusIndex(0U),
    mu32_ActiveNodeCount(0),
    mpc_IpDispatcher(NULL),
-   mu32_ActiveBusIndex(0U),
    mpc_SecurityPemDb(NULL)
 {
    //Check if client and server use same float standard, see #84517 for more details
@@ -105,6 +105,8 @@ C_OscComDriverProtocol::~C_OscComDriverProtocol(void)
    this->mpc_IpDispatcher = NULL;  //do not delete ! not owned by us
    this->mpc_SecurityPemDb = NULL; //do not delete ! not owned by us
    this->mpc_SysDef = NULL;        //do not delete ! not owned by us
+
+   C_OscProtocolSecuritySubLayer::h_ClearAll(); //no longer needed
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,6 +164,9 @@ int32_t C_OscComDriverProtocol::Init(const C_OscSystemDefinition & orc_SystemDef
 
    if (s32_Retval == C_NO_ERR)
    {
+      //clear map with all nodes' traffic encryption configuration
+      C_OscProtocolSecuritySubLayer::h_ClearAll();
+
       this->mu32_ActiveBusIndex = ou32_ActiveBusIndex;
       this->mc_ActiveNodesSystem.clear();
       this->mc_ActiveNodesSystem = orc_ActiveNodes;
@@ -980,7 +985,7 @@ uint32_t C_OscComDriverProtocol::m_GetActiveNodeCount(void) const
 
    If no active node is found that matches the passed absolute index the function will fail with an assertion.
 
-   \param[in]     ou32_NodeIndex    absolute index of node within system description
+   \param[in]     ou32_NodeIndex    absolute index of node within system definition
    \param[out]    opq_Found         Optional flag if server id was found
 
    \return   index of node within list of active nodes
@@ -1413,9 +1418,11 @@ int32_t C_OscComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32_t
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a node into a security level
 
-   \param[in]     ou32_ActiveNode       active node index of vector mc_ActiveNodes
-   \param[in]     ou8_SecurityLevel     level of requested security
-   \param[out]    opu8_NrCode           if != NULL: negative response code
+   \param[in]   ou32_ActiveNode       active node index of vector mc_ActiveNodes
+   \param[in]   ou8_SecurityLevel     level of requested security
+   \param[out]  opu8_NrCode           if != NULL: negative response code
+   \param[out]  opq_SecureAuthenticationActive  if != NULL: true: secure authentication required by server
+   \param[out]  opq_TrafficEncryptionActive     if != NULL: true: traffic encryption required by server
 
    \return
    C_NO_ERR    All nodes set to session successfully
@@ -1430,10 +1437,14 @@ int32_t C_OscComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32_t
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(const uint32_t ou32_ActiveNode, const uint8_t ou8_SecurityLevel,
-                                                        uint8_t * const opu8_NrCode) const
+                                                        uint8_t * const opu8_NrCode,
+                                                        bool * const opq_SecureAuthenticationActive,
+                                                        bool * const opq_TrafficEncryptionActive) const
 {
    C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
-   const int32_t s32_Return = this->m_SetNodeSecurityAccess(pc_ProtocolOsy, ou8_SecurityLevel, opu8_NrCode);
+   const int32_t s32_Return = this->m_SetNodeSecurityAccess(pc_ProtocolOsy, ou8_SecurityLevel, opu8_NrCode,
+                                                            opq_SecureAuthenticationActive,
+                                                            opq_TrafficEncryptionActive);
 
    return s32_Return;
 }
@@ -1448,6 +1459,9 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(const uint32_t ou32_Acti
    \param[in]   opc_ExistingProtocol   Protocol to use for communication
    \param[in]   ou8_SecurityLevel      level of requested security
    \param[out]  opu8_NrCode            if != NULL: negative response code
+   \param[out]  opq_SecureAuthenticationActive  if != NULL: true: secure authentication required by server
+   \param[out]  opq_TrafficEncryptionActive     if != NULL: true: traffic encryption required by server
+
 
    \return
    C_NO_ERR    All nodes set to session successfully
@@ -1457,13 +1471,15 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(const uint32_t ou32_Acti
    C_COM       Communication problem
    C_WARN      Error response
    C_TIMEOUT   Expected response not received within timeout
-   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+   C_CHECKSUM  Security related error
+               (something went wrong while handshaking with the server or when handling encryption parameters)
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy * const opc_ExistingProtocol,
-                                                        const uint8_t ou8_SecurityLevel,
-                                                        uint8_t * const opu8_NrCode) const
+                                                        const uint8_t ou8_SecurityLevel, uint8_t * const opu8_NrCode,
+                                                        bool * const opq_SecureAuthenticationActive,
+                                                        bool * const opq_TrafficEncryptionActive) const
 {
    int32_t s32_Return = C_CONFIG;
 
@@ -1472,13 +1488,22 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
       if (opc_ExistingProtocol != NULL)
       {
          // Set the security level
+         bool q_SecureAuthenticationActive = false;
+         bool q_TrafficEncryptionActive = false;
          bool q_SecureMode;
          uint64_t u64_Seed;
-         uint8_t ou8_SecurityAlgorithm;
+         std::vector<uint8_t> c_TrafficEncryptionInitVector;
          uint8_t u8_NrErrorCode = 0U;
 
+         //new SecurityAccess requested: Preset "needs encryption" to false:
+         tgl_assert(opc_ExistingProtocol->pc_SecuritySubLayer != NULL);
+         opc_ExistingProtocol->pc_SecuritySubLayer->SetEncryptionIsActive(false);
+
          s32_Return = opc_ExistingProtocol->OsySecurityAccessRequestSeed(ou8_SecurityLevel, q_SecureMode, u64_Seed,
-                                                                         ou8_SecurityAlgorithm, &u8_NrErrorCode);
+                                                                         q_SecureAuthenticationActive,
+                                                                         q_TrafficEncryptionActive,
+                                                                         c_TrafficEncryptionInitVector,
+                                                                         &u8_NrErrorCode);
 
          if (opu8_NrCode != NULL)
          {
@@ -1497,125 +1522,193 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
             stw::tgl::TglSleep(1000);
 
             s32_Return = opc_ExistingProtocol->OsySecurityAccessRequestSeed(ou8_SecurityLevel, q_SecureMode, u64_Seed,
-                                                                            ou8_SecurityAlgorithm, opu8_NrCode);
+                                                                            q_SecureAuthenticationActive,
+                                                                            q_TrafficEncryptionActive,
+                                                                            c_TrafficEncryptionInitVector,
+                                                                            opu8_NrCode);
          }
 
          if (s32_Return == C_NO_ERR)
          {
-            if (q_SecureMode == false)
+            if (q_SecureAuthenticationActive == false)
             {
+               //sanity check: L7 should not be possible without authentication; this would be a severe server issue:
                if (ou8_SecurityLevel == 7U)
                {
-                  s32_Return = C_CHECKSUM;
                   osc_write_log_error("Security Access",
-                                      "Unexpected secure mode: disabled. For level 7 secure mode should always be enabled. (No need to use level 7 without secure mode)");
+                                      "Unexpected secure mode: disabled. For level 7 secure authentication mode should always be enabled. (No need to use level 7 without secure mode)");
+                  s32_Return = C_CHECKSUM;
                }
-               else
+               // Seed should be a fixed value:
+               if (u64_Seed != 42U)
                {
-                  const uint32_t u32_KEY = 23U; // fixed in UDS stack for non secure mode
-                  if (u64_Seed != 42U)
-                  {
-                     C_SclString c_Tmp;
-                     c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
-                                          "expected value, expected: 42, got %i", u64_Seed);
-                     // Should be a fixed value too
-                     osc_write_log_warning("Security Access", c_Tmp.c_str());
-                  }
-
-                  s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel, u32_KEY, opu8_NrCode);
+                  //Do not consider this an error: older server implementations could return a value of zero
+                  // to signal that the level was already unlocked. This is described as valid in the UDS standard
+                  // but not on the openSYDE protocol specification. In any case we need to ignore to stay compatible.
+                  const C_SclString c_Tmp =
+                     "Received seed in non secure mode does not match the expected value, expected: 42, got " +
+                     C_SclString::IntToStr(u64_Seed);
+                  osc_write_log_warning("Security Access", c_Tmp.c_str());
                }
+            }
+         }
+
+         if (s32_Return == C_NO_ERR)
+         {
+            //set up SendKey request data depending on security options:
+            //hard-coded authentication key for non-secure operation:
+            const uint32_t u32_THE_NON_SECURE_KEY = 23U;
+            std::vector<uint8_t> c_AuthenticationSignature;
+            std::vector<uint8_t> c_TrafficEncryptionPublicClientKey;
+            std::vector<uint8_t> c_TrafficEncryptionPublicServerKey;
+
+            if (q_SecureMode == false)
+            {
+               //none of the security options are active: use simple variant:
+               s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel, u32_THE_NON_SECURE_KEY,
+                                                                           opu8_NrCode);
             }
             else
             {
-               //check pem database on NULL
-               if (mpc_SecurityPemDb != NULL)
+               if (q_SecureAuthenticationActive == true)
                {
-                  const C_OscSecurityPemKeyInfo * pc_PemKeyInfo = NULL;
-                  if (ou8_SecurityLevel == 7U)
+                  //we need to calculate the proper key based on the challenge we got:
+                  //check pem database on NULL
+                  if (mpc_SecurityPemDb != NULL)
                   {
-                     pc_PemKeyInfo =
-                        this->mpc_SecurityPemDb->GetLevel7PemInformation();
+                     const C_OscSecurityPemKeyInfo * pc_PemKeyInfo = NULL;
+                     if (ou8_SecurityLevel == 7U)
+                     {
+                        pc_PemKeyInfo = this->mpc_SecurityPemDb->GetLevel7PemInformation();
+                     }
+                     else
+                     {
+                        //we need the server's certificate snr to look up the correct key
+                        std::vector<uint8_t> c_CertSnr;
+                        s32_Return = opc_ExistingProtocol->OsyReadAuthenticationCertificateSerialNumber(c_CertSnr,
+                                                                                                        opu8_NrCode);
+
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           //get PEM file by serial number from database
+                           pc_PemKeyInfo = this->mpc_SecurityPemDb->GetPemFileBySerialNumber(c_CertSnr);
+                        }
+                     }
+
+                     if (pc_PemKeyInfo != NULL)
+                     {
+                        std::vector<uint8_t> c_RandomValue;
+                        std::vector<uint8_t> c_PrivKey;
+                        c_AuthenticationSignature.resize(128, 0U);
+                        c_RandomValue.resize(8, 0U);
+
+                        c_RandomValue[0] = static_cast<uint8_t>(u64_Seed >> 56U);
+                        c_RandomValue[1] = static_cast<uint8_t>(u64_Seed >> 48U);
+                        c_RandomValue[2] = static_cast<uint8_t>(u64_Seed >> 40U);
+                        c_RandomValue[3] = static_cast<uint8_t>(u64_Seed >> 32U);
+                        c_RandomValue[4] = static_cast<uint8_t>(u64_Seed >> 24U);
+                        c_RandomValue[5] = static_cast<uint8_t>(u64_Seed >> 16U);
+                        c_RandomValue[6] = static_cast<uint8_t>(u64_Seed >> 8U);
+                        c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
+
+                        //get private authentication key from PEM file:
+                        c_PrivKey = pc_PemKeyInfo->GetPrivateKey();
+
+                        //calculate RSA signature with private key and random value from server (u64_Seed)
+                        s32_Return =
+                           C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_AuthenticationSignature);
+
+                        if ((s32_Return != C_NO_ERR) || (c_AuthenticationSignature.size() != 128U))
+                        {
+                           C_SclString c_Tmp;
+                           c_Tmp.PrintFormatted("Error on calculating RSA signature: %d; signature size: %d",
+                                                s32_Return, static_cast<int32_t>(c_AuthenticationSignature.size()));
+                           osc_write_log_error("Security Access", c_Tmp.c_str());
+                           s32_Return = C_CHECKSUM;
+                        }
+                     }
+                     else
+                     {
+                        if (ou8_SecurityLevel == 7U)
+                        {
+                           osc_write_log_error("Security Access", "No level 7 PEM file found in database.");
+                        }
+                        else
+                        {
+                           osc_write_log_error("Security Access", "No PEM file found for received serial number.");
+                        }
+                        s32_Return = C_CHECKSUM;
+                     }
                   }
                   else
                   {
-                     //we need the server's certificate snr to look up the correct key
-                     std::vector<uint8_t> c_CertSnr;
-                     s32_Return = opc_ExistingProtocol->OsyReadCertificateSerialNumber(c_CertSnr, opu8_NrCode);
-
-                     if (s32_Return == C_NO_ERR)
-                     {
-                        //get PEM file by serial number from database
-                        pc_PemKeyInfo =
-                           this->mpc_SecurityPemDb->GetPemFileBySerialNumber(c_CertSnr);
-                     }
+                     osc_write_log_error("Security Access", "PEM database not initialized.");
+                     s32_Return = C_CONFIG;
                   }
+               }
 
-                  if (pc_PemKeyInfo != NULL)
+               if ((s32_Return == C_NO_ERR) && (q_TrafficEncryptionActive == true))
+               {
+                  //get own public key; we need to sent it to the server
+                  s32_Return = opc_ExistingProtocol->pc_SecuritySubLayer->GetEcdhPublicKey(
+                     c_TrafficEncryptionPublicClientKey);
+                  if (s32_Return != C_NO_ERR)
                   {
-                     std::vector<uint8_t> c_Signature;
-                     std::vector<uint8_t> c_RandomValue;
-                     std::vector<uint8_t> c_PrivKey;
-                     c_Signature.resize(128, 0U);
-                     c_RandomValue.resize(8, 0U);
+                     osc_write_log_error("Security Access",
+                                         "Traffic encryption requested by server. Could not get own ECDH public key.");
+                     s32_Return = C_CHECKSUM;
+                  }
+               }
 
-                     c_RandomValue[0] = static_cast<uint8_t>(u64_Seed >> 56U);
-                     c_RandomValue[1] = static_cast<uint8_t>(u64_Seed >> 48U);
-                     c_RandomValue[2] = static_cast<uint8_t>(u64_Seed >> 40U);
-                     c_RandomValue[3] = static_cast<uint8_t>(u64_Seed >> 32U);
-                     c_RandomValue[4] = static_cast<uint8_t>(u64_Seed >> 24U);
-                     c_RandomValue[5] = static_cast<uint8_t>(u64_Seed >> 16U);
-                     c_RandomValue[6] = static_cast<uint8_t>(u64_Seed >> 8U);
-                     c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
+               //perform the actual service call
+               if (s32_Return == C_NO_ERR)
+               {
+                  //send composed data to server
+                  s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(
+                     ou8_SecurityLevel,
+                     c_AuthenticationSignature,
+                     u32_THE_NON_SECURE_KEY,
+                     c_TrafficEncryptionPublicClientKey,
+                     c_TrafficEncryptionPublicServerKey,
+                     opu8_NrCode);
 
-                     //get private key from PEM file
-                     c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
+                  if (s32_Return != C_NO_ERR)
+                  {
+                     C_SclString c_Tmp;
+                     c_Tmp.PrintFormatted("Error performing SecurityAccess service: %d", s32_Return);
+                     osc_write_log_error("Security Access", c_Tmp.c_str());
+                     s32_Return = C_CHECKSUM;
+                  }
+               }
 
-                     //calculate RSA signature with private key and random value from server (u64_Seed)
-                     s32_Return = C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);
+               //if encryption is on: feed server's public key and init vector to encryption engine
+               if ((s32_Return == C_NO_ERR) && (q_TrafficEncryptionActive == true))
+               {
+                  C_OscProtocolSecuritySubLayer & rc_Ssl = (*opc_ExistingProtocol->pc_SecuritySubLayer);
 
+                  s32_Return = rc_Ssl.SetAesInitVector(c_TrafficEncryptionInitVector);
+                  if (s32_Return != C_NO_ERR)
+                  {
+                     //this should not happen in real life: the only known reason would be an invalid size
+                     // which should be detected by the protocol driver already.
+                     osc_write_log_error("Security Access",
+                                         "Traffic encryption: Could not store received aes init vector.");
+                     s32_Return = C_CHECKSUM;
+                  }
+                  else
+                  {
+                     s32_Return = rc_Ssl.DeriveAesKey(c_TrafficEncryptionPublicServerKey);
                      if (s32_Return != C_NO_ERR)
                      {
-                        C_SclString c_Tmp;
-                        c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
-                        osc_write_log_error("Security Access", c_Tmp.c_str());
+                        osc_write_log_error("Security Access", "Traffic encryption: Could not derive AES key.");
                         s32_Return = C_CHECKSUM;
                      }
                      else
                      {
-                        //sanity check: calculated rsa signature 128 byte long?
-                        if (c_Signature.size() == 128U)
-                        {
-                           //send signature back to server
-                           s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel,
-                                                                                       c_Signature,
-                                                                                       opu8_NrCode);
-                           if (s32_Return != C_NO_ERR)
-                           {
-                              C_SclString c_Tmp;
-                              c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
-                              osc_write_log_error("Security Access", c_Tmp.c_str());
-                              s32_Return = C_CHECKSUM;
-                           }
-                        }
+                        //done here; subsequent traffic needs encryption
+                        rc_Ssl.SetEncryptionIsActive(true);
                      }
                   }
-                  else
-                  {
-                     if (ou8_SecurityLevel == 7U)
-                     {
-                        osc_write_log_error("Security Access", "No level 7 PEM file found in database.");
-                     }
-                     else
-                     {
-                        osc_write_log_error("Security Access", "No PEM file found for received serial number.");
-                     }
-                     s32_Return = C_CHECKSUM;
-                  }
-               }
-               else
-               {
-                  osc_write_log_error("Security Access", "PEM database not initialized.");
-                  s32_Return = C_CONFIG;
                }
             }
          }
@@ -1627,6 +1720,14 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
              (s32_Return != C_CHECKSUM)) //security related error
          {
             s32_Return = C_COM;
+         }
+         if (opq_SecureAuthenticationActive != NULL)
+         {
+            *opq_SecureAuthenticationActive = q_SecureAuthenticationActive;
+         }
+         if (opq_TrafficEncryptionActive != NULL)
+         {
+            *opq_TrafficEncryptionActive = q_TrafficEncryptionActive;
          }
       }
       else
@@ -1772,7 +1873,8 @@ int32_t C_OscComDriverProtocol::m_StartRoutingIp2Ip(const uint32_t ou32_ActiveNo
          uint32_t u32_OsyRoutingTarget;
          bool q_Found;
 
-         if (this->m_IsRoutingSpecificNecessary(this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]])
+         if (this->m_IsRoutingSpecificNecessary(this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode
+                                                                          ]])
              ==
              true)
          {
@@ -2061,6 +2163,7 @@ int32_t C_OscComDriverProtocol::m_StartRouting(const uint32_t ou32_ActiveNode,
                                                uint32_t * const opu32_ErrorActiveNodeIndex)
 {
    int32_t s32_Return = C_NO_ERR;
+   bool q_TrafficEnryptionLegacyRoutingError = false;
 
    if (this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() > 0)
    {
@@ -2128,7 +2231,7 @@ int32_t C_OscComDriverProtocol::m_StartRouting(const uint32_t ou32_ActiveNode,
                {
                   const C_OscRoutingRoutePoint & rc_Point = c_ActRoute.c_VecRoutePoints[u32_CounterRoutePoints];
 
-                  // In case of Ethernet as out interface the ip to ip routing handles this server
+                  // In case of Ethernet as our interface the ip to ip routing handles this server
                   if (rc_Point.e_OutInterfaceType != C_OscSystemBus::eETHERNET)
                   {
                      const uint32_t u32_ActiveRouterNode = this->m_GetActiveIndex(rc_Point.u32_NodeIndex);
@@ -2180,7 +2283,8 @@ int32_t C_OscComDriverProtocol::m_StartRouting(const uint32_t ou32_ActiveNode,
                               if ((u32_SourceBusIndex < this->mpc_SysDef->c_Buses.size()) &&
                                   (rc_PointTarget.u32_OutBusIndex < this->mpc_SysDef->c_Buses.size()))
                               {
-                                 const uint8_t u8_SourceBusId = this->mpc_SysDef->c_Buses[u32_SourceBusIndex].u8_BusId;
+                                 const uint8_t u8_SourceBusId =
+                                    this->mpc_SysDef->c_Buses[u32_SourceBusIndex].u8_BusId;
                                  const uint8_t u8_TargetBusId =
                                     this->mpc_SysDef->c_Buses[rc_PointTarget.u32_OutBusIndex].u8_BusId;
 
@@ -2271,6 +2375,15 @@ int32_t C_OscComDriverProtocol::m_StartRouting(const uint32_t ou32_ActiveNode,
                   {
                      // Start legacy routing
                      s32_Return = pc_RoutingDispatcher->CAN_Init();
+
+                     if ((s32_Return == C_WARN) &&
+                         (pc_RoutingDispatcher->GetNrCodeOfCanInit() ==
+                          C_OscProtocolDriverOsy::hu8_NR_SECURE_DATA_TRANSMISSION_NOT_ALLOWED))
+                     {
+                        // Special case: Routing to a legacy node is not possible if router has traffic encryption
+                        // activated
+                        q_TrafficEnryptionLegacyRoutingError = true;
+                     }
                   }
                }
 
@@ -2320,6 +2433,23 @@ int32_t C_OscComDriverProtocol::m_StartRouting(const uint32_t ou32_ActiveNode,
                           "Error on starting routing to node " + C_SclString::IntToStr(
                              this->mc_ActiveNodesIndexes[ou32_ActiveNode]) + " with error " +
                           C_OscLoggingHandler::h_StwError(s32_Return));
+
+      if (q_TrafficEnryptionLegacyRoutingError == true)
+      {
+         uint32_t u32_TunnelRouter = 0U;
+
+         if (this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() > 0)
+         {
+            u32_TunnelRouter = this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints[
+               this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() - 1].u32_NodeIndex;
+         }
+
+         osc_write_log_error("Start Routing", "This error is caused by following scenario: "
+                             "The openSYDE node " + C_SclString::IntToStr(u32_TunnelRouter) +
+                             ", which is used as router to communicate with the node with "
+                             "the STW Flashloader, has the security feature traffic encryption activated. "
+                             "This scenario is not supported and causes this error.");
+      }
    }
 
    return s32_Return;
@@ -2435,7 +2565,8 @@ void C_OscComDriverProtocol::m_StopRoutingOfActiveNodes(void)
 
          if (rc_ActRoute.c_VecRoutePoints.size() > 0)
          {
-            const C_OscNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ActiveNode]];
+            const C_OscNode * const pc_Node =
+               &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ActiveNode]];
 
             // Stop specific routing of all nodes first. It needs the openSYDE routing if configured
             this->m_StopRoutingSpecific(u32_ActiveNode);
@@ -2661,7 +2792,8 @@ void C_OscComDriverProtocol::m_StopRoutingSpecific(const uint32_t ou32_ActiveNod
       {
          // For the exit we need an other security level
          const uint32_t u32_ActiveRouterNode = this->m_GetActiveIndex(this->mc_Routes[ou32_ActiveNode].
-                                                                      c_VecRoutePoints[this->mc_Routes[ou32_ActiveNode].
+                                                                      c_VecRoutePoints[this->mc_Routes[
+                                                                                          ou32_ActiveNode].
                                                                                        c_VecRoutePoints.size() -
                                                                                        1].u32_NodeIndex);
 
@@ -3072,8 +3204,9 @@ int32_t C_OscComDriverProtocol::m_InitForEthernet(void)
                   {
                      // Exist a dispatcher handle for this router server
                      const std::map<uint32_t,
-                                    uint32_t>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
-                        u32_Ip2IpRouterActiveNodeTargetSide);
+                                    uint32_t>::const_iterator c_IterUniqueIp2IpRouters =
+                        c_ActiveNodeIp2IpRouters.find(
+                           u32_Ip2IpRouterActiveNodeTargetSide);
 
                      if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
                      {
@@ -3200,7 +3333,8 @@ int32_t C_OscComDriverProtocol::m_InitForEthernet(void)
                   {
                      //Invalid configuration = programming error
                      osc_write_log_error("Ethernet initialization", "Could not set broadcast dispatcher. Error Code: " +
-                                         C_SclString::IntToStr(s32_Retval));
+                                         C_SclString::IntToStr(
+                                            s32_Retval));
 
                      s32_Retval = C_OVERFLOW;
                   }
@@ -3295,7 +3429,8 @@ int32_t C_OscComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32_t ou3
                // Search the other 'side'
                for (s32_RoutePointCounter = s32_LastRoutePoint; s32_RoutePointCounter >= 0; --s32_RoutePointCounter)
                {
-                  if (rc_Route.c_VecRoutePoints[s32_RoutePointCounter].e_InInterfaceType == C_OscSystemBus::eETHERNET)
+                  if (rc_Route.c_VecRoutePoints[s32_RoutePointCounter].e_InInterfaceType ==
+                      C_OscSystemBus::eETHERNET)
                   {
                      if ((s32_RoutePointCounter == s32_LastRoutePoint) &&
                          (rc_Route.c_VecRoutePoints[s32_RoutePointCounter].e_OutInterfaceType ==

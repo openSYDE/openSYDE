@@ -229,6 +229,14 @@ void C_SdNdeDalLogJobDataSelectionTableView::AddData(
 void C_SdNdeDalLogJobDataSelectionTableView::selectionChanged(const QItemSelection & orc_Selected,
                                                               const QItemSelection & orc_Deselected)
 {
+   const uint32_t u32_SelectedItemCount = static_cast<uint32_t>(this->selectedIndexes().size());
+
+   // This is applicable when a data item is deleted.
+   if ((u32_SelectedItemCount == 0) && (this->IsEmpty() == false))
+   {
+      this->selectRow(this->currentIndex().row());
+   }
+
    // Calling this method ensures correct item row selection
    C_TblViewScroll::selectionChanged(orc_Selected, orc_Deselected);
 }

@@ -18,6 +18,7 @@
 #include "C_SclString.hpp"
 #include "C_OscNodeDataPoolListElement.hpp"
 #include "C_OscNodeDataPoolDataSet.hpp"
+#include "C_OscSystemNameMaxCharLimitChangeReportItem.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -48,6 +49,8 @@ public:
    void CheckErrorDataSetValue(const uint32_t & oru32_ElementIndex, const uint32_t & oru32_DataSetIndex,
                                bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
                                const uint32_t * const opu32_ArrayIndex) const;
+   void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
+                               std::list<C_OscSystemNameMaxCharLimitChangeReportItem> * const opc_ChangedItems);
 
    int32_t SetCrcFromBigEndianBlob(const std::vector<uint8_t> & orc_Data);
    int32_t SetCrcFromLittleEndianBlob(const std::vector<uint8_t> & orc_Data);

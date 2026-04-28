@@ -85,7 +85,7 @@ private:
                               std::vector<stw::scl::C_SclString> & orc_Names);
    static int32_t mh_CheckDuplicateNames(const stw::scl::C_SclString & orc_Section,
                                          const stw::scl::C_SclString & orc_DomainSingularName,
-                                         std::vector<stw::scl::C_SclString> & orc_Names);
+                                         const std::vector<stw::scl::C_SclString> & orc_Names);
    static stw::scl::C_SclString mh_SafetyModeToString(
       const C_OscHalcDefBase::E_SafetyMode & ore_NodeDataPoolElementAccess);
    static int32_t mh_StringToSafetyMode(const stw::scl::C_SclString & orc_String,

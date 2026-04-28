@@ -13,6 +13,7 @@
 
 #include <QString>
 #include <QApplication>
+#include <QImageReader>
 #include "C_Uti.hpp"
 #include "C_UtiStyleSheets.hpp"
 #include "C_NagMainWindow.hpp"
@@ -59,6 +60,10 @@ int32_t main(int32_t os32_Argc, char_t * opacn_Argv[])
    // turn on the DPI support**
    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+
+   // increase allocation limit for image reading: default is 256MB but we have users with images 11700x7800 which then
+   // leads to allocation size of 11700x7800x4 (RGBA) = 365MB
+   QImageReader::setAllocationLimit(512);
 
    QApplication c_Appl(os32_Argc, opacn_Argv);
 

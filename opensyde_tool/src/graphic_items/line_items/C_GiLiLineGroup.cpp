@@ -923,7 +923,7 @@ bool C_GiLiLineGroup::GetMiddleLine() const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_GiLiLineGroup::GetNumberPoints(void) const
 {
-   return this->mc_Points.size();
+   return static_cast<int32_t>(this->mc_Points.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

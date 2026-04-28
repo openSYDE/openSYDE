@@ -124,8 +124,8 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const uint32_t ou32_NodeIndex, const in
    this->mpc_Ui->pc_LineEditProject->SetDragAndDropActiveForFolder(true);
    this->mpc_Ui->pc_LineEditOutputFile->SetDragAndDropActiveForFile("hex");
 
-   c_CodeGeneratorSupportedFiles.push_back("exe");
-   c_CodeGeneratorSupportedFiles.push_back("bat");
+   c_CodeGeneratorSupportedFiles.append("exe");
+   c_CodeGeneratorSupportedFiles.append("bat");
    this->mpc_Ui->pc_LineEditCodeGenerator->SetDragAndDropActiveForFile(true, &c_CodeGeneratorSupportedFiles);
 
    this->mpc_Ui->pc_LineEditCodeGenerate->SetDragAndDropActiveForFolder(true);
@@ -152,7 +152,7 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const uint32_t ou32_NodeIndex, const in
            &C_SdNdeDbProperties::m_HandleAddDataPools);
    connect(this->mpc_Ui->pc_PushButtonRevertToDefault, &QPushButton::clicked, this,
            &C_SdNdeDbProperties::m_HandleRevertCodeGenerator);
-   connect(this->mpc_Ui->pc_CheckBoxFileGen, &QCheckBox::stateChanged,
+   connect(this->mpc_Ui->pc_CheckBoxFileGen, &QCheckBox::checkStateChanged,
            this, &C_SdNdeDbProperties::m_OnFileGenerationChanged);
 
    // browse actions

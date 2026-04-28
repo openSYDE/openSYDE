@@ -21,6 +21,7 @@
 #include "C_OscCanProtocol.hpp"
 #include "C_OscHalcConfig.hpp"
 #include "C_OscDataLoggerJob.hpp"
+#include "C_OscXappProperties.hpp"
 #include "C_OscCanMessageUniqueId.hpp"
 #include "C_OscCanOpenManagerInfo.hpp"
 
@@ -137,6 +138,7 @@ public:
    void ReCalcCanProtocolDataPoolIndices(void);
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const;
+   bool IsDiagnosisAvailable(const C_OscSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
    uint32_t CountAllLocalMessages(void) const;
    void HandleNameMaxCharLimit(const uint32_t ou32_NameMaxCharLimit,
@@ -167,6 +169,7 @@ public:
    std::map<uint8_t, C_OscCanOpenManagerInfo> c_CanOpenManagers; ///< CANopen managers grouped by their
    ///< according CAN interface ID
    std::vector<C_OscDataLoggerJob> c_DataLoggerJobs; ///< Data logger jobs
+   C_OscXappProperties c_XappProperties;             ///< X-App properties
 
    //constraints imposed by openSYDE protocol:
    static const uint32_t hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE = 32U;

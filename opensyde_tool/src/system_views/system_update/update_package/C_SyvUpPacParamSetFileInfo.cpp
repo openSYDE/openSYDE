@@ -486,9 +486,11 @@ QString C_SyvUpPacParamSetFileInfo::mh_GetVersionString(const uint32_t ou32_Vers
                                                         const uint32_t ou32_VersionByte3)
 {
    const QString c_Retval =
-      static_cast<QString>("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, QChar('0')).arg(ou32_VersionByte2, 2, 10,
-                                                                                      QChar('0')).arg(
-         ou32_VersionByte3, 2, 10, QChar('0'));
+      static_cast<QString>("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, static_cast<QChar>('0')).arg(ou32_VersionByte2, 2,
+                                                                                                   10,
+                                                                                                   static_cast<QChar>(
+                                                                                                      '0')).arg(
+         ou32_VersionByte3, 2, 10, static_cast<QChar>('0'));
 
    return c_Retval;
 }

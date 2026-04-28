@@ -78,7 +78,8 @@ private:
                                         std::vector<uint32_t> & orc_NodesUpdateOrder,
                                         const std::vector<uint8_t> & orc_DecryptNodes,
                                         const std::vector<stw::scl::C_SclString> & orc_DecryptNodesPassword,
-                                        const std::vector<std::vector<uint8_t> > & orc_NodeSignatureKeys);
+                                        const std::vector<std::vector<uint8_t> > & orc_NodeSignatureKeys,
+                                        const bool oq_UseMinorVersion1);
    static int32_t mh_UnpackNodes(const std::vector<uint8_t> & orc_DecryptNodes,
                                  const std::vector<stw::scl::C_SclString> & orc_DecryptNodesPassword,
                                  const uint32_t ou32_NodeCount,

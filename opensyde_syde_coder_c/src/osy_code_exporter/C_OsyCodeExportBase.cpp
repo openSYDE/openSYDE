@@ -26,7 +26,7 @@
 #include "TGLFile.hpp"
 #include "C_OsyCodeExportBase.hpp"
 #include "C_OscUtils.hpp"
-#include "C_OscBinaryHash.hpp"
+#include "C_OscUtilBinaryHash.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -112,7 +112,7 @@ C_SclString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SclString & orc
                             reinterpret_cast<PVOID *>(&pc_Info), //lint !e9176
                             &u32_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+            c_Version.PrintFormatted("V%lu.%02lur%lu", (pc_Info->dwFileVersionMS >> 16U),
                                      pc_Info->dwFileVersionMS & 0x0000FFFFUL,
                                      (pc_Info->dwFileVersionLS >> 16U));
          }
@@ -133,13 +133,16 @@ C_OsyCodeExportBase::~C_OsyCodeExportBase(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up generic code export engine
 
-   Set up class elements and print application information to console
+   Set up class elements and print application information to console and log
+
+   \param[in]   osn_Argc     number of command line arguments
+   \param[in]   oppcn_Argv   command line arguments
 
    \retval eRESULT_OK                      init OK
    \retval eRESULT_ERASE_FILE_LIST_ERROR   could not remove pre-existing file list file
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
+C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(const int32_t os32_Argc, char_t * const * const oppcn_Argv)
 {
    E_ResultCode e_Return = eRESULT_OK;
    char_t acn_ApplicationName[MAX_PATH + 1];
@@ -151,7 +154,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 
    mc_ExeName = acn_ApplicationName;
    mc_ExeVersion = h_GetApplicationVersion(mc_ExeName);
-   mc_BinaryHash = stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash();
+   mc_BinaryHash = stw::opensyde_core::C_OscUtilBinaryHash::h_CreateBinaryHash();
 
    mc_LogFileName = TglChangeFileExtension(mc_ExeName, ".log");
    mc_ListOfFilesFileName = TglChangeFileExtension(mc_ExeName, "") + "_file_list.txt";
@@ -168,6 +171,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    stw::opensyde_core::C_OscLoggingHandler::h_SetWriteToConsoleActive(false);
    stw::opensyde_core::C_OscLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFileName);
    osc_write_log_info("Starting tool", mc_ExeName + " Version: " + mc_ExeVersion + ", MD5-Checksum: " + mc_BinaryHash);
+   osc_write_log_info("Call", "Command line: \"" +
+                      stw::opensyde_core::C_OscUtils::h_GetCommandLineAsString(os32_Argc, oppcn_Argv) + "\"");
 
    //try to remove list-of-files file if it already exists
    if (stw::tgl::TglFileExists(mc_ListOfFilesFileName) == true)

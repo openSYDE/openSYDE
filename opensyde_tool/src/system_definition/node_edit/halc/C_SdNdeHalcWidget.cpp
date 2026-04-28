@@ -877,7 +877,7 @@ void C_SdNdeHalcWidget::m_UpdatePinCount(void) const
             }
             else
             {
-               u32_PinCount += pc_Domain->c_Channels.size();
+               u32_PinCount += static_cast<uint32_t>(pc_Domain->c_Channels.size());
             }
          }
       }

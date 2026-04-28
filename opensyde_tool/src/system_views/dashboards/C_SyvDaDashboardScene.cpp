@@ -401,18 +401,18 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
          */
          QVector<uint32_t> c_OtherIndices;
          //Indices
-         c_OtherIndices.push_back(pc_Dashboard->c_Boundaries.size());
-         c_OtherIndices.push_back(pc_Dashboard->c_TextElements.size());
-         c_OtherIndices.push_back(pc_Dashboard->c_LineArrows.size());
-         c_OtherIndices.push_back(pc_Dashboard->c_Images.size());
-         c_OtherIndices.push_back(pc_Dashboard->GetLabels().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetSpinBoxes().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetSliders().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetProgressBars().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetToggles().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetPieCharts().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetTables().size());
-         c_OtherIndices.push_back(pc_Dashboard->GetParams().size());
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->c_Boundaries.size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->c_TextElements.size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->c_LineArrows.size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->c_Images.size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetLabels().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetSpinBoxes().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetSliders().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetProgressBars().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetToggles().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetPieCharts().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetTables().size()));
+         c_OtherIndices.push_back(static_cast<uint>(pc_Dashboard->GetParams().size()));
          //Ignore deprecated charts
          //Copy labels
          for (u32_ItElem = 0; u32_ItElem < rc_Labels.size(); ++u32_ItElem)
@@ -1025,10 +1025,13 @@ void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active   Flag if connection is active or not active now
+   \param[in]  oq_Active                                 Flag if connection is active or not active now
+   \param[in]  orc_MappingNodeToTrafficEncryptionStatus  Mapping node to traffic encryption status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
+void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                                     bool> & orc_MappingNodeToTrafficEncryptionStatus)
+const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
 
@@ -1038,7 +1041,7 @@ void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
-         pc_Item->ConnectionActiveChanged(oq_Active);
+         pc_Item->ConnectionActiveChanged(oq_Active, orc_MappingNodeToTrafficEncryptionStatus);
       }
    }
 

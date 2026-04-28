@@ -1134,8 +1134,9 @@ int32_t C_OscSupServiceUpdatePackageV1::mh_SupDefParamAdapter(const C_OscSystemD
          const C_SclString c_Tmp = c_Folder + "/" + TglExtractFileName(orc_ApplicationsToWrite[u32_Pos].c_PemFile);
          c_SupDefNodeContent.c_PemFile = c_Tmp;
 
-         c_SupDefNodeContent.q_SendSecurityEnabledState = orc_ApplicationsToWrite[u32_Pos].q_SendSecurityEnabledState;
-         c_SupDefNodeContent.q_SecurityEnabled = orc_ApplicationsToWrite[u32_Pos].q_SecurityEnabled;
+         c_SupDefNodeContent.q_SendSecurityEnabledState =
+            orc_ApplicationsToWrite[u32_Pos].q_SendSecureAuthenticationEnabledState;
+         c_SupDefNodeContent.q_SecurityEnabled = orc_ApplicationsToWrite[u32_Pos].q_SecureAuthenticationEnabled;
          c_SupDefNodeContent.q_SendDebuggerEnabledState = orc_ApplicationsToWrite[u32_Pos].q_SendDebuggerEnabledState;
          c_SupDefNodeContent.q_DebuggerEnabled = orc_ApplicationsToWrite[u32_Pos].q_DebuggerEnabled;
       }
@@ -1304,9 +1305,10 @@ void C_OscSupServiceUpdatePackageV1::mh_LoadPemConfigSection(C_OscSuSequences::C
       if (orc_DoFlash.c_PemFile != "")
       {
          // Only in case of a PEM file, the states are relevant
-         orc_DoFlash.q_SendSecurityEnabledState =
+         orc_DoFlash.q_SendSecureAuthenticationEnabledState =
             orc_XmlParser.GetAttributeBool(mc_PEM_FILE_CONFIG_SEC_SEND_ATTR, false);
-         orc_DoFlash.q_SecurityEnabled = orc_XmlParser.GetAttributeBool(mc_PEM_FILE_CONFIG_SEC_ENAB_ATTR, false);
+         orc_DoFlash.q_SecureAuthenticationEnabled = orc_XmlParser.GetAttributeBool(mc_PEM_FILE_CONFIG_SEC_ENAB_ATTR,
+                                                                                    false);
 
          orc_DoFlash.q_SendDebuggerEnabledState =
             orc_XmlParser.GetAttributeBool(mc_PEM_FILE_CONFIG_DEB_SEND_ATTR, false);

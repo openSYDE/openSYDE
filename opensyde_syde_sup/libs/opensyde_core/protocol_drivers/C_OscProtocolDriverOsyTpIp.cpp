@@ -514,7 +514,7 @@ int32_t C_OscProtocolDriverOsyTpIp::BroadcastSetIpAddress(const C_OscProtocolSer
                            else if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U] == 3U)
                            {
                               m_LogWarningWithHeaderAndIp(
-                                 "SetIpAddress: could not perform action. Node has security activated.",
+                                 "SetIpAddress: could not perform action. Node has security feature activated.",
                                  TGL_UTIL_FUNC_ID, orau8_ResponseIp);
                               if (opu8_ErrorResult != NULL)
                               {
@@ -711,7 +711,7 @@ int32_t C_OscProtocolDriverOsyTpIp::BroadcastSetIpAddressExtended(const C_OscPro
                            else if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U] == 3U)
                            {
                               m_LogWarningWithHeaderAndIp(
-                                 "SetIpAddress: could not perform action. Node has security activated.",
+                                 "SetIpAddress: could not perform action. Node has security feature activated.",
                                  TGL_UTIL_FUNC_ID, orau8_ResponseIp);
                               if (opu8_ErrorResult != NULL)
                               {

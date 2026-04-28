@@ -71,6 +71,7 @@ protected:
    static int32_t mh_SortMessagesByName(stw::opensyde_core::C_OscNode & orc_OscNode, C_PuiSdNode & orc_UiNode);
    uint32_t m_GetHashNode(const uint32_t ou32_NodeIndex) const;
    uint32_t m_GetHashBus(const uint32_t ou32_BusIndex) const;
+   virtual void m_FixDataLoggerTriggerIssues(void) = 0;
    virtual void m_HandleSyncNodeInterfaceChanged(void) = 0;
    virtual void m_HandleSyncNodeInterfaceDeleted(void) = 0;
    virtual void m_HandleSyncNodeRoutingSettingsChanged(void) = 0;

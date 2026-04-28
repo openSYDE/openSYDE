@@ -1457,6 +1457,8 @@ int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(C_OscProtocolDriverOsy
    \param[in]     orc_ServerId      Server id for communication
    \param[in]     oq_SessionOnly    true: only set session; don't set security access
    \param[out]    opu8_NrCode       if != NULL: negative response code
+   \param[out]    opq_SecureAuthenticationActive  if != NULL: true: secure authentication required by server
+   \param[out]    opq_TrafficEncryptionActive     if != NULL: true: traffic encryption required by server
 
    \return
    C_NO_ERR    Session and security access set successfully
@@ -1471,7 +1473,9 @@ int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(C_OscProtocolDriverOsy
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                          const bool oq_SessionOnly, uint8_t * const opu8_NrCode)
+                                                          const bool oq_SessionOnly, uint8_t * const opu8_NrCode,
+                                                          bool * const opq_SecureAuthenticationActive,
+                                                          bool * const opq_TrafficEncryptionActive)
 {
    int32_t s32_Return = C_RANGE;
    bool q_Found = false;
@@ -1485,7 +1489,8 @@ int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(const C_OscProtocolDri
 
       if ((s32_Return == C_NO_ERR) && (oq_SessionOnly == false))
       {
-         s32_Return = this->m_SetNodeSecurityAccess(u32_ActiveNodeIndex, 1, opu8_NrCode);
+         s32_Return = this->m_SetNodeSecurityAccess(u32_ActiveNodeIndex, 1, opu8_NrCode, opq_SecureAuthenticationActive,
+                                                    opq_TrafficEncryptionActive);
       }
    }
    else
@@ -1506,7 +1511,8 @@ int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(const C_OscProtocolDri
 
          if ((s32_Return == C_NO_ERR) && (oq_SessionOnly == false))
          {
-            s32_Return = this->m_SetNodeSecurityAccess(&c_OsyProtocol, 1, opu8_NrCode);
+            s32_Return = this->m_SetNodeSecurityAccess(&c_OsyProtocol, 1, opu8_NrCode, opq_SecureAuthenticationActive,
+                                                       opq_TrafficEncryptionActive);
          }
       }
    }
@@ -1829,7 +1835,7 @@ int32_t C_OscComDriverFlash::SendOsyReadListOfFeatures(const C_OscProtocolDriver
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reads the certificate serial number
+/*! \brief   Reads the authentication certificate serial number
 
    Serial number is a byte array with maximum length of 20 Bytes.
 
@@ -1849,23 +1855,23 @@ int32_t C_OscComDriverFlash::SendOsyReadListOfFeatures(const C_OscProtocolDriver
    C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                                std::vector<uint8_t> & orc_SerialNumber,
-                                                                uint8_t * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadAuthenticationCertificateSerialNumber(
+   const C_OscProtocolDriverOsyNode & orc_ServerId, std::vector<uint8_t> & orc_SerialNumber,
+   uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->OsyReadCertificateSerialNumber(orc_SerialNumber, opu8_NrCode);
+      s32_Return = pc_ExistingProtocol->OsyReadAuthenticationCertificateSerialNumber(orc_SerialNumber, opu8_NrCode);
    }
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reads the certificate serial number for security access level 7
+/*! \brief   Reads the authentication certificate serial number for security access level 7
 
    Serial number is a byte array with maximum length of 20 Bytes.
 
@@ -1885,23 +1891,23 @@ int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumber(const C_OscProto
    C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumberL7(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                                  std::vector<uint8_t> & orc_SerialNumber,
-                                                                  uint8_t * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadAuthenticationCertificateSerialNumberL7(
+   const C_OscProtocolDriverOsyNode & orc_ServerId, std::vector<uint8_t> & orc_SerialNumber,
+   uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->OsyReadCertificateSerialNumberL7(orc_SerialNumber, opu8_NrCode);
+      s32_Return = pc_ExistingProtocol->OsyReadAuthenticationCertificateSerialNumberL7(orc_SerialNumber, opu8_NrCode);
    }
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Writes the public security key with its certificate serial number
+/*! \brief   Writes the public security authentication key with its certificate serial number
 
    Public key modulus is a byte array with a length of 128 Bytes.
    Public key exponent is a byte array with a length of 1 to 4 Bytes containing the exponent (high byte first).
@@ -1926,26 +1932,26 @@ int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumberL7(const C_OscPro
                expectation
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsyWriteSecurityKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                     const std::vector<uint8_t> & orc_PublicKeyModulus,
-                                                     const std::vector<uint8_t> & orc_PublicKeyExponent,
-                                                     const std::vector<uint8_t> & orc_CertificateSerialNumber,
-                                                     uint8_t * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyWriteSecurityAuthenticationKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                   const std::vector<uint8_t> & orc_PublicKeyModulus,
+                                                                   const std::vector<uint8_t> & orc_PublicKeyExponent,
+                                                                   const std::vector<uint8_t> & orc_CertificateSerialNumber,
+                                                                   uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->OsyWriteSecurityKey(orc_PublicKeyModulus, orc_PublicKeyExponent,
-                                                            orc_CertificateSerialNumber, opu8_NrCode);
+      s32_Return = pc_ExistingProtocol->OsyWriteSecurityAuthenticationKey(orc_PublicKeyModulus, orc_PublicKeyExponent,
+                                                                          orc_CertificateSerialNumber, opu8_NrCode);
    }
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reads the certificate serial number
+/*! \brief   Reads the security authentication status
 
    \param[in]  orc_ServerId                 Server id for communication
    \param[out] orq_SecurityOn               read flag if security is on or off on the node
@@ -1963,23 +1969,24 @@ int32_t C_OscComDriverFlash::SendOsyWriteSecurityKey(const C_OscProtocolDriverOs
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsyReadSecurityActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                           bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
-                                                           uint8_t * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadSecurityAuthenticationActivation(
+   const C_OscProtocolDriverOsyNode & orc_ServerId, bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+   uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->OsyReadSecurityActivation(orq_SecurityOn, oru8_SecurityAlgorithm, opu8_NrCode);
+      s32_Return = pc_ExistingProtocol->OsyReadSecurityAuthenticationActivation(orq_SecurityOn, oru8_SecurityAlgorithm,
+                                                                                opu8_NrCode);
    }
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Writes the certificate serial number
+/*! \brief   Writes the security authentication status
 
    \param[in]  orc_ServerId          Server id for communication
    \param[in]  oq_SecurityOn         new flag if security is on or off on the node
@@ -1997,17 +2004,89 @@ int32_t C_OscComDriverFlash::SendOsyReadSecurityActivation(const C_OscProtocolDr
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_OscComDriverFlash::SendOsyWriteSecurityActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
-                                                            const bool oq_SecurityOn,
-                                                            const uint8_t ou8_SecurityAlgorithm,
-                                                            uint8_t * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyWriteSecurityAuthenticationActivation(
+   const C_OscProtocolDriverOsyNode & orc_ServerId, const bool oq_SecurityOn, const uint8_t ou8_SecurityAlgorithm,
+   uint8_t * const opu8_NrCode) const
 {
    int32_t s32_Return = C_RANGE;
    C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->OsyWriteSecurityActivation(oq_SecurityOn, ou8_SecurityAlgorithm, opu8_NrCode);
+      s32_Return = pc_ExistingProtocol->OsyWriteSecurityAuthenticationActivation(oq_SecurityOn, ou8_SecurityAlgorithm,
+                                                                                 opu8_NrCode);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reads the security traffic encryption status
+
+   \param[in]  orc_ServerId                 Server id for communication
+   \param[out] orq_SecurityOn               read flag if security is on or off on the node
+   \param[out] oru8_SecurityAlgorithm       read used security algorithm of the node
+   \param[out] opu8_NrCode                  if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR   Security activation was read successfully
+   C_RANGE    openSYDE protocol not found
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscComDriverFlash::SendOsyReadSecurityTrafficEncryptionActivation(
+   const C_OscProtocolDriverOsyNode & orc_ServerId, bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+   uint8_t * const opu8_NrCode) const
+{
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyReadSecurityTrafficEncryptionActivation(orq_SecurityOn,
+                                                                                   oru8_SecurityAlgorithm,
+                                                                                   opu8_NrCode);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Writes the security traffic encryption status
+
+   \param[in]  orc_ServerId          Server id for communication
+   \param[in]  oq_SecurityOn         new flag if security is on or off on the node
+   \param[in]  ou8_SecurityAlgorithm new used security algorithm of the node
+   \param[out] opu8_NrCode           if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR   Security activation was write successfully
+   C_RANGE    openSYDE protocol not found
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OscComDriverFlash::SendOsyWriteSecurityTrafficEncryptionActivation(
+   const C_OscProtocolDriverOsyNode & orc_ServerId, const bool oq_SecurityOn, const uint8_t ou8_SecurityAlgorithm,
+   uint8_t * const opu8_NrCode) const
+{
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyWriteSecurityTrafficEncryptionActivation(oq_SecurityOn,
+                                                                                    ou8_SecurityAlgorithm,
+                                                                                    opu8_NrCode);
    }
 
    return s32_Return;

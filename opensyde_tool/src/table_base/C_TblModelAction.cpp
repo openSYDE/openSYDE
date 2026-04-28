@@ -149,23 +149,24 @@ uint32_t C_TblModelAction::DeleteSelectedItems(const std::vector<uint32_t> & orc
    std::vector<std::vector<uint32_t> > c_ContiguousSections =
       C_Uti::h_GetContiguousSectionsAscending(orc_SelectedIndices);
    //Start deleting from back (easier to keep indices valid)
-   for (uint32_t u32_ItSection = c_ContiguousSections.size(); u32_ItSection > 0UL; --u32_ItSection)
+   for (uint32_t u32_ItSection = static_cast<uint32_t>(c_ContiguousSections.size()); u32_ItSection > 0UL;
+        --u32_ItSection)
    {
       const std::vector<uint32_t> & rc_Section =
-         c_ContiguousSections[static_cast<std::vector<uint32_t>::size_type>(u32_ItSection - 1UL)];
-      if (rc_Section.size() > 0UL)
+         c_ContiguousSections[static_cast<std::vector<uint32_t>::size_type>(u32_ItSection) - 1UL];
+      if (rc_Section.size() > 0)
       {
          const uint32_t u32_FirstDeletedIndex = rc_Section[0UL];
          const uint32_t u32_LastDeletedIndex =
-            rc_Section[static_cast<std::vector<uint32_t>::size_type>(rc_Section.size() - 1UL)];
+            rc_Section[static_cast<std::vector<uint32_t>::size_type>(rc_Section.size()) - 1UL];
          this->m_BeginRemoveRows(u32_FirstDeletedIndex, u32_LastDeletedIndex);
          //Remove all items in the current section (from back to front -> easier to keep next index valid)
-         for (uint32_t u32_ItItem = rc_Section.size(); u32_ItItem > 0UL; --u32_ItItem)
+         for (uint32_t u32_ItItem = static_cast<uint32_t>(rc_Section.size()); u32_ItItem > 0UL; --u32_ItItem)
          {
             //Only remove item if its index is in range (as its a public interface its probably better to check)
-            if (rc_Section[static_cast<std::vector<uint32_t>::size_type>(u32_ItItem - 1UL)] < this->m_GetSizeItems())
+            if (rc_Section[static_cast<std::vector<uint32_t>::size_type>(u32_ItItem) - 1UL] < this->m_GetSizeItems())
             {
-               this->m_DeleteItem(rc_Section[static_cast<std::vector<uint32_t>::size_type>(u32_ItItem - 1UL)]);
+               this->m_DeleteItem(rc_Section[static_cast<std::vector<uint32_t>::size_type>(u32_ItItem) - 1UL]);
             }
          }
          this->m_EndRemoveRows(u32_FirstDeletedIndex, u32_LastDeletedIndex);
@@ -179,7 +180,7 @@ uint32_t C_TblModelAction::DeleteSelectedItems(const std::vector<uint32_t> & orc
                                                                                           1UL)];
       if (rc_Section.size() > 0UL)
       {
-         u32_Retval = rc_Section[static_cast<std::vector<uint32_t>::size_type>(rc_Section.size() - 1UL)];
+         u32_Retval = rc_Section[rc_Section.size() - 1];
       }
    }
    //Signal number of items changed
@@ -262,7 +263,7 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32_t> & orc_Selec
                const std::vector<uint32_t> & rc_Section = c_ContiguousSections[u32_ItSection];
                q_Continue = false;
                //This still has to happen! (even if we skip that section!)
-               u32_TargetAccessIndex += rc_Section.size();
+               u32_TargetAccessIndex += static_cast<uint32_t>(rc_Section.size());
             }
             else
             {
@@ -293,7 +294,7 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32_t> & orc_Selec
             {
                //Qt interface seems to insert the items before removing anything so the "new position" has to have an
                // bigger offset
-               u32_TargetIndex += rc_Section.size();
+               u32_TargetIndex += static_cast<uint32_t>(rc_Section.size());
                //We insert after removing so this has to be considered
                u32_TargetIndexParam = u32_TargetIndex - 1UL;
             }
@@ -302,7 +303,7 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32_t> & orc_Selec
                                 QModelIndex(), u32_TargetIndex);
             this->m_MoveItems(rc_Section, u32_TargetIndexParam);
             this->endMoveRows();
-            u32_TargetAccessIndex += rc_Section.size();
+            u32_TargetAccessIndex += static_cast<uint32_t>(rc_Section.size());
          }
       }
    }

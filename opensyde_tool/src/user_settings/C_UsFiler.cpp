@@ -251,7 +251,7 @@ void C_UsFiler::mh_SaveNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
    }
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_CanOpenExpandedCanOpenManagerCounter.toStdString().c_str(),
-                        c_Interfaces.size());
+                        static_cast<int32_t>(c_Interfaces.size()));
    uint32_t u32_DevicesCounter = 0UL;
    std::map<uint8_t, bool> c_Devices = orc_Node.GetExpandedCanOpenDevices();
    for (std::map<uint8_t, bool>::const_iterator c_ItDevices = c_Devices.begin();
@@ -268,7 +268,7 @@ void C_UsFiler::mh_SaveNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
    }
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_CanOpenExpandedCanOpenDevicesCounter.toStdString().c_str(),
-                        c_Devices.size());
+                        static_cast<int32_t>(c_Devices.size()));
    uint32_t u32_DeviceCounter = 0UL;
    std::map<std::pair<uint8_t, std::pair<uint8_t, stw::scl::C_SclString> >,
             bool> c_Device = orc_Node.GetExpandedCanOpenDevice();
@@ -297,7 +297,7 @@ void C_UsFiler::mh_SaveNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
    }
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_CanOpenExpandedCanOpenDeviceCounter.toStdString().c_str(),
-                        c_Device.size());
+                        static_cast<int32_t>(c_Device.size()));
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_CanOpenSelectedCanOpenManager.toStdString().c_str(),
                         static_cast<int32_t>(orc_Node.GetSelectedCanOpenManager()));
@@ -328,7 +328,7 @@ void C_UsFiler::mh_SaveNode(C_SclIniFile & orc_Ini, const QString & orc_SectionN
 
    //Datapool count
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_NodeIdDatapoolCount.toStdString().c_str(),
-                        c_DatapoolKeyList.size());
+                        static_cast<int32_t>(c_DatapoolKeyList.size()));
    for (QList<QString>::const_iterator c_ItDatapoolKey = c_DatapoolKeyList.begin();
         c_ItDatapoolKey != c_DatapoolKeyList.end(); ++c_ItDatapoolKey)
    {
@@ -442,7 +442,7 @@ void C_UsFiler::mh_SaveDatapool(C_SclIniFile & orc_Ini, const QString & orc_Sect
 
    //Expanded list names
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DatapoolIdExpandedListNameCount.toStdString().c_str(),
-                        rc_ExpandedListNames.size());
+                        static_cast<int32_t>(rc_ExpandedListNames.size()));
 
    for (uint32_t u32_ItExpandedList = 0; u32_ItExpandedList < rc_ExpandedListNames.size(); ++u32_ItExpandedList)
    {
@@ -457,7 +457,7 @@ void C_UsFiler::mh_SaveDatapool(C_SclIniFile & orc_Ini, const QString & orc_Sect
 
    //Selected list names
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DatapoolIdSelectedListNameCount.toStdString().c_str(),
-                        rc_SelectedListNames.size());
+                        static_cast<int32_t>(rc_SelectedListNames.size()));
 
    for (uint32_t u32_ItSelectedList = 0; u32_ItSelectedList < rc_SelectedListNames.size(); ++u32_ItSelectedList)
    {
@@ -473,7 +473,7 @@ void C_UsFiler::mh_SaveDatapool(C_SclIniFile & orc_Ini, const QString & orc_Sect
    //Selected variable names
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_DatapoolIdSelectedVariableNameCount.toStdString().c_str(),
-                        rc_SelectedVariableNames.size());
+                        static_cast<int32_t>(rc_SelectedVariableNames.size()));
 
    for (uint32_t u32_ItSelectedVariable = 0; u32_ItSelectedVariable < rc_SelectedVariableNames.size();
         ++u32_ItSelectedVariable)
@@ -490,7 +490,7 @@ void C_UsFiler::mh_SaveDatapool(C_SclIniFile & orc_Ini, const QString & orc_Sect
 
    //Interfaces
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
-                        c_DatapoolIdInterfaceCount.toStdString().c_str(), c_Interfaces.size());
+                        c_DatapoolIdInterfaceCount.toStdString().c_str(), static_cast<int32_t>(c_Interfaces.size()));
 
    for (QList<QString>::const_iterator c_ItBusKey = c_Interfaces.begin(); c_ItBusKey != c_Interfaces.end();
         ++c_ItBusKey)
@@ -505,7 +505,7 @@ void C_UsFiler::mh_SaveDatapool(C_SclIniFile & orc_Ini, const QString & orc_Sect
 
    //Lists
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
-                        c_DatapoolIdListCount.toStdString().c_str(), rc_Lists.size());
+                        c_DatapoolIdListCount.toStdString().c_str(), static_cast<int32_t>(rc_Lists.size()));
 
    for (QList<QString>::const_iterator c_ItListKey = rc_Lists.begin(); c_ItListKey != rc_Lists.end();
         ++c_ItListKey)
@@ -668,7 +668,7 @@ void C_UsFiler::mh_SaveView(C_SclIniFile & orc_Ini, const QString & orc_SectionN
 
    // View nodes
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdNodesCount.toStdString().c_str(),
-                        rc_NodesKeyList.size());
+                        static_cast<int32_t>(rc_NodesKeyList.size()));
    s32_Iterator = 0;
    for (QList<QString>::const_iterator c_ItNodesKey = rc_NodesKeyList.begin(); c_ItNodesKey != rc_NodesKeyList.end();
         ++c_ItNodesKey)
@@ -703,7 +703,7 @@ void C_UsFiler::mh_SaveView(C_SclIniFile & orc_Ini, const QString & orc_SectionN
 
    //Dashboard count
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdDashboardCount.toStdString().c_str(),
-                        rc_DashboardKeyList.size());
+                        static_cast<int32_t>(rc_DashboardKeyList.size()));
    s32_Iterator = 0;
    for (QList<QString>::const_iterator c_ItDashboardKey = rc_DashboardKeyList.begin();
         c_ItDashboardKey != rc_DashboardKeyList.end(); ++c_ItDashboardKey)
@@ -744,7 +744,7 @@ void C_UsFiler::mh_SaveDataRatesPerNode(C_SclIniFile & orc_Ini, const QString & 
 
    //Data rate count
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DataRateIdCount.toStdString().c_str(),
-                        rc_UpdateDataRateHistory.size());
+                        static_cast<int32_t>(rc_UpdateDataRateHistory.size()));
    //Per checksum section
    for (QMap<uint32_t, float64_t >::const_iterator c_ItDataRateKey = rc_UpdateDataRateHistory.begin();
         c_ItDataRateKey != rc_UpdateDataRateHistory.end(); ++c_ItDataRateKey)
@@ -794,7 +794,7 @@ void C_UsFiler::mh_SaveViewNode(C_SclIniFile & orc_Ini, const QString & orc_Sect
    //Section expanded flags
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         static_cast<QString>("%1SectionCount").arg(orc_ViewNodeIdBase).toStdString().c_str(),
-                        rc_ExpandedFlags.size());
+                        static_cast<int32_t>(rc_ExpandedFlags.size()));
    for (s32_SectionCounter = 0; s32_SectionCounter < rc_ExpandedFlags.size(); ++s32_SectionCounter)
    {
       c_NodeIdExpandedFlag = static_cast<QString>("%1Section%2").arg(orc_ViewNodeIdBase).arg(s32_SectionCounter);
@@ -1152,7 +1152,8 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
                            orc_UserSettings.GetProjLastSysDefBusTabIndex());
 
       //System definition
-      orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNode_count", c_NodeKeyList.size());
+      orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNode_count",
+                           static_cast<int32_t>(c_NodeKeyList.size()));
 
       for (QList<QString>::const_iterator c_ItNodeKey = c_NodeKeyList.begin(); c_ItNodeKey != c_NodeKeyList.end();
            ++c_ItNodeKey)
@@ -1166,7 +1167,8 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
          ++s32_ItNode;
       }
 
-      orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdBus_count", c_BusKeyList.size());
+      orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdBus_count",
+                           static_cast<int32_t>(c_BusKeyList.size()));
 
       for (QList<QString>::const_iterator c_ItBusKey = c_BusKeyList.begin(); c_ItBusKey != c_BusKeyList.end();
            ++c_ItBusKey)
@@ -1181,7 +1183,8 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       }
 
       //System views
-      orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSvSetupView_count", c_ViewKeyList.size());
+      orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSvSetupView_count",
+                           static_cast<int32_t>(c_ViewKeyList.size()));
 
       for (QList<QString>::const_iterator c_ItViewKey = c_ViewKeyList.begin(); c_ItViewKey != c_ViewKeyList.end();
            ++c_ItViewKey)
@@ -1222,7 +1225,7 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
          orc_UserSettings.GetLastKnownSecureUpdateConfigState());
 
       // Values from Update widget
-      orc_Ini.WriteInteger("Update", "PemFileCount", c_PemFilePaths.size());
+      orc_Ini.WriteInteger("Update", "PemFileCount", static_cast<int32_t>(c_PemFilePaths.size()));
       for (int32_t s32_SectionCounter = 0; s32_SectionCounter < static_cast<int32_t>(c_PemFilePaths.size());
            ++s32_SectionCounter)
       {
@@ -2484,7 +2487,7 @@ void C_UsFiler::mh_SaveColumns(C_SclIniFile & orc_Ini, const QString & orc_Secti
    const QString c_IdColumnCount = static_cast<QString>("%1Column_Count").arg(orc_IdBase);
 
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
-                        c_IdColumnCount.toStdString().c_str(), orc_ColumnWidths.size());
+                        c_IdColumnCount.toStdString().c_str(), static_cast<int32_t>(orc_ColumnWidths.size()));
    for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
    {
       const QString c_IdColumn = static_cast<QString>("%1Column%2").arg(orc_IdBase).arg(u32_ItCol);

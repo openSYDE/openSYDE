@@ -43,8 +43,9 @@ public:
 protected:
    int32_t m_NvmReadListRaw(const C_OscNodeDataPoolList & orc_List, std::vector<uint8_t> & orc_Values,
                             uint8_t * const opu8_NrCode);
-   int32_t m_SaveDumpToList(std::vector<uint8_t> & orc_Values, C_OscNodeDataPoolList & orc_List) const;
-   int32_t m_SaveDumpValuesToListValues(std::vector<uint8_t> & orc_Values, C_OscNodeDataPoolList & orc_List) const;
+   int32_t m_SaveDumpToList(const std::vector<uint8_t> & orc_Values, C_OscNodeDataPoolList & orc_List) const;
+   int32_t m_SaveDumpValuesToListValues(const std::vector<uint8_t> & orc_Values,
+                                        C_OscNodeDataPoolList & orc_List) const;
    static int32_t mh_AdaptProtocolReturnValue(const int32_t os32_ProtReturnValue);
 };
 

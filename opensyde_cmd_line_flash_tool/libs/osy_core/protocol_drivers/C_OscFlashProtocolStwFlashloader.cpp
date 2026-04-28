@@ -50,6 +50,7 @@ using namespace stw::scl;
 //----------------------------------------------------------------------------------------------------------------------
 C_OscFlashProtocolStwFlashloader::C_OscFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress,
                                                                    void * const opv_Instance) :
+   C_DLReportEvents(),
    C_XFLFlashWrite(),
    pr_ReportProgress(opr_Progress),
    pv_ReportProgressInstance(opv_Instance)

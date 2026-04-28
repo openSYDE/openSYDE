@@ -1116,7 +1116,8 @@ int32_t C_PuiSdHandlerHalc::SetHalcDomainChannelParameterConfigElementString(con
 
    \param[in]      ou32_NodeIndex      Node index
    \param[in]      ou32_DomainIndex    Domain index
-   \param[in]      ou32_Channel        Channel
+   \param[in]      ou32_ChannelIndex   Channel index
+   \param[in]      oq_UseChannelIndex  Use channel index
    \param[in,out]  orc_Name            Name
 
    \return
@@ -1125,29 +1126,35 @@ int32_t C_PuiSdHandlerHalc::SetHalcDomainChannelParameterConfigElementString(con
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerHalc::GetHalChannelOrDomainName(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
-                                                      const uint32_t ou32_Channel, QString & orc_Name) const
+                                                      const uint32_t ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                                      QString & orc_Name) const
 {
    int32_t s32_Retval = C_NO_ERR;
-   const C_OscHalcDefChannelDef * const pc_ChannelDef = this->GetHalcDomainFileChannelDataConst(ou32_NodeIndex,
-                                                                                                ou32_DomainIndex,
-                                                                                                ou32_Channel);
+   const C_OscHalcConfigDomain * const pc_Domain = this->GetHalcDomainConfigDataConst(ou32_NodeIndex,
+                                                                                      ou32_DomainIndex);
 
-   if (pc_ChannelDef != NULL)
+   if (pc_Domain != NULL)
    {
-      orc_Name = pc_ChannelDef->c_Name.c_str();
-   }
-   else
-   {
-      const C_OscHalcConfigDomain * const pc_Domain = this->GetHalcDomainConfigDataConst(ou32_NodeIndex,
-                                                                                         ou32_DomainIndex);
-      if (pc_Domain != NULL)
+      if (oq_UseChannelIndex)
       {
-         orc_Name = pc_Domain->c_SingularName.c_str();
+         if (ou32_ChannelIndex < pc_Domain->c_Channels.size())
+         {
+            const C_OscHalcDefChannelDef & rc_Channel = pc_Domain->c_Channels[ou32_ChannelIndex];
+            orc_Name = rc_Channel.c_Name.c_str();
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
       else
       {
-         s32_Retval = C_RANGE;
+         orc_Name = pc_Domain->c_SingularName.c_str();
       }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
    return s32_Retval;
 }

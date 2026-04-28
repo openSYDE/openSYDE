@@ -169,7 +169,7 @@ void C_PopPasswordDialogWidget::HandleMouseMoveEvent(const QMouseEvent * const o
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopPasswordDialogWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_LabHeading->setText(C_GtGetText::h_GetText("SERVICE PROJECT AUTHENTIFICATION"));
+   this->mpc_Ui->pc_LabHeading->setText(C_GtGetText::h_GetText("SERVICE PROJECT AUTHENTICATION"));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
    this->mpc_Ui->pc_PubTogglePwd->setText("");

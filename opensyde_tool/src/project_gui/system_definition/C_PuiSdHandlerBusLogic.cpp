@@ -57,7 +57,7 @@ using namespace stw::opensyde_gui_logic;
 uint32_t C_PuiSdHandlerBusLogic::AddBusAndSort(C_OscSystemBus & orc_OscBus, const C_PuiSdBus & orc_UiBus,
                                                const QString * const opc_Name, const bool oq_AllowBusIdAdaption)
 {
-   const uint32_t u32_Index = mc_CoreDefinition.c_Buses.size();
+   const uint32_t u32_Index = static_cast<uint32_t>(mc_CoreDefinition.c_Buses.size());
 
    if (opc_Name != NULL)
    {
@@ -529,7 +529,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t C_PuiSdHandlerBusLogic::GetOscBusesSize(void) const
 {
-   return this->mc_CoreDefinition.c_Buses.size();
+   return static_cast<uint32_t>(this->mc_CoreDefinition.c_Buses.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1722,7 +1722,7 @@ int32_t C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OscCanMessageIde
                                                                      orc_MessageId.u32_InterfaceIndex,
                                                                      orc_MessageId.u32_DatapoolIndex,
                                                                      orq_NewMessageIsTx,
-                                                                     rc_Messages.size() - 1UL);
+                                                                     static_cast<uint32_t>(rc_Messages.size()) - 1UL);
 
                   u32_SignalStartIndex = pc_UpdatedMessageContainer->GetMessageSignalDataStartIndex(
                      orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex);
@@ -2011,7 +2011,7 @@ int32_t C_PuiSdHandlerBusLogic::AddCanMessage(const uint32_t & oru32_NodeIndex,
    if (pc_MessageContainer != NULL)
    {
       const std::vector<C_OscCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(orq_MessageIsTx);
-      const uint32_t u32_MessageIndex = rc_Messages.size();
+      const uint32_t u32_MessageIndex = static_cast<uint32_t>(rc_Messages.size());
       const C_OscCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex,
                                                              ou32_DatapoolIndex,
                                                              orq_MessageIsTx,
@@ -2108,7 +2108,7 @@ int32_t C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OscCanMessageIdentifica
       {
          //Signal each deleted signal to the sync engine (descending order is important, do this before actually
          // deleting anything)
-         for (uint32_t u32_ItSig = pc_Message->c_Signals.size(); u32_ItSig > 0UL; --u32_ItSig)
+         for (uint32_t u32_ItSig = static_cast<uint32_t>(pc_Message->c_Signals.size()); u32_ItSig > 0UL; --u32_ItSig)
          {
             C_OscNodeDataPoolListElementId c_Id;
             if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, u32_ItSig - 1UL, c_Id) == C_NO_ERR)
@@ -2154,7 +2154,7 @@ int32_t C_PuiSdHandlerBusLogic::AddCanSignal(const C_OscCanMessageIdentification
 
    if (pc_Message != NULL)
    {
-      const uint32_t u32_SignalIndex = pc_Message->c_Signals.size();
+      const uint32_t u32_SignalIndex = static_cast<uint32_t>(pc_Message->c_Signals.size());
       s32_Retval = this->InsertCanSignal(orc_MessageId, u32_SignalIndex, orc_Signal, orc_OscSignalCommon,
                                          orc_UiSignalCommon, orc_UiSignal);
    }
@@ -2246,7 +2246,8 @@ int32_t C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OscCanMessageIdentificat
                         if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                         {
                            C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
-                           if ((u32_SignalIndex + oru32_SignalIndex) <= rc_UiList.c_DataPoolListElements.size())
+                           if ((u32_SignalIndex + oru32_SignalIndex) <=
+                               static_cast<uint32_t>(rc_UiList.c_DataPoolListElements.size()))
                            {
                               rc_UiList.c_DataPoolListElements.insert(
                                  rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex,
@@ -2398,7 +2399,8 @@ int32_t C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OscCanMessageIdentificat
                         if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                         {
                            C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
-                           if ((u32_SignalIndex + oru32_SignalIndex) < rc_UiList.c_DataPoolListElements.size())
+                           if ((u32_SignalIndex + oru32_SignalIndex) <
+                               static_cast<uint32_t>(rc_UiList.c_DataPoolListElements.size()))
                            {
                               rc_UiList.c_DataPoolListElements.erase(
                                  rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex);
@@ -2613,7 +2615,7 @@ int32_t C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OscCanMessageIdentific
             if (c_Message1.c_Signals.size() == c_Message2.c_Signals.size())
             {
                //Step 1: Get position and size in list
-               const uint32_t u32_SignalSize = c_Message1.c_Signals.size();
+               const uint32_t u32_SignalSize = static_cast<uint32_t>(c_Message1.c_Signals.size());
 
                if (u32_SignalSize > 0)
                {
@@ -2637,8 +2639,10 @@ int32_t C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OscCanMessageIdentific
                         orc_MessageId1.q_MessageIsTx, orc_MessageId1.u32_MessageIndex);
                      const uint32_t u32_List2Start = pc_MessageContainer2->GetMessageSignalDataStartIndex(
                         orc_MessageId2.q_MessageIsTx, orc_MessageId2.u32_MessageIndex);
-                     if (((u32_List1Start + u32_SignalSize) <= pc_List1->c_DataPoolListElements.size()) &&
-                         ((u32_List2Start + u32_SignalSize) <= pc_List2->c_DataPoolListElements.size()))
+                     if (((u32_List1Start + u32_SignalSize) <=
+                          static_cast<uint32_t>(pc_List1->c_DataPoolListElements.size())) &&
+                         ((u32_List2Start + u32_SignalSize) <=
+                          static_cast<uint32_t>(pc_List2->c_DataPoolListElements.size())))
                      {
                         for (uint32_t u32_ItSignal = 0; u32_ItSignal < u32_SignalSize; ++u32_ItSignal)
                         {
@@ -2852,8 +2856,8 @@ int32_t C_PuiSdHandlerBusLogic::CountLocalMessages(const uint32_t & oru32_NodeIn
          for (uint32_t u32_ItCont = 0UL; u32_ItCont < rc_Prot.c_ComMessages.size(); ++u32_ItCont)
          {
             const C_OscCanMessageContainer & rc_Cont = rc_Prot.c_ComMessages[u32_ItCont];
-            oru32_MessageCount += rc_Cont.c_RxMessages.size();
-            oru32_MessageCount += rc_Cont.c_TxMessages.size();
+            oru32_MessageCount += static_cast<uint32_t>(rc_Cont.c_RxMessages.size());
+            oru32_MessageCount += static_cast<uint32_t>(rc_Cont.c_TxMessages.size());
          }
       }
    }
@@ -3258,8 +3262,8 @@ int32_t C_PuiSdHandlerBusLogic::m_DeleteUiCanMessage(const C_OscCanMessageIdenti
                            const C_PuiSdNodeCanMessage * const pc_Message = this->GetUiCanMessage(orc_MessageId);
                            if (pc_Message != NULL)
                            {
-                              for (uint32_t u32_ItSignal = pc_Message->c_Signals.size(); u32_ItSignal > 0;
-                                   --u32_ItSignal)
+                              for (uint32_t u32_ItSignal = static_cast<uint32_t>(pc_Message->c_Signals.size());
+                                   u32_ItSignal > 0; --u32_ItSignal)
                               {
                                  rc_UiList.c_DataPoolListElements.erase(
                                     ((rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex) + u32_ItSignal) - 1);

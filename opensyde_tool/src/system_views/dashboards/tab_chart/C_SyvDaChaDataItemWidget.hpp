@@ -60,6 +60,8 @@ public:
    void UpdateMeasurementValue(const E_MeasurementValueState oe_MeasurementValueVariant, const QString & orc_Value);
    void UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError, const bool oq_ErrorActive);
    void ResetError(void);
+   void ConnectionActiveChanged(const bool oq_Active, const QMap<uint32_t,
+                                                                 bool> & orc_MappingNodeToTrafficEncryptionStatus);
    void UpdateTransparency(const int32_t os32_Value) const;
 
    QString GetDataElementName(void) const;
@@ -82,12 +84,19 @@ protected:
    void mousePressEvent(QMouseEvent * const opc_Event) override;
 
 private:
+   enum E_WarningType
+   {
+      eWARNING_INACTIVE,
+      eWARNING_ACTIVE_SECURITY,
+      eWARNING_ACTIVE_PERMANENT
+   };
+
    Ui::C_SyvDaChaDataItemWidget * mpc_Ui;
    const uint32_t mu32_ViewIndex;
    stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId mc_DataPoolElementId;
    uint32_t mu32_DataPoolElementConfigIndex;
    bool mq_Selected;
-   bool mq_Warning;
+   E_WarningType me_Warning;
    bool mq_Error;
    bool mq_Invalid;
 
