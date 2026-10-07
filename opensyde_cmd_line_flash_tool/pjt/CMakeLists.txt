@@ -32,9 +32,17 @@ set(OPENSYDE_CORE_SKIP_PROTOCOL_LOGGING            1)
 set(OPENSYDE_CORE_SKIP_X_CONFIG_GENERATION         1)
 set(OPENSYDE_CORE_SKIP_X_CERTIFICATES_GENERATION   1)
 set(OPENSYDE_CORE_SKIP_SYSTEM_PACKAGE_HANDLING     1)
-set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS             0)
-set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET              0)
 set(OPENSYDE_CORE_SKIP_SECURITY                    1)
+
+if(WIN32)
+   set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS  0)
+   set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET   0)
+   set(OPENSYDE_CORE_SKIP_LINUX_TARGET     1)
+else()
+   set(OPENSYDE_CORE_SKIP_WINDOWS_DRIVERS  1)
+   set(OPENSYDE_CORE_SKIP_WINDOWS_TARGET   1)
+   set(OPENSYDE_CORE_SKIP_LINUX_TARGET     0)
+endif()
 
 # warn a lot
 # Unfortunately forcing C90 by using "-Wc90-c99-compat" or "-std=c89" would (correctly) also prohibit
@@ -77,9 +85,14 @@ add_executable(osy_cmd_line_flash_tool ${OSY_CMD_LINE_FLASH_TOOL_SOURCES})
 # add required libraries
 target_link_libraries(osy_cmd_line_flash_tool
    opensyde_core
-   version
    crypto
 )
+
+if(WIN32)
+   target_link_libraries(osy_syde_coder_c
+      version
+   )
+endif()
 
 # define precompiled headers for core and application
 target_precompile_headers(opensyde_core PRIVATE ${PROJECT_ROOT}/src/precomp_headers.hpp)

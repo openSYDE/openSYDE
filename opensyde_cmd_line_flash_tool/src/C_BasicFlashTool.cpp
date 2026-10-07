@@ -14,7 +14,6 @@
 #include "precomp_headers.hpp"
 
 #include <getopt.h> //note: as we use getopt.h this application is not portable to all compilers
-#include <conio.h>
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -25,6 +24,13 @@
 #include "C_OscUtils.hpp"
 #include "C_BasicUpdateSequence.hpp"
 #include "C_BasicFlashTool.hpp"
+#include "version_config.hpp"
+
+#ifdef _WIN32
+#include <conio.h>
+#else
+#include <stdio.h>
+#endif
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
@@ -70,6 +76,7 @@ C_BasicFlashTool::~C_BasicFlashTool()
 {
    if (this->mpc_CanDispatcher != NULL)
    {
+#ifdef _WIN32
       if (this->mpc_CanDispatcher->DLL_Close() == C_NO_ERR)
       {
          osc_write_log_info("Teardown", "CAN DLL closed.");
@@ -78,6 +85,7 @@ C_BasicFlashTool::~C_BasicFlashTool()
       {
          osc_write_log_info("Teardown", "Failed to close CAN DLL.");
       }
+#endif
 
       delete this->mpc_CanDispatcher;
       this->mpc_CanDispatcher = NULL;
@@ -95,17 +103,13 @@ C_BasicFlashTool::~C_BasicFlashTool()
 //----------------------------------------------------------------------------------------------------------------------
 void C_BasicFlashTool::Init(const int32_t os32_Argc, char_t * const * const oppcn_Argv)
 {
-   char_t acn_ApplicationName[MAX_PATH + 1];
    C_SclString c_LogFile;
    C_TglDateTime c_DateTime;
    C_SclString c_ExeName;
    const C_SclString c_ExeVersion = mh_GetApplicationVersion(TglGetExePath());
    const C_SclString c_BinaryHash = C_OscUtilBinaryHash::h_CreateBinaryHash();
-   const uint32_t u32_Return = GetModuleFileNameA(NULL, &acn_ApplicationName[0], MAX_PATH + 1);
 
-   tgl_assert(u32_Return != 0);
-
-   c_ExeName = acn_ApplicationName;
+   c_ExeName = TglGetExePath();
 
    std::cout << "This is a very simple openSYDE tool for updating one device with one hex file." << std::endl;
    std::cout << "Version: " << c_ExeVersion.c_str() << std::endl;
@@ -339,8 +343,10 @@ C_BasicFlashTool::E_Result C_BasicFlashTool::Flash(void)
 
       osc_write_log_info("Initialization", "CAN DLL path used: " + c_DllPath);
 
+   #ifdef _WIN32
       this->mpc_CanDispatcher->SetDLLName(c_DllPath);
       s32_Return = this->mpc_CanDispatcher->DLL_Open();
+   #endif
       if (s32_Return == C_NO_ERR)
       {
          osc_write_log_info("Initialization", "CAN DLL loaded.");
@@ -449,13 +455,12 @@ C_BasicFlashTool::E_Result C_BasicFlashTool::Flash(void)
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_BasicFlashTool::mh_GetApplicationVersion(const stw::scl::C_SclString & orc_FileName)
 {
+   C_SclString c_Version = "V?.\?\?r?";
+#ifdef _WIN32
    VS_FIXEDFILEINFO * pc_Info;
    uint32_t u32_ValSize;
    int32_t s32_InfoSize;
    uint8_t * pu8_Buffer;
-   C_SclString c_Version;
-
-   c_Version = "V?.\?\?r?";
 
    s32_InfoSize = GetFileVersionInfoSizeA(orc_FileName.c_str(), NULL);
    if (s32_InfoSize != 0)
@@ -475,6 +480,15 @@ C_SclString C_BasicFlashTool::mh_GetApplicationVersion(const stw::scl::C_SclStri
       }
       delete[] pu8_Buffer;
    }
+   #else
+      (void)orc_FileName;
+
+   c_Version.PrintFormatted("V%d.%02dr%d",
+                            PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR,
+                            PROJECT_VERSION_RELEASE);
+
+   return c_Version;
+   #endif
    return c_Version;
 }
 
@@ -518,7 +532,13 @@ void C_BasicFlashTool::m_Pause(void)
       TglSleep(1);
 
       // check user input
-      if (kbhit() > 0)
+      if (
+#if _WIN32
+         kbhit() > 0
+#else
+         getchar() != EOF
+#endif
+      )
       {
          std::cout << "Breaking ...\n" << std::endl;
          q_Stay = false;
